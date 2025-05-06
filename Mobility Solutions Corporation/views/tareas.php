@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprobaciones</title>
-    <link rel="shortcut icon" href="../Imagenes/movility.ico" />
-    <link rel="stylesheet" href="../CSS/tareas.css">
+    <link rel="shortcut icon" href="../Assets/logo_MSC.png" />
+    <link rel="stylesheet" href="../css/tareas.css">
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
