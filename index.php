@@ -1,5 +1,5 @@
 <?php
 
-    echo "Pagina God-Code Ixtlahuacan de los membrillos"
+    echo "Pagina God-Code Ixtlahuacan de los membrillos."
 
 ?>
