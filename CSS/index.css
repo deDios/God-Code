@@ -1,0 +1,189 @@
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html,
+    body {
+        height: 100%;
+        font-family: "Segoe UI", sans-serif;
+        background: #f9f9f9;
+        color: #222;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background-color: white;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 40px;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #0a61d0;
+    }
+
+    .logo-icon {
+        height: 40px;
+        width: auto;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-outline {
+        border: 1px solid #0a61d0;
+        color: #0a61d0;
+        background-color: white;
+    }
+
+    .btn-primary {
+        background-color: #0a61d0;
+        color: white;
+    }
+
+    .subnav {
+        display: flex;
+        gap: 20px;
+        padding: 8px 40px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ddd;
+    }
+
+    .subnav a {
+        text-decoration: none;
+        color: #444;
+        font-weight: 500;
+    }
+
+    main {
+        flex: 1;
+    }
+
+    .section-title {
+        padding: 40px 40px 10px;
+        font-size: 3rem;
+        color: #0a61d0;
+        border-bottom: 2px solid #0a61d0;
+        width: fit-content;
+    }
+
+    .section-subtitle {
+        padding: 10px 40px;
+        font-size: 1.2rem;
+    }
+
+    footer {
+        background-color: #004393;
+        color: white;
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    footer div {
+        margin-bottom: 10px;
+    }
+
+    footer small {
+        display: block;
+        font-size: 0.8rem;
+    }
+
+    /*---------------------------Animaciones para los botones-----------------------------*/
+    /*estos son botones, iconos del tope de pagina*/
+    /* Logo, se hace mas grande*/
+    .logo:hover {
+        color: #094bb0;
+        cursor: pointer;
+    }
+
+    /* Imagen del logo se hace mas grande*/
+    .logo-icon:hover {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+
+    /*el contorno del boton cambia de color*/
+    .btn-outline:hover {
+        background-color: #0a61d0;
+        color: white;
+        transition: 0.3s ease;
+    }
+
+    /*boton principal cambia de color*/
+    .btn-primary:hover {
+        background-color: #094bb0;
+        transition: 0.3s ease;
+    }
+
+    /*Barra de navegacion mas pequeña*/
+    .subnav {
+  display: flex;
+  gap: 20px;
+  padding: 8px 40px;
+  background-color: #f1f1f1;
+  border-top: 1px solid #ddd;
+}
+/* */
+.subnav a {
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+/*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
+.subnav a:hover {
+  background-color: #e0eaff;
+  color: #0a61d0;
+  font-weight: 600;
+}
+
+/*cambia la fuente según que pagina este activa */
+.subnav a.active {
+  color: #0a61d0;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
