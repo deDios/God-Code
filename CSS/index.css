@@ -144,46 +144,67 @@
 
     /*Barra de navegacion mas pequeña*/
     .subnav {
-  display: flex;
-  gap: 20px;
-  padding: 8px 40px;
-  background-color: #f1f1f1;
-  border-top: 1px solid #ddd;
-}
-/* */
-.subnav a {
-  text-decoration: none;
-  color: #444;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 6px 12px;
-  border-radius: 5px;
-}
+        display: flex;
+        gap: 20px;
+        padding: 8px 40px;
+        background-color: #f1f1f1;
+        border-top: 1px solid #ddd;
+    }
 
-/*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
-.subnav a:hover {
-  background-color: #e0eaff;
-  color: #0a61d0;
-  font-weight: 600;
-}
+    /* */
+    .subnav a {
+        text-decoration: none;
+        color: #444;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 5px;
+    }
 
-/*cambia la fuente según que pagina este activa */
-.subnav a.active {
-  color: #0a61d0;
-  font-weight: 700;
-  text-decoration: underline;
-}
+    /*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
+    .subnav a:hover {
+        background-color: #e0eaff;
+        color: #0a61d0;
+        font-weight: 600;
+    }
 
+    /*cambia la fuente según que pagina este activa */
+    .subnav a.active {
+        color: #0a61d0;
+        font-weight: 700;
+        text-decoration: underline;
+    }
 
+    /*css para la vista de mobile*/
 
+    /*el menu de hamburguesa estara oculto por defecto*/
+    .hamburger {
+        display: none;
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 10px 40px;
+        text-align: right;
+        margin-left: auto;
+    }
 
+    /*--------------------------------Resuluciones pequeñas-----------------------------------*/
+    @media (max-width: 700px) {
+        /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
+        .subnav {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px 40px;
+            background-color: #f1f1f1;
+        }
 
+        .hamburger {
+            display: block;
+            color: #0a61d0;
+            margin-left: auto;
+        }
 
-
-
-
-
-
-
-
-
+        .subnav.show {
+            display: flex;
+        }
+    }
