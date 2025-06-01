@@ -1,210 +1,437 @@
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+/*cosas que no estan renderizadas en pantallas de resoluciones grandes*/
+.social-bar-mobile {
+    display: none;
+}
 
-    html,
-    body {
-        height: 100%;
-        font-family: "Segoe UI", sans-serif;
-        background: #f9f9f9;
-        color: #222;
-    }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    body {
-        display: flex;
-        flex-direction: column;
-    }
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Segoe UI", sans-serif;
+    background: #f9f9f9;
+    color: #222;
+}
 
-    header {
-        background-color: white;
-        border-bottom: 1px solid #ddd;
-    }
+body {
+    display: flex;
+    flex-direction: column;
+}
 
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 40px;
-    }
+header {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+}
 
-    .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #0a61d0;
-    }
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background-color: #fff;
+    white-space: nowrap;
+}
 
-    .logo-icon {
-        height: 40px;
-        width: auto;
-        margin-right: 8px;
-        vertical-align: middle;
-    }
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0a61d0;
+}
+
+.logo-icon {
+    height: 40px;
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.user-icon img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+    max-width: 200px;
+}
+
+.btn-outline {
+    border: 1px solid #0a61d0;
+    color: #0a61d0;
+    background-color: white;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #0a61d0;
+    color: white;
+    text-decoration: none;
+}
+
+.subnav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    white-space: nowrap;
+    gap: 20px;
+    padding: 8px 40px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ddd;
+}
+
+.subnav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+}
+
+/*--------------------css para la sección de contenido-----------------------------*/
+
+.innovacion-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem;
+    background: #fff;
+    flex-wrap: wrap;
+}
+
+.columna {
+    flex: 1;
+    min-width: 280px;
+}
+
+.texto h1 {
+    color: #0f62fe;
+    font-size: 2rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+.texto p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.botones {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.imagen img {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.noticias h3 {
+    color: #444;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.noticias ul {
+    list-style: none;
+    padding: 0;
+}
+
+.noticias li {
+    margin-bottom: 1rem;
+}
+
+.noticias a {
+    color: #0f62fe;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.paginacion {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.paginacion a {
+    text-decoration: none;
+    color: #0f62fe;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid transparent;
+}
+
+.paginacion .activo {
+    font-weight: bold;
+    border-bottom: 2px solid #0f62fe;
+}
+
+
+/*---------------------------Animaciones para los botones-----------------------------*/
+/*estos son botones, iconos del tope de pagina*/
+/* Logo, se hace mas grande*/
+.logo:hover {
+    color: #094bb0;
+    cursor: pointer;
+}
+
+/* Imagen del logo se hace mas grande*/
+.logo-icon:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/*el contorno del boton cambia de color*/
+.btn-outline:hover {
+    background-color: #0a61d0;
+    color: white;
+    transition: 0.3s ease;
+}
+
+/*boton principal cambia de color*/
+.btn-primary:hover {
+    background-color: #094bb0;
+    transition: 0.3s ease;
+}
+
+/*Barra de navegacion mas pequeña*/
+.subnav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 5px;
+}
+
+/*----------------css para los iconos de redes sociales-----------------*/
+.subnav .social-icons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    width: 100%;
+    padding-right: 10px;
+}
+
+/* contenedor circular para que no se vea feo */
+.subnav .circle-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* imagen recortada */
+.subnav .circle-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+/* efecto hover sencillo para los iconos */
+.subnav .social-icons img:hover {
+    transform: scale(1.1);
+}
+
+/*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
+.subnav a:hover {
+    background-color: #e0eaff;
+    color: #0a61d0;
+    font-weight: 600;
+}
+
+/*cambia la fuente según que pagina este activa */
+.subnav a.active {
+    color: #0a61d0;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+main {
+    flex: 1;
+}
+
+.section-title {
+    padding: 40px 40px 10px;
+    font-size: 3rem;
+    color: #0a61d0;
+    border-bottom: 2px solid #0a61d0;
+    width: fit-content;
+}
+
+.section-subtitle {
+    padding: 10px 40px;
+    font-size: 1.2rem;
+}
+
+footer {
+    background-color: #004393;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer div {
+    margin-bottom: 10px;
+}
+
+footer small {
+    display: block;
+    font-size: 0.8rem;
+}
+
+/*css para la vista de mobile*/
+
+/*el menu de hamburguesa estara oculto por defecto*/
+.hamburger {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 10px 40px;
+    text-align: right;
+    margin-left: auto;
+}
+
+/*--------------------------------Resuluciones pequeñas-----------------------------------*/
+@media (max-width: 700px) {
 
     .actions {
-        display: flex;
-        gap: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        display: none;
     }
 
     .btn {
-        padding: 6px 16px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-weight: bold;
+        width: 100%;
     }
 
-    .btn-outline {
-        border: 1px solid #0a61d0;
-        color: #0a61d0;
-        background-color: white;
-    }
-
-    .btn-primary {
-        background-color: #0a61d0;
-        color: white;
-    }
-
+    /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
     .subnav {
-        display: flex;
-        gap: 20px;
-        padding: 8px 40px;
-        background-color: #f1f1f1;
-        border-top: 1px solid #ddd;
-    }
-
-    .subnav a {
-        text-decoration: none;
-        color: #444;
-        font-weight: 500;
-    }
-
-    main {
-        flex: 1;
-    }
-
-    .section-title {
-        padding: 40px 40px 10px;
-        font-size: 3rem;
-        color: #0a61d0;
-        border-bottom: 2px solid #0a61d0;
-        width: fit-content;
-    }
-
-    .section-subtitle {
-        padding: 10px 40px;
-        font-size: 1.2rem;
-    }
-
-    footer {
-        background-color: #004393;
-        color: white;
-        padding: 20px 40px;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    footer div {
-        margin-bottom: 10px;
-    }
-
-    footer small {
-        display: block;
-        font-size: 0.8rem;
-    }
-
-    /*---------------------------Animaciones para los botones-----------------------------*/
-    /*estos son botones, iconos del tope de pagina*/
-    /* Logo, se hace mas grande*/
-    .logo:hover {
-        color: #094bb0;
-        cursor: pointer;
-    }
-
-    /* Imagen del logo se hace mas grande*/
-    .logo-icon:hover {
-        transform: scale(1.1);
-        transition: transform 0.3s ease;
-    }
-
-    /*el contorno del boton cambia de color*/
-    .btn-outline:hover {
-        background-color: #0a61d0;
-        color: white;
-        transition: 0.3s ease;
-    }
-
-    /*boton principal cambia de color*/
-    .btn-primary:hover {
-        background-color: #094bb0;
-        transition: 0.3s ease;
-    }
-
-    /*Barra de navegacion mas pequeña*/
-    .subnav {
-        display: flex;
-        gap: 20px;
-        padding: 8px 40px;
-        background-color: #f1f1f1;
-        border-top: 1px solid #ddd;
-    }
-
-    /* */
-    .subnav a {
-        text-decoration: none;
-        color: #444;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 6px 12px;
-        border-radius: 5px;
-    }
-
-    /*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
-    .subnav a:hover {
-        background-color: #e0eaff;
-        color: #0a61d0;
-        font-weight: 600;
-    }
-
-    /*cambia la fuente según que pagina este activa */
-    .subnav a.active {
-        color: #0a61d0;
-        font-weight: 700;
-        text-decoration: underline;
-    }
-
-    /*css para la vista de mobile*/
-
-    /*el menu de hamburguesa estara oculto por defecto*/
-    .hamburger {
         display: none;
-        font-size: 2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 1px 10px;
+        background-color: #f1f1f1;
+    }
+
+    .subnav .social-icons {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+        font-size: 1.8rem;
+        background: none;
+        border: none;
         cursor: pointer;
-        padding: 10px 40px;
-        text-align: right;
         margin-left: auto;
+        padding: 8px;
+        color: #0a61d0;
+        justify-content: left;
     }
 
-    /*--------------------------------Resuluciones pequeñas-----------------------------------*/
-    @media (max-width: 700px) {
-        /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
-        .subnav {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            padding: 10px 40px;
-            background-color: #f1f1f1;
-        }
-
-        .hamburger {
-            display: block;
-            color: #0a61d0;
-            margin-left: auto;
-        }
-
-        .subnav.show {
-            display: flex;
-        }
+    .subnav.show {
+        display: flex;
     }
+
+    /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
+    .social-bar-mobile {
+        display: flex;
+        background-color: white;
+        justify-content: flex-end;
+        padding: 5px 20px;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /*----------------css para los iconos de redes sociales MOBILE-----------------*/
+    .social-bar-mobile .social-icons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+    }
+
+    /*css para el icono mobile de usuario*/
+    .user-icon-mobile img {
+        display: flex;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* contenedor circular para que no se vea feo */
+    .social-bar-mobile .circle-icon-mobile {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* imagen recortada */
+    .social-bar-mobile .circle-icon-mobile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    /* efecto hover sencillo para los iconos */
+    .social-bar-mobile .social-icons img:hover {
+        transform: scale(1.1);
+    }
+
+    /*----------------cosas que no renderizan en MOBILE-----------------*/
+    .actions {
+        display: none;
+    }
+
+    .imagen img {
+        display: none;
+    }
+
+    .noticias {
+        display: none;
+    }
+}
