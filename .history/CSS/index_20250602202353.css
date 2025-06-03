@@ -4,7 +4,7 @@
 }
 
 * {
-    box-sizing: border-box;
+    box-sizing: border-box; 
     margin: 0;
     padding: 0;
 }
@@ -112,7 +112,7 @@ header {
     padding: 8px 12px;
 }
 
-/*-------------------- css para la sección 1 -----------------------------*/
+/*--------------------css para la sección de contenido-----------------------------*/
 
 .innovacion-section {
     display: flex;
@@ -212,7 +212,7 @@ header {
 .paginacion {
     margin-top: auto;
     padding-top: 1rem;
-    margin-top: 300px; /*esto hace que los botones 123 se bajen mas*/
+    margin-top: 160px;
 }
 
 .paginacion a {
@@ -227,213 +227,12 @@ header {
     text-decoration: underline;
 }
 
-/*--------------- css para la seccion 2 ---------------*/
-
-.objetivos {
-    text-align: center;
-    padding: 40px 20px;
-    background-color: #f9f9f9;
-}
-
-.objetivos h2 {
-    font-size: 1.8rem;
-    margin-bottom: 40px;
-}
-
-.cards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.card {
-    background-color: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 250px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card img {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 15px;
-}
-
-.card h3 {
-    font-size: 1.3rem;
-    margin: 10px 0;
-}
-
-.card p {
-    font-size: .8rem;
-    color: #555;
-    font-weight: bold;
-}
-
-.info-button {
-    margin-top: 40px;
-}
+/*--------------- css para la seccion 2 o soluciones de la pagina ---------------*/
 
 
-.info-button button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 25px;
-    background-color: #3367d6;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
 
-.info-button button:hover {
-    background-color: #274c9b;
-}
 
-/*------------------------ css para la seccion 3 --------------------------------------*/
 
-.potencial {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 50px 20px;
-    background-color: #fff;
-}
-
-.potencial h2 {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 50px;
-    color: #111;
-}
-
-.potencial h2 span {
-    color: #1a73e8;
-}
-
-.bloque {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-}
-
-.bloque .imagen {
-    flex: 1 1 80px;
-    text-align: center;
-}
-
-.bloque .imagen img {
-    max-width: 50%;
-    height: auto;
-    border-radius: 16px;
-    background-color: transparent;
-}
-
-.bloque .texto {
-    flex: 2 1 400px;
-}
-
-.bloque .texto h3 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    color: #222;
-}
-
-.bloque .texto p {
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.6;
-}
-
-/*------------------------ css para la seccion 4 --------------------------------------*/
-
-.ayuda {
-    background-color: #f8fbfd;
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    margin: 60px auto;
-    max-width: 800px;
-}
-
-.ayuda h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.ayuda p {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.btn-contacto {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #e8f0fe;
-    color: #1a73e8;
-    border-radius: 999px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* Preguntas frecuentes */
-.faq {
-    max-width: 800px;
-    margin: 60px auto;
-    padding: 0 20px;
-}
-
-.faq h2 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.expandir-todo {
-    float: right;
-    margin-bottom: 10px;
-    background: none;
-    border: none;
-    color: #1a73e8;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.acordeon .item {
-    border-top: 1px solid #ddd;
-}
-
-.pregunta {
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    padding: 15px;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #1a73e8;
-}
-
-.respuesta {
-    padding: 0 15px 15px;
-    display: none;
-    color: #333;
-    font-size: 15px;
-}
 
 /*---------------------------Animaciones para los botones-----------------------------*/
 /*estos son botones / iconos del tope de pagina*/
@@ -576,14 +375,6 @@ footer small {
         display: none;
     }
 
-    .botones {
-        margin-top: 4rem;
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
     .btn {
         width: 100%;
     }
@@ -681,10 +472,6 @@ footer small {
     }
 
     .noticias {
-        display: none;
-    }
-
-    .columna.noticias {
         display: none;
     }
 }

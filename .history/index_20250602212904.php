@@ -71,7 +71,7 @@
     </header>
 
     <main>
-        <!-------------------------- Seccion 1  --------------------------->
+        <!-- Contenido principal -->
         <section class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">

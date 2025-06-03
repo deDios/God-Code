@@ -58,20 +58,20 @@
 
             <div class="social-icons">
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-------------------------- Seccion 1  --------------------------->
+        <!-- Contenido principal -->
         <section class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">

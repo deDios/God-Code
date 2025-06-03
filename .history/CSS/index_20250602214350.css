@@ -212,7 +212,7 @@ header {
 .paginacion {
     margin-top: auto;
     padding-top: 1rem;
-    margin-top: 300px; /*esto hace que los botones 123 se bajen mas*/
+    margin-top: 200px; /*esto hace que los botones 123 se bajen mas*/
 }
 
 .paginacion a {
@@ -270,20 +270,18 @@ header {
 }
 
 .card h3 {
-    font-size: 1.3rem;
+    font-size: 1rem;
     margin: 10px 0;
 }
 
 .card p {
-    font-size: .8rem;
+    font-size: 0.9rem;
     color: #555;
-    font-weight: bold;
 }
 
 .info-button {
     margin-top: 40px;
 }
-
 
 .info-button button {
     padding: 12px 24px;
@@ -293,7 +291,6 @@ header {
     color: white;
     font-size: 1rem;
     cursor: pointer;
-    font-weight: bold;
     transition: background-color 0.3s ease;
 }
 

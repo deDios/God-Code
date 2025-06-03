@@ -12,13 +12,13 @@
     <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas -->
     <div class="social-bar-mobile">
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+            <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
         </div>
         <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
         <div class="user-icon-mobile">
@@ -58,20 +58,20 @@
 
             <div class="social-icons">
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-------------------------- Seccion 1  --------------------------->
+        <!-- Contenido principal -->
         <section class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">
@@ -187,37 +187,31 @@
         <!-------------- seccion 4  ------------------>
 
         <section class="ayuda">
-            <div class="ayuda-contenido">
-                <h2>Permítenos ayudarte.</h2>
-                <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en
-                    Google Ads.</p>
-                <a href="#contacto" class="btn-contacto">Contáctanos pero ya esta el contacto abajo</a>
-            </div>
-        </section>
+  <div class="ayuda-contenido">
+    <h2>Permítenos ayudarte.</h2>
+    <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en Google Ads.</p>
+    <a href="#contacto" class="btn-contacto">Contáctanos</a>
+  </div>
+</section>
 
-        <section class="faq">
-            <h2>Preguntas frecuentes</h2>
+<section class="faq">
+  <h2>Preguntas frecuentes</h2>
 
-            <div class="acordeon">
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas de
-                        Google Ads que puedo ejecutar?</button>
-                    <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según tu
-                        objetivo.</div>
-                </div>
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es adecuada
-                        para mi negocio?</button>
-                    <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
-                    </div>
-                </div>
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
-                    <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                        personalización de anuncios.</div>
-                </div>
-            </div>
-        </section>
+  <div class="acordeon">
+    <div class="item">
+      <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas de Google Ads que puedo ejecutar?</button>
+      <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según tu objetivo.</div>
+    </div>
+    <div class="item">
+      <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es adecuada para mi negocio?</button>
+      <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.</div>
+    </div>
+    <div class="item">
+      <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
+      <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y personalización de anuncios.</div>
+    </div>
+  </div>
+</section>
 
     </main>
 

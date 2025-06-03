@@ -12,13 +12,13 @@
     <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas -->
     <div class="social-bar-mobile">
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+            <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
         </div>
         <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
         <div class="user-icon-mobile">
@@ -58,20 +58,20 @@
 
             <div class="social-icons">
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-------------------------- Seccion 1  --------------------------->
+        <!-- Contenido principal -->
         <section class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">
@@ -191,7 +191,7 @@
                 <h2>Permítenos ayudarte.</h2>
                 <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en
                     Google Ads.</p>
-                <a href="#contacto" class="btn-contacto">Contáctanos pero ya esta el contacto abajo</a>
+                <a href="#contacto" class="btn-contacto">Contáctanos</a>
             </div>
         </section>
 

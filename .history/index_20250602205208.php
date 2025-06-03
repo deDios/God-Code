@@ -12,13 +12,13 @@
     <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas -->
     <div class="social-bar-mobile">
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+            <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
         </div>
         <div class="circle-icon-mobile">
-            <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+            <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
         </div>
         <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
         <div class="user-icon-mobile">
@@ -58,20 +58,20 @@
 
             <div class="social-icons">
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Facebook" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="Instagram" />
                 </div>
                 <div class="circle-icon">
-                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+                    <img src="ASSETS/index/facebook_icon.png" alt="TikTok" />
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-------------------------- Seccion 1  --------------------------->
+        <!-- Contenido principal -->
         <section class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">
@@ -100,7 +100,7 @@
         </section>
 
 
-        <!-------------------------- seccion 2 ---------------------------------->
+        <!-- Siguiente seccion del contenido -->
         <section class="objetivos">
             <h2>Alcanza tus objetivos con las soluciones que tenemos para ti o tu negocio.</h2>
             <div class="cards">
@@ -133,89 +133,6 @@
             </div>
             <div class="info-button">
                 <button>Más información</button>
-            </div>
-        </section>
-
-        <!-------------- seccion 3  ------------------>
-        <section class="potencial">
-            <h2>El potencial de Google <span>para tu negocio</span></h2>
-
-            <div class="bloque">
-                <div class="imagen">
-                    <img src="ASSETS/index/mapa.png" alt="Clientes donde estén">
-                </div>
-                <div class="texto">
-                    <h3>Llega a tus clientes estén donde estén</h3>
-                    <p>
-                        Muestra tus anuncios en el lugar y momento adecuados gracias a Google Ads.
-                        Deja que la automatización de Google encuentre los formatos de anuncio
-                        en YouTube, Discover, la Búsqueda y más para maximizar las conversiones
-                        de tu negocio.
-                    </p>
-                </div>
-            </div>
-
-            <div class="bloque">
-                <div class="imagen">
-                    <img src="ASSETS/index/clipboard.png" alt="Optimiza ROI">
-                </div>
-                <div class="texto">
-                    <h3>Registra, aprende y optimiza el ROI</h3>
-                    <p>
-                        Registra las conversiones para obtener información de tu público objetivo.
-                        La optimización automática del presupuesto de Google te permite captar clientes nuevos
-                        con el ROI más alto.
-                    </p>
-                </div>
-            </div>
-
-            <div class="bloque">
-                <div class="imagen">
-                    <img src="ASSETS/index/dinero.png" alt="Controla tu presupuesto">
-                </div>
-                <div class="texto">
-                    <h3>Controla tu presupuesto</h3>
-                    <p>
-                        Obtén recomendaciones, realiza ajustes y decide tu presupuesto mensual.
-                        La tecnología de Google te permite medir resultados y aprovechar tu inversión
-                        publicitaria de la mejor manera.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-------------- seccion 4  ------------------>
-
-        <section class="ayuda">
-            <div class="ayuda-contenido">
-                <h2>Permítenos ayudarte.</h2>
-                <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en
-                    Google Ads.</p>
-                <a href="#contacto" class="btn-contacto">Contáctanos pero ya esta el contacto abajo</a>
-            </div>
-        </section>
-
-        <section class="faq">
-            <h2>Preguntas frecuentes</h2>
-
-            <div class="acordeon">
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas de
-                        Google Ads que puedo ejecutar?</button>
-                    <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según tu
-                        objetivo.</div>
-                </div>
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es adecuada
-                        para mi negocio?</button>
-                    <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
-                    </div>
-                </div>
-                <div class="item">
-                    <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
-                    <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                        personalización de anuncios.</div>
-                </div>
             </div>
         </section>
 
