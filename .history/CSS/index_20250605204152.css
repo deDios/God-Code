@@ -366,22 +366,13 @@ header.scrolled .subnav {
 .bloque .imagen {
     flex: 1 1 80px;
     text-align: center;
-    padding: 10px;
 }
 
 .bloque .imagen img {
-    max-width: 60%;
+    max-width: 50%;
     height: auto;
     border-radius: 16px;
     background-color: transparent;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-.bloque .imagen img:hover {
-    transform: scale(1.05) rotate(2deg);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .bloque .texto {
@@ -402,30 +393,27 @@ header.scrolled .subnav {
 
 /*------------------------ css para la seccion 4 --------------------------------------*/
 
-.ayuda-faq {
+.ayuda {
     background-color: #f8fbfd;
     border-radius: 20px;
-    padding: 40px 30px;
+    padding: 40px;
     text-align: center;
+    margin: 60px auto;
+    max-width: 800px;
 }
 
-/* Contenido de ayuda */
-.ayuda-faq .ayuda-contenido {
-    margin-bottom: 100px;
-}
-
-.ayuda-faq .ayuda-contenido h2 {
+.ayuda h2 {
     font-size: 28px;
     margin-bottom: 10px;
 }
 
-.ayuda-faq .ayuda-contenido p {
+.ayuda p {
     font-size: 16px;
     color: #555;
     margin-bottom: 20px;
 }
 
-.ayuda-faq .btn-contacto {
+.btn-contacto {
     display: inline-block;
     padding: 10px 20px;
     background-color: #e8f0fe;
@@ -436,22 +424,33 @@ header.scrolled .subnav {
 }
 
 /* Preguntas frecuentes */
-.ayuda-faq .faq {
-    text-align: left;
+.faq {
+    max-width: 800px;
+    margin: 60px auto;
     padding: 0 20px;
 }
 
-.ayuda-faq .faq h2 {
+.faq h2 {
     text-align: center;
     font-size: 24px;
     margin-bottom: 20px;
 }
 
-.ayuda-faq .acordeon .item {
+.expandir-todo {
+    float: right;
+    margin-bottom: 10px;
+    background: none;
+    border: none;
+    color: #1a73e8;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.acordeon .item {
     border-top: 1px solid #ddd;
 }
 
-.ayuda-faq .pregunta {
+.pregunta {
     width: 100%;
     text-align: left;
     background: none;
@@ -463,8 +462,8 @@ header.scrolled .subnav {
     color: #1a73e8;
 }
 
-.ayuda-faq .respuesta {
-    padding: 0 20px 15px;
+.respuesta {
+    padding: 0 15px 15px;
     display: none;
     color: #333;
     font-size: 15px;

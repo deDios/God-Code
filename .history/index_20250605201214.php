@@ -10,64 +10,65 @@
 
 <body>
     <!-- Tope de pagina -->
-    <header id="header">
-        <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
-        <div class="social-bar-mobile">
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Facebook.png" alt="Facebook" />
-            </div>
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Instagram.png" alt="Instagram" />
-            </div>
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
-            </div>
-            <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
-            <div class="user-icon-mobile">
+    <header id="header"></header>
+    <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
+    <div class="social-bar-mobile">
+        <div class="circle-icon-mobile">
+            <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+        </div>
+        <div class="circle-icon-mobile">
+            <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+        </div>
+        <div class="circle-icon-mobile">
+            <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+        </div>
+        <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
+        <div class="user-icon-mobile">
+            <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                alt="Usuario" />
+        </div>
+    </div>
+
+
+    <div class="top-bar" id="top-bar">
+        <div class="logo">
+            <img src="ASSETS/godcode_icon.png" alt="Logo GodCode" class="logo-icon">
+            GodCode
+        </div>
+
+        <!--Boton hamburguesa que aparece segun la resolucion-->
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+        <div class="actions">
+            <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
+            <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
+            <!-- icono de usuario para despues hacer el login -->
+            <div class="user-icon">
                 <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                     alt="Usuario" />
             </div>
         </div>
 
-        <div class="top-bar" id="top-bar">
-            <div class="logo">
-                <img src="ASSETS/godcode_icon.png" alt="Logo GodCode" class="logo-icon">
-                GodCode
+    </div>
+    <!-- Barra de navegación pequeña -->
+    <div id="mobile-menu" class="subnav">
+        <a href="#" class="active">Inicio</a>
+        <a href="#">Productos</a>
+        <a href="#">Quiénes somos</a>
+        <a href="#">Ubicación</a>
+
+        <div class="social-icons">
+            <div class="circle-icon">
+                <img src="ASSETS/index/Facebook.png" alt="Facebook" />
             </div>
-
-            <!--Boton hamburguesa que aparece segun la resolucion-->
-            <div class="hamburger" onclick="toggleMenu()">☰</div>
-
-            <div class="actions">
-                <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
-                <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon">
-                    <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                        alt="Usuario" />
-                </div>
+            <div class="circle-icon">
+                <img src="ASSETS/index/Instagram.png" alt="Instagram" />
             </div>
-
-        </div>
-        <!-- Barra de navegación pequeña -->
-        <div id="mobile-menu" class="subnav">
-            <a href="#" class="active">Inicio</a>
-            <a href="#">Productos</a>
-            <a href="#">Quiénes somos</a>
-            <a href="#">Ubicación</a>
-
-            <div class="social-icons">
-                <div class="circle-icon">
-                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
-                </div>
-                <div class="circle-icon">
-                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
-                </div>
-                <div class="circle-icon">
-                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
-                </div>
+            <div class="circle-icon">
+                <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
             </div>
         </div>
+    </div>
     </header>
 
     <main>
@@ -186,35 +187,35 @@
 
         <!-------------- seccion 4  ------------------>
 
-        <section class="ayuda-faq">
+        <section class="ayuda">
             <div class="ayuda-contenido">
                 <h2>Permítenos ayudarte.</h2>
                 <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en
                     Google Ads.</p>
-                <a href="#contacto" class="btn-contacto">Contáctanos pero ya está el contacto abajo</a>
+                <a href="#contacto" class="btn-contacto">Contáctanos pero ya esta el contacto abajo</a>
             </div>
+        </section>
 
-            <div class="faq">
-                <h2>Preguntas frecuentes</h2>
+        <section class="faq">
+            <h2>Preguntas frecuentes</h2>
 
-                <div class="acordeon">
-                    <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas
-                            de Google Ads que puedo ejecutar?</button>
-                        <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según
-                            tu objetivo.</div>
+            <div class="acordeon">
+                <div class="item">
+                    <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas de
+                        Google Ads que puedo ejecutar?</button>
+                    <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según tu
+                        objetivo.</div>
+                </div>
+                <div class="item">
+                    <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es adecuada
+                        para mi negocio?</button>
+                    <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
                     </div>
-                    <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es
-                            adecuada para mi negocio?</button>
-                        <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
-                        </div>
-                    </div>
-                    <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
-                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                            personalización de anuncios.</div>
-                    </div>
+                </div>
+                <div class="item">
+                    <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
+                    <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
+                        personalización de anuncios.</div>
                 </div>
             </div>
         </section>
