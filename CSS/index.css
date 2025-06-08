@@ -905,80 +905,8 @@ footer small {
     line-height: 1.6;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*--------------------------------Resuluciones pequeñas-----------------------------------*/
 @media (max-width: 700px) {
-
-    .actions {
-        flex-direction: column;
-        align-items: flex-start;
-        display: none;
-    }
-
-    .botones {
-        margin-top: 4rem;
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .btn {
-        width: 100%;
-    }
-
-    /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
-    .subnav {
-        display: none;
-    }
-
-    .subnav .social-icons {
-        display: none;
-    }
-
-    .hamburger {
-        display: flex;
-        font-size: 1.8rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        margin-left: auto;
-        padding: 8px;
-        color: #0a61d0;
-    }
-
-    .subnav.show {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
-
     /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
     .social-bar-mobile {
         display: flex;
@@ -1042,6 +970,50 @@ footer small {
     /* efecto hover sencillo para los iconos */
     .social-bar-mobile .social-icons img:hover {
         transform: scale(1.1);
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: flex-start;
+        display: none;
+    }
+
+    .botones {
+        margin-top: 4rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
+    .subnav {
+        display: none;
+    }
+
+    .subnav .social-icons {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+        font-size: 1.8rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: auto;
+        padding: 8px;
+        color: #0a61d0;
+    }
+
+    .subnav.show {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
     }
 
     /*----------------cosas que no renderizan en MOBILE-----------------*/

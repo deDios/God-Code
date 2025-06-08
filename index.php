@@ -12,20 +12,23 @@
     <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
+        <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
         <div class="social-bar-mobile">
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Facebook.png" alt="Facebook" />
-            </div>
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Instagram.png" alt="Instagram" />
-            </div>
-            <div class="icon-mobile">
-                <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
-            </div>
-            <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
-            <div class="user-icon-mobile">
-                <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                    alt="Usuario" />
+            <div class="social-icons">
+                <div class="icon-mobile">
+                    <img src="ASSETS/index/Facebook.png" alt="Facebook" />
+                </div>
+                <div class="icon-mobile">
+                    <img src="ASSETS/index/Instagram.png" alt="Instagram" />
+                </div>
+                <div class="icon-mobile">
+                    <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
+                </div>
+                <!-- Icono de usuario para login en vista mobile -->
+                <div class="user-icon-mobile">
+                    <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                        alt="Usuario" />
+                </div>
             </div>
         </div>
 
@@ -53,7 +56,7 @@
         <div id="mobile-menu" class="subnav">
             <a href="index.html" class="active">Inicio</a>
             <a href="#">Productos</a>
-            <a href="../VIEW/Nosotros.php" >Quiénes somos</a>
+            <a href="VIEW/Nosotros.php">Quiénes somos</a>
             <a href="#">Ubicación</a>
 
             <div class="social-icons">
