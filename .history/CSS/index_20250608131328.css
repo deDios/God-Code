@@ -147,7 +147,7 @@ header.scrolled .subnav {
     display: flex;
     justify-content: space-between;
     gap: 2rem;
-    padding: 4rem;
+    padding: 2rem;
     background: #fff;
     flex-wrap: wrap;
 }
@@ -178,7 +178,7 @@ header.scrolled .subnav {
 }
 
 .columna.imagen {
-    padding-top: 10px;
+    padding-top: 50px;
 }
 
 .imagen img {
@@ -267,7 +267,7 @@ header.scrolled .subnav {
     text-align: center;
     padding: 40px 20px;
     background-color: #f9f9f9;
-    padding: 6rem;
+    padding-top: 60px;
 }
 
 .objetivos h2 {
@@ -342,7 +342,6 @@ header.scrolled .subnav {
     margin: 0 auto;
     padding: 50px 20px;
     background-color: #fff;
-    padding: 4rem;
 }
 
 .potencial h2 {
@@ -406,8 +405,8 @@ header.scrolled .subnav {
 .ayuda-faq {
     background-color: #f8fbfd;
     border-radius: 20px;
+    padding: 40px 30px;
     text-align: center;
-    padding: 4rem;
 }
 
 /* Contenido de ayuda */
@@ -970,6 +969,7 @@ footer small {
         margin-left: auto;
         padding: 8px;
         color: #0a61d0;
+        justify-content: left;
     }
 
     .subnav.show {

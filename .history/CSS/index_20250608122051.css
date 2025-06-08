@@ -147,7 +147,7 @@ header.scrolled .subnav {
     display: flex;
     justify-content: space-between;
     gap: 2rem;
-    padding: 4rem;
+    padding: 2rem;
     background: #fff;
     flex-wrap: wrap;
 }
@@ -178,7 +178,7 @@ header.scrolled .subnav {
 }
 
 .columna.imagen {
-    padding-top: 10px;
+    padding-top: 50px;
 }
 
 .imagen img {
@@ -267,7 +267,7 @@ header.scrolled .subnav {
     text-align: center;
     padding: 40px 20px;
     background-color: #f9f9f9;
-    padding: 6rem;
+    padding-top: 60px;
 }
 
 .objetivos h2 {
@@ -342,7 +342,6 @@ header.scrolled .subnav {
     margin: 0 auto;
     padding: 50px 20px;
     background-color: #fff;
-    padding: 4rem;
 }
 
 .potencial h2 {
@@ -406,8 +405,8 @@ header.scrolled .subnav {
 .ayuda-faq {
     background-color: #f8fbfd;
     border-radius: 20px;
+    padding: 40px 30px;
     text-align: center;
-    padding: 4rem;
 }
 
 /* Contenido de ayuda */
@@ -817,7 +816,7 @@ footer small {
 }
 
 .proyecto img {
-    width: 80%;
+    width: 100%;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -831,36 +830,7 @@ footer small {
     font-size: 1.05em;
     line-height: 1.6;
 }
-/*para que no se vea feo en dispositivos mobile*/
-@media (max-width: 768px) {
-  .proyectos {
-    padding: 30px 20px;
-  }
 
-  .proyecto {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .proyecto .texto,
-  .proyecto .imagen {
-    flex: 1 1 100%;
-  }
-
-  .proyecto img {
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .proyecto h3 {
-    font-size: 1.5em;
-  }
-
-  .proyecto p {
-    font-size: 1em;
-  }
-}
 /*--------------------------------- seccion 4 ---------------------------------*/
 
 .creciendoJuntos {
@@ -970,12 +940,11 @@ footer small {
         margin-left: auto;
         padding: 8px;
         color: #0a61d0;
+        justify-content: left;
     }
 
     .subnav.show {
         display: flex;
-        flex-direction: column;
-         align-items: flex-end;
     }
 
     /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
