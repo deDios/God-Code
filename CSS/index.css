@@ -64,7 +64,6 @@ header.scrolled .top-bar {
     background-color: #f1f1f1;
     display: flex;
     justify-content: space-around;
-    align-items: center;
     padding: 0.5rem 1rem;
     z-index: 1000;
     white-space: nowrap;
@@ -831,77 +830,79 @@ footer small {
     font-size: 1.05em;
     line-height: 1.6;
 }
+
 /*para que no se vea feo en dispositivos mobile*/
 @media (max-width: 768px) {
-  .proyectos {
-    padding: 30px 20px;
-  }
+    .proyectos {
+        padding: 30px 20px;
+    }
 
-  .proyecto {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+    .proyecto {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
 
-  .proyecto .texto,
-  .proyecto .imagen {
-    flex: 1 1 100%;
-  }
+    .proyecto .texto,
+    .proyecto .imagen {
+        flex: 1 1 100%;
+    }
 
-  .proyecto img {
-    width: 100%;
-    max-width: 400px;
-  }
+    .proyecto img {
+        width: 100%;
+        max-width: 400px;
+    }
 
-  .proyecto h3 {
-    font-size: 1.5em;
-  }
+    .proyecto h3 {
+        font-size: 1.5em;
+    }
 
-  .proyecto p {
-    font-size: 1em;
-  }
+    .proyecto p {
+        font-size: 1em;
+    }
 }
+
 /*--------------------------------- seccion 4 ---------------------------------*/
 
 .creciendoJuntos {
-  background-color: #f9f9f9;
-  padding: 60px 40px;
-  text-align: center;
-  font-family: sans-serif;
+    background-color: #f9f9f9;
+    padding: 60px 40px;
+    text-align: center;
+    font-family: sans-serif;
 }
 
 .creciendoJuntos h2 {
-  font-size: 2.3em;
-  margin-bottom: 40px;
+    font-size: 2.3em;
+    margin-bottom: 40px;
 }
 
 .creciendoJuntos h2 span {
-  color: #1a73e8;
-  font-weight: bold;
+    color: #1a73e8;
+    font-weight: bold;
 }
 
 .creciendoJuntos-contenido {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 40px;
-  text-align: left;
-  max-width: 1000px;
-  margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 40px;
+    text-align: left;
+    max-width: 1000px;
+    margin: auto;
 }
 
 .creciendoJuntos .bloque {
-  flex: 1 1 400px;
+    flex: 1 1 400px;
 }
 
 .creciendoJuntos .bloque h3 {
-  font-size: 1.5em;
-  margin-bottom: 15px;
+    font-size: 1.5em;
+    margin-bottom: 15px;
 }
 
 .creciendoJuntos .bloque p {
-  font-size: 1em;
-  line-height: 1.6;
+    font-size: 1em;
+    line-height: 1.6;
 }
 
 
@@ -975,7 +976,7 @@ footer small {
     .subnav.show {
         display: flex;
         flex-direction: column;
-         align-items: flex-end;
+        align-items: flex-end;
     }
 
     /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
