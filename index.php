@@ -56,7 +56,7 @@
         <div id="mobile-menu" class="subnav">
             <a href="index.html" class="active">Inicio</a>
             <a href="#">Productos</a>
-            <a href="VIEW/Nosotros.php">Quiénes somos</a>
+            <a href="VIEW/Nosotros.php">Nosotros</a>
             <a href="#">Ubicación</a>
 
             <div class="social-icons">
@@ -198,7 +198,7 @@
             </div>
 
             <div class="faq">
-                <h2>Preguntas frecuentes</h2>
+                <h2>Preguntas frecuentes</h2> 
 
                 <div class="acordeon">
                     <div class="item">

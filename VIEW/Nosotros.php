@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../CSS/index.css">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GodCode</title>
+    <link rel="stylesheet" href="../CSS/index.css"/>
 </head>
 
 <body>
@@ -51,9 +51,9 @@
         </div>
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.html">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <a href="#">Productos</a>
-            <a href="../VIEW/Nosotros.php" class="active">Quiénes somos</a>
+            <a href="../VIEW/Nosotros.php" class="active">Nosotros</a>
             <a href="#">Ubicación</a>
 
             <div class="social-icons">
@@ -165,7 +165,7 @@
         <section class="proyectos">
             <h2>Proyectos de <span>GodCode</span></h2>
 
-            <div class="proyecto">
+            <div class="proyecto fila invertida2">
                 <div class="texto">
                     <h3>Mobility solutions</h3>
                     <p>Desarrollamos el sitio web de Mobility Solutions Corp, una empresa especializada en soluciones de
@@ -177,14 +177,14 @@
                         transforma ideas en soluciones digitales sólidas, escalables y enfocadas en el usuario final.
                     </p>
                 </div>
-                <div class="imagen">
-                    <img src="../ASSETS/Nosotros/seccion3_img1.png" alt="Mobility Solutions">
+                <div class="imagenNosotros">
+                    <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Mobility Solutions">
                 </div>
             </div>
 
             <div class="proyecto">
-                <div class="imagen">
-                    <img src="../ASSETS/Nosotros/seccion3_img2.png" alt="Luna Cafe">
+                <div class="imagenNosotros">
+                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Cafe">
                 </div>
                 <div class="texto">
                     <h3>Luna cafe</h3>

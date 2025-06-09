@@ -74,7 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
   mostrarNoticias(paginaActual);
   crearPaginacion();
 });
-
+//seccion 4 de ayuda
+function toggleItem(btn) {
+  const respuesta = btn.nextElementSibling;
+  respuesta.style.display = respuesta.style.display === 'block' ? 'none' : 'block';
+}
 
 
 

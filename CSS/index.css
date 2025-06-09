@@ -146,7 +146,7 @@ header.scrolled .subnav {
     display: flex;
     justify-content: space-between;
     gap: 2rem;
-    padding: 4rem;
+    padding: 4rem 2rem;
     background: #fff;
     flex-wrap: wrap;
 }
@@ -154,6 +154,7 @@ header.scrolled .subnav {
 .columna {
     flex: 1;
     min-width: 280px;
+    padding: 1.5rem;
 }
 
 .texto h1 {
@@ -177,14 +178,16 @@ header.scrolled .subnav {
 }
 
 .columna.imagen {
-    padding-top: 10px;
+    padding: 1.5rem;
 }
 
 .imagen img {
     width: 100%;
     max-width: 100%;
     border-radius: 20px;
+    object-fit: cover;
 }
+
 
 /*-------------------------------- css para noticias -----------------------*/
 .columna.noticias {
@@ -606,14 +609,14 @@ footer small {
 /*--------------------------------------------------------------------------VIEW NOSOTROS---------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 .nosotros {
-    padding: 60px 20px;
+    padding: 80px 30px;
     margin: auto;
-    background-color: white;
+    background-color: #fff;
 }
 
 .nosotros-titulo {
     text-align: center;
-    font-size: 24px;
+    font-size: 2.2rem;
     font-weight: bold;
     color: #002244;
     margin-bottom: 60px;
@@ -627,13 +630,14 @@ footer small {
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 60px;
-    gap: 40px;
+    justify-content: center;
+    gap: 20px;
     flex-wrap: wrap;
-    padding: 30px;
-    border-radius: 20px;
+    padding: 40px;
     overflow: hidden;
+    max-width: 1280px;
+    width: 100%;
+    margin: auto;
 }
 
 .fila.normal {
@@ -647,7 +651,6 @@ footer small {
 .imagen-nosotros {
     width: 45%;
     max-width: 500px;
-    border-radius: 15px;
     z-index: 1;
 }
 
@@ -655,18 +658,19 @@ footer small {
     flex: 1;
     z-index: 1;
     min-width: 280px;
+    padding: 10px;
 }
 
 .texto-nosotros h3 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: #111;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #0d1a26;
 }
 
 .texto-nosotros p {
-    font-size: 15px;
-    color: #333;
-    line-height: 1.5;
+    font-size: 1.05rem;
+    color: #444;
+    line-height: 1.7;
 }
 
 .decoracion {
@@ -684,14 +688,20 @@ footer small {
     .bloque-nosotros {
         flex-direction: column !important;
         text-align: center;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
     }
 
     .imagen-nosotros {
         width: 100%;
+        max-width: 400px;
+        margin-bottom: 20px;
     }
 
     .texto-nosotros {
         width: 100%;
+        max-width: 600px;
     }
 }
 
@@ -778,13 +788,41 @@ footer small {
     color: #1a1a1a;
 }
 
+@media (max-width: 768px) {
+  .slide {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .slide .texto,
+  .slide .imagen {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .slide .imagen img {
+    margin: 0 auto;
+    max-width: 300px;
+  }
+
+  .slide .texto p {
+    font-size: 1.1rem;
+  }
+
+  .slide .texto span {
+    font-size: 0.85rem;
+  }
+}
+
 /*----------------------------------------------- sseccion 3 ---------------------------------------*/
 
 .proyectos {
     background: white;
-    padding: 50px;
+    padding: 60px 30px;
     margin: auto;
-    font-family: sans-serif;
 }
 
 .proyectos h2 {
@@ -799,68 +837,77 @@ footer small {
 }
 
 .proyecto {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto 80px auto;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 80px;
-    gap: 30px;
+    gap: 40px;
+    text-align: center;
 }
 
 .proyecto .texto {
-    flex: 1 1 45%;
+    flex: 1 1 500px;
+    max-width: 600px;
 }
 
 .proyecto .imagen {
-    flex: 1 1 45%;
+    flex: 1 1 400px;
+    max-width: 600px;
 }
 
 .proyecto img {
     width: 80%;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .proyecto h3 {
     font-size: 1.8em;
     margin-bottom: 15px;
+    color: #222;
 }
 
 .proyecto p {
     font-size: 1.05em;
     line-height: 1.6;
+    color: #444;
 }
 
-/*para que no se vea feo en dispositivos mobile*/
+/* Responsive */
 @media (max-width: 768px) {
+
     .proyectos {
-        padding: 30px 20px;
+        padding: 40px 20px;
     }
 
     .proyecto {
         flex-direction: column;
-        align-items: center;
         text-align: center;
+        gap: 30px;
     }
 
     .proyecto .texto,
-    .proyecto .imagen {
+    .proyecto .imagenNosotros {
         flex: 1 1 100%;
-    }
-
-    .proyecto img {
         width: 100%;
         max-width: 400px;
+        margin: 0 auto;
     }
 
     .proyecto h3 {
-        font-size: 1.5em;
+        font-size: 1.6em;
     }
 
     .proyecto p {
         font-size: 1em;
     }
+    /*esto esta para que se invierta el primer proyecto de godcode en resoluciones pequeñas y no se vea mal.*/
+    .fila.invertida2 {
+        flex-direction: column-reverse;
+    }
 }
+
 
 /*--------------------------------- seccion 4 ---------------------------------*/
 
@@ -907,6 +954,7 @@ footer small {
 
 /*--------------------------------Resuluciones pequeñas-----------------------------------*/
 @media (max-width: 700px) {
+
     /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
     .social-bar-mobile {
         display: flex;
@@ -914,7 +962,7 @@ footer small {
         gap: 15px;
         padding: 5px 20px;
         width: 100%;
-        background-color: white;
+        background-color: #f1f1f1;
         position: fixed;
         top: 86px;
         z-index: 999;
