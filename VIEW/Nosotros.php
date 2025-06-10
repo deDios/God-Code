@@ -25,7 +25,7 @@
             <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
             <div class="user-icon-mobile">
                 <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                    alt="Usuario" />
+                    alt="Usuario" href="../VIEW/Login.php" />
             </div>
         </div>
 
@@ -44,7 +44,7 @@
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                        alt="Usuario" />
+                        alt="Usuario" href="../VIEW/Login.php" />
                 </div>
             </div>
 
