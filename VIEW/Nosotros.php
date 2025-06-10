@@ -23,9 +23,9 @@
                 <img src="../ASSETS/index/Tiktok.png" alt="TikTok" />
             </div>
             <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
-            <div class="user-icon-mobile">
+            <div class="user-icon-mobile" onclick="window.location.href='../VIEW/Login.php'">
                 <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                    alt="Usuario" href="../VIEW/Login.php" />
+                    alt="Usuario"/>
             </div>
         </div>
 
@@ -42,7 +42,7 @@
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon">
+                <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'" >
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                         alt="Usuario" href="../VIEW/Login.php" />
                 </div>
@@ -77,7 +77,7 @@
             <h2 class="nosotros-titulo">En <span>GOD CODE</span> desarrollamos proyectos web para tu negocio</h2>
 
             <!-- Acerca de nosotros -->
-            <div class="bloque-nosotros fila normal">
+            <div class="bloque-nosotros fila normal animado">
                 <div class="decoracion"></div>
                 <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros" class="imagen-nosotros">
                 <div class="texto-nosotros">
@@ -89,7 +89,7 @@
             </div>
 
             <!-- Nuestra misión -->
-            <div class="bloque-nosotros fila invertida">
+            <div class="bloque-nosotros fila invertida animado">
                 <div class="decoracion"></div>
                 <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión" class="imagen-nosotros">
                 <div class="texto-nosotros">
@@ -102,7 +102,7 @@
             </div>
 
             <!-- Nuestra historia -->
-            <div class="bloque-nosotros fila normal">
+            <div class="bloque-nosotros fila normal animado">
                 <div class="decoracion"></div>
                 <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia" class="imagen-nosotros">
                 <div class="texto-nosotros">
@@ -165,7 +165,7 @@
         <section class="proyectos">
             <h2>Proyectos de <span>GodCode</span></h2>
 
-            <div class="proyecto fila invertida2">
+            <div class="proyecto fila invertida2 animado">
                 <div class="texto">
                     <h3>Mobility solutions</h3>
                     <p>Desarrollamos el sitio web de Mobility Solutions Corp, una empresa especializada en soluciones de
@@ -182,7 +182,7 @@
                 </div>
             </div>
 
-            <div class="proyecto">
+            <div class="proyecto animado">
                 <div class="imagenNosotros">
                     <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Cafe">
                 </div>

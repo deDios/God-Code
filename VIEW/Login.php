@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../CSS/index.css" />
 </head>
 
-<body>
+<body> 
     <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
@@ -23,7 +23,7 @@
                 <img src="../ASSETS/index/Tiktok.png" alt="TikTok" />
             </div>
             <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
-            <div class="user-icon-mobile">
+            <div class="user-icon-mobile" onclick="window.location.href='../VIEW/Login.php'" >
                 <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                     alt="Usuario" />
             </div>
@@ -42,7 +42,7 @@
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon">
+                <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'" >
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                         alt="Usuario" />
                 </div>
@@ -71,7 +71,7 @@
     </header>
 
     
-    <main>
+    <main class="animado">
         <div class="login-wrapper">
             <section class="login-container">
                 <div class="login-visual">
@@ -106,20 +106,6 @@
             </div>
         </section>
     </main>
-
-    <!-- Pie de pagina -->
-    <footer>
-        <div>
-            <strong>Contacto</strong>
-            <small>Teléfono: 33 3333 3333</small>
-            <small>Ubicación: Ixtlahuacán de los membrillos</small>
-        </div>
-        <div>
-            <strong>Horarios de servicio</strong>
-            <small>Lunes a Viernes</small>
-            <small>De 9:00AM a 8:00PM</small>
-        </div>
-    </footer>
 
     <script src="../JS/index.js"></script>
 </body>

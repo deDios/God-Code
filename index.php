@@ -25,9 +25,9 @@
                     <img src="ASSETS/index/Tiktok.png" alt="TikTok" />
                 </div>
                 <!-- Icono de usuario para login en vista mobile -->
-                <div class="user-icon-mobile">
+                <div class="user-icon-mobile" onclick="window.location.href='VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                        alt="Usuario" href="VIEW/Login.php" />
+                        alt="Usuario" />
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon">
+                <div class="user-icon" onclick="window.location.href='VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                         alt="Usuario" href="VIEW/Login.php" />
                 </div>
@@ -97,7 +97,11 @@
             <!-- Columna derecha -->
             <div class="columna noticias">
                 <h3>Noticias</h3>
-                <div id="lista-noticias"></div>
+
+                <div id="lista-noticias">
+                    <div class="contenido-noticias"></div> <!-- Este es el que usaremos para las animaciones -->
+                </div>
+
                 <div id="paginacion" class="paginacion"></div>
             </div>
         </section>
@@ -198,7 +202,7 @@
             </div>
 
             <div class="faq">
-                <h2>Preguntas frecuentes</h2> 
+                <h2>Preguntas frecuentes</h2>
 
                 <div class="acordeon">
                     <div class="item">
