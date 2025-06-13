@@ -57,7 +57,7 @@
             <a href="index.html" class="active">Inicio</a>
             <a href="#">Productos</a>
             <a href="VIEW/Nosotros.php">Nosotros</a>
-            <a href="#">Ubicación</a>
+            <a href="VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">

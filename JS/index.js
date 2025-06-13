@@ -138,7 +138,6 @@ if (window.location.pathname.includes("index.php")) {
 
 //solo carga si estamos en la vista ----------------------------------Nosotros----------------------------------------------
 if (window.location.pathname.includes("Nosotros.php")) {
-
   //seccion 2 Nosotros carrusel
   let indice = 0;
   const slides = document.querySelectorAll(".slide");
@@ -158,22 +157,71 @@ if (window.location.pathname.includes("Nosotros.php")) {
   mostrarSlide(indice);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const animados = document.querySelectorAll(".animado");
+//------------------------------- vista blog JS --------------------------
+if (window.location.pathname.includes("Blog.php")) {
+  //---------js para la parte de noticias para recuperar la informacion y colocarla en la vista Noticias
+  //esto todavia esta pendiente 
+  function abrirNoticia(event, boton) {
+    event.preventDefault();
+    const card = boton.closest(".card");
+    const noticiaId = card.getAttribute("data-id");
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.2, 
-      }
-    );
+    if (noticiaId) {
+      localStorage.setItem("noticiaSeleccionada", noticiaId);
+      window.location.href = "Noticia.php";
+    } else {
+      alert("No se pudo identificar la noticia.");
+    }
+  }
 
-    animados.forEach((el) => observer.observe(el));
+  //carrusel para la parte de cursos
+  const track = document.querySelector(".carousel-track");
+  const prevButton = document.querySelector(".carousel-btn.prev");
+  const nextButton = document.querySelector(".carousel-btn.next");
+  const cards = Array.from(track.children);
+  const cardWidth = cards[0].getBoundingClientRect().width + 16;
+
+  let currentIndex = 0;
+
+  function updateCarousel() {
+    track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  }
+
+  prevButton.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCarousel();
+    }
   });
+
+  nextButton.addEventListener("click", () => {
+    if (
+      currentIndex <
+      cards.length - Math.floor(track.parentElement.offsetWidth / cardWidth)
+    ) {
+      currentIndex++;
+      updateCarousel();
+    }
+  });
+}
+
+//------------------------------------------------------------js global-----------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const animados = document.querySelectorAll(".animado");
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.2,
+    }
+  );
+
+  animados.forEach((el) => observer.observe(el));
+});

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GodCode</title>
+    <link rel="stylesheet" href="../CSS/index.css" />
+</head>
+
+<body>
+    <!-- Tope de pagina -->
+    <header id="header">
+        <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
+        <div class="social-bar-mobile">
+            <div class="icon-mobile">
+                <img src="../ASSETS/index/Facebook.png" alt="Facebook" />
+            </div>
+            <div class="icon-mobile">
+                <img src="../ASSETS/index/Instagram.png" alt="Instagram" />
+            </div>
+            <div class="icon-mobile">
+                <img src="../ASSETS/index/Tiktok.png" alt="TikTok" />
+            </div>
+            <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
+            <div class="user-icon-mobile" onclick="window.location.href='../VIEW/Login.php'">
+                <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                    alt="Usuario" />
+            </div>
+        </div>
+
+        <div class="top-bar" id="top-bar">
+            <div class="logo">
+                <img src="../ASSETS/godcode_icon.png" alt="Logo GodCode" class="logo-icon">
+                GodCode
+            </div>
+
+            <!--Boton hamburguesa que aparece segun la resolucion-->
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+            <div class="actions">
+                <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
+                <!-- icono de usuario para despues hacer el login -->
+                <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
+                    <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                        alt="Usuario" />
+                </div>
+            </div>
+
+        </div>
+        <!-- Barra de navegación pequeña -->
+        <div id="mobile-menu" class="subnav">
+            <a href="../index.php">Inicio</a>
+            <a href="#">Productos</a>
+            <a href="../VIEW/Nosotros.php">Nosotros</a>
+            <a href="../VIEW/Blog.php">Blog</a>
+
+            <div class="social-icons">
+                <div class="circle-icon">
+                    <img src="../ASSETS/index/Facebook.png" alt="Facebook" />
+                </div>
+                <div class="circle-icon">
+                    <img src="../ASSETS/index/Instagram.png" alt="Instagram" />
+                </div>
+                <div class="circle-icon">
+                    <img src="../ASSETS/index/Tiktok.png" alt="TikTok" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- seccion 1 -->
+        <section id="blog-godcode" class="animado">
+            <h2>Blog GodCode</h2>
+            <h3>Lo Nuevo</h3>
+            <p class="descripcion">
+                Explora el futuro hoy<br>
+                Descubre las últimas noticias en tecnología, innovación y avances que están transformando el mundo.<br>
+                Mantente al día con lo más relevante, todo en un solo lugar.
+            </p>
+
+            <div class="grid-cards">
+                <div class="card" data-id="meta">
+                    <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
+                    <div class="contenido">
+                        <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
+                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                    </div>
+                </div>
+
+                <div class="card" data-id="apple">
+                    <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
+                    <div class="contenido">
+                        <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
+                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                    </div>
+                </div>
+
+                <div class="card" data-id="nato">
+                    <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
+                    <div class="contenido">
+                        <p>NATO lanza nueva estrategia para investigación científica...</p>
+                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- seccion 2 -->
+        <section id="filtros-cursos">
+            <h2>Cursos destacados</h2>
+            <h3>Explora nuestras mejores opciones</h3>
+            <p class="descripcion">
+                Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido actualizado
+                y práctico.
+            </p>
+            <div class="contenedor-filtros">
+                <div class="filtro">
+                    <label for="categoria">categorías de cursos</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Selecciona una categoría</option>
+                        <option value="programacion">Programación</option>
+                        <option value="diseño">Diseño</option>
+                        <option value="marketing">Marketing</option>
+                    </select>
+                </div>
+
+                <div class="filtro">
+                    <label for="filtro">Filtros</label>
+                    <select id="filtro" name="filtro">
+                        <option value="">Selecciona un filtro</option>
+                        <option value="populares">Más populares</option>
+                        <option value="nuevos">Más recientes</option>
+                        <option value="gratis">Gratuitos</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- seccion 3 -->
+        <section id="cursos-destacados">
+            <h3>Cursos de programación</h3>
+
+            <div class="carousel-container">
+                <button class="carousel-btn prev" aria-label="Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+
+                <div class="carousel-track-container">
+                    <div class="carousel-track grid-cards-cursos">
+                        <a href="curso-css.html" class="card">
+                            <img src="../ASSETS/cursos/cursos_img1.png" alt="Curso de CSS" />
+                            <div class="contenido">
+                                <h4>Curso de CSS</h4>
+                                <p>Aprende diseño y estilo de páginas web, conoce propiedades y validaciones CSS.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img2.png" alt="Curso de PHP" />
+                            <div class="contenido">
+                                <h4>Curso de PHP</h4>
+                                <p>Desarrolla sitios dinámicos con lenguaje PHP y bases de datos MySQL.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img3.png" alt="Curso de HTML" />
+                            <div class="contenido">
+                                <h4>Curso de HTML</h4>
+                                <p>Aprende a estructurar páginas web desde cero usando HTML, el lenguaje base de la web.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
+                            <div class="contenido">
+                                <h4>Curso de JavaScript</h4>
+                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
+                            <div class="contenido">
+                                <h4>Curso de JavaScript</h4>
+                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
+                            <div class="contenido">
+                                <h4>Curso de JavaScript</h4>
+                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+
+                        <a href="#" class="card">
+                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
+                            <div class="contenido">
+                                <h4>Curso de JavaScript</h4>
+                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
+                                <p>Cant. de horas esperadas de duración</p>
+                                <strong>Precio : $300</strong>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <button class="carousel-btn next" aria-label="Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+
+
+    </main>
+
+    <!-- Pie de pagina -->
+    <footer>
+        <div>
+            <strong>Contacto</strong>
+            <small>Teléfono: 33 3333 3333</small>
+            <small>Ubicación: Ixtlahuacán de los membrillos</small>
+        </div>
+        <div>
+            <strong>Horarios de servicio</strong>
+            <small>Lunes a Viernes</small>
+            <small>De 9:00AM a 8:00PM</small>
+        </div>
+    </footer>
+
+    <script src="../JS/index.js"></script>
+</body>
+
+</html>
