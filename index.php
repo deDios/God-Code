@@ -149,7 +149,7 @@
 
             <div class="bloque">
                 <div class="imagen">
-                    <img src="ASSETS/index/mapa.png" alt="Clientes donde estén">
+                    <img src="ASSETS/index/mapa.png" alt="Clientes img">
                 </div>
                 <div class="texto">
                     <h3>Llega a tus clientes estén donde estén</h3>

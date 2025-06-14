@@ -2,10 +2,10 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/index.css"/>
+    <link rel="stylesheet" href="../CSS/index.css" />
 </head>
 
 <body>
@@ -25,7 +25,7 @@
             <!-- icono de usuario para despues hacer el login pero para la vista mobile-->
             <div class="user-icon-mobile" onclick="window.location.href='../VIEW/Login.php'">
                 <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                    alt="Usuario"/>
+                    alt="Usuario" />
             </div>
         </div>
 
@@ -42,7 +42,7 @@
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'" >
+                <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
                         alt="Usuario" href="../VIEW/Login.php" />
                 </div>
@@ -152,12 +152,16 @@
             </div>
 
             <div class="controles">
-                <button onclick="moverCarrusel(-1)">
-                    <img src="../ASSETS/Nosotros/flechaIzquierda.png" alt="Anterior">
+                <button class="carousel-btn prev" onclick="moverCarrusel(-1)" aria-label="Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
                 </button>
                 <span id="indicador">1 / 3</span>
-                <button onclick="moverCarrusel(1)">
-                    <img src="../ASSETS/Nosotros/flechaDerecha.png" alt="Siguiente">
+                <button class="carousel-btn next" onclick="moverCarrusel(1)" aria-label="Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
                 </button>
             </div>
         </section>
@@ -197,25 +201,26 @@
         </section>
 
         <section class="creciendoJuntos">
-  <h2>Creciendo juntos <span>#GodCode</span></h2>
-  <div class="creciendoJuntos-contenido">
-    <div class="bloque">
-      <h3>Careers en GodCode</h3>
-      <p>Inspírate con las historias de éxito de quienes han trabajado con nosotros para hacer crecer sus negocios y alcanzar resultados increíbles.</p>
-    </div>
-    <div class="bloque">
-      <p>
-        <strong>nuestros contactos:</strong><br>
-        Celular:<br>
-        +52 33 3333 3333<br>
-        +52 33 3333 3333<br><br>
-        Email:<br>
-        correo@gmail.com<br>
-        correo@gmail.com
-      </p>
-    </div>
-  </div>
-</section>
+            <h2>Creciendo juntos <span>#GodCode</span></h2>
+            <div class="creciendoJuntos-contenido">
+                <div class="bloque">
+                    <h3>Careers en GodCode</h3>
+                    <p>Inspírate con las historias de éxito de quienes han trabajado con nosotros para hacer crecer sus
+                        negocios y alcanzar resultados increíbles.</p>
+                </div>
+                <div class="bloque">
+                    <p>
+                        <strong>nuestros contactos:</strong><br>
+                        Celular:<br>
+                        +52 33 3333 3333<br>
+                        +52 33 3333 3333<br><br>
+                        Email:<br>
+                        correo@gmail.com<br>
+                        correo@gmail.com
+                    </p>
+                </div>
+            </div>
+        </section>
     </main>
 
 

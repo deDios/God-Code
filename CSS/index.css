@@ -828,18 +828,47 @@ footer small {
     gap: 15px;
 }
 
-.controles button {
+.controles .carousel-btn {
     background: white;
     border: none;
-    border-radius: 50%;
     padding: 10px;
+    border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.controles button img {
-    width: 30px;
-    height: 35px;
+.controles .carousel-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.controles .carousel-btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+.controles .carousel-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+}
+
+.controles .carousel-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+.controles .carousel-btn:hover svg {
+    transform: scale(1.1);
 }
 
 #indicador {
@@ -1269,7 +1298,71 @@ footer small {
     background: #125ab3;
 }
 
-F
+/* parte responsive de la seccion blog */
+@media (max-width: 768px) {
+    #blog-godcode {
+        padding: 3rem 1rem;
+    }
+
+    #blog-godcode h2 {
+        font-size: 2rem;
+    }
+
+    #blog-godcode h3 {
+        font-size: 1.4rem;
+    }
+
+    #blog-godcode .descripcion {
+        font-size: 0.95rem;
+        margin: 1rem auto 2rem;
+    }
+
+    #blog-godcode .grid-cards {
+        padding: 0.5rem;
+        gap: 1.5rem;
+    }
+
+    #blog-godcode .card {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    #blog-godcode .card img {
+        height: 180px;
+    }
+
+    #blog-godcode .card .contenido {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+
+    #blog-godcode .card button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #blog-godcode h2 {
+        font-size: 1.7rem;
+    }
+
+    #blog-godcode h3 {
+        font-size: 1.2rem;
+    }
+
+    #blog-godcode .card img {
+        height: 160px;
+    }
+
+    #blog-godcode .card .contenido {
+        font-size: 0.85rem;
+    }
+
+    #blog-godcode .card button {
+        width: 100%;
+    }
+}
 
 /*---------------- seccion 2 -------------------*/
 #filtros-cursos {
@@ -1421,39 +1514,49 @@ F
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: #1a73e8;
+    background: white;
     border: none;
-    color: white;
-    font-size: 2rem;
-    padding: 0.6rem 1rem;
+    padding: 10px;
     border-radius: 50%;
     cursor: pointer;
     user-select: none;
     z-index: 10;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(26, 115, 232, 0.5);
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 #cursos-destacados .carousel-btn:hover {
-    background: #125ab3;
-    box-shadow: 0 4px 12px rgba(18, 90, 179, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#cursos-destacados .carousel-btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
 }
 
 #cursos-destacados .carousel-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px #2980b9;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
 }
 
 #cursos-destacados .carousel-btn svg {
-    display: block;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    transition: transform 0.3s ease;
     pointer-events: none;
 }
 
+#cursos-destacados .carousel-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Posiciones laterales */
 #cursos-destacados .carousel-btn.prev {
     left: 10px;
 }
