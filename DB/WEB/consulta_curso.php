@@ -1,10 +1,11 @@
 <?php
 header('Content-Type: application/json');
 
-$inc = include "../DB/conn/Conexion.php";
+include "../DB/conn/Conexion.php";
+$con = conectar();
 
-if (!$inc || !isset($con)) {
-    die(json_encode(["error" => "❌ Falló la inclusión o conexión"]));
+if (!$con) {
+    die(json_encode(["error" => "❌ No se pudo conectar a la base de datos"]));
 }
 
 $query = 'SELECT 
