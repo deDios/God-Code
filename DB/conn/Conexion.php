@@ -16,7 +16,6 @@ function conectar() {
     )) {
         return null; // Retorna null si falla
     }
-
     return $con;
 }
 ?>
