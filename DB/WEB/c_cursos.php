@@ -12,7 +12,7 @@ if (!isset($_POST['estatus'])) {
     die(json_encode(["error" => "❌ El parámetro 'estatus' es obligatorio (por POST)"]));
 }
 
-$estatus = (int) $_POST['estatus']; // Sanitizar
+$estatus = (int) $_POST['estatus'];
 
 $con = conectar();
 if (!$con) {
