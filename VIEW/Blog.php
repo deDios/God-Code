@@ -152,75 +152,8 @@
                 </button>
 
                 <div class="carousel-track-container">
-                    <div class="carousel-track grid-cards-cursos">
-                        <a href="curso-css.html" class="card">
-                            <img src="../ASSETS/cursos/cursos_img1.png" alt="Curso de CSS" />
-                            <div class="contenido">
-                                <h4>Curso de CSS</h4>
-                                <p>Aprende diseño y estilo de páginas web, conoce propiedades y validaciones CSS.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img2.png" alt="Curso de PHP" />
-                            <div class="contenido">
-                                <h4>Curso de PHP</h4>
-                                <p>Desarrolla sitios dinámicos con lenguaje PHP y bases de datos MySQL.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img3.png" alt="Curso de HTML" />
-                            <div class="contenido">
-                                <h4>Curso de HTML</h4>
-                                <p>Aprende a estructurar páginas web desde cero usando HTML, el lenguaje base de la web.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
-                            <div class="contenido">
-                                <h4>Curso de JavaScript</h4>
-                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
-                            <div class="contenido">
-                                <h4>Curso de JavaScript</h4>
-                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
-                            <div class="contenido">
-                                <h4>Curso de JavaScript</h4>
-                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
-
-                        <a href="#" class="card">
-                            <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de JavaScript" />
-                            <div class="contenido">
-                                <h4>Curso de JavaScript</h4>
-                                <p>Aprende a dar vida a tus páginas web con JavaScript, creando funciones interactivas y dinámicas desde cero.</p>
-                                <p>Cant. de horas esperadas de duración</p>
-                                <strong>Precio : $300</strong>
-                            </div>
-                        </a>
+                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
+                        <!-- Las cards se generarán dinámicamente con JavaScript -->
                     </div>
                 </div>
 
