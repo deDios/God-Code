@@ -1,7 +1,15 @@
 <?php
 header('Content-Type: application/json');
 
-include "../db/conn/Conexion.php";
+
+$path = realpath(__DIR__ . "/../db/conn/Conexion.php");
+if ($path && file_exists($path)) {
+    include $path;
+    echo "Incluido correctamente";
+} else {
+    die("Error: no se encontró Conexion.php en la ruta $path");
+}
+
 $con = conectar();
 
 if (!$con) {
