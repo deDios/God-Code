@@ -3,10 +3,8 @@ header('Content-Type: application/json');
 
 $inc = include "../DB/conn/Conexion.php";
 
-if (isset($con)) {
-    echo "✅ Conexión creada correctamente";
-} else {
-    echo "❌ No se creó la conexión";
+if (!$inc || !isset($con)) {
+    die(json_encode(["error" => "❌ Falló la inclusión o conexión"]));
 }
 
 $query = 'SELECT 
