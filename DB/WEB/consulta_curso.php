@@ -3,6 +3,12 @@ header('Content-Type: application/json');
 
 $inc = include "../DB/conn/Conexion.php";
 
+if (isset($con)) {
+    echo "✅ Conexión creada correctamente";
+} else {
+    echo "❌ No se creó la conexión";
+}
+
 $query = 'SELECT 
             id,
             nombre,
@@ -15,7 +21,7 @@ $query = 'SELECT
             creado_por,
             fecha_creacion,
             fecha_modif
-          FROM GC_Cursos
+          FROM god_code.GC_Cursos
           WHERE estatus = 1
           ORDER BY nombre ASC;';
 
