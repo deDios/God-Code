@@ -1,10 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-// Incluir la conexión a la base de datos
 $inc = include "../DB/conn/Conexion.php";
 
-// Consulta a la base de datos
 $query = 'SELECT 
             id,
             nombre,

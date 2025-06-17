@@ -7,5 +7,4 @@ if (mysqli_connect_errno()){
     die('Error: Falla en la conexion de MySQL'. mysqli_connect_errno());
 }
 
-
 ?>
