@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-include "../DB/conn/Conexion.php";
+include "../db/conn/Conexion.php";
 $con = conectar();
 
 if (!$con) {
