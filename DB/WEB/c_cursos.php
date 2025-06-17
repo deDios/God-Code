@@ -5,19 +5,19 @@ $path = realpath("/home/site/wwwroot/db/conn/Conexion.php");
 if ($path && file_exists($path)) {
     include $path;
 } else {
-    die(json_encode(["error" => "❌ No se encontró Conexion.php en la ruta $path"]));
+    die(json_encode(["error" => "No se encontró Conexion.php en la ruta $path"]));
 }
 
 $input = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($input['estatus'])) {
-    die(json_encode(["error" => "❌ El parámetro 'estatus' es obligatorio en el cuerpo JSON (ej. { \"estatus\": 1 })"]));
+    die(json_encode(["error" => "El parámetro 'estatus' es obligatorio en el cuerpo JSON (ej. { \"estatus\": 1 })"]));
 }
 $estatus = (int)$input['estatus'];
 
 $con = conectar();
 if (!$con) {
-    die(json_encode(["error" => "❌ No se pudo conectar a la base de datos"]));
+    die(json_encode(["error" => "No se pudo conectar a la base de datos"]));
 }
 
 $query = "SELECT 
