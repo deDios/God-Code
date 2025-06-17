@@ -3,10 +3,18 @@
 $con = mysqli_init();
 mysqli_ssl_set($con, NULL, NULL, "/home/site/wwwroot/DB/conn/DigiCertGlobalRootCA.crt.pem", NULL, NULL);
 
-if (!mysqli_real_connect($con, "mobilitysolutions-server.mysql.database.azure.com", "btdonyajwn", "Llaverito_4855797'?", "god_code", 3306, NULL, MYSQLI_CLIENT_SSL)) {
-    $con = null;
-    return false;
+if (!mysqli_real_connect(
+    $con,
+    "mobilitysolutions-server.mysql.database.azure.com",
+    "btdonyajwn",
+    "Llaverito_4855797'?",
+    "god_code",
+    3306,
+    NULL,
+    MYSQLI_CLIENT_SSL
+)) {
+    die("❌ Error: " . mysqli_connect_error());
 }
 
-return true;
+echo "✅ Conexión exitosa";
 ?>
