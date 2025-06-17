@@ -8,11 +8,12 @@ if ($path && file_exists($path)) {
     die(json_encode(["error" => "❌ No se encontró Conexion.php en la ruta $path"]));
 }
 
-if (!isset($_POST['estatus'])) {
-    die(json_encode(["error" => "❌ El parámetro 'estatus' es obligatorio (por POST)"]));
-}
+$input = json_decode(file_get_contents("php://input"), true);
 
-$estatus = (int) $_POST['estatus'];
+if (!isset($input['estatus'])) {
+    die(json_encode(["error" => "❌ El parámetro 'estatus' es obligatorio en el cuerpo JSON (ej. { \"estatus\": 1 })"]));
+}
+$estatus = (int)$input['estatus'];
 
 $con = conectar();
 if (!$con) {
@@ -38,8 +39,8 @@ $query = "SELECT
 $result = mysqli_query($con, $query);
 
 if ($result && $result->num_rows > 0) {
-    $data = array();
-    
+    $data = [];
+
     while ($row = $result->fetch_assoc()) {
         $row['id'] = (int)$row['id'];
         $row['tutor'] = (int)$row['tutor'];
