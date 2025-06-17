@@ -1,8 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-
-$path = realpath(__DIR__ . "/../db/conn/Conexion.php");
+$path = realpath("/home/site/wwwroot/db/conn/Conexion.php");
 if ($path && file_exists($path)) {
     include $path;
     echo "Incluido correctamente";
