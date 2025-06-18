@@ -31,7 +31,9 @@ $query = "SELECT
             estatus,
             creado_por,
             fecha_creacion,
-            fecha_modif
+            fecha_modif,
+            categoria,
+            prioridad
           FROM god_code.GC_Cursos
           WHERE estatus = $estatus
           ORDER BY nombre ASC";
@@ -48,6 +50,8 @@ if ($result && $result->num_rows > 0) {
         $row['precio'] = (int)$row['precio'];
         $row['estatus'] = (int)$row['estatus'];
         $row['creado_por'] = (int)$row['creado_por'];
+        $row['categoria'] = (int)$row['categoria'];
+        $row['prioridad'] = (int)$row['prioridad'];
         $row['fecha_creacion'] = $row['fecha_creacion'];
         $row['fecha_modif'] = $row['fecha_modif'];
         $data[] = $row;
