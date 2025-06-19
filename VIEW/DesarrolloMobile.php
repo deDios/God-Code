@@ -133,15 +133,20 @@
             <!-- Texto informativo y llamado a la acción -->
             <div class="info-section">
                 <div class="info-text">
-                    <h2>Desarrollo Web</h2>
+                    <h2>Desarrollo Mobile</h2>
                     <p>
-                        Los grandes sitios web comienzan con una buena estrategia de desarrollo. Desde la planificación
-                        hasta el diseño y la programación, cada paso cuenta para construir experiencias digitales que
-                        realmente conectan con tus usuarios y logran resultados medibles. <a>GodCode</a>
+                        Las grandes apps comienzan con una buena
+                        estrategia de desarrollo. Desde la conceptualización
+                        hasta el diseño y la programación, cada etapa
+                        es clave para crear experiencias mobiles intuitivas,
+                        funcionales y alineadas con las necesidades reales
+                        de tus usuarios. Desarrolla aplicaciones que no
+                        solo se ven bien, sino que generan impacto,
+                        engagement y resultados medibles. GodCode
                     </p>
                 </div>
                 <div class="cta-box">
-                    <h3>Crea tu sitio web</h3>
+                    <h3>Crea tu App Mobile</h3>
                     <button onclick="location.href='#'">Contáctanos</button>
                 </div>
             </div>
@@ -159,29 +164,28 @@
                         <!-- Cards-->
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Planificacion</h4>
+                                <h4>Desarrollo de App Mobile</h4>
                             </div>
                             <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img1.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Diseño</h4>
+                                <h4>Diseño de App</h4>
                             </div>
                             <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img2.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Desarrollo de sitio Web </h4>
+                                <h4>Compatibilidad y adaptabilidad</h4>
                             </div>
                             <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img3.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Pruebas y control de</h4>
-                                <h4>calidad</h4>
+                                <h4>Actualizaciones regulares</h4>
                             </div>
                             <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img4.png" alt="img">
                         </div>
@@ -200,17 +204,16 @@
         <section id="descripcion-pagina-Productos" class="animado">
             <div class="descripcion-pagina-Productos__wrapper">
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza aplicaciones móviles que marcan la diferencia</span></h2>
+                    <h2><span>Diseña, construye y lanza aplicaciones mobiles que marcan la diferenciaDesde ideas
+                            simples</span></h2>
                     <p>
-                        Desde sitios informativos hasta plataformas personalizadas, planifica cada etapa del desarrollo
-                        con claridad.
-                        Organiza el contenido, define la estructura, establece los objetivos y colabora con diseñadores
-                        y desarrolladores en
-                        un solo flujo de trabajo. Asigna tareas, establece prioridades, revisa avances en tiempo real y
-                        asegúrate de que cada
-                        detalle esté alineado con la experiencia del usuario. Lanza sitios web que no solo se ven bien,
-                        sino que también cumplen
-                        resultados.
+                        hasta soluciones móviles complejas, planifica cada fase del desarrollo con precisión.Define
+                        funcionalidades clave, diseña interfaces intuitivas, establece objetivos claros y colabora con
+                        diseñadores,
+                        programadores y testers en un flujo de trabajo unificado. Asigna tareas, gestiona prioridades,
+                        realiza pruebas en
+                        tiempo real y asegúrate de que cada interacción sea fluida y centrada en el usuario.Lanza apps
+                        que no solo funcionan, sino que también cautivan, fidelizan y generan resultados reales.
                     </p>
                 </div>
 
@@ -219,26 +222,27 @@
                     <p> Visualiza cada etapa del proyecto con tableros, listas y cronogramas adaptados a tus procesos.
                         Desde la arquitectura
                         inicial hasta la publicación final, crea flujos de trabajo personalizados para diseño,
-                        desarrollo, contenido y pruebas. Integra tus herramientas favoritas como editores de código,
+                        desarrollo, contenido y pruebas. Integra tus herramientas favoritas —como editores de código,
                         gestores de contenido y plataformas de análisis y
                         mantén todo centralizado para que tu equipo avance con claridad y sin perder el rumbo.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
-                            alt="img" />
+                            alt="Diseño de app móvil" />
                     </div>
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu app móvil con datos que importan</span></h2>
-                    <p>Supervisa el avance de cada etapa del desarrollo en tiempo real: diseño, contenido, programación
-                        y pruebas. Detecta
-                        cuellos de botella, identifica errores a tiempo y toma decisiones basadas en datos
-                        concretos. Comprende el rendimiento de tu equipo y del proyecto, anticipa riesgos y mejora
-                        continuamente la eficiencia para
-                        entregar sitios web de mayor calidad, en menos tiempo.</p>
+                    <h2><span>Optimiza tu app móvil con datos que importanSupervisa el progreso de cada etapa del
+                            desarrollo en tiempo real: diseño de interfaz, desarrollo de funcionalidades,
+                            pruebas y despliegue.</span></h2>
+                    <p> Detecta cuellos de botella, identifica errores antes del lanzamiento y toma decisiones
+                        informadas
+                        basadas en datos reales. Evalúa el rendimiento de tu equipo y de la aplicación, anticipa riesgos
+                        y mejora continuamente
+                        tus procesos para lanzar apps móviles de mayor calidad, en menos tiempo.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
-                            alt="img" />
+                            alt="Datos de aplicación móvil" />
                     </div>
                 </div>
             </div>
@@ -251,20 +255,7 @@
         </section>
 
     </main>
-    
-    <!-- Pie de pagina -->
-    <footer>
-        <div>
-            <strong>Contacto</strong>
-            <small>Teléfono: 33 3333 3333</small>
-            <small>Ubicación: Ixtlahuacán de los membrillos</small>
-        </div>
-        <div>
-            <strong>Horarios de servicio</strong>
-            <small>Lunes a Viernes</small>
-            <small>De 9:00AM a 8:00PM</small>
-        </div>
-    </footer>
+
     <script src="../JS/index.js"></script>
 </body>
 

@@ -160,7 +160,7 @@ if (window.location.pathname.includes("Nosotros.php")) {
 //------------------------------- vista blog JS --------------------------
 if (window.location.pathname.includes("Blog.php")) {
   //---------js para la parte de noticias para recuperar la informacion y colocarla en la vista Noticias
-  //esto todavia esta pendiente 
+  //esto todavia esta pendiente
   function abrirNoticia(event, boton) {
     event.preventDefault();
     const card = boton.closest(".card");
@@ -178,17 +178,16 @@ if (window.location.pathname.includes("Blog.php")) {
   // JS Para comenzar a rescatar datos para la pagina de momento con informacion dummy -------------------------------------------------------------
   // -----------------------------------------------------------------------------------------------------------------------------------------------
 
-
   let track, prevButton, nextButton, cards, cardWidth, currentIndex;
 
   function generarCardsCursos() {
-    const container = document.getElementById('cursos-container');
+    const container = document.getElementById("cursos-container");
 
     if (!container) return;
 
-    let html = '';
+    let html = "";
 
-    cursos.forEach(curso => {
+    cursos.forEach((curso) => {
       html += `
         <a href="${curso.url}" class="card" data-curso-id="${curso.id}">
             <img src="${curso.imagen_miniatura}" alt="${curso.titulo}" />
@@ -224,20 +223,20 @@ if (window.location.pathname.includes("Blog.php")) {
 
     actualizarBotones();
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       cardWidth = cards[0].getBoundingClientRect().width + 16;
       updateCarousel();
       actualizarBotones();
     });
 
-    const mediaQuery = window.matchMedia('(max-width: 480px)');
+    const mediaQuery = window.matchMedia("(max-width: 480px)");
     function handleMobileChange(e) {
       if (e.matches) {
-        prevButton.style.display = 'none';
-        nextButton.style.display = 'none';
+        prevButton.style.display = "none";
+        nextButton.style.display = "none";
       } else {
-        prevButton.style.display = 'flex';
-        nextButton.style.display = 'flex';
+        prevButton.style.display = "flex";
+        nextButton.style.display = "flex";
         actualizarBotones();
       }
     }
@@ -258,7 +257,9 @@ if (window.location.pathname.includes("Blog.php")) {
   }
 
   function moverSiguiente() {
-    const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+    const cardsVisibles = Math.floor(
+      track.parentElement.offsetWidth / cardWidth
+    );
     if (currentIndex < cards.length - cardsVisibles) {
       currentIndex++;
       updateCarousel();
@@ -266,54 +267,59 @@ if (window.location.pathname.includes("Blog.php")) {
   }
 
   function actualizarBotones() {
-    prevButton.style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
+    prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
 
-    const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
-    nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? 'hidden' : 'visible';
+    const cardsVisibles = Math.floor(
+      track.parentElement.offsetWidth / cardWidth
+    );
+    nextButton.style.visibility =
+      currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
   }
 
-  document.addEventListener('DOMContentLoaded', generarCardsCursos);
-
-}//aqui termina la vista BLOG
-
-
+  document.addEventListener("DOMContentLoaded", generarCardsCursos);
+} //aqui termina la vista BLOG
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 
-
 if (window.location.pathname.includes("CursoInfo.php")) {
-
   function toggleAcordeon(header) {
     const item = header.parentElement;
-    const contenido = item.querySelector('.contenido');
-    const isOpen = contenido.style.display === 'block';
+    const contenido = item.querySelector(".contenido");
+    const isOpen = contenido.style.display === "block";
 
     // Cerrar todos si deseas modo exclusivo
-    document.querySelectorAll('#curso-detalle-extra .contenido').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('#curso-detalle-extra .cabecera').forEach(el => el.classList.remove('abierto'));
+    document
+      .querySelectorAll("#curso-detalle-extra .contenido")
+      .forEach((el) => (el.style.display = "none"));
+    document
+      .querySelectorAll("#curso-detalle-extra .cabecera")
+      .forEach((el) => el.classList.remove("abierto"));
 
     if (!isOpen) {
-      contenido.style.display = 'block';
-      header.classList.add('abierto');
+      contenido.style.display = "block";
+      header.classList.add("abierto");
     }
   }
 
-  const id = new URLSearchParams(window.location.search).get('id');
+  const id = new URLSearchParams(window.location.search).get("id");
 }
-
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- VISTE PRODUCTOS/DesarrolloWeb.php -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (window.location.pathname.includes("DesarrolloWeb.php")) {
-
   document.addEventListener("DOMContentLoaded", function () {
-
-    const track = document.querySelector("#desarrollo-web-carrusel .carousel-track");
-    const prevButton = document.querySelector("#desarrollo-web-carrusel .carousel-btn.prev");
-    const nextButton = document.querySelector("#desarrollo-web-carrusel .carousel-btn.next");
+    const track = document.querySelector(
+      "#desarrollo-web-carrusel .carousel-track"
+    );
+    const prevButton = document.querySelector(
+      "#desarrollo-web-carrusel .carousel-btn.prev"
+    );
+    const nextButton = document.querySelector(
+      "#desarrollo-web-carrusel .carousel-btn.next"
+    );
 
     if (!track || !prevButton || !nextButton) return;
 
@@ -370,42 +376,39 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
     function actualizarBotones() {
       const visibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
       prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextButton.style.visibility = currentIndex >= cards.length - visibles ? "hidden" : "visible";
+      nextButton.style.visibility =
+        currentIndex >= cards.length - visibles ? "hidden" : "visible";
     }
 
     updateCarousel();
   });
-
 }
 
-
-
-
-
-
-
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------- vista CursoInfo -------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {
-  const menu = document.querySelector('#submenu-productos .megamenu');
-  menu.classList.remove('show');
+  const menu = document.querySelector("#submenu-productos .megamenu");
+  menu.classList.remove("show");
 
-  const link = document.querySelector('#submenu-productos > a');
-  link.addEventListener('click', (e) => {
+  const link = document.querySelector("#submenu-productos > a");
+  link.addEventListener("click", (e) => {
     e.preventDefault();
-    menu.classList.toggle('show');
+    menu.classList.toggle("show");
   });
 
-  document.addEventListener('click', (e) => {
-    const contenedor = document.querySelector('#submenu-productos');
+  document.addEventListener("click", (e) => {
+    const contenedor = document.querySelector("#submenu-productos");
     if (!contenedor.contains(e.target)) {
-      menu.classList.remove('show');
+      menu.classList.remove("show");
     }
   });
 });
 
-//esta es la class "animado" que al colocarsela algo le agrega una transicion    
+//esta es la class "animado" que al colocarsela algo le agrega una transicion
 document.addEventListener("DOMContentLoaded", () => {
   const animados = document.querySelectorAll(".animado");
 
@@ -426,3 +429,70 @@ document.addEventListener("DOMContentLoaded", () => {
   animados.forEach((el) => observer.observe(el));
 });
 
+//funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
+const productos = [
+  {
+    texto: "Desarrollo offshore",
+    icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Desarrollo web",
+    icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Desarrollo Mobile",
+    icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
+    link: "../VIEW/DesarrolloMobile.php",
+  },
+  {
+    texto: "Desarrollo nearshore",
+    icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Servicios en la nube",
+    icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Diseño UX/UI",
+    icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Sercivio educativo",
+    icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Educación",
+    icono: "../ASSETS/ProductosPopUp/Educacion.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Finanzas",
+    icono: "../ASSETS/ProductosPopUp/Finanzas.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+  {
+    texto: "Tecnología",
+    icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
+    link: "../VIEW/DesarrolloWeb.php",
+  },
+];
+
+const contenedor = document.querySelector("#otros-productos .productos-random");
+
+const seleccionAleatoria = productos
+  .sort(() => 0.5 - Math.random())
+  .slice(0, 3);
+
+seleccionAleatoria.forEach((prod) => {
+  const a = document.createElement("a");
+  a.href = prod.link;
+  a.className = "producto-item";
+  a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
+  contenedor.appendChild(a);
+});
