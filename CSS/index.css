@@ -3,12 +3,6 @@
     display: none;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 html,
 body {
     margin: 0;
@@ -641,7 +635,99 @@ footer small {
     font-size: 0.8rem;
 }
 
-/*css para la vista de mobile*/
+#submenu-productos {
+    position: relative;
+}
+
+#submenu-productos .megamenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 100vw;
+    max-width: 1000px;
+    padding: 2rem;
+    border-radius: 10px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#submenu-productos .megamenu.show {
+    display: flex;
+}
+
+#submenu-productos .col {
+    flex: 1 1 200px;
+}
+
+#submenu-productos .full-width {
+    flex: 1 1 100%;
+    text-align: center;
+}
+
+#submenu-productos h4 {
+    font-size: 1rem;
+    color: #0a61d0;
+    margin-bottom: 1rem;
+}
+
+#submenu-productos ul {
+    list-style: none;
+    padding: 0;
+}
+
+#submenu-productos ul li {
+    margin-bottom: 0.5rem;
+}
+
+#submenu-productos ul li a {
+    text-decoration: none;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#submenu-productos ul li a img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+#submenu-productos .tech-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+#submenu-productos .tech-icons span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: #444;
+}
+
+#submenu-productos .tech-icons img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+#submenu-productos>a {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
 
 /*el menu de hamburguesa estara oculto por defecto*/
 .hamburger {
@@ -1989,7 +2075,320 @@ footer small {
     }
 }
 
+/*----------------------------------------------------------------------------------------*/
+/*-------------------------------- VISTA PRODUCTOS/DESARROLLO WEB -------------------------------------------*/
+/*----------------------------------------------------------------------------------------*/
+#desarrollo-web-carrusel .info-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1280px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
 
+#desarrollo-web-carrusel .info-text {
+    flex: 1 1 60%;
+    min-width: 280px;
+}
+
+#desarrollo-web-carrusel .info-text h2 {
+    font-size: 1.8rem;
+    color: #0a61d0;
+    margin-bottom: 1rem;
+}
+
+#desarrollo-web-carrusel .info-text p {
+    font-size: 1.05rem;
+    color: #222;
+    line-height: 1.6;
+}
+
+#desarrollo-web-carrusel .info-text p a {
+    color: #0a61d0;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#desarrollo-web-carrusel .cta-box {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex: 1 1 300px;
+    min-width: 250px;
+}
+
+#desarrollo-web-carrusel .cta-box h3 {
+    font-size: 1.2rem;
+    color: #222;
+    margin-bottom: 1rem;
+}
+
+#desarrollo-web-carrusel .cta-box button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#desarrollo-web-carrusel .cta-box button:hover {
+    background-color: #3578d4;
+}
+
+@media (max-width: 768px) {
+    #desarrollo-web-carrusel .info-section {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    #desarrollo-web-carrusel .cta-box {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+#desarrollo-web-carrusel .carousel-container {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+#desarrollo-web-carrusel .carousel-track-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+}
+
+#desarrollo-web-carrusel .carousel-track-container::-webkit-scrollbar {
+    display: none;
+}
+
+#desarrollo-web-carrusel .carousel-track {
+    display: flex;
+    gap: 1rem;
+    transition: transform 0.3s ease-in-out;
+    padding: 1rem;
+    will-change: transform;
+}
+
+#desarrollo-web-carrusel .carousel-track {
+    display: flex;
+    align-items: stretch;
+    /* ← ¡Esto es clave! */
+}
+
+#desarrollo-web-carrusel .simple-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    padding: 0;
+    max-width: 220px;
+    min-height: 320px;
+    cursor: default;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#desarrollo-web-carrusel .simple-card .card-body {
+    padding: 1rem;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#desarrollo-web-carrusel .simple-card h4 {
+    font-size: 1rem;
+    color: #0562EF;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+#desarrollo-web-carrusel .simple-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    margin: 0;
+    border-radius: 0px 0px 12px 12px;
+}
+
+#desarrollo-web-carrusel .carousel-container {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#desarrollo-web-carrusel .carousel-track-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+}
+
+#desarrollo-web-carrusel .carousel-track-container::-webkit-scrollbar {
+    display: none;
+}
+
+#desarrollo-web-carrusel .carousel-track {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 1rem;
+    transition: transform 0.3s ease-in-out;
+    padding: 1rem;
+    will-change: transform;
+}
+
+#desarrollo-web-carrusel .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+#desarrollo-web-carrusel .carousel-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#desarrollo-web-carrusel .carousel-btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+#desarrollo-web-carrusel .carousel-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+}
+
+#desarrollo-web-carrusel .carousel-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#desarrollo-web-carrusel .carousel-btn:hover svg {
+    transform: scale(1.1);
+}
+
+#desarrollo-web-carrusel .carousel-btn.prev {
+    left: 10px;
+}
+
+#desarrollo-web-carrusel .carousel-btn.next {
+    right: 10px;
+}
+
+@media (max-width: 1024px) {
+    #desarrollo-web-carrusel .carousel-track .card {
+        flex: 0 0 45%;
+        max-width: 45%;
+    }
+}
+
+@media (max-width: 768px) {
+    #desarrollo-web-carrusel .carousel-track .card {
+        flex: 0 0 70%;
+        max-width: 70%;
+    }
+}
+
+@media (max-width: 480px) {
+    #desarrollo-web-carrusel .carousel-track .card {
+        flex: 0 0 85%;
+        max-width: 85%;
+    }
+
+    #desarrollo-web-carrusel .carousel-btn.prev,
+    #desarrollo-web-carrusel .carousel-btn.next {
+        display: none;
+    }
+
+    #desarrollo-web-carrusel .carousel-container {
+        padding: 1rem 0.5rem;
+    }
+}
+
+/*----------- seccion 2 ----------------*/
+#mobile-apps {
+    padding: 4rem 0;
+    background-color: #fff;
+    width: 100%;
+}
+
+.mobile-apps__wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+#mobile-apps h2 {
+    color: #0562EF;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#mobile-apps h2 span {
+    color: #0562EF;
+}
+
+#mobile-apps p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.mobile-apps__bloque {
+    margin-bottom: 3rem;
+}
+
+.mobile-apps__imagen {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.mobile-apps__imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
 
 
 
