@@ -9,7 +9,7 @@
 </head>
 
 <body>
-     <!-- Tope de pagina -->
+    <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
@@ -187,28 +187,29 @@
         <section id="cursos-destacados">
             <h3>Cursos de programación</h3>
 
-            <div class="carousel-container">
-                <button class="carousel-btn prev" aria-label="Anterior">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                    </svg>
-                </button>
+            <section id="cursos-destacados">
+                <h3>Cursos disponibles</h3>
 
-                <div class="carousel-track-container">
-                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
-                        <!-- Las cards se generarán dinámicamente con JavaScript -->
+                <div class="carousel-container">
+                    <button class="carousel-btn prev" aria-label="Anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
+
+                    <div class="carousel-track-container">
+                        <div class="carousel-track grid-cards-cursos" id="cursos-container">
+                            <!-- Las cards se insertan desde JS -->
+                        </div>
                     </div>
+
+                    <button class="carousel-btn next" aria-label="Siguiente">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                        </svg>
+                    </button>
                 </div>
-
-                <button class="carousel-btn next" aria-label="Siguiente">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
-                    </svg>
-                </button>
-            </div>
-        </section>
-
-
+            </section>
 
     </main>
 

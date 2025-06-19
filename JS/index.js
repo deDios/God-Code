@@ -158,7 +158,7 @@ if (window.location.pathname.includes("Nosotros.php")) {
 }
 
 //------------------------------- vista blog JS --------------------------
-if (window.location.pathname.includes("Blog.php")) {
+if (window.location.pathname.includes("Blog.php")||window.location.pathname.includes("ejemplo_api.php")) {
   //---------js para la parte de noticias para recuperar la informacion y colocarla en la vista Noticias
   //esto todavia esta pendiente
   function abrirNoticia(event, boton) {
@@ -174,109 +174,101 @@ if (window.location.pathname.includes("Blog.php")) {
     }
   }
 
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
-  // JS Para comenzar a rescatar datos para la pagina de momento con informacion dummy -------------------------------------------------------------
-  // -----------------------------------------------------------------------------------------------------------------------------------------------
-
-  let track, prevButton, nextButton, cards, cardWidth, currentIndex;
-
-  function generarCardsCursos() {
+  //aqui inicia el carrusel y las funciones para el fetch
+  document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("cursos-container");
 
-    if (!container) return;
+    const response = await fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    );
 
-    let html = "";
+    const data = await response.json();
 
-    cursos.forEach((curso) => {
-      html += `
-        <a href="${curso.url}" class="card" data-curso-id="${curso.id}">
-            <img src="${curso.imagen_miniatura}" alt="${curso.titulo}" />
-            <div class="contenido">
-                <h4>${curso.titulo}</h4>
-                <p>${curso.descripcion_corta}</p>
-                <p class="horas">${curso.duracion} horas</p>
-                <p class="precio">Precio: <strong>$${curso.precio}</strong></p>
-            </div>
-        </a>`;
-    });
-    container.innerHTML = html;
+    if (data && Array.isArray(data)) {
+      container.innerHTML = data
+        .map(
+          (curso) => `
+      <div class="card">
+        <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(
+          curso.nombre
+        )}" alt="${curso.nombre}">
+        <div class="contenido">
+          <h4>${curso.nombre}</h4>
+          <p>${curso.descripcion_breve}</p>
+          <p class="horas">${curso.horas} horas</p>
+          <p class="precio">$${curso.precio}</p>
+        </div>
+      </div>
+    `
+        )
+        .join("");
+    }
 
     inicializarCarrusel();
-  }
+  });
 
   function inicializarCarrusel() {
-    track = document.querySelector(".carousel-track");
-    prevButton = document.querySelector(".carousel-btn.prev");
-    nextButton = document.querySelector(".carousel-btn.next");
+    const track = document.querySelector(".carousel-track");
+    const prevButton = document.querySelector(".carousel-btn.prev");
+    const nextButton = document.querySelector(".carousel-btn.next");
 
     if (!track || !prevButton || !nextButton) return;
 
-    cards = Array.from(track.children);
-
+    const cards = Array.from(track.children);
     if (cards.length === 0) return;
 
-    cardWidth = cards[0].getBoundingClientRect().width + 16;
-    currentIndex = 0;
+    let cardWidth = cards[0].getBoundingClientRect().width + 16;
+    let currentIndex = 0;
 
     prevButton.addEventListener("click", moverAnterior);
     nextButton.addEventListener("click", moverSiguiente);
 
-    actualizarBotones();
+    function moverAnterior() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    }
+
+    function moverSiguiente() {
+      const cardsVisibles = Math.floor(
+        track.parentElement.offsetWidth / cardWidth
+      );
+      if (currentIndex < cards.length - cardsVisibles) {
+        currentIndex++;
+        updateCarousel();
+      }
+    }
+
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+      actualizarBotones();
+    }
+
+    function actualizarBotones() {
+      const cardsVisibles = Math.floor(
+        track.parentElement.offsetWidth / cardWidth
+      );
+      prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+      nextButton.style.visibility =
+        currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+    }
 
     window.addEventListener("resize", () => {
       cardWidth = cards[0].getBoundingClientRect().width + 16;
       updateCarousel();
-      actualizarBotones();
     });
 
-    const mediaQuery = window.matchMedia("(max-width: 480px)");
-    function handleMobileChange(e) {
-      if (e.matches) {
-        prevButton.style.display = "none";
-        nextButton.style.display = "none";
-      } else {
-        prevButton.style.display = "flex";
-        nextButton.style.display = "flex";
-        actualizarBotones();
-      }
-    }
-    mediaQuery.addListener(handleMobileChange);
-    handleMobileChange(mediaQuery);
-  }
-
-  function updateCarousel() {
-    track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
     actualizarBotones();
   }
 
-  function moverAnterior() {
-    if (currentIndex > 0) {
-      currentIndex--;
-      updateCarousel();
-    }
-  }
-
-  function moverSiguiente() {
-    const cardsVisibles = Math.floor(
-      track.parentElement.offsetWidth / cardWidth
-    );
-    if (currentIndex < cards.length - cardsVisibles) {
-      currentIndex++;
-      updateCarousel();
-    }
-  }
-
-  function actualizarBotones() {
-    prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-
-    const cardsVisibles = Math.floor(
-      track.parentElement.offsetWidth / cardWidth
-    );
-    nextButton.style.visibility =
-      currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
-  }
-
-  document.addEventListener("DOMContentLoaded", generarCardsCursos);
 } //aqui termina la vista BLOG
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
