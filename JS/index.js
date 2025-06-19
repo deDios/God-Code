@@ -125,7 +125,7 @@ if (window.location.pathname.includes("index.php")) {
         (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
       mostrarNoticias(paginaActual);
       crearPaginacion();
-    }, 6000); // 6 segundos para cambiar de pagina y haga la transicion
+    }, 6000);
   });
 
   //seccion 4 de ayuda
@@ -158,9 +158,7 @@ if (window.location.pathname.includes("Nosotros.php")) {
 }
 
 //------------------------------- vista blog JS --------------------------
-if (window.location.pathname.includes("Blog.php")||window.location.pathname.includes("ejemplo_api.php")) {
-  //---------js para la parte de noticias para recuperar la informacion y colocarla en la vista Noticias
-  //esto todavia esta pendiente
+if (window.location.pathname.includes("Blog.php") || window.location.pathname.includes("ejemplo_api.php")) {
   function abrirNoticia(event, boton) {
     event.preventDefault();
     const card = boton.closest(".card");
@@ -174,17 +172,23 @@ if (window.location.pathname.includes("Blog.php")||window.location.pathname.incl
     }
   }
 
-  //aqui inicia el carrusel y las funciones para el fetch
   document.addEventListener("DOMContentLoaded", async () => {
     const container = document.getElementById("cursos-container");
+
+    // no estaba el apartado imagen en las cards pero aca se puede cambiar
+    const imagenesCursos = {
+      1: "../ASSETS/cursos/cursos_img1.png",
+      2: "../ASSETS/cursos/cursos_img2.png",
+      3: "../ASSETS/cursos/cursos_img3.png",
+      4: "../ASSETS/cursos/cursos_img4.png",
+      5: "../ASSETS/cursos/cursos_img4.png",
+    };
 
     const response = await fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ estatus: 1 }),
       }
     );
@@ -193,21 +197,20 @@ if (window.location.pathname.includes("Blog.php")||window.location.pathname.incl
 
     if (data && Array.isArray(data)) {
       container.innerHTML = data
-        .map(
-          (curso) => `
-      <div class="card">
-        <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(
-          curso.nombre
-        )}" alt="${curso.nombre}">
-        <div class="contenido">
-          <h4>${curso.nombre}</h4>
-          <p>${curso.descripcion_breve}</p>
-          <p class="horas">${curso.horas} horas</p>
-          <p class="precio">$${curso.precio}</p>
-        </div>
-      </div>
-    `
-        )
+        .map((curso) => {
+          const imagenSrc = imagenesCursos[curso.id] || "https://via.placeholder.com/300x200?text=Curso";
+          return `
+            <div class="card">
+              <img src="${imagenSrc}" alt="${curso.nombre}">
+              <div class="contenido">
+                <h4>${curso.nombre}</h4>
+                <p>${curso.descripcion_breve}</p>
+                <p class="horas">${curso.horas} horas</p>
+                <p class="precio">$${curso.precio}</p>
+              </div>
+            </div>
+          `;
+        })
         .join("");
     }
 
@@ -238,9 +241,7 @@ if (window.location.pathname.includes("Blog.php")||window.location.pathname.incl
     }
 
     function moverSiguiente() {
-      const cardsVisibles = Math.floor(
-        track.parentElement.offsetWidth / cardWidth
-      );
+      const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
       if (currentIndex < cards.length - cardsVisibles) {
         currentIndex++;
         updateCarousel();
@@ -253,12 +254,9 @@ if (window.location.pathname.includes("Blog.php")||window.location.pathname.incl
     }
 
     function actualizarBotones() {
-      const cardsVisibles = Math.floor(
-        track.parentElement.offsetWidth / cardWidth
-      );
+      const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
       prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextButton.style.visibility =
-        currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+      nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
     }
 
     window.addEventListener("resize", () => {
@@ -268,8 +266,8 @@ if (window.location.pathname.includes("Blog.php")||window.location.pathname.incl
 
     actualizarBotones();
   }
+}
 
-} //aqui termina la vista BLOG
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- vista CursoInfo -------------------------------------------------------------

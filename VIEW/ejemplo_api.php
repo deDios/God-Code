@@ -26,7 +26,7 @@
             margin-top: 1rem;
         }
     </style>
-    <link rel="stylesheet" href="CSS/index.css">
+    <link rel="stylesheet" href="../CSS/index.css">
 </head>
 
 <body>
@@ -95,34 +95,32 @@
 
     <!-- seccion 3 -->
     <section id="cursos-destacados">
-        <h3>Cursos de programación</h3>
+        <h3>Cursos disponibles</h3>
 
-        <section id="cursos-destacados">
-            <h3>Cursos disponibles</h3>
+        <div class="carousel-container">
+            <button class="carousel-btn prev" aria-label="Anterior">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                </svg>
+            </button>
 
-            <div class="carousel-container">
-                <button class="carousel-btn prev" aria-label="Anterior">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                    </svg>
-                </button>
-
-                <div class="carousel-track-container">
-                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
-                        <!-- Las cards se insertan desde JS -->
-                    </div>
+            <div class="carousel-track-container">
+                <div class="carousel-track grid-cards-cursos" id="cursos-container">
+                    <!-- Las cards se insertan desde JS -->
                 </div>
-
-                <button class="carousel-btn next" aria-label="Siguiente">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
-                    </svg>
-                </button>
             </div>
-        </section>
+
+            <button class="carousel-btn next" aria-label="Siguiente">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                </svg>
+            </button>
+        </div>
+    </section>
 
 
-        <script src="../JS/index.js"></script>
+
+    <script src="../JS/index.js"></script>
 </body>
 
 </html>
