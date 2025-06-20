@@ -185,7 +185,7 @@
 
         <!-- seccion 3 -->
         <section id="cursos-destacados">
-            <h3>Cursos disponibles</h3>
+            <h3>Cursos disponibles V6</h3>
 
             <div class="carousel-container" id="carousel-container">
                 <button class="carousel-btn prev" aria-label="Anterior">

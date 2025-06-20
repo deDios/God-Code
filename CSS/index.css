@@ -1576,7 +1576,7 @@ footer small {
     will-change: transform;
 }
 
-#cursos-destacados .carousel-track .card {
+#cursos-destacados #cursos-container .card {
     flex: 0 0 calc((100% - 3 * 2rem) / 4);
     max-width: 280px;
     background: #ffffff;
@@ -1592,33 +1592,33 @@ footer small {
     overflow: hidden;
 }
 
-#cursos-destacados .carousel-track .card:hover {
+#cursos-destacados #cursos-container .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-#cursos-destacados .carousel-track .card img {
+#cursos-destacados #cursos-container .card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: 20px 20px 0 0;
 }
 
-#cursos-destacados .carousel-track .card .contenido {
+#cursos-destacados #cursos-container .card .contenido {
     padding: 1rem 1rem 1.5rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 }
 
-#cursos-destacados .carousel-track .card .contenido h4 {
+#cursos-destacados #cursos-container .card .contenido h4 {
     color: #0562EF;
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
-#cursos-destacados .carousel-track .card .contenido h4::after {
+#cursos-destacados #cursos-container .card .contenido h4::after {
     content: "";
     display: block;
     width: 100%;
@@ -1627,20 +1627,21 @@ footer small {
     margin-top: 0.5rem;
 }
 
-#cursos-destacados .carousel-track .card .contenido p {
+#cursos-destacados #cursos-container .card .contenido p {
     font-size: 0.95rem;
     color: #222;
     line-height: 1.6;
     margin-top: 0.5rem;
 }
 
-#cursos-destacados .carousel-track .card .contenido .horas,
-#cursos-destacados .carousel-track .card .contenido .precio {
+#cursos-destacados #cursos-container .card .contenido .horas,
+#cursos-destacados #cursos-container .card .contenido .precio {
     font-weight: 500;
     font-size: 0.9rem;
     margin-top: auto;
     color: #444;
 }
+
 
 #cursos-destacados .carousel-track .contenido {
     padding: 1.2rem;

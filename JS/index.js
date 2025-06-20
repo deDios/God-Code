@@ -176,9 +176,7 @@ if (
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const container = document.getElementById("carousel-container");
-
-    // no estaba el apartado imagen en las cards pero aca se puede cambiar
+    const container = document.getElementById("cursos-container"); // Asegúrate que es este ID
     const imagenesCursos = {
       1: "../ASSETS/cursos/cursos_img1.png",
       2: "../ASSETS/cursos/cursos_img2.png",
@@ -199,6 +197,8 @@ if (
     const data = await response.json();
 
     if (data && Array.isArray(data)) {
+      data.sort((a, b) => (a.prioridad ?? 9999) - (b.prioridad ?? 9999));
+
       container.innerHTML = data
         .map((curso) => {
           const imagenSrc =
@@ -385,7 +385,10 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
-if (window.location.pathname.includes("DesarrolloWeb.php")||window.location.pathname.includes("DesarrolloMobile.php")) {
+if (
+  window.location.pathname.includes("DesarrolloWeb.php") ||
+  window.location.pathname.includes("DesarrolloMobile.php")
+) {
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [
     {
