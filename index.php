@@ -61,28 +61,38 @@
                     <div class="col">
                         <h4>Lo que hacemos</h4>
                         <ul>
-                            <li><a href="VIEW/DesarrolloWeb.php"><img src="ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a></li>
-                            <li><a href="VIEW/DesarrolloMobile.php"><img src="ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo Mobile</a></li>
+                            <li><a href="VIEW/DesarrolloWeb.php"><img src="ASSETS/ProductosPopUp/DesarrolloWeb.png"
+                                        alt="Web">Desarrollo Web</a></li>
+                            <li><a href="VIEW/DesarrolloMobile.php"><img
+                                        src="ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
+                                    Mobile</a></li>
                             <li><a href="#"><img src="ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
                                     Nearshore</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DesarrolloOffshore.png" alt="Offshore">Desarrollo Offshore</a>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DesarrolloOffshore.png"
+                                        alt="Offshore">Desarrollo Offshore</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio educativo</a></li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios
+                                    en la Nube</a></li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a>
+                            </li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
+                                    educativo</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">Tecnología</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a></li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
+                            </li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Tecnologia.png"
+                                        alt="Tecnología">Tecnología</a></li>
+                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col tecnologias full-width">
@@ -115,33 +125,35 @@
 
     <main>
         <!-------------------------- Seccion 1  --------------------------->
-        <section class="innovacion-section">
+        <section id="seccion-innovacion" class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">
-                <h1>Desbloquee la innovación,<br> acelere el crecimiento</h1>
+                <h1>Tecnología unificada.<br> Experiencias conectadas</h1>
                 <p>
-                    IBM LinuxONE Emperor 5 combina Linux e inteligencia artificial para ofrecer seguridad,
-                    rendimiento y eficiencia en la inferencia de IA.
+                    En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos los
+                    canales y dispositivos de tu negocio.
+                    Desde aplicaciones móviles hasta plataformas web, sistemas de gestión y puntos de contacto físicos,
+                    conectamos cada parte de tu negocio para brindar experiencias consistentes, fluidas y personalizadas
+                    a tus usuarios. Innovación real para empresas que buscan eficiencia, escalabilidad y una presencia
+                    360°.
                 </p>
                 <div class="botones">
-                    <a href="#" class="btn btn-primary">Descubra IBM LinuxONE 5</a>
-                    <a href="#" class="btn btn-outline">Explore el conjunto de herramientas de IA</a>
+                    <a href="#" class="btn btn-primary">Descubre GodCode 360°</a>
+                    <a href="#" class="btn btn-outline">Explora el conjunto de soluciones</a>
                 </div>
             </div>
 
             <!-- Columna central -->
             <div class="columna imagen">
-                <img src="https://blob.udgtv.com/images/uploads/2017/07/inbox3-focus-0-0-608-342.jpg" />
+                <img src="ASSETS/index/Seccion1_img1.png" />
             </div>
 
             <!-- Columna derecha -->
             <div class="columna noticias">
-                <h3>Noticias</h3>
-
+                <h3>Noticias sobre tecnología</h3>
                 <div id="lista-noticias">
-                    <div class="contenido-noticias"></div> <!-- Este es el que usaremos para las animaciones -->
+                    <div class="contenido-noticias"></div>
                 </div>
-
                 <div id="paginacion" class="paginacion"></div>
             </div>
         </section>
@@ -152,30 +164,40 @@
             <h2>Alcanza tus objetivos con las soluciones que tenemos para ti o tu negocio.</h2>
             <div class="cards">
                 <div class="card">
-                    <img src="ASSETS/index/calendario.png" alt="Conversión">
-                    <h3>Maximiza los clientes potenciales y las conversiones</h3>
-                    <p>Consigue clientes potenciales de mayor calidad y mejora las conversiones.</p>
+                    <img src="ASSETS/index/seccion2_img1.png" alt="Conversión">
+                    <h3>Aumenta tus ventas
+                        con tecnología</h3>
+                    <p>Automatiza tus procesos, analiza tus datos en tiempo real y ofrece experiencias digitales que
+                        convierten. Creamos plataformas y herramientas que impactan directamente en tus resultados de
+                        venta.</p>
                 </div>
                 <div class="card">
-                    <img src="ASSETS/index/barras.png" alt="Ventas en línea">
-                    <h3>Aumenta las ventas en línea</h3>
-                    <p>Llega a los compradores donde se encuentren y aumenta el tráfico y las ventas de tu sitio.</p>
+                    <img src="ASSETS/index/seccion2_img2.png" alt="Ventas en línea">
+                    <h3>Impulsa tu negocio</h3>
+                    <p>Desarrollamos soluciones a la medida para escalar tu empresa. Desde sistemas internos hasta
+                        plataformas integrales, te ayudamos a operar de manera más ágil, segura y eficiente.</p>
                 </div>
                 <div class="card">
-                    <img src="ASSETS/index/tienda.png" alt="Tráfico en tienda">
-                    <h3>Impulsa el tráfico presencial en la tienda</h3>
-                    <p>Atrae a los consumidores a tu tienda y aumenta las ventas tradicionales.</p>
+                    <img src="ASSETS/index/seccion2_img3.png" alt="Tráfico en tienda">
+                    <h3>Muestra tu marca</h3>
+                    <p>Haz que tu marca hable por ti. Diseñamos sitios web y experiencias digitales visualmente
+                        poderosas, que transmiten confianza, profesionalismo y un mensaje claro para tu audiencia.</p>
                 </div>
                 <div class="card">
-                    <img src="ASSETS/index/planeta.png" alt="Marca">
-                    <h3>Muestra tu marca a más personas</h3>
-                    <p>Muestra tu marca para aumentar el alcance y la participación.</p>
+                    <img src="ASSETS/index/seccion2_img4.png" alt="Marca">
+                    <h3>De un móvil a
+                        tus clientes</h3>
+                    <p>Tus clientes viven en su celular, y tu negocio también debe estar ahí. Creamos apps móviles
+                        modernas, rápidas y seguras para que tus productos o servicios estén siempre al alcance de la
+                        mano.</p>
                 </div>
                 <div class="card">
-                    <img src="ASSETS/index/celular.png" alt="Aplicación">
-                    <h3>Promociona tu aplicación para los usuarios nuevos</h3>
-                    <p>Promociona tu aplicación entre los usuarios adecuados para impulsar las descargas y la
-                        participación.</p>
+                    <img src="ASSETS/index/seccion2_img5.png" alt="Aplicación">
+                    <h3>Maximiza tus clientes
+                        potenciales</h3>
+                    <p>Utilizamos tecnología para atraer, segmentar y convertir leads en clientes reales. Conecta con
+                        las personas correctas, en el momento adecuado, con soluciones digitales pensadas para crecer tu
+                        base de clientes.</p>
                 </div>
             </div>
             <div class="info-button">
@@ -189,43 +211,43 @@
 
             <div class="bloque">
                 <div class="imagen">
-                    <img src="ASSETS/index/mapa.png" alt="Clientes img">
+                    <img src="ASSETS/index/seccion3_img1.png" alt="Clientes img">
                 </div>
                 <div class="texto">
                     <h3>Llega a tus clientes estén donde estén</h3>
                     <p>
-                        Muestra tus anuncios en el lugar y momento adecuados gracias a Google Ads.
-                        Deja que la automatización de Google encuentre los formatos de anuncio
-                        en YouTube, Discover, la Búsqueda y más para maximizar las conversiones
-                        de tu negocio.
+                        Desarrollamos soluciones tecnológicas omnicanal que permiten interactuar con tus clientes desde
+                        cualquier dispositivo o plataforma.Ya sea en redes sociales, apps móviles, sitios web o sistemas
+                        físicos, conectamos todos los canales para que tu negocio esté presente donde tus clientes te
+                        necesiten.
                     </p>
                 </div>
             </div>
 
             <div class="bloque">
                 <div class="imagen">
-                    <img src="ASSETS/index/clipboard.png" alt="Optimiza ROI">
+                    <img src="ASSETS/index/seccion3_img2.png" alt="Optimiza ROI">
                 </div>
                 <div class="texto">
-                    <h3>Registra, aprende y optimiza el ROI</h3>
+                    <h3>Administra y controla tus herramientas</h3>
                     <p>
-                        Registra las conversiones para obtener información de tu público objetivo.
-                        La optimización automática del presupuesto de Google te permite captar clientes nuevos
-                        con el ROI más alto.
+                        Centraliza y automatiza tus procesos en un solo panel de control.GodCode crea soluciones que
+                        integran tus sistemas actuales, brindándote visibilidad total y control sobre las herramientas
+                        que usas día a día para operar tu negocio de forma más eficiente y segura.
                     </p>
                 </div>
             </div>
 
             <div class="bloque">
                 <div class="imagen">
-                    <img src="ASSETS/index/dinero.png" alt="Controla tu presupuesto">
+                    <img src="ASSETS/index/seccion3_img3.png" alt="Controla tu presupuesto">
                 </div>
                 <div class="texto">
-                    <h3>Controla tu presupuesto</h3>
+                    <h3>Gestiona tus costos y hazte de nuevas herramientas</h3>
                     <p>
-                        Obtén recomendaciones, realiza ajustes y decide tu presupuesto mensual.
-                        La tecnología de Google te permite medir resultados y aprovechar tu inversión
-                        publicitaria de la mejor manera.
+                        Optimiza tus recursos y maximiza el retorno de tu inversión tecnológica.Te ayudamos a
+                        identificar oportunidades de ahorro, reducir gastos operativos y adoptar nuevas soluciones que
+                        potencien tu crecimiento, sin perder el control financiero.
                     </p>
                 </div>
             </div>
@@ -236,9 +258,12 @@
         <section class="ayuda-faq">
             <div class="ayuda-contenido">
                 <h2>Permítenos ayudarte.</h2>
-                <p>Recibe asistencia personalizada sin cargo. Crea tu plan de anuncios personalizados con un experto en
-                    Google Ads.</p>
-                <a href="#contacto" class="btn-contacto">Contáctanos pero ya está el contacto abajo</a>
+                <p>Recibe asesoría personalizada sin costo.Te ayudamos a identificar las soluciones tecnológicas ideales
+                    para tu empresa, ya sea que necesites una app, una plataforma web, automatización de procesos o una
+                    experiencia omnicanal completa.
+                    Creamos tu plan tecnológico a medida, guiado por expertos en desarrollo e innovación.
+                </p>
+                <a href="#contacto" class="btn-contacto">Contáctanos</a>
             </div>
 
             <div class="faq">
@@ -246,19 +271,40 @@
 
                 <div class="acordeon">
                     <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Cuáles son los diferentes tipos de campañas
-                            de Google Ads que puedo ejecutar?</button>
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Qué tipo de soluciones desarrollan en GodCode?</button>
                         <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según
                             tu objetivo.</div>
                     </div>
                     <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Qué tipo de campaña de Google Ads es
-                            adecuada para mi negocio?</button>
+                        <button class="pregunta" onclick="toggleItem(this)">¿Puedo contratar solo una parte del
+                            desarrollo, como una app o solo el sitio web?</button>
                         <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
                         </div>
                     </div>
                     <div class="item">
-                        <button class="pregunta" onclick="toggleItem(this)">¿Google Ads usa IA?</button>
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿GodCode trabaja con empresas pequeñas o solo grandes corporativos?</button>
+                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
+                            personalización de anuncios.</div>
+                    </div>
+
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Qué es una solución omnicanal y cómo puede ayudar a mi negocio?</button>
+                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
+                            personalización de anuncios.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+
+                            ¿Ofrecen consultoría antes de comenzar un proyecto?</button>
+                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
+                            personalización de anuncios.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Los desarrollos son personalizados o trabajan con plantillas?</button>
                         <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
                             personalización de anuncios.</div>
                     </div>

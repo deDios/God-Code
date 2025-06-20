@@ -173,7 +173,7 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const container = document.getElementById("cursos-container");
+    const container = document.getElementById("carousel-container");
 
     // no estaba el apartado imagen en las cards pero aca se puede cambiar
     const imagenesCursos = {
@@ -198,7 +198,7 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
     if (data && Array.isArray(data)) {
       container.innerHTML = data
         .map((curso) => {
-          const imagenSrc = imagenesCursos[curso.id] || "https://via.placeholder.com/300x200?text=Curso";
+          const imagenSrc = imagenesCursos[curso.id] || "../ASSETS/cursos/cursos_img1.png";
           return `
             <div class="card">
               <img src="${imagenSrc}" alt="${curso.nombre}">
