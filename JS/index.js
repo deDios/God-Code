@@ -158,7 +158,10 @@ if (window.location.pathname.includes("Nosotros.php")) {
 }
 
 //------------------------------- vista blog JS --------------------------
-if (window.location.pathname.includes("Blog.php") || window.location.pathname.includes("ejemplo_api.php")) {
+if (
+  window.location.pathname.includes("Blog.php") ||
+  window.location.pathname.includes("ejemplo_api.php")
+) {
   function abrirNoticia(event, boton) {
     event.preventDefault();
     const card = boton.closest(".card");
@@ -198,7 +201,8 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
     if (data && Array.isArray(data)) {
       container.innerHTML = data
         .map((curso) => {
-          const imagenSrc = imagenesCursos[curso.id] || "../ASSETS/cursos/cursos_img1.png";
+          const imagenSrc =
+            imagenesCursos[curso.id] || "../ASSETS/cursos/cursos_img1.png";
           return `
             <div class="card">
               <img src="${imagenSrc}" alt="${curso.nombre}">
@@ -241,7 +245,9 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
     }
 
     function moverSiguiente() {
-      const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+      const cardsVisibles = Math.floor(
+        track.parentElement.offsetWidth / cardWidth
+      );
       if (currentIndex < cards.length - cardsVisibles) {
         currentIndex++;
         updateCarousel();
@@ -254,9 +260,12 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
     }
 
     function actualizarBotones() {
-      const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+      const cardsVisibles = Math.floor(
+        track.parentElement.offsetWidth / cardWidth
+      );
       prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+      nextButton.style.visibility =
+        currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
     }
 
     window.addEventListener("resize", () => {
@@ -267,7 +276,6 @@ if (window.location.pathname.includes("Blog.php") || window.location.pathname.in
     actualizarBotones();
   }
 }
-
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- vista CursoInfo -------------------------------------------------------------
@@ -377,7 +385,77 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
+if (window.location.pathname.includes("DesarrolloWeb.php")||window.location.pathname.includes("DesarrolloMobile.php")) {
+  //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
+  const productos = [
+    {
+      texto: "Desarrollo offshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo web",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo Mobile",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
+      link: "../VIEW/DesarrolloMobile.php",
+    },
+    {
+      texto: "Desarrollo nearshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Servicios en la nube",
+      icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Diseño UX/UI",
+      icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Sercivio educativo",
+      icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Educación",
+      icono: "../ASSETS/ProductosPopUp/Educacion.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Finanzas",
+      icono: "../ASSETS/ProductosPopUp/Finanzas.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Tecnología",
+      icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+  ];
 
+  const contenedor = document.querySelector(
+    "#otros-productos .productos-random"
+  );
+
+  const seleccionAleatoria = productos
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3);
+
+  seleccionAleatoria.forEach((prod) => {
+    const a = document.createElement("a");
+    a.href = prod.link;
+    a.className = "producto-item";
+    a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
+    contenedor.appendChild(a);
+  });
+}
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {
@@ -417,72 +495,4 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   animados.forEach((el) => observer.observe(el));
-});
-
-//funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
-const productos = [
-  {
-    texto: "Desarrollo offshore",
-    icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Desarrollo web",
-    icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Desarrollo Mobile",
-    icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
-    link: "../VIEW/DesarrolloMobile.php",
-  },
-  {
-    texto: "Desarrollo nearshore",
-    icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Servicios en la nube",
-    icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Diseño UX/UI",
-    icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Sercivio educativo",
-    icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Educación",
-    icono: "../ASSETS/ProductosPopUp/Educacion.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Finanzas",
-    icono: "../ASSETS/ProductosPopUp/Finanzas.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-  {
-    texto: "Tecnología",
-    icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
-    link: "../VIEW/DesarrolloWeb.php",
-  },
-];
-
-const contenedor = document.querySelector("#otros-productos .productos-random");
-
-const seleccionAleatoria = productos
-  .sort(() => 0.5 - Math.random())
-  .slice(0, 3);
-
-seleccionAleatoria.forEach((prod) => {
-  const a = document.createElement("a");
-  a.href = prod.link;
-  a.className = "producto-item";
-  a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
-  contenedor.appendChild(a);
 });

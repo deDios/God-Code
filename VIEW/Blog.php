@@ -185,12 +185,10 @@
 
         <!-- seccion 3 -->
         <section id="cursos-destacados">
-            <h3>Cursos de programación</h3>
-
             <section id="cursos-destacados">
                 <h3>Cursos disponibles</h3>
 
-                <div class="carousel-container">
+                <div class="carousel-container" id="carousel-container">
                     <button class="carousel-btn prev" aria-label="Anterior">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
                             <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
