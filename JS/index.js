@@ -162,119 +162,124 @@ if (
   window.location.pathname.includes("Blog.php") ||
   window.location.pathname.includes("ejemplo_api.php")
 ) {
-  function abrirNoticia(event, boton) {
-    event.preventDefault();
-    const card = boton.closest(".card");
-    const noticiaId = card.getAttribute("data-id");
+  document.addEventListener("DOMContentLoaded", () => {
+    const cursosContainer = document.getElementById("cursos-container");
+    const categoriaSelect = document.getElementById("categoria");
+    const limpiarBtn = document.getElementById("limpiar-filtros");
 
-    if (noticiaId) {
-      localStorage.setItem("noticiaSeleccionada", noticiaId);
-      window.location.href = "Noticia.php";
-    } else {
-      alert("No se pudo identificar la noticia.");
-    }
-  }
+    let cursosOriginales = [];
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const container = document.getElementById("cursos-container"); // Asegúrate que es este ID
-    const imagenesCursos = {
-      1: "../ASSETS/cursos/cursos_img1.png",
-      2: "../ASSETS/cursos/cursos_img2.png",
-      3: "../ASSETS/cursos/cursos_img3.png",
-      4: "../ASSETS/cursos/cursos_img4.png",
-      5: "../ASSETS/cursos/cursos_img4.png",
-    };
+    fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estatus: 1 })
+    })
+      .then(res => res.json())
+      .then(categorias => {
+        categorias.forEach(cat => {
+          const option = document.createElement("option");
+          option.value = cat.id;
+          option.textContent = cat.nombre;
+          categoriaSelect.appendChild(option);
+        });
+      })
+      .catch(err => console.error("Error al cargar categorías:", err));
 
-    const response = await fetch(
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estatus: 1 }),
-      }
-    );
+    fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estatus: 1 })
+    })
+      .then(res => res.json())
+      .then(data => {
+        cursosOriginales = data;
+        renderizarCursos(data);
+        inicializarCarrusel();
+      })
+      .catch(err => console.error("Error al cargar cursos:", err));
 
-    const data = await response.json();
+    categoriaSelect.addEventListener("change", () => {
+      const categoriaSeleccionada = categoriaSelect.value;
+      const filtrados = categoriaSeleccionada
+        ? cursosOriginales.filter(curso => curso.categoria == categoriaSeleccionada)
+        : cursosOriginales;
+      renderizarCursos(filtrados);
+      inicializarCarrusel();
+    });
 
-    if (data && Array.isArray(data)) {
-      data.sort((a, b) => (a.prioridad ?? 9999) - (b.prioridad ?? 9999));
+    limpiarBtn.addEventListener("click", () => {
+      categoriaSelect.value = "";
+      renderizarCursos(cursosOriginales);
+      inicializarCarrusel();
+    });
 
-      container.innerHTML = data
-        .map((curso) => {
-          const imagenSrc =
-            imagenesCursos[curso.id] || "../ASSETS/cursos/cursos_img1.png";
-          return `
-            <div class="card">
-              <img src="${imagenSrc}" alt="${curso.nombre}">
-              <div class="contenido">
-                <h4>${curso.nombre}</h4>
-                <p>${curso.descripcion_breve}</p>
-                <p class="horas">${curso.horas} horas</p>
-                <p class="precio">$${curso.precio}</p>
-              </div>
-            </div>
-          `;
-        })
+    function renderizarCursos(cursos) {
+      cursosContainer.innerHTML = cursos
+        .map(
+          curso => `
+        <div class="card">
+          <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(curso.nombre)}" alt="${curso.nombre}">
+          <div class="contenido">
+            <h4>${curso.nombre}</h4>
+            <p>${curso.descripcion_breve}</p>
+            <p class="info">${curso.horas} hr | $${curso.precio} mx</p>
+          </div>
+        </div>
+      `
+        )
         .join("");
     }
 
-    inicializarCarrusel();
-  });
+    function inicializarCarrusel() {
+      const track = document.querySelector(".carousel-track");
+      const prevButton = document.querySelector(".carousel-btn.prev");
+      const nextButton = document.querySelector(".carousel-btn.next");
 
-  function inicializarCarrusel() {
-    const track = document.querySelector(".carousel-track");
-    const prevButton = document.querySelector(".carousel-btn.prev");
-    const nextButton = document.querySelector(".carousel-btn.next");
+      if (!track || !prevButton || !nextButton) return;
 
-    if (!track || !prevButton || !nextButton) return;
+      const cards = Array.from(track.children);
+      if (cards.length === 0) return;
 
-    const cards = Array.from(track.children);
-    if (cards.length === 0) return;
+      let cardWidth = cards[0].getBoundingClientRect().width + 16;
+      let currentIndex = 0;
 
-    let cardWidth = cards[0].getBoundingClientRect().width + 16;
-    let currentIndex = 0;
+      prevButton.addEventListener("click", moverAnterior);
+      nextButton.addEventListener("click", moverSiguiente);
 
-    prevButton.addEventListener("click", moverAnterior);
-    nextButton.addEventListener("click", moverSiguiente);
-
-    function moverAnterior() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCarousel();
+      function moverAnterior() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        }
       }
-    }
 
-    function moverSiguiente() {
-      const cardsVisibles = Math.floor(
-        track.parentElement.offsetWidth / cardWidth
-      );
-      if (currentIndex < cards.length - cardsVisibles) {
-        currentIndex++;
-        updateCarousel();
+      function moverSiguiente() {
+        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        if (currentIndex < cards.length - cardsVisibles) {
+          currentIndex++;
+          updateCarousel();
+        }
       }
-    }
 
-    function updateCarousel() {
-      track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-      actualizarBotones();
-    }
+      function updateCarousel() {
+        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        actualizarBotones();
+      }
 
-    function actualizarBotones() {
-      const cardsVisibles = Math.floor(
-        track.parentElement.offsetWidth / cardWidth
-      );
-      prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextButton.style.visibility =
-        currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
-    }
+      function actualizarBotones() {
+        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+        nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+      }
 
-    window.addEventListener("resize", () => {
-      cardWidth = cards[0].getBoundingClientRect().width + 16;
+      window.addEventListener("resize", () => {
+        cardWidth = cards[0].getBoundingClientRect().width + 16;
+        updateCarousel();
+      });
+
       updateCarousel();
-    });
-
-    actualizarBotones();
-  }
+    }
+  });
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -383,7 +388,7 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------- vista CursoInfo -------------------------------------------------------------
+//------------------------------- vistas del megamenu de productos -------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (
   window.location.pathname.includes("DesarrolloWeb.php") ||
@@ -459,6 +464,143 @@ if (
     contenedor.appendChild(a);
   });
 }
+
+if (
+  window.location.pathname.includes("ServiciosEnLaNube.php")
+) {
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const carousel = document.getElementById("ventajas-carousel");
+    const prevBtn = document.querySelector(".ventajas-nube__btn.prev");
+    const nextBtn = document.querySelector(".ventajas-nube__btn.next");
+    const slides = carousel.querySelectorAll(".ventaja");
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateCarousel() {
+      const slideWidth = carousel.offsetWidth;
+      carousel.scrollTo({
+        left: slideWidth * currentIndex,
+        behavior: "smooth"
+      });
+
+      prevBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+      nextBtn.style.visibility = currentIndex === totalSlides - 1 ? "hidden" : "visible";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < totalSlides - 1) {
+        currentIndex++;
+        updateCarousel();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      updateCarousel();
+    });
+
+    updateCarousel();
+  });
+
+  //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
+  const productos = [
+    {
+      texto: "Desarrollo offshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo web",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo Mobile",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
+      link: "../VIEW/DesarrolloMobile.php",
+    },
+    {
+      texto: "Desarrollo nearshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Servicios en la nube",
+      icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
+      link: "../VIEW/ServiciosEnLaNube.php",
+    },
+    {
+      texto: "Diseño UX/UI",
+      icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Sercivio educativo",
+      icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Educación",
+      icono: "../ASSETS/ProductosPopUp/Educacion.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Finanzas",
+      icono: "../ASSETS/ProductosPopUp/Finanzas.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Tecnología",
+      icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+  ];
+
+  const contenedor = document.querySelector(
+    "#otros-productos .productos-random"
+  );
+
+  const seleccionAleatoria = productos
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3);
+
+  seleccionAleatoria.forEach((prod) => {
+    const a = document.createElement("a");
+    a.href = prod.link;
+    a.className = "producto-item";
+    a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
+    contenedor.appendChild(a);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {

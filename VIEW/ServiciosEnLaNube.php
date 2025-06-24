@@ -77,8 +77,9 @@
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png"
-                                        alt="Nube">Servicios en la Nube</a></li>
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
+                                    Nube</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
                                     UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
@@ -128,71 +129,79 @@
 
     <main>
         <!-- Seccion 1  -->
-        <section id="desarrollo-web-carrusel" class="animado">
-
-            <!-- Texto informativo y llamado a la acción -->
-            <div class="info-section">
-                <div class="info-text">
-                    <h2>Desarrollo Mobile</h2>
+        <section id="servicios-nube">
+            <div class="servicios-nube__contenedor">
+                <div class="servicios-nube__texto">
+                    <h2>Servicios en la Nube</h2>
                     <p>
-                        Las grandes apps comienzan con una buena
-                        estrategia de desarrollo. Desde la conceptualización
-                        hasta el diseño y la programación, cada etapa
-                        es clave para crear experiencias mobiles intuitivas,
-                        funcionales y alineadas con las necesidades reales
-                        de tus usuarios. Desarrolla aplicaciones que no
-                        solo se ven bien, sino que generan impacto,
-                        engagement y resultados medibles. GodCode
+                        Las grandes soluciones digitales comienzan con una estrategia sólida en la nube. Desde la
+                        planificación de la infraestructura hasta la implementación y escalabilidad, cada etapa es clave
+                        para construir entornos seguros, flexibles y eficientes.
+                        Aprovecha el poder del cómputo en la nube para alojar tus aplicaciones, gestionar datos,
+                        automatizar procesos y optimizar el rendimiento de tus sistemas. Desarrolla soluciones que no
+                        solo funcionan bien, sino que evolucionan contigo, impulsan la innovación y logran resultados
+                        reales.
+                        <a href="#" class="link-godcode">GodCode</a>
                     </p>
                 </div>
-                <div class="cta-box">
-                    <h3>Crea tu App Mobile</h3>
-                    <button onclick="location.href='#'">Contáctanos</button>
+
+                <div class="servicios-nube__imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion1_img1.png"
+                        alt="Servicios en la nube" />
                 </div>
             </div>
+        </section>
 
-            <!-- Carrusel de cursos -->
-            <div class="carousel-container">
-                <button class="carousel-btn prev" aria-label="Anterior">
+        <!-- Seccion 2  -->
+        <section id="ventajas-nube">
+            <p class="ventajas-nube__intro">
+                Estas son las ventajas estratégicas que su producto puede alcanzar mediante la adopción<br>
+                de soluciones basadas en la nube.
+            </p>
+
+            <div class="ventajas-nube__contenedor">
+                <button class="ventajas-nube__btn prev" aria-label="Anterior">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                     </svg>
                 </button>
 
-                <div class="carousel-track-container">
-                    <div class="carousel-track">
-                        <!-- Cards-->
-                        <div class="simple-card">
-                            <div class="card-body">
-                                <h4>Desarrollo de App Mobile</h4>
-                            </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img1.png" alt="img">
-                        </div>
+                <div class="ventajas-nube__carousel" id="ventajas-carousel">
 
-                        <div class="simple-card">
-                            <div class="card-body">
-                                <h4>Diseño de App</h4>
-                            </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img2.png" alt="img">
-                        </div>
-
-                        <div class="simple-card">
-                            <div class="card-body">
-                                <h4>Compatibilidad y adaptabilidad</h4>
-                            </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img3.png" alt="img">
-                        </div>
-
-                        <div class="simple-card">
-                            <div class="card-body">
-                                <h4>Actualizaciones regulares</h4>
-                            </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img4.png" alt="img">
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
+                            alt="Ventaja" />
+                        <div class="ventaja__texto">
+                            <h3>Escalabilidad inmediata</h3>
+                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
+                                demanda, sin necesidad de infraestructura física adicional.</p>
                         </div>
                     </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
+                            alt="Ventaja" />
+                        <div class="ventaja__texto">
+                            <h3>Escalabilidad inmediata</h3>
+                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
+                                demanda, sin necesidad de infraestructura física adicional.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
+                            alt="Ventaja" />
+                        <div class="ventaja__texto">
+                            <h3>Escalabilidad inmediata</h3>
+                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
+                                demanda, sin necesidad de infraestructura física adicional.</p>
+                        </div>
+                    </div>
+
+
                 </div>
 
-                <button class="carousel-btn next" aria-label="Siguiente">
+                <button class="ventajas-nube__btn next" aria-label="Siguiente">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
                     </svg>
@@ -200,62 +209,48 @@
             </div>
         </section>
 
-        <!-- seccion 2 -->
-        <section id="descripcion-pagina-Productos" class="animado">
-            <div class="descripcion-pagina-Productos__wrapper">
-                <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza aplicaciones mobiles que marcan la diferenciaDesde ideas
-                            simples</span></h2>
-                    <p>
-                        hasta soluciones móviles complejas, planifica cada fase del desarrollo con precisión.Define
-                        funcionalidades clave, diseña interfaces intuitivas, establece objetivos claros y colabora con
-                        diseñadores,
-                        programadores y testers en un flujo de trabajo unificado. Asigna tareas, gestiona prioridades,
-                        realiza pruebas en
-                        tiempo real y asegúrate de que cada interacción sea fluida y centrada en el usuario.Lanza apps
-                        que no solo funcionan, sino que también cautivan, fidelizan y generan resultados reales.
-                    </p>
-                </div>
-
-                <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Lleva el control total del desarrollo de tu app móvil</span></h2>
-                    <p> Visualiza cada etapa del proyecto con tableros, listas y cronogramas adaptados a tus procesos.
-                        Desde la arquitectura
-                        inicial hasta la publicación final, crea flujos de trabajo personalizados para diseño,
-                        desarrollo, contenido y pruebas. Integra tus herramientas favoritas —como editores de código,
-                        gestores de contenido y plataformas de análisis y
-                        mantén todo centralizado para que tu equipo avance con claridad y sin perder el rumbo.</p>
-                    <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
-                            alt="Diseño de app móvil" />
-                    </div>
-                </div>
-
-                <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu app móvil con datos que importanSupervisa el progreso de cada etapa del
-                            desarrollo en tiempo real: diseño de interfaz, desarrollo de funcionalidades,
-                            pruebas y despliegue.</span></h2>
-                    <p> Detecta cuellos de botella, identifica errores antes del lanzamiento y toma decisiones
-                        informadas
-                        basadas en datos reales. Evalúa el rendimiento de tu equipo y de la aplicación, anticipa riesgos
-                        y mejora continuamente
-                        tus procesos para lanzar apps móviles de mayor calidad, en menos tiempo.</p>
-                    <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
-                            alt="Datos de aplicación móvil" />
-                    </div>
+        <!-- Seccion 3  -->
+        <section id="nube-final">
+            <div class="nube-final__contenido">
+                <p>
+                    No te pierdas la oportunidad de tener tus páginas y apps alojadas en nuestro servicio en la nube.
+                    Optimiza el rendimiento, la seguridad y la escalabilidad de tus soluciones digitales con una
+                    infraestructura moderna, confiable y diseñada para acompañar el crecimiento de tu negocio. Al migrar
+                    tus aplicaciones y sitios web a nuestra nube, disfrutarás de disponibilidad continua, tiempos de
+                    carga rápidos, respaldo automático de datos y protección avanzada contra amenazas.
+                    <br><br>
+                    Además, podrás realizar despliegues más ágiles, mantener el control total sobre tus recursos y
+                    reducir significativamente los costos operativos. Nuestro equipo técnico te acompaña en cada etapa:
+                    desde la configuración inicial hasta el monitoreo y mantenimiento, garantizando un entorno estable y
+                    adaptado a tus necesidades. Haz que tu proyecto digital evolucione con la flexibilidad y potencia
+                    que solo la nube puede ofrecer.
+                </p>
+                <div class="nube-final__imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion3_img1.png"
+                        alt="Servicios en la nube">
                 </div>
             </div>
         </section>
 
-        <!-- seccion 3  los productos aparecen en grupso de 3 y lo hacen aleactoreamente -->
+        <!-- Seccion 4  -->
         <section id="otros-productos">
             <h2>Otros Productos</h2>
             <div class="productos-random"></div>
         </section>
-
     </main>
-
+    <!-- Pie de pagina -->
+    <footer>
+        <div>
+            <strong>Contacto</strong>
+            <small>Teléfono: 33 3333 3333</small>
+            <small>Ubicación: Ixtlahuacán de los membrillos</small>
+        </div>
+        <div>
+            <strong>Horarios de servicio</strong>
+            <small>Lunes a Viernes</small>
+            <small>De 9:00AM a 8:00PM</small>
+        </div>
+    </footer>
     <script src="../JS/index.js"></script>
 </body>
 

@@ -72,7 +72,7 @@
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio educativo</a></li>
                         </ul>

@@ -61,28 +61,40 @@
                     <div class="col">
                         <h4>Lo que hacemos</h4>
                         <ul>
-                            <li><a href="../VIEW/DesarrolloWeb.php"><img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a></li>
-                            <li><a href="../VIEW/DesarrolloMobile.php"><img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo Mobile</a></li>
+                            <li><a href="../VIEW/DesarrolloWeb.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a>
+                            </li>
+                            <li><a href="../VIEW/DesarrolloMobile.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
+                                    Mobile</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
                                     Nearshore</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png" alt="Offshore">Desarrollo Offshore</a>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png"
+                                        alt="Offshore">Desarrollo Offshore</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio educativo</a></li>
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
+                                    Nube</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                                    UX/UI</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
+                                    educativo</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">Tecnología</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Educacion.png"
+                                        alt="Educación">Educación</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Tecnologia.png"
+                                        alt="Tecnología">Tecnología</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col tecnologias full-width">
@@ -91,7 +103,8 @@
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Azure.png" alt="Azure"> Azure</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Php.png" alt="PHP"> PHP</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Kotlin.png" alt="Kotlin"> Kotlin</span>
-                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI"> SwiftUI</span>
+                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI">
+                                SwiftUI</span>
                         </div>
                     </div>
                 </div>
@@ -123,7 +136,6 @@
                 Descubre las últimas noticias en tecnología, innovación y avances que están transformando el mundo.<br>
                 Mantente al día con lo más relevante, todo en un solo lugar.
             </p>
-
             <div class="grid-cards">
                 <div class="card" data-id="meta">
                     <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
@@ -149,43 +161,38 @@
                     </div>
                 </div>
             </div>
-
         </section>
 
         <!-- seccion 2 -->
         <section id="filtros-cursos">
-            <h2>Cursos destacados</h2>
-            <h3>Explora nuestras mejores opciones</h3>
-            <p class="descripcion">
-                Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido actualizado
-                y práctico.
-            </p>
+            <div class="filtros-cursos__contenido">
+                <h2>Cursos destacados</h2>
+                <h3>Explora nuestras mejores opciones</h3>
+                <p class="descripcion">
+                    Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
+                    actualizado y práctico.
+                </p>
+            </div>
+
             <div class="contenedor-filtros">
                 <div class="filtro">
-                    <label for="categoria">categorías de cursos</label>
+                    <label for="categoria">Categorías de cursos</label>
                     <select id="categoria" name="categoria">
                         <option value="">Selecciona una categoría</option>
-                        <option value="programacion">Programación</option>
-                        <option value="diseño">Diseño</option>
-                        <option value="marketing">Marketing</option>
+                        <!-- Se llenará con JS -->
                     </select>
                 </div>
 
-                <div class="filtro">
-                    <label for="filtro">Filtros</label>
-                    <select id="filtro" name="filtro">
-                        <option value="">Selecciona un filtro</option>
-                        <option value="populares">Más populares</option>
-                        <option value="nuevos">Más recientes</option>
-                        <option value="gratis">Gratuitos</option>
-                    </select>
+                <div class="filtro limpiar">
+                    <label>&nbsp;</label>
+                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
                 </div>
             </div>
         </section>
 
         <!-- seccion 3 -->
         <section id="cursos-destacados">
-            <h3>Cursos disponibles V6</h3>
+            <h3>Cursos disponibles V8</h3>
 
             <div class="carousel-container" id="carousel-container">
                 <button class="carousel-btn prev" aria-label="Anterior">
