@@ -183,16 +183,6 @@
                     </select>
                 </div>
 
-                <div class="filtro">
-                    <label for="filtro">Filtros</label>
-                    <select id="filtro" name="filtro">
-                        <option value="">Selecciona un filtro</option>
-                        <option value="populares">Más populares</option>
-                        <option value="nuevos">Más recientes</option>
-                        <option value="gratis">Gratuitos</option>
-                    </select>
-                </div>
-
                 <div class="filtro limpiar">
                     <label>&nbsp;</label>
                     <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
@@ -202,7 +192,7 @@
 
         <!-- seccion 3 -->
         <section id="cursos-destacados">
-            <h3>Cursos disponibles V6</h3>
+            <h3>Cursos disponibles V8</h3>
 
             <div class="carousel-container" id="carousel-container">
                 <button class="carousel-btn prev" aria-label="Anterior">

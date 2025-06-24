@@ -311,143 +311,79 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
 
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const selectCategoria = document.getElementById("categoria");
-    const selectFiltro = document.getElementById("filtro");
-    const btnLimpiar = document.getElementById("limpiar-filtros");
-    const container = document.getElementById("cursos-container");
+    const categoriaSelect = document.getElementById("categoria");
+    const limpiarBtn = document.getElementById("limpiar-filtros");
+    const cursosContainer = document.getElementById("cursos-container");
 
+    // 1. Cargar categorías dinámicamente desde la base de datos
     async function cargarCategorias() {
       try {
-        const res = await fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php");
-        const categorias = await res.json();
-
-        categorias.forEach(cat => {
-          const option = document.createElement("option");
-          option.value = cat.id;
-          option.textContent = cat.nombre;
-          selectCategoria.appendChild(option);
+        const res = await fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/categorias.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estatus: 1 })
         });
+
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          data.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat.id;
+            option.textContent = cat.nombre;
+            categoriaSelect.appendChild(option);
+          });
+        }
       } catch (err) {
-        console.error("Error cargando categorías:", err);
+        console.error("Error al cargar categorías:", err);
       }
     }
 
-    async function cargarCursos() {
-      const categoria = selectCategoria.value;
-      const filtro = selectFiltro.value;
-
-      const body = { estatus: 1 };
-      if (categoria) body.categoria = parseInt(categoria);
-      if (filtro) body.filtro = filtro;
+    // 2. Cargar cursos filtrados (o todos si no hay filtros)
+    async function cargarCursosFiltrados() {
+      const categoria = categoriaSelect.value;
 
       try {
         const res = await fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ estatus: 1 })
         });
 
-        const cursos = await res.json();
-        renderizarCursos(cursos);
+        let cursos = await res.json();
+        if (!Array.isArray(cursos)) return;
+
+        // Aplicar filtro por categoría si está seleccionada
+        if (categoria) {
+          cursos = cursos.filter(curso => curso.categoria == categoria);
+        }
+
+        // Renderizar cursos
+        cursosContainer.innerHTML = cursos.map(curso => `
+        <div class="card">
+          <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(curso.nombre)}" alt="${curso.nombre}">
+          <div class="contenido">
+            <h4>${curso.nombre}</h4>
+            <p>${curso.descripcion_breve}</p>
+            <p class="info">${curso.horas} hr | $${curso.precio} mx</p>
+          </div>
+        </div>
+      `).join("");
+
+        inicializarCarrusel();
+
       } catch (err) {
-        console.error("Error cargando cursos:", err);
+        console.error("Error al cargar cursos:", err);
       }
     }
 
-    function renderizarCursos(cursos) {
-      container.innerHTML = "";
-
-      if (!cursos || !Array.isArray(cursos) || cursos.length === 0) {
-        container.innerHTML = "<p>No hay cursos disponibles.</p>";
-        return;
-      }
-
-      cursos.forEach(curso => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const img = document.createElement("img");
-        img.src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(curso.nombre)}`;
-        img.alt = curso.nombre;
-
-        const contenido = document.createElement("div");
-        contenido.className = "contenido";
-
-        contenido.innerHTML = `
-        <h4>${curso.nombre}</h4>
-        <p>${curso.descripcion_breve}</p>
-        <p class="horas">${curso.horas} horas</p>
-        <p class="precio"> $${curso.precio}</p>
-      `;
-
-        card.appendChild(img);
-        card.appendChild(contenido);
-        container.appendChild(card);
-      });
-
-      inicializarCarrusel();
-    }
-
-    function inicializarCarrusel() {
-      const track = document.querySelector(".carousel-track");
-      const prevButton = document.querySelector(".carousel-btn.prev");
-      const nextButton = document.querySelector(".carousel-btn.next");
-
-      if (!track || !prevButton || !nextButton) return;
-
-      const cards = Array.from(track.children);
-      if (cards.length === 0) return;
-
-      let cardWidth = cards[0].getBoundingClientRect().width + 16;
-      let currentIndex = 0;
-
-      function updateCarousel() {
-        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-        actualizarBotones();
-      }
-
-      function moverAnterior() {
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateCarousel();
-        }
-      }
-
-      function moverSiguiente() {
-        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
-        if (currentIndex < cards.length - cardsVisibles) {
-          currentIndex++;
-          updateCarousel();
-        }
-      }
-
-      function actualizarBotones() {
-        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
-        prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-        nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
-      }
-
-      prevButton.onclick = moverAnterior;
-      nextButton.onclick = moverSiguiente;
-
-      window.addEventListener("resize", () => {
-        cardWidth = cards[0].getBoundingClientRect().width + 16;
-        updateCarousel();
-      });
-
-      actualizarBotones();
-    }
-
-    selectCategoria.addEventListener("change", cargarCursos);
-    selectFiltro.addEventListener("change", cargarCursos);
-    btnLimpiar.addEventListener("click", () => {
-      selectCategoria.value = "";
-      selectFiltro.value = "";
-      cargarCursos();
+    categoriaSelect.addEventListener("change", cargarCursosFiltrados);
+    limpiarBtn.addEventListener("click", () => {
+      categoriaSelect.value = "";
+      cargarCursosFiltrados();
     });
 
     await cargarCategorias();
-    cargarCursos();
+    await cargarCursosFiltrados();
   });
 
 
