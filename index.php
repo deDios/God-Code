@@ -273,41 +273,102 @@
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué tipo de soluciones desarrollan en GodCode?</button>
-                        <div class="respuesta">Existen campañas de búsqueda, display, video, shopping, apps y más, según
-                            tu objetivo.</div>
+                        <div class="respuesta">Desarrollamos soluciones web, móviles, de automatización, integración de
+                            sistemas y plataformas a la medida, enfocadas en la eficiencia y la conexión omnicanal.
+                        </div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">¿Puedo contratar solo una parte del
                             desarrollo, como una app o solo el sitio web?</button>
-                        <div class="respuesta">Depende de tu objetivo: ventas, tráfico, leads o reconocimiento de marca.
+                        <div class="respuesta">Sí. Desarrollamos integraciones con plataformas existentes como
+                            Salesforce, HubSpot, SAP, Zoho, etc., para que todo funcione en un mismo entorno.
                         </div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿GodCode trabaja con empresas pequeñas o solo grandes corporativos?</button>
-                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                            personalización de anuncios.</div>
+                        <div class="respuesta">Trabajamos con todo tipo de clientes: desde emprendedores y pymes hasta
+                            grandes empresas. Diseñamos soluciones escalables que crecen contigo.</div>
                     </div>
 
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué es una solución omnicanal y cómo puede ayudar a mi negocio?</button>
-                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                            personalización de anuncios.</div>
+                        <div class="respuesta">Es una estrategia que conecta todos los puntos de contacto con tus
+                            clientes (web, móvil, redes, sistemas físicos, etc.). Mejora la experiencia del cliente y la
+                            eficiencia de tu negocio.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
 
                             ¿Ofrecen consultoría antes de comenzar un proyecto?</button>
-                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                            personalización de anuncios.</div>
+                        <div class="respuesta">Sí. Nuestra primera asesoría es gratuita y te ayudamos a identificar la
+                            solución tecnológica ideal para tu negocio.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Los desarrollos son personalizados o trabajan con plantillas?</button>
-                        <div class="respuesta">Sí, Google Ads utiliza IA para automatizar pujas, segmentación y
-                            personalización de anuncios.</div>
+                        <div class="respuesta">Todos nuestros desarrollos son personalizados y hechos desde cero,
+                            alineados con tus objetivos, procesos y marca.</div>
                     </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Qué tecnologías utilizan en sus proyectos?</button>
+                        <div class="respuesta">Trabajamos con tecnologías modernas como React, Flutter, Laravel,
+                            Node.js, Python, Swift, y bases de datos escalables como PostgreSQL, Firebase, y MongoDB,
+                            entre otras.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Qué tiempo toma un proyecto típico?</button>
+                        <div class="respuesta">Depende de la complejidad. Un sistema simple puede tomar entre 2 y 4
+                            semanas; soluciones más completas pueden requerir entre 2 y 4 meses. Siempre damos un
+                            cronograma claro al inicio.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Ofrecen soporte o mantenimiento después de terminar el desarrollo?</button>
+                        <div class="respuesta">Sí, ofrecemos soporte técnico, actualizaciones, mejoras y mantenimiento
+                            mensual o por evento según tus necesidades.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Puedo integrar sus soluciones con sistemas que ya uso (como CRM o ERP)?</button>
+                        <div class="respuesta">Sí. Desarrollamos integraciones con plataformas existentes como
+                            Salesforce, HubSpot, SAP, Zoho, etc., para que todo funcione en un mismo entorno.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Qué costos manejan y cómo se cotiza un proyecto?</button>
+                        <div class="respuesta">Cada proyecto se cotiza según alcance, funcionalidades y tiempos. La
+                            primera reunión es gratuita y te entregamos una propuesta clara, sin compromiso.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Ofrecen opciones de pago flexibles?</button>
+                        <div class="respuesta">Sí. Tenemos opciones por fases, mensualidades o contratos por
+                            mantenimiento para facilitarte el acceso a nuestras soluciones.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿GodCode puede ayudarme a digitalizar procesos internos de mi empresa?</button>
+                        <div class="respuesta">Por supuesto. Diseñamos plataformas internas, automatizaciones,
+                            dashboards y flujos que reducen tareas manuales y aumentan tu productividad.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Puedo monitorear el avance de mi proyecto?</button>
+                        <div class="respuesta">Sí. Usamos herramientas colaborativas dentro de godcode o podemos
+                            trabajar con Trello y Monday para que estés al tanto de cada avance, entregable y fecha
+                            clave.</div>
+                    </div>
+                    <div class="item">
+                        <button class="pregunta" onclick="toggleItem(this)">
+                            ¿Dónde están ubicados y en qué zonas ofrecen servicio?</button>
+                        <div class="respuesta">Estamos en Ixtlahuacan de los Membrillos, pero trabajamos con clientes en
+                            todo el mundo de forma remota. Nuestra tecnología no tiene fronteras.</div>
+                    </div>
+
                 </div>
             </div>
         </section>

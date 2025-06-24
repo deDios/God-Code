@@ -463,45 +463,57 @@ header.scrolled .subnav {
     background-color: #f8fbfd;
     border-radius: 20px;
     text-align: center;
-    padding: 4rem;
+    padding: 4rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-/* Contenido de ayuda */
 .ayuda-faq .ayuda-contenido {
-    margin-bottom: 100px;
+    margin-bottom: 4rem;
+    padding: 0 1rem;
 }
 
 .ayuda-faq .ayuda-contenido h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #1a73e8;
 }
 
 .ayuda-faq .ayuda-contenido p {
-    font-size: 16px;
+    font-size: 1.1rem;
     color: #555;
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
+    line-height: 1.6;
 }
 
 .ayuda-faq .btn-contacto {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #e8f0fe;
     color: #1a73e8;
     border-radius: 999px;
     text-decoration: none;
     font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Preguntas frecuentes */
+.ayuda-faq .btn-contacto:hover {
+    background-color: #1a73e8;
+    color: white;
+    transform: translateY(-2px);
+}
+
 .ayuda-faq .faq {
     text-align: left;
-    padding: 0 20px;
+    padding: 0 1rem;
 }
 
 .ayuda-faq .faq h2 {
     text-align: center;
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #222;
 }
 
 .ayuda-faq .acordeon .item {
@@ -513,19 +525,36 @@ header.scrolled .subnav {
     text-align: left;
     background: none;
     border: none;
-    padding: 15px;
-    font-size: 16px;
+    padding: 1rem;
+    font-size: 1.05rem;
     cursor: pointer;
     font-weight: bold;
     color: #1a73e8;
 }
 
 .ayuda-faq .respuesta {
-    padding: 0 20px 15px;
+    padding: 0 1.2rem 1rem;
     display: none;
     color: #333;
-    font-size: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
+
+/* Responsive ajustes */
+@media (max-width: 768px) {
+    .ayuda-faq {
+        padding: 3rem 1rem;
+    }
+
+    .ayuda-faq .ayuda-contenido h2 {
+        font-size: 1.5rem;
+    }
+
+    .ayuda-faq .faq h2 {
+        font-size: 1.4rem;
+    }
+}
+
 
 /*---------------------------Animaciones para los botones-----------------------------*/
 /*estos son botones / iconos del tope de pagina*/
@@ -840,6 +869,7 @@ footer small {
     transform: translateY(0);
 }
 
+
 /* Responsive */
 @media (max-width: 768px) {
     .bloque-nosotros {
@@ -1115,18 +1145,19 @@ footer small {
     font-weight: bold;
 }
 
-.creciendoJuntos-contenido {
+.creciendoJuntos-contenido.fila-horizontal {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
     gap: 40px;
-    text-align: left;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: auto;
+    text-align: left;
+    flex-wrap: wrap;
 }
 
 .creciendoJuntos .bloque {
-    flex: 1 1 400px;
+    flex: 1 1 600px;
 }
 
 .creciendoJuntos .bloque h3 {
@@ -1138,6 +1169,48 @@ footer small {
     font-size: 1em;
     line-height: 1.6;
 }
+
+.creciendoJuntos .contenedor-boton {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.creciendoJuntos .btn-contacto {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.creciendoJuntos .btn-contacto:hover {
+    background-color: #1a73e8;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .creciendoJuntos-contenido.fila-horizontal {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .creciendoJuntos .contenedor-boton {
+        margin-top: 20px;
+    }
+
+    .creciendoJuntos .bloque {
+        text-align: center;
+    }
+}
+
 
 /*----------------------------------------------------------------------------------------*/
 /*-------------------------------- VISTA LOGIN -------------------------------------------*/

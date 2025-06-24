@@ -61,28 +61,40 @@
                     <div class="col">
                         <h4>Lo que hacemos</h4>
                         <ul>
-                            <li><a href="../VIEW/DesarrolloWeb.php"><img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a></li>
-                            <li><a href="../VIEW/DesarrolloMobile.php"><img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo Mobile</a></li>
+                            <li><a href="../VIEW/DesarrolloWeb.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a>
+                            </li>
+                            <li><a href="../VIEW/DesarrolloMobile.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
+                                    Mobile</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
                                     Nearshore</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png" alt="Offshore">Desarrollo Offshore</a>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png"
+                                        alt="Offshore">Desarrollo Offshore</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio educativo</a></li>
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
+                                    Nube</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                                    UX/UI</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
+                                    educativo</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">Tecnología</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Educacion.png"
+                                        alt="Educación">Educación</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Tecnologia.png"
+                                        alt="Tecnología">Tecnología</a></li>
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col tecnologias full-width">
@@ -91,12 +103,13 @@
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Azure.png" alt="Azure"> Azure</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Php.png" alt="PHP"> PHP</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Kotlin.png" alt="Kotlin"> Kotlin</span>
-                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI"> SwiftUI</span>
+                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI">
+                                SwiftUI</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <a href="../VIEW/Nosotros.php" class="active" >Nosotros</a>
+            <a href="../VIEW/Nosotros.php" class="active">Nosotros</a>
             <a href="../VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
@@ -125,9 +138,11 @@
                 <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros" class="imagen-nosotros">
                 <div class="texto-nosotros">
                     <h3>Acerca de nosotros.</h3>
-                    <p>En GoDCode, somos una startup especializada en desarrollo web que transforma ideas en soluciones
-                        digitales funcionales y estéticas. Colaboramos estrechamente con nuestros clientes para ayudar a
-                        emprendedores, empresas y proyectos a construir su presencia en línea de forma efectiva.</p>
+                    <p>En GodCode creamos soluciones tecnológicas personalizadas que se
+                        adaptan a las necesidades de cada empresa. Desarrollamos plataformas
+                        web, apps móviles, sistemas inteligentes y procesos conectados que
+                        ayudan a nuestros clientes a alcanzar sus objetivos y crecer de forma
+                        sostenible.</p>
                 </div>
             </div>
 
@@ -137,9 +152,11 @@
                 <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión" class="imagen-nosotros">
                 <div class="texto-nosotros">
                     <h3>Nuestra misión.</h3>
-                    <p>En GoDCode, nuestra misión es ofrecer soluciones digitales innovadoras que impulsen el
-                        crecimiento de nuestros clientes. Buscamos transformar ideas en herramientas funcionales a
-                        través del desarrollo web.</p>
+                    <p>Convertirnos en un referente del desarrollo tecnológico a nivel
+                        global, creando experiencias digitales innovadoras, integradas
+                        y accesibles, que transformen la manera en que las empresas
+                        se conectan con su audiencia, sin importar el canal o el
+                        dispositivo.</p>
                 </div>
 
             </div>
@@ -150,7 +167,12 @@
                 <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia" class="imagen-nosotros">
                 <div class="texto-nosotros">
                     <h3>Nuestra historia.</h3>
-                    <p>Descripción de nuestra historia.</p>
+                    <p>GodCode nació como una solución interna para Luna Café, un
+                        emprendimiento que necesitaba digitalizar sus procesos y conectar
+                        mejor con sus clientes. El éxito de esa primera experiencia nos mostró
+                        que muchas otras empresas enfrentaban los mismos desafíos.
+                        Así comenzó nuestro camino: ayudando a negocios reales a lograr su
+                        transformación digital.</p>
                 </div>
             </div>
 
@@ -214,14 +236,16 @@
 
             <div class="proyecto fila invertida2 animado">
                 <div class="texto">
-                    <h3>Mobility solutions</h3>
-                    <p>Desarrollamos el sitio web de Mobility Solutions Corp, una empresa especializada en soluciones de
-                        movilidad eléctrica y sustentable. Nuestro objetivo fue crear una plataforma moderna, intuitiva
-                        y totalmente responsive que reflejara su compromiso con la innovación y el medio
-                        ambiente.<br><br>
-                        El sitio ofrece una navegación fluida, integración de formularios de contacto personalizados y
-                        un diseño limpio que resalta la identidad de la marca. Este proyecto demuestra cómo GodCode
-                        transforma ideas en soluciones digitales sólidas, escalables y enfocadas en el usuario final.
+                    <h3>Mobility Solutions –
+                        Plataforma web empresarial</h3>
+                    <p>Diseñamos y desarrollamos una plataforma web completa para
+                        la empresa Mobility Solutions, con un enfoque integral:
+                        Catálogo dinámico de productos y servicios.
+                        Módulo de gestión y actualización del catálogo.
+                        Apartado operativo para atender requerimientos internos,gestionar autorizaciones y cargar nuevas
+                        imágenes de forma ágil.
+                        Como resultado, una herramienta flexible y profesional que mejora
+                        la experiencia del usuario y optimiza la gestión operativa de la empresa.
                     </p>
                 </div>
                 <div class="imagenNosotros">
@@ -234,33 +258,40 @@
                     <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Cafe">
                 </div>
                 <div class="texto">
-                    <h3>Luna cafe</h3>
-                    <p>Diseñamos y desarrollamos una aplicación de punto de venta (POS) exclusiva para Luna Café,
-                        pensada para dispositivos iOS. El sistema permite gestionar ventas, controlar inventario,
-                        generar reportes diarios y agilizar el proceso de atención al cliente con una interfaz amigable
-                        y táctil.</p>
+                    <h3>Luna Café – Punto de venta inteligente
+                    </h3>
+                    <p>Creamos un sistema POS personalizado, diseñado para facilitar y automatizar
+                        la operación diaria del negocio:
+                        Punto de venta amigable y totalmente gestionable.
+                        Módulos de control de gastos, asistencia del personal y promociones.
+                        Dashboard con métricas en tiempo real sobre ventas y comportamiento de
+                        clientes.
+                        Seguimiento de clientes frecuentes y campañas de fidelización.
+                        Como resultado, una herramienta clave para la operación eficiente del negocio
+                        y la toma de decisiones basada en datos.</p>
                 </div>
             </div>
         </section>
 
-        <section class="creciendoJuntos">
+        <section id="creciendoJuntos" class="creciendoJuntos">
             <h2>Creciendo juntos <span>#GodCode</span></h2>
-            <div class="creciendoJuntos-contenido">
+
+            <div class="creciendoJuntos-contenido fila-horizontal">
                 <div class="bloque">
                     <h3>Careers en GodCode</h3>
-                    <p>Inspírate con las historias de éxito de quienes han trabajado con nosotros para hacer crecer sus
-                        negocios y alcanzar resultados increíbles.</p>
-                </div>
-                <div class="bloque">
                     <p>
-                        <strong>nuestros contactos:</strong><br>
-                        Celular:<br>
-                        +52 33 3333 3333<br>
-                        +52 33 3333 3333<br><br>
-                        Email:<br>
-                        correo@gmail.com<br>
-                        correo@gmail.com
+                        En GodCode, creemos que el talento humano es el motor que impulsa la innovación. Buscamos
+                        personas apasionadas por la tecnología, la creatividad y el desarrollo de soluciones que
+                        transformen la forma en que las empresas operan y se conectan con sus usuarios.
+                        Si te apasiona el desarrollo de software, el diseño UX/UI, la arquitectura de soluciones, la
+                        inteligencia
+                        artificial o simplemente tienes una mente inquieta que quiere construir el futuro, queremos
+                        conocerte.
                     </p>
+                </div>
+
+                <div class="contenedor-boton">
+                    <a href="#contacto" class="btn-contacto">Deja tus datos y CV aquí</a>
                 </div>
             </div>
         </section>
