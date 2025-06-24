@@ -1499,7 +1499,7 @@ footer small {
     line-height: 1.6;
 }
 
-.contenedor-filtros {
+#filtros-cursos .contenedor-filtros {
     display: flex;
     justify-content: center;
     gap: 2rem;
@@ -1513,24 +1513,48 @@ footer small {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.filtro {
+#filtros-cursos .filtro {
     display: flex;
     flex-direction: column;
     width: 250px;
 }
 
-.filtro label {
+#filtros-cursos .filtro label {
     margin-bottom: 0.5rem;
     font-weight: 600;
     color: #333;
     text-transform: capitalize;
 }
 
-.filtro select {
+#filtros-cursos .filtro select {
     padding: 0.6rem 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
+}
+
+#filtros-cursos .btn-limpiar {
+    padding: 0.6rem 1rem;
+    background-color: white;
+    color: #1a73e8;
+    border: 2px solid #1a73e8;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+#filtros-cursos .btn-limpiar:hover {
+    background-color: #1a73e8;
+    color: white;
+}
+
+#filtros-cursos .filtro.limpiar {
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    min-width: 160px;
 }
 
 /*------------------------------- seccion 3 ----------------------------------*/
@@ -1576,6 +1600,7 @@ footer small {
     will-change: transform;
 }
 
+
 #cursos-destacados #cursos-container .card {
     flex: 0 0 calc((100% - 3 * 2rem) / 4);
     max-width: 280px;
@@ -1584,12 +1609,14 @@ footer small {
     border: 1px solid #e1e9f0;
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 420px;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
+    padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
 }
 
 #cursos-destacados #cursos-container .card:hover {
@@ -1605,9 +1632,10 @@ footer small {
 }
 
 #cursos-destacados #cursos-container .card .contenido {
-    padding: 1rem 1rem 1.5rem;
+    padding: 1.2rem;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     flex-grow: 1;
 }
 
@@ -1638,19 +1666,14 @@ footer small {
 #cursos-destacados #cursos-container .card .contenido .precio {
     font-weight: 500;
     font-size: 0.9rem;
-    margin-top: auto;
     color: #444;
+    margin-top: auto;
 }
 
-
-#cursos-destacados .carousel-track .contenido {
-    padding: 1.2rem;
-    text-align: left;
-    font-size: 0.95rem;
-    color: #444;
-    line-height: 1.5;
-    flex-grow: 1;
-    overflow: hidden;
+#cursos-destacados .carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
 }
 
 #cursos-destacados .carousel-btn {
@@ -1664,27 +1687,21 @@ footer small {
     cursor: pointer;
     user-select: none;
     z-index: 10;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 #cursos-destacados .carousel-btn:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
 }
 
 #cursos-destacados .carousel-btn:active {
     background: rgba(0, 0, 0, 0.1);
     transform: scale(0.95);
-}
-
-#cursos-destacados .carousel-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
 }
 
 #cursos-destacados .carousel-btn svg {
@@ -1695,11 +1712,6 @@ footer small {
     pointer-events: none;
 }
 
-#cursos-destacados .carousel-btn:hover svg {
-    transform: scale(1.1);
-}
-
-/* Posiciones laterales */
 #cursos-destacados .carousel-btn.prev {
     left: 10px;
 }
@@ -1708,37 +1720,28 @@ footer small {
     right: 10px;
 }
 
-#cursos-destacados .contenido .horas {
-    font-style: italic;
-    color: #666;
-    font-size: 0.85rem;
-}
-
-#cursos-destacados .contenido .precio {
-    font-weight: bold;
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: #000;
-}
-
 @media (max-width: 1024px) {
     #cursos-destacados .carousel-track .card {
-        flex: 0 0 45%;
-        max-width: 45%;
+        flex: 0 0 48%;
+        max-width: 48%;
     }
 }
 
 @media (max-width: 768px) {
     #cursos-destacados .carousel-track .card {
-        flex: 0 0 70%;
-        max-width: 70%;
+        flex: 0 0 80%;
+        max-width: 80%;
+    }
+
+    #cursos-destacados .carousel-btn {
+        padding: 8px;
     }
 }
 
 @media (max-width: 480px) {
     #cursos-destacados .carousel-track .card {
-        flex: 0 0 85%;
-        max-width: 85%;
+        flex: 0 0 90%;
+        max-width: 90%;
     }
 
     #cursos-destacados .carousel-btn.prev,
@@ -2519,12 +2522,231 @@ footer small {
 
 
 /*--------------------------------------------------------------------------------------------------------------*/
-/*-------------------------------- VISTA PRODUCTOS/DESARROLLO MOBILE -------------------------------------------*/
+/*-------------------------------- VISTA PRODUCTOS/SERVICIOS EN LA NUBE -------------------------------------------*/
 /*--------------------------------------------------------------------------------------------------------------*/
 
+/*---------- seccion 1 --------------*/
+#servicios-nube {
+    padding: 4rem 1rem;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+#servicios-nube .servicios-nube__contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+#servicios-nube .servicios-nube__texto {
+    flex: 1 1 400px;
+    max-width: 600px;
+}
+
+#servicios-nube h2 {
+    color: #0562EF;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#servicios-nube p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #222;
+    text-align: justify;
+}
+
+#servicios-nube .link-godcode {
+    color: #0562EF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#servicios-nube .link-godcode:hover {
+    text-decoration: underline;
+}
+
+#servicios-nube .servicios-nube__imagen {
+    flex: 1 1 300px;
+    text-align: center;
+}
+
+#servicios-nube .servicios-nube__imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
 
 
+/*--------- seccion 2 ----------------*/
+#ventajas-nube {
+    background: #f2f2f2;
+    padding: 3rem 1rem;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
 
+#ventajas-nube .ventajas-nube__intro {
+    font-size: 1.1rem;
+    color: #222;
+    margin-bottom: 2rem;
+}
+
+#ventajas-nube .ventajas-nube__contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: auto;
+    position: relative;
+    gap: 1rem;
+}
+
+#ventajas-nube .ventajas-nube__carousel {
+    display: flex;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    width: 100%;
+    max-width: 800px;
+}
+
+#ventajas-nube .ventaja {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    text-align: left;
+}
+
+#ventajas-nube .ventaja img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 12px;
+}
+
+#ventajas-nube .ventaja__texto {
+    max-width: 500px;
+}
+
+#ventajas-nube .ventaja__texto h3 {
+    color: #0562EF;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+}
+
+#ventajas-nube .ventaja__texto p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+#ventajas-nube .ventajas-nube__btn {
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+#ventajas-nube .ventajas-nube__btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+#ventajas-nube .ventajas-nube__btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+#ventajas-nube .ventajas-nube__btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+}
+
+#ventajas-nube .ventajas-nube__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#ventajas-nube .ventajas-nube__btn:hover svg {
+    transform: scale(1.1);
+}
+
+
+@media (max-width: 768px) {
+    #ventajas-nube .ventaja {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #ventajas-nube .ventaja img {
+        max-width: 100px;
+    }
+
+    #ventajas-nube .ventaja p {
+        max-width: 100%;
+    }
+}
+
+/*------- seccion 3 -------*/
+#nube-final {
+    background-color: #f5f5f5;
+    padding: 3rem 1rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#nube-final .nube-final__contenido {
+    max-width: 960px;
+    margin: auto;
+}
+
+#nube-final p {
+    color: #222;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+#nube-final .nube-final__imagen {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+#nube-final .nube-final__imagen img {
+    max-width: 100%;
+    width: 400px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+    #nube-final p {
+        font-size: 1rem;
+    }
+
+    #nube-final .nube-final__imagen img {
+        width: 100%;
+    }
+}
 
 
 

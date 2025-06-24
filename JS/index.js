@@ -308,82 +308,154 @@ if (window.location.pathname.includes("CursoInfo.php")) {
 //------------------------------- VISTE PRODUCTOS/DesarrolloWeb.php -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (window.location.pathname.includes("DesarrolloWeb.php")) {
-  document.addEventListener("DOMContentLoaded", function () {
-    const track = document.querySelector(
-      "#desarrollo-web-carrusel .carousel-track"
-    );
-    const prevButton = document.querySelector(
-      "#desarrollo-web-carrusel .carousel-btn.prev"
-    );
-    const nextButton = document.querySelector(
-      "#desarrollo-web-carrusel .carousel-btn.next"
-    );
 
-    if (!track || !prevButton || !nextButton) return;
 
-    const cards = Array.from(track.children);
-    if (cards.length === 0) return;
+  document.addEventListener("DOMContentLoaded", async () => {
+    const selectCategoria = document.getElementById("categoria");
+    const selectFiltro = document.getElementById("filtro");
+    const btnLimpiar = document.getElementById("limpiar-filtros");
+    const container = document.getElementById("cursos-container");
 
-    let cardWidth = cards[0].getBoundingClientRect().width + 16;
-    let currentIndex = 0;
+    async function cargarCategorias() {
+      try {
+        const res = await fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php");
+        const categorias = await res.json();
 
-    prevButton.addEventListener("click", moverAnterior);
-    nextButton.addEventListener("click", moverSiguiente);
+        categorias.forEach(cat => {
+          const option = document.createElement("option");
+          option.value = cat.id;
+          option.textContent = cat.nombre;
+          selectCategoria.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Error cargando categorías:", err);
+      }
+    }
 
-    window.addEventListener("resize", () => {
-      cardWidth = cards[0].getBoundingClientRect().width + 16;
-      updateCarousel();
-      actualizarBotones();
-    });
+    async function cargarCursos() {
+      const categoria = selectCategoria.value;
+      const filtro = selectFiltro.value;
 
-    const mediaQuery = window.matchMedia("(max-width: 480px)");
-    mediaQuery.addEventListener("change", handleMobileChange);
-    handleMobileChange(mediaQuery);
+      const body = { estatus: 1 };
+      if (categoria) body.categoria = parseInt(categoria);
+      if (filtro) body.filtro = filtro;
 
-    function handleMobileChange(e) {
-      if (e.matches) {
-        prevButton.style.display = "none";
-        nextButton.style.display = "none";
-      } else {
-        prevButton.style.display = "flex";
-        nextButton.style.display = "flex";
+      try {
+        const res = await fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const cursos = await res.json();
+        renderizarCursos(cursos);
+      } catch (err) {
+        console.error("Error cargando cursos:", err);
+      }
+    }
+
+    function renderizarCursos(cursos) {
+      container.innerHTML = "";
+
+      if (!cursos || !Array.isArray(cursos) || cursos.length === 0) {
+        container.innerHTML = "<p>No hay cursos disponibles.</p>";
+        return;
+      }
+
+      cursos.forEach(curso => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const img = document.createElement("img");
+        img.src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(curso.nombre)}`;
+        img.alt = curso.nombre;
+
+        const contenido = document.createElement("div");
+        contenido.className = "contenido";
+
+        contenido.innerHTML = `
+        <h4>${curso.nombre}</h4>
+        <p>${curso.descripcion_breve}</p>
+        <p class="horas">${curso.horas} horas</p>
+        <p class="precio"> $${curso.precio}</p>
+      `;
+
+        card.appendChild(img);
+        card.appendChild(contenido);
+        container.appendChild(card);
+      });
+
+      inicializarCarrusel();
+    }
+
+    function inicializarCarrusel() {
+      const track = document.querySelector(".carousel-track");
+      const prevButton = document.querySelector(".carousel-btn.prev");
+      const nextButton = document.querySelector(".carousel-btn.next");
+
+      if (!track || !prevButton || !nextButton) return;
+
+      const cards = Array.from(track.children);
+      if (cards.length === 0) return;
+
+      let cardWidth = cards[0].getBoundingClientRect().width + 16;
+      let currentIndex = 0;
+
+      function updateCarousel() {
+        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
         actualizarBotones();
       }
-    }
 
-    function updateCarousel() {
-      track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+      function moverAnterior() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        }
+      }
+
+      function moverSiguiente() {
+        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        if (currentIndex < cards.length - cardsVisibles) {
+          currentIndex++;
+          updateCarousel();
+        }
+      }
+
+      function actualizarBotones() {
+        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+        nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+      }
+
+      prevButton.onclick = moverAnterior;
+      nextButton.onclick = moverSiguiente;
+
+      window.addEventListener("resize", () => {
+        cardWidth = cards[0].getBoundingClientRect().width + 16;
+        updateCarousel();
+      });
+
       actualizarBotones();
     }
 
-    function moverAnterior() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateCarousel();
-      }
-    }
+    selectCategoria.addEventListener("change", cargarCursos);
+    selectFiltro.addEventListener("change", cargarCursos);
+    btnLimpiar.addEventListener("click", () => {
+      selectCategoria.value = "";
+      selectFiltro.value = "";
+      cargarCursos();
+    });
 
-    function moverSiguiente() {
-      const visibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
-      if (currentIndex < cards.length - visibles) {
-        currentIndex++;
-        updateCarousel();
-      }
-    }
-
-    function actualizarBotones() {
-      const visibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
-      prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextButton.style.visibility =
-        currentIndex >= cards.length - visibles ? "hidden" : "visible";
-    }
-
-    updateCarousel();
+    await cargarCategorias();
+    cargarCursos();
   });
+
+
+
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------- vista CursoInfo -------------------------------------------------------------
+//------------------------------- vistas del megamenu de productos -------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (
   window.location.pathname.includes("DesarrolloWeb.php") ||
@@ -459,6 +531,143 @@ if (
     contenedor.appendChild(a);
   });
 }
+
+if (
+  window.location.pathname.includes("ServiciosEnLaNube.php")
+) {
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const carousel = document.getElementById("ventajas-carousel");
+    const prevBtn = document.querySelector(".ventajas-nube__btn.prev");
+    const nextBtn = document.querySelector(".ventajas-nube__btn.next");
+    const slides = carousel.querySelectorAll(".ventaja");
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    function updateCarousel() {
+      const slideWidth = carousel.offsetWidth;
+      carousel.scrollTo({
+        left: slideWidth * currentIndex,
+        behavior: "smooth"
+      });
+
+      prevBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+      nextBtn.style.visibility = currentIndex === totalSlides - 1 ? "hidden" : "visible";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < totalSlides - 1) {
+        currentIndex++;
+        updateCarousel();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      updateCarousel();
+    });
+
+    updateCarousel();
+  });
+
+  //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
+  const productos = [
+    {
+      texto: "Desarrollo offshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo web",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Desarrollo Mobile",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
+      link: "../VIEW/DesarrolloMobile.php",
+    },
+    {
+      texto: "Desarrollo nearshore",
+      icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Servicios en la nube",
+      icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
+      link: "../VIEW/ServiciosEnLaNube.php",
+    },
+    {
+      texto: "Diseño UX/UI",
+      icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Sercivio educativo",
+      icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Educación",
+      icono: "../ASSETS/ProductosPopUp/Educacion.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Finanzas",
+      icono: "../ASSETS/ProductosPopUp/Finanzas.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+    {
+      texto: "Tecnología",
+      icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
+      link: "../VIEW/DesarrolloWeb.php",
+    },
+  ];
+
+  const contenedor = document.querySelector(
+    "#otros-productos .productos-random"
+  );
+
+  const seleccionAleatoria = productos
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 3);
+
+  seleccionAleatoria.forEach((prod) => {
+    const a = document.createElement("a");
+    a.href = prod.link;
+    a.className = "producto-item";
+    a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
+    contenedor.appendChild(a);
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {
