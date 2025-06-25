@@ -341,3 +341,56 @@ footer small {
     font-weight: 700;
     text-decoration: underline;
 }
+
+/*----------- Otros productos ----------------*/
+#otros-productos {
+    background-color: #f2f2f2;
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+#otros-productos h2 {
+    color: #0562EF;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+}
+
+#otros-productos .productos-random {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+#otros-productos .producto-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1rem;
+    color: #222;
+    font-weight: 500;
+    background-color: white;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#otros-productos .producto-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    color: #0562EF;
+}
+
+#otros-productos .producto-item img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.lista-ajustada {
+  padding-left: 1.2rem;
+  list-style-position: inside;
+}

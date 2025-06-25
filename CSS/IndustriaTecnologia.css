@@ -1,0 +1,163 @@
+/* ---------------------- seccion 1 -------------------*/
+#industria-tecnologia-1 {
+    padding: 4rem 1rem;
+    background: #f9fbff;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    margin: auto;
+}
+
+#industria-tecnologia-1 h2 {
+    text-align: center;
+    color: #1a73e8;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+#industria-tecnologia-1 .contenido-seccion {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+#industria-tecnologia-1 .contenido-seccion img {
+    flex: 1 1 350px;
+    max-width: 40%;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+#industria-tecnologia-1 .contenido-seccion .texto {
+    flex: 1 1 300px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+#industria-tecnologia-1 .contenido-seccion .texto a {
+    color: #1a73e8;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    #industria-tecnologia-1 .contenido-seccion {
+        flex-direction: column;
+        text-align: justify;
+    }
+
+    #industria-tecnologia-1 h2 {
+        font-size: 2rem;
+    }
+
+    #industria-tecnologia-1 .contenido-seccion .texto {
+        font-size: 1rem;
+    }
+
+    #industria-tecnologia-1 .contenido-seccion img {
+        flex: 1 1 350px;
+        max-width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+}
+
+
+/*--------------- seccion 2 --------------- */
+#industria-tecnologia-2 {
+    padding: 4rem 1rem;
+    background: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    margin: auto;
+}
+
+#industria-tecnologia-2 .contenido-seccion {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+#industria-tecnologia-2 .contenido-seccion img {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+#industria-tecnologia-2 .contenido-seccion .texto {
+    flex: 1 1 500px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    #industria-tecnologia-2 .contenido-seccion {
+        flex-direction: column;
+        text-align: justify;
+    }
+
+    #industria-tecnologia-2 .contenido-seccion .texto {
+        font-size: 1rem;
+    }
+}
+
+/*---------- seccion 3 ---------------*/
+#cta-tecnologia {
+    background: #f9fbff;
+    padding: 4rem 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #222;
+    text-align: center;
+}
+
+#cta-tecnologia .contenido {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#cta-tecnologia h3 {
+    color: #1a73e8;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+#cta-tecnologia p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+}
+
+#cta-tecnologia .btn-cta {
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 10;
+    margin: 2rem auto 0;
+}
+
+#cta-tecnologia .btn-cta:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+#cta-tecnologia .btn-cta svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    pointer-events: none;
+}

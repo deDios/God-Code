@@ -75,7 +75,8 @@
                             <li><a href="../VIEW/ServiciosEnLaNube.php"><img
                                         src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
                                     Nube</a></li>
-                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png"
+                                        alt="UX/UI">Diseño
                                     UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
@@ -170,29 +171,28 @@
             </div>
 
             <div class="contenedor-filtros">
-                <div class="filtro limpiar">
-                    <label>&nbsp;</label>
-                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+
+                <div class="filtro">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Selecciona una categoría</option>
+                        <!-- Se llenara con JS -->
+                    </select>
                 </div>
 
                 <div class="filtro">
                     <label for="explorar">Explorar</label>
                     <select id="explorar" name="explorar">
                         <option value="">Selecciona una opción</option>
-                        <option value="">Destacados</option>
                         <option value="">Popupares</option>
                         <option value="">Gratuitos</option>
                     </select>
                 </div>
 
-                <div class="filtro">
-                    <label for="categoria">Categoría</label>
-                    <select id="categoria" name="categoria">
-                        <option value="">Selecciona una categoría</option>
-                        <!-- Se llenará con JS -->
-                    </select>
+                <div class="filtro limpiar">
+                    <label>&nbsp;</label>
+                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
                 </div>
-
             </div>
         </section>
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ServicioEducativo.css" />
+    <link rel="stylesheet" href="../CSS/IndustriaTecnologia.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -125,121 +125,106 @@
 
 
     <main>
-        <!-- Seccion 1 -->
-        <section id="servicio-educativo">
-            <div class="educativo-contenido">
-                <div class="educativo-texto">
-                    <h3>Servicio educativo</h3>
+        <!-- seccion 1 -->
+        <section id="industria-tecnologia-1">
+            <h2>Tecnología</h2>
+            <div class="contenido-seccion">
+                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion1_img1.png"
+                    alt="Industria 4.0">
+                <div class="texto">
                     <p>
-                        Las grandes oportunidades profesionales comienzan con una formación integral en tecnología,
-                        administración y lenguas extranjeras.
-                        En un mundo cada vez más globalizado y digital, estudiar en estas áreas te brinda las
-                        herramientas necesarias para destacar en el mercado laboral y adaptarte a los constantes cambios
-                        del entorno profesional.
+                        Nuestros programas de formación están diseñados para responder a los desafíos reales de las
+                        industrias tecnológicas, ofreciendo contenidos actualizados, metodologías ágiles y herramientas
+                        prácticas que impulsan el desarrollo de habilidades técnicas y estratégicas.
                     </p>
                     <p>
-                        Adquiere habilidades tecnológicas que te permitirán dominar el uso de software, análisis de
-                        datos, desarrollo de sistemas y herramientas digitales esenciales en cualquier industria.
-                    </p>
-                    <p>
-                        Complementa tu perfil con conocimientos administrativos sólidos en gestión, liderazgo,
-                        planificación estratégica y optimización de procesos organizacionales.
-                    </p>
-                    <p>
-                        Y potencia aún más tu desarrollo aprendiendo lenguas extranjeras, clave para comunicarte con el
-                        mundo, acceder a mejores oportunidades y participar activamente en entornos multiculturales.
-                        Estudiar estas disciplinas no solo fortalece tu perfil profesional, sino que te convierte en un
-                        talento versátil, preparado para afrontar los desafíos del presente y construir el futuro con
-                        visión global. <a class="link-godcode">GodCode</a>
+                        Formamos profesionales capaces de enfrentar entornos digitales en constante evolución,
+                        preparados para innovar, adaptarse y liderar en sectores altamente competitivos. Desde el
+                        desarrollo de software y la gestión de datos, hasta la ciberseguridad, inteligencia artificial y
+                        diseño de experiencias digitales, nuestros cursos están alineados con las exigencias del mercado
+                        actual y pensados para aportar valor real a empresas, startups y sectores de tecnología.
                     </p>
                 </div>
-                <div class="educativo-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion1_img1.png"
-                        alt="Servicio educativo">
+            </div>
+            <div class="contenido-seccion">
+                <div class="texto">
+                    <p>
+                    <p>
+                        Creemos que la educación tecnológica no solo transforma carreras, sino que también acelera el
+                        progreso de las organizaciones. Por eso, cada uno de nuestros programas se enfoca en construir
+                        talento especializado, preparado para tomar decisiones, crear soluciones eficientes y generar
+                        impacto en el ecosistema digital. Haz crecer tu capital humano con formación de calidad,
+                        relevante y alineada a las tendencias tecnológicas globales. <a href="#">GodCode</a>.
+                    </p>
                 </div>
             </div>
         </section>
 
-        <!-- Seccion 2 cursos disponibles -->
-        <section>
-            seccion de cursos pendiente
-        </section>
-
-        <!-- Seccion 3 -->
-        <section id="educacion-digital">
-            <div class="educacion-bloque">
-                <div class="educacion-texto">
+        <!-- seccion 2 -->
+        <section id="industria-tecnologia-2">
+            <div class="contenido-seccion">
+                <div class="texto">
                     <p>
-                        No te pierdas la oportunidad de transformar tu oferta educativa con soluciones innovadoras y
-                        centradas en el aprendizaje. Mejora la experiencia de estudiantes y docentes, fortalece tu
-                        propuesta académica y amplía tu alcance con herramientas diseñadas para educar de forma
-                        efectiva, dinámica y accesible.
+                        Ofrecemos una propuesta integral orientada a la industria tecnológica, en la que utilizamos
+                        diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas a las
+                        necesidades del entorno digital actual.
                     </p>
                     <p>
-                        Al aplicar metodologías pedagógicas modernas y recursos digitales estratégicos, tu servicio
-                        educativo se adapta a las nuevas demandas del entorno digital y potencia el aprendizaje real.
+                        Aplicamos herramientas modernas, y entornos de desarrollo actualizados que nos permiten crear
+                        productos y servicios de alto valor, como sistemas basados en arquitectura de microservicios,
+                        plataformas móviles y web interactivas, hasta interfaces inteligentes y sistemas de
+                        automatización. Nuestros especialistas trabajan con tecnologías vérsatiles y escalables que
+                        garantizan resultados eficientes.
                     </p>
                     <p>
-                        Desde la planificación de contenidos hasta la evaluación del progreso, trabajamos cada etapa
-                        para que tu plataforma o programa no solo transmita conocimiento, sino que también motive,
-                        conecte y forme con propósito.
-                    </p>
-                    <p>
-                        Evita barreras de acceso, mejora la participación y transforma cada sesión en una experiencia de
-                        valor.
-                    </p>
-                    <p>
-                        Nuestro equipo de expertos en educación digital te acompaña en todo el proceso: diseño
-                        instruccional, creación de materiales, implementación tecnológica y mejoras continuas.
-                    </p>
-                    <p>
-                        Desarrollamos soluciones adaptables a distintos niveles educativos, dispositivos y contextos,
-                        pensadas para lograr un aprendizaje significativo y medible.
-                    </p>
-                    <p>
-                        Haz que tu proyecto educativo evolucione con herramientas que inspiran, transforman y dejan
-                        huella en cada estudiante.
+                        Ya sea que se trate de crear, optimizar o transformar procesos digitales, ofrecemos soluciones
+                        personalizadas para alcanzar mayor calidad, flexibilidad e impacto real.
                     </p>
                 </div>
-                <div class="educacion-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion3_img1.png"
-                        alt="Educación digital">
-                </div>
-            </div>
-
-            <div class="educacion-bloque reverse">
-                <div class="educacion-texto">
-                    <h3>Únete a alguno de nuestros cursos</h3>
-                    <p>
-                        ¿Apasionado por aprender y desarrollar nuevas habilidades?<br>
-                        En nuestra comunidad educativa te ofrecemos formación integral en Administración, Programación y
-                        Lengua, tres áreas clave para crecer personal y profesionalmente en un mundo cada vez más
-                        conectado y competitivo.
-                    </p>
-                    <p>
-                        Aquí no solo adquieres las competencias prácticas y aplicables a la vida real. Nuestros
-                        programas están diseñados para que participes activamente en tu proceso de aprendizaje desde la
-                        comprensión de conceptos fundamentales hasta el dominio de herramientas y técnicas actualizadas.
-                    </p>
-                    <p>
-                        Aprender con el apoyo de docentes comprometidos, materiales dinámicos y entornos colaborativos
-                        donde podrás resolver problemas, proponer ideas y crecer junto a otros estudiantes.
-                    </p>
-                    <p>
-                        Ya sea que busques avanzar en tu carrera, iniciar un nuevo camino profesional o simplemente
-                        reforzar tus conocimientos, este espacio es para ti.<br>
-                        Haz que tu futuro comience hoy. Capacítate con nosotros y transforma tu potencial en
-                        oportunidades reales.
-                    </p>
-                </div>
-                <div class="educacion-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion4_img1.png"
-                        alt="Cursos GodCode">
-                </div>
+                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion2_img1.png"
+                    alt="Soluciones tecnológicas">
             </div>
         </section>
 
-        <!-- Seccion 4  -->
+        <!-- seccion 3 -->
+        <section id="cta-tecnologia">
+            <div class="contenido">
+                <h3>
+                    ¿Estás listo para llevar tus proyectos digitales al siguiente nivel o potenciar las<br>
+                    capacidades tecnológicas de tu equipo?
+                </h3>
+
+                <p>
+                    En GodCode, utilizamos una amplia gama de tecnologías para desarrollar soluciones modernas,
+                    escalables y
+                    adaptadas a las exigencias de la industria tecnológica actual.
+                </p>
+                <p>
+                    Ya sea que necesites construir una plataforma digital desde cero, optimizar tus sistemas existentes
+                    o
+                    integrar herramientas inteligentes en tus procesos, contamos con la experiencia y los recursos para
+                    hacerlo
+                    realidad.
+                </p>
+                <p>
+                    Aplicamos metodologías ágiles, frameworks actualizados, infraestructura en la nube y tecnologías de
+                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos.
+                </p>
+                <p>
+                    Solicita más información sobre nuestros servicios tecnológicos, agenda una asesoría con nuestro
+                    equipo o
+                    descubre cómo podemos ayudarte a impulsar la transformación digital de tu empresa.
+                </p>
+
+                <button class="btn-cta">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M21 8V7l-3 2-2-2-3 2-2-2-3 2-2-2-3 2v1l3-2 2 2 3-2 2 2 3-2 2 2 3-2zM3 10v10h18V10H3zm2 2h14v6H5v-6z" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- Seccion otros productos  -->
         <section id="otros-productos">
             <h2>Otros Productos</h2>
             <div class="productos-random"></div>

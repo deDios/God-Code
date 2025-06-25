@@ -75,7 +75,8 @@
                             <li><a href="../VIEW/ServiciosEnLaNube.php"><img
                                         src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
                                     Nube</a></li>
-                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png"
+                                        alt="UX/UI">Diseño
                                     UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
@@ -125,7 +126,8 @@
     <main>
 
         <section class="nosotros">
-            <h2 class="nosotros-titulo">En <span>GOD CODE</span> desarrollamos proyectos web para tu negocio</h2>
+            <h2 class="nosotros-titulo">En <span>GOD CODE </span>desarrollamos tecnología pensada específicamente para
+                tu negocio</h2>
 
             <!-- Acerca de nosotros -->
             <div class="bloque-nosotros fila normal animado">
@@ -231,17 +233,17 @@
 
             <div class="proyecto fila invertida2 animado">
                 <div class="texto">
-                    <h3>Mobility Solutions –
-                        Plataforma web empresarial</h3>
-                    <p>Diseñamos y desarrollamos una plataforma web completa para
-                        la empresa Mobility Solutions, con un enfoque integral:
-                        Catálogo dinámico de productos y servicios.
-                        Módulo de gestión y actualización del catálogo.
-                        Apartado operativo para atender requerimientos internos,gestionar autorizaciones y cargar nuevas
-                        imágenes de forma ágil.
-                        Como resultado, una herramienta flexible y profesional que mejora
-                        la experiencia del usuario y optimiza la gestión operativa de la empresa.
-                    </p>
+                    <h3>Mobility Solutions – Plataforma web empresarial</h3>
+                    <p>Diseñamos y desarrollamos una plataforma web completa para la empresa Mobility Solutions, con un
+                        enfoque integral:</p>
+                    <ul class="lista-puntos">
+                        <li>Catálogo dinámico de productos y servicios.</li>
+                        <li>Módulo de gestión y actualización del catálogo.</li>
+                        <li>Apartado operativo para atender requerimientos internos, gestionar autorizaciones y cargar
+                            nuevas imágenes de forma ágil.</li>
+                    </ul>
+                    <p>Como resultado, una herramienta flexible y profesional que mejora la experiencia del usuario y
+                        optimiza la gestión operativa de la empresa.</p>
                 </div>
                 <div class="imagenNosotros">
                     <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Mobility Solutions">
@@ -250,20 +252,20 @@
 
             <div class="proyecto animado">
                 <div class="imagenNosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Cafe">
+                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Café">
                 </div>
                 <div class="texto">
-                    <h3>Luna Café – Punto de venta inteligente
-                    </h3>
-                    <p>Creamos un sistema POS personalizado, diseñado para facilitar y automatizar
-                        la operación diaria del negocio:
-                        Punto de venta amigable y totalmente gestionable.
-                        Módulos de control de gastos, asistencia del personal y promociones.
-                        Dashboard con métricas en tiempo real sobre ventas y comportamiento de
-                        clientes.
-                        Seguimiento de clientes frecuentes y campañas de fidelización.
-                        Como resultado, una herramienta clave para la operación eficiente del negocio
-                        y la toma de decisiones basada en datos.</p>
+                    <h3>Luna Café – Punto de venta inteligente</h3>
+                    <p>Creamos un sistema POS personalizado, diseñado para facilitar y automatizar la operación diaria
+                        del negocio:</p>
+                    <ul class="lista-puntos">
+                        <li>Punto de venta amigable y totalmente gestionable.</li>
+                        <li>Módulos de control de gastos, asistencia del personal y promociones.</li>
+                        <li>Dashboard con métricas en tiempo real sobre ventas y comportamiento de clientes.</li>
+                        <li>Seguimiento de clientes frecuentes y campañas de fidelización.</li>
+                    </ul>
+                    <p>Como resultado, una herramienta clave para la operación eficiente del negocio y la toma de
+                        decisiones basada en datos.</p>
                 </div>
             </div>
         </section>

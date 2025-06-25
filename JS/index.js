@@ -165,18 +165,12 @@ if (
   document.addEventListener("DOMContentLoaded", () => {
     const cursosContainer = document.getElementById("cursos-container");
     const categoriaSelect = document.getElementById("categoria");
+    const explorarSelect = document.getElementById("explorar");
     const limpiarBtn = document.getElementById("limpiar-filtros");
 
     let cursosOriginales = [];
 
-    const imagenesCursos = {
-      1: "../ASSETS/cursos/cursos_img1.png",
-      2: "../ASSETS/cursos/cursos_img2.png",
-      3: "../ASSETS/cursos/cursos_img3.png",
-      4: "../ASSETS/cursos/cursos_img4.png",
-      5: "../ASSETS/cursos/cursos_img4.png",
-    };
-
+    // Cargar categorías
     fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
       {
@@ -212,44 +206,71 @@ if (
       })
       .catch((err) => console.error("Error al cargar cursos:", err));
 
-    categoriaSelect.addEventListener("change", () => {
-      const categoriaSeleccionada = categoriaSelect.value;
-      const filtrados = categoriaSeleccionada
-        ? cursosOriginales.filter(
-            (curso) => curso.categoria == categoriaSeleccionada
-          )
-        : cursosOriginales;
-      renderizarCursos(filtrados);
-      inicializarCarrusel();
-    });
+    categoriaSelect.addEventListener("change", aplicarFiltros);
+    explorarSelect.addEventListener("change", aplicarFiltros);
 
     limpiarBtn.addEventListener("click", () => {
       categoriaSelect.value = "";
+      explorarSelect.value = "";
       renderizarCursos(cursosOriginales);
       inicializarCarrusel();
     });
 
-    function renderizarCursos(cursos) {
-      cursosContainer.innerHTML = cursos
-        .map((curso) => {
-          const imgSrc =
-            imagenesCursos[curso.id] ||
-            `https://via.placeholder.com/300x200?text=${encodeURIComponent(
-              curso.nombre
-            )}`;
+    function aplicarFiltros() {
+      const categoriaSeleccionada = categoriaSelect.value;
+      const explorarSeleccionado = explorarSelect.value;
 
-          return `
-          <div class="card">
-            <img src="${imgSrc}" alt="${curso.nombre}">
-            <div class="contenido">
-              <h4>${curso.nombre}</h4>
-              <p>${curso.descripcion_breve}</p>
-              <p class="info">${curso.horas} hr | $${curso.precio} mx</p>
-            </div>
-          </div>
-        `;
-        })
-        .join("");
+      let cursosFiltrados = [...cursosOriginales];
+
+      if (categoriaSeleccionada) {
+        cursosFiltrados = cursosFiltrados.filter(
+          (curso) => curso.categoria == categoriaSeleccionada
+        );
+      }
+
+      if (explorarSeleccionado === "Populares") {
+        cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
+      } else if (explorarSeleccionado === "Gratuitos") {
+        cursosFiltrados = cursosFiltrados.filter(
+          (curso) => parseFloat(curso.precio) === 0
+        );
+      }
+
+      renderizarCursos(cursosFiltrados);
+      inicializarCarrusel();
+    }
+
+    function renderizarCursos(cursos) {
+      cursosContainer.innerHTML = "";
+      cursos.forEach((curso) => { //aca se cargan los cursos con este foreach
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const img = document.createElement("img");
+        img.src = `../ASSETS/cursos/img<?php echo ${curso.id}; ?>.png`; //aqui esta lo de la imagen + el id de la card
+        img.alt = curso.nombre;
+
+        const contenido = document.createElement("div");
+        contenido.classList.add("contenido");
+
+        const titulo = document.createElement("h4");
+        titulo.textContent = curso.nombre;
+
+        const descripcion = document.createElement("p");
+        descripcion.textContent = curso.descripcion_breve;
+
+        const info = document.createElement("p");
+        info.classList.add("info");
+        info.textContent = `${curso.horas} hr | $${curso.precio} mx`;
+
+        contenido.appendChild(titulo);
+        contenido.appendChild(descripcion);
+        contenido.appendChild(info);
+
+        card.appendChild(img);
+        card.appendChild(contenido);
+        cursosContainer.appendChild(card);
+      });
     }
 
     function inicializarCarrusel() {
@@ -394,7 +415,10 @@ if (
   window.location.pathname.includes("DesarrolloWeb.php") ||
   window.location.pathname.includes("DesarrolloMobile.php") ||
   window.location.pathname.includes("ServiciosEnLaNube.php") ||
-  window.location.pathname.includes("DisenoUXUI.php")
+  window.location.pathname.includes("IndustriaEducacion.php") ||
+  window.location.pathname.includes("ServicioEducativo") ||
+  window.location.pathname.includes("DisenoUXUI.php") ||
+  window.location.pathname.includes("IndustriaTecnologia.php")
 ) {
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [

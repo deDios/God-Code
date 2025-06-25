@@ -1,0 +1,137 @@
+/*------ seccion 1 -----------*/
+#industria-educacion {
+  padding: 3rem 1.5rem;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  text-align: center;
+}
+
+#industria-educacion h2 {
+  font-size: 1.8rem;
+  color: #1a73e8;
+  margin-bottom: 2rem;
+}
+
+.industria-educacion__contenido {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.industria-educacion__texto {
+  flex: 1 1 500px;
+}
+
+.industria-educacion__texto p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.link-godcode {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.link-godcode:hover {
+  text-decoration: underline;
+}
+
+.industria-educacion__imagen {
+  flex: 1 1 400px;
+  text-align: center;
+}
+
+.industria-educacion__imagen img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .industria-educacion__contenido {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .industria-educacion__texto {
+    text-align: left;
+  }
+}
+
+/*-------- seccion 2 ---------*/
+.seccion-educacion {
+  background-color: #f2f2f2;
+  padding: 60px 20px;
+  font-family: Arial, sans-serif;
+}
+
+.educacion-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+}
+
+.educacion-imagen {
+  margin-bottom: 30px;
+}
+
+.educacion-imagen img {
+  max-width: 300px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.educacion-texto p {
+  font-size: 16px;
+  color: #222;
+  line-height: 1.7;
+  margin-bottom: 18px;
+  max-width: 800px;
+}
+
+
+/*-------- seccion 3 ----------*/
+.seccion-educacion-cta {
+  background-color: #ffffff;
+  padding: 60px 20px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.educacion-cta-contenido {
+  max-width: 900px;
+  margin: auto;
+}
+
+.educacion-cta-contenido h3 {
+  color: #1a73e8;
+  font-size: 20px;
+  margin-bottom: 25px;
+}
+
+.educacion-cta-contenido p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.educacion-cta-boton {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #1a73e8;
+  text-decoration: underline;
+  font-size: 16px;
+}
+
