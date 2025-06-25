@@ -66,19 +66,14 @@
                             <li><a href="VIEW/DesarrolloMobile.php"><img
                                         src="ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
                                     Mobile</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
-                                    Nearshore</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DesarrolloOffshore.png"
-                                        alt="Offshore">Desarrollo Offshore</a>
-                            </li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img src="ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios
                                     en la Nube</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a>
+                            <li><a href="../VIEW/DisenoUXUI.php"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a>
                             </li>
                             <li><a href="#"><img src="ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
@@ -273,28 +268,28 @@
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué tipo de soluciones desarrollan en GodCode?</button>
-                        <div class="respuesta">Desarrollamos soluciones web, móviles, de automatización, integración de
+                        <div class="respuesta" style="display: block;">Desarrollamos soluciones web, móviles, de automatización, integración de
                             sistemas y plataformas a la medida, enfocadas en la eficiencia y la conexión omnicanal.
                         </div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">¿Puedo contratar solo una parte del
                             desarrollo, como una app o solo el sitio web?</button>
-                        <div class="respuesta">Sí. Desarrollamos integraciones con plataformas existentes como
+                        <div class="respuesta" style="display: block;">Sí. Desarrollamos integraciones con plataformas existentes como
                             Salesforce, HubSpot, SAP, Zoho, etc., para que todo funcione en un mismo entorno.
                         </div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿GodCode trabaja con empresas pequeñas o solo grandes corporativos?</button>
-                        <div class="respuesta">Trabajamos con todo tipo de clientes: desde emprendedores y pymes hasta
+                        <div class="respuesta" style="display: block;">Trabajamos con todo tipo de clientes: desde emprendedores y pymes hasta
                             grandes empresas. Diseñamos soluciones escalables que crecen contigo.</div>
                     </div>
 
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué es una solución omnicanal y cómo puede ayudar a mi negocio?</button>
-                        <div class="respuesta">Es una estrategia que conecta todos los puntos de contacto con tus
+                        <div class="respuesta" style="display: block;">Es una estrategia que conecta todos los puntos de contacto con tus
                             clientes (web, móvil, redes, sistemas físicos, etc.). Mejora la experiencia del cliente y la
                             eficiencia de tu negocio.</div>
                     </div>
@@ -302,70 +297,70 @@
                         <button class="pregunta" onclick="toggleItem(this)">
 
                             ¿Ofrecen consultoría antes de comenzar un proyecto?</button>
-                        <div class="respuesta">Sí. Nuestra primera asesoría es gratuita y te ayudamos a identificar la
+                        <div class="respuesta" style="display: block;">Sí. Nuestra primera asesoría es gratuita y te ayudamos a identificar la
                             solución tecnológica ideal para tu negocio.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Los desarrollos son personalizados o trabajan con plantillas?</button>
-                        <div class="respuesta">Todos nuestros desarrollos son personalizados y hechos desde cero,
+                        <div class="respuesta" style="display: block;">Todos nuestros desarrollos son personalizados y hechos desde cero,
                             alineados con tus objetivos, procesos y marca.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué tecnologías utilizan en sus proyectos?</button>
-                        <div class="respuesta">Trabajamos con tecnologías modernas como React, Flutter, Laravel,
+                        <div class="respuesta" style="display: block;">Trabajamos con tecnologías modernas como React, Flutter, Laravel,
                             Node.js, Python, Swift, y bases de datos escalables como PostgreSQL, Firebase, y MongoDB,
                             entre otras.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué tiempo toma un proyecto típico?</button>
-                        <div class="respuesta">Depende de la complejidad. Un sistema simple puede tomar entre 2 y 4
+                        <div class="respuesta" style="display: block;">Depende de la complejidad. Un sistema simple puede tomar entre 2 y 4
                             semanas; soluciones más completas pueden requerir entre 2 y 4 meses. Siempre damos un
                             cronograma claro al inicio.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Ofrecen soporte o mantenimiento después de terminar el desarrollo?</button>
-                        <div class="respuesta">Sí, ofrecemos soporte técnico, actualizaciones, mejoras y mantenimiento
+                        <div class="respuesta" style="display: block;">Sí, ofrecemos soporte técnico, actualizaciones, mejoras y mantenimiento
                             mensual o por evento según tus necesidades.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Puedo integrar sus soluciones con sistemas que ya uso (como CRM o ERP)?</button>
-                        <div class="respuesta">Sí. Desarrollamos integraciones con plataformas existentes como
+                        <div class="respuesta" style="display: block;">Sí. Desarrollamos integraciones con plataformas existentes como
                             Salesforce, HubSpot, SAP, Zoho, etc., para que todo funcione en un mismo entorno.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Qué costos manejan y cómo se cotiza un proyecto?</button>
-                        <div class="respuesta">Cada proyecto se cotiza según alcance, funcionalidades y tiempos. La
+                        <div class="respuesta" style="display: block;">Cada proyecto se cotiza según alcance, funcionalidades y tiempos. La
                             primera reunión es gratuita y te entregamos una propuesta clara, sin compromiso.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Ofrecen opciones de pago flexibles?</button>
-                        <div class="respuesta">Sí. Tenemos opciones por fases, mensualidades o contratos por
+                        <div class="respuesta" style="display: block;">Sí. Tenemos opciones por fases, mensualidades o contratos por
                             mantenimiento para facilitarte el acceso a nuestras soluciones.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿GodCode puede ayudarme a digitalizar procesos internos de mi empresa?</button>
-                        <div class="respuesta">Por supuesto. Diseñamos plataformas internas, automatizaciones,
+                        <div class="respuesta" style="display: block;">Por supuesto. Diseñamos plataformas internas, automatizaciones,
                             dashboards y flujos que reducen tareas manuales y aumentan tu productividad.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Puedo monitorear el avance de mi proyecto?</button>
-                        <div class="respuesta">Sí. Usamos herramientas colaborativas dentro de godcode o podemos
+                        <div class="respuesta" style="display: block;">Sí. Usamos herramientas colaborativas dentro de godcode o podemos
                             trabajar con Trello y Monday para que estés al tanto de cada avance, entregable y fecha
                             clave.</div>
                     </div>
                     <div class="item">
                         <button class="pregunta" onclick="toggleItem(this)">
                             ¿Dónde están ubicados y en qué zonas ofrecen servicio?</button>
-                        <div class="respuesta">Estamos en Ixtlahuacan de los Membrillos, pero trabajamos con clientes en
+                        <div class="respuesta" style="display: block;">Estamos en Ixtlahuacan de los Membrillos, pero trabajamos con clientes en
                             todo el mundo de forma remota. Nuestra tecnología no tiene fronteras.</div>
                     </div>
 

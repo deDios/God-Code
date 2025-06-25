@@ -1,0 +1,266 @@
+/*----------------- seccion 1 ----------------*/
+.seccion-uxui {
+    background: #ffffff;
+    padding: 60px 20px;
+    font-family: Arial, sans-serif;
+    margin: auto;
+}
+
+.uxui-contenido {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.uxui-imagen {
+    flex: 1 1 350px;
+    text-align: center;
+}
+
+.uxui-imagen img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.uxui-texto {
+    flex: 2 1 500px;
+}
+
+.uxui-texto h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #1a73e8;
+}
+
+.uxui-texto h3 span {
+    color: #1a73e8;
+}
+
+.uxui-texto p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.uxui-texto a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/*--------------- seccion 2 --------------*/
+#ventajas-uxui {
+    background: #f9f9f9;
+    padding: 3rem 1rem;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+#ventajas-uxui .ventajas-uxui__intro {
+    font-size: 1.1rem;
+    color: #222;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-inline: auto;
+}
+
+#ventajas-uxui .ventajas-uxui__contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: auto;
+    position: relative;
+    gap: 1rem;
+}
+
+#ventajas-uxui .ventajas-uxui__carousel {
+    display: flex;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    width: 100%;
+    max-width: 800px;
+}
+
+#ventajas-uxui .ventaja {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    text-align: left;
+}
+
+#ventajas-uxui .ventaja img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 12px;
+}
+
+#ventajas-uxui .ventaja__texto {
+    max-width: 500px;
+}
+
+#ventajas-uxui .ventaja__texto h3 {
+    color: #0562EF;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+}
+
+#ventajas-uxui .ventaja__texto p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+#ventajas-uxui .ventajas-uxui__btn {
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+#ventajas-uxui .ventajas-uxui__btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+#ventajas-uxui .ventajas-uxui__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    pointer-events: none;
+}
+
+@media (max-width: 768px) {
+    #ventajas-uxui .ventaja {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #ventajas-uxui .ventaja img {
+        max-width: 120px;
+    }
+
+    #ventajas-uxui .ventaja__texto {
+        text-align: center;
+    }
+}
+
+/*------- seccion 3 -----------*/
+.seccion-uxui {
+    background: #ffffff;
+    padding: 60px 20px;
+    font-family: Arial, sans-serif;
+    margin: auto;
+}
+
+.uxui-contenido {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.uxui-imagen {
+    flex: 1 1 350px;
+    text-align: center;
+}
+
+.uxui-imagen img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.uxui-texto {
+    flex: 2 1 500px;
+}
+
+.uxui-texto h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #1a73e8;
+}
+
+.uxui-texto h3 span {
+    color: #1a73e8;
+}
+
+.uxui-texto p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.uxui-texto a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/*----------- Otros productos ----------------*/
+#otros-productos {
+    background-color: #f2f2f2;
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+#otros-productos h2 {
+    color: #0562EF;
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+}
+
+#otros-productos .productos-random {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+#otros-productos .producto-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1rem;
+    color: #222;
+    font-weight: 500;
+    background-color: white;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#otros-productos .producto-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    color: #0562EF;
+}
+
+#otros-productos .producto-item img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}

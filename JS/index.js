@@ -169,39 +169,55 @@ if (
 
     let cursosOriginales = [];
 
-    fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estatus: 1 })
-    })
-      .then(res => res.json())
-      .then(categorias => {
-        categorias.forEach(cat => {
+    const imagenesCursos = {
+      1: "../ASSETS/cursos/cursos_img1.png",
+      2: "../ASSETS/cursos/cursos_img2.png",
+      3: "../ASSETS/cursos/cursos_img3.png",
+      4: "../ASSETS/cursos/cursos_img4.png",
+      5: "../ASSETS/cursos/cursos_img4.png",
+    };
+
+    fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    )
+      .then((res) => res.json())
+      .then((categorias) => {
+        categorias.forEach((cat) => {
           const option = document.createElement("option");
           option.value = cat.id;
           option.textContent = cat.nombre;
           categoriaSelect.appendChild(option);
         });
       })
-      .catch(err => console.error("Error al cargar categorías:", err));
+      .catch((err) => console.error("Error al cargar categorías:", err));
 
-    fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estatus: 1 })
-    })
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
         cursosOriginales = data;
         renderizarCursos(data);
         inicializarCarrusel();
       })
-      .catch(err => console.error("Error al cargar cursos:", err));
+      .catch((err) => console.error("Error al cargar cursos:", err));
 
     categoriaSelect.addEventListener("change", () => {
       const categoriaSeleccionada = categoriaSelect.value;
       const filtrados = categoriaSeleccionada
-        ? cursosOriginales.filter(curso => curso.categoria == categoriaSeleccionada)
+        ? cursosOriginales.filter(
+            (curso) => curso.categoria == categoriaSeleccionada
+          )
         : cursosOriginales;
       renderizarCursos(filtrados);
       inicializarCarrusel();
@@ -215,18 +231,24 @@ if (
 
     function renderizarCursos(cursos) {
       cursosContainer.innerHTML = cursos
-        .map(
-          curso => `
-        <div class="card">
-          <img src="https://via.placeholder.com/300x200?text=${encodeURIComponent(curso.nombre)}" alt="${curso.nombre}">
-          <div class="contenido">
-            <h4>${curso.nombre}</h4>
-            <p>${curso.descripcion_breve}</p>
-            <p class="info">${curso.horas} hr | $${curso.precio} mx</p>
+        .map((curso) => {
+          const imgSrc =
+            imagenesCursos[curso.id] ||
+            `https://via.placeholder.com/300x200?text=${encodeURIComponent(
+              curso.nombre
+            )}`;
+
+          return `
+          <div class="card">
+            <img src="${imgSrc}" alt="${curso.nombre}">
+            <div class="contenido">
+              <h4>${curso.nombre}</h4>
+              <p>${curso.descripcion_breve}</p>
+              <p class="info">${curso.horas} hr | $${curso.precio} mx</p>
+            </div>
           </div>
-        </div>
-      `
-        )
+        `;
+        })
         .join("");
     }
 
@@ -254,7 +276,9 @@ if (
       }
 
       function moverSiguiente() {
-        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        const cardsVisibles = Math.floor(
+          track.parentElement.offsetWidth / cardWidth
+        );
         if (currentIndex < cards.length - cardsVisibles) {
           currentIndex++;
           updateCarousel();
@@ -267,9 +291,12 @@ if (
       }
 
       function actualizarBotones() {
-        const cardsVisibles = Math.floor(track.parentElement.offsetWidth / cardWidth);
+        const cardsVisibles = Math.floor(
+          track.parentElement.offsetWidth / cardWidth
+        );
         prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-        nextButton.style.visibility = currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+        nextButton.style.visibility =
+          currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
       }
 
       window.addEventListener("resize", () => {
@@ -280,33 +307,6 @@ if (
       updateCarousel();
     }
   });
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------- vista CursoInfo -------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------------------------------------------------------
-
-if (window.location.pathname.includes("CursoInfo.php")) {
-  function toggleAcordeon(header) {
-    const item = header.parentElement;
-    const contenido = item.querySelector(".contenido");
-    const isOpen = contenido.style.display === "block";
-
-    // Cerrar todos si deseas modo exclusivo
-    document
-      .querySelectorAll("#curso-detalle-extra .contenido")
-      .forEach((el) => (el.style.display = "none"));
-    document
-      .querySelectorAll("#curso-detalle-extra .cabecera")
-      .forEach((el) => el.classList.remove("abierto"));
-
-    if (!isOpen) {
-      contenido.style.display = "block";
-      header.classList.add("abierto");
-    }
-  }
-
-  const id = new URLSearchParams(window.location.search).get("id");
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -392,7 +392,9 @@ if (window.location.pathname.includes("DesarrolloWeb.php")) {
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (
   window.location.pathname.includes("DesarrolloWeb.php") ||
-  window.location.pathname.includes("DesarrolloMobile.php")
+  window.location.pathname.includes("DesarrolloMobile.php") ||
+  window.location.pathname.includes("ServiciosEnLaNube.php") ||
+  window.location.pathname.includes("DisenoUXUI.php")
 ) {
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [
@@ -424,7 +426,7 @@ if (
     {
       texto: "Diseño UX/UI",
       icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/DiseñoUXUI.php",
     },
     {
       texto: "Sercivio educativo",
@@ -465,10 +467,10 @@ if (
   });
 }
 
-if (
-  window.location.pathname.includes("ServiciosEnLaNube.php")
-) {
-
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------- VISTA PRODUCTOS/ServiciosEnLaNube.php -------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+if (window.location.pathname.includes("ServiciosEnLaNube.php")) {
   document.addEventListener("DOMContentLoaded", () => {
     const carousel = document.getElementById("ventajas-carousel");
     const prevBtn = document.querySelector(".ventajas-nube__btn.prev");
@@ -482,11 +484,12 @@ if (
       const slideWidth = carousel.offsetWidth;
       carousel.scrollTo({
         left: slideWidth * currentIndex,
-        behavior: "smooth"
+        behavior: "smooth",
       });
 
       prevBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-      nextBtn.style.visibility = currentIndex === totalSlides - 1 ? "hidden" : "visible";
+      nextBtn.style.visibility =
+        currentIndex === totalSlides - 1 ? "hidden" : "visible";
     }
 
     prevBtn.addEventListener("click", () => {
@@ -509,97 +512,53 @@ if (
 
     updateCarousel();
   });
-
-  //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
-  const productos = [
-    {
-      texto: "Desarrollo offshore",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Desarrollo web",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Desarrollo Mobile",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
-      link: "../VIEW/DesarrolloMobile.php",
-    },
-    {
-      texto: "Desarrollo nearshore",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Servicios en la nube",
-      icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
-      link: "../VIEW/ServiciosEnLaNube.php",
-    },
-    {
-      texto: "Diseño UX/UI",
-      icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Sercivio educativo",
-      icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Educación",
-      icono: "../ASSETS/ProductosPopUp/Educacion.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Finanzas",
-      icono: "../ASSETS/ProductosPopUp/Finanzas.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
-      texto: "Tecnología",
-      icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-  ];
-
-  const contenedor = document.querySelector(
-    "#otros-productos .productos-random"
-  );
-
-  const seleccionAleatoria = productos
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 3);
-
-  seleccionAleatoria.forEach((prod) => {
-    const a = document.createElement("a");
-    a.href = prod.link;
-    a.className = "producto-item";
-    a.innerHTML = `<img src="${prod.icono}" alt="${prod.texto}"><span>${prod.texto}</span>`;
-    contenedor.appendChild(a);
-  });
 }
 
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------- VISTA PRODUCTOS/DiseñoUXUI.php -------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------------------------------------------------------
+if (window.location.href.includes("DisenoUXUI")) {
+  const path = window.location.pathname.toLowerCase();
+  console.log("Página actual:", path);
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const carousel = document.getElementById("ventajas-uxui-carousel");
+    const prevBtn = document.querySelector(".ventajas-uxui__btn.prev");
+    const nextBtn = document.querySelector(".ventajas-uxui__btn.next");
+    const slides = carousel.querySelectorAll(".ventaja");
 
+    let currentIndex = 0;
 
+    function updateCarousel() {
+      const slideWidth = carousel.offsetWidth;
+      carousel.scrollTo({
+        left: slideWidth * currentIndex,
+        behavior: "smooth",
+      });
 
+      prevBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+      nextBtn.style.visibility =
+        currentIndex >= slides.length - 1 ? "hidden" : "visible";
+    }
 
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    });
 
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < slides.length - 1) {
+        currentIndex++;
+        updateCarousel();
+      }
+    });
 
-
-
-
-
-
-
-
-
-
-
-
-
+    window.addEventListener("resize", updateCarousel);
+    updateCarousel();
+  });
+}
 
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav

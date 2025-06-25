@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/index.css" />
+    <link rel="stylesheet" href="../CSS/DiseñoUXUI.css" />
+    <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
 <body>
@@ -54,7 +55,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php">Inicio</a>
+            <a href="../index.php" class="active">Inicio</a>
             <div class="nav-item has-megamenu" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -67,6 +68,7 @@
                             <li><a href="../VIEW/DesarrolloMobile.php"><img
                                         src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
                                     Mobile</a></li>
+                            </li>
                         </ul>
                     </div>
                     <div class="col">
@@ -75,7 +77,7 @@
                             <li><a href="../VIEW/ServiciosEnLaNube.php"><img
                                         src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
                                     Nube</a></li>
-                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
                                     UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
@@ -105,7 +107,7 @@
                 </div>
             </div>
             <a href="../VIEW/Nosotros.php">Nosotros</a>
-            <a href="../VIEW/Blog.php" class="active">Blog</a>
+            <a href="../VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">
@@ -121,104 +123,19 @@
         </div>
     </header>
 
+
     <main>
-        <!-- seccion 1 -->
-        <section id="blog-godcode" class="animado">
-            <h2>Blog GodCode</h2>
-            <h3>Lo Nuevo</h3>
-            <p class="descripcion">
-                Explora el futuro hoy<br>
-                Descubre las últimas noticias en tecnología, innovación y avances que están transformando el mundo.<br>
-                Mantente al día con lo más relevante, todo en un solo lugar.
-            </p>
-            <div class="grid-cards">
-                <div class="card" data-id="meta">
-                    <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
-                    <div class="contenido">
-                        <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                    </div>
-                </div>
+        <!-- Seccion 1 -->
+        <section>
 
-                <div class="card" data-id="apple">
-                    <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
-                    <div class="contenido">
-                        <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                    </div>
-                </div>
-
-                <div class="card" data-id="nato">
-                    <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
-                    <div class="contenido">
-                        <p>NATO lanza nueva estrategia para investigación científica...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                    </div>
-                </div>
-            </div>
         </section>
 
-        <!-- seccion 2 -->
-        <section id="filtros-cursos">
-            <div class="filtros-cursos__contenido">
-                <h2>Cursos destacados</h2>
-                <h3>Explora nuestras mejores opciones</h3>
-                <p class="descripcion">
-                    Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
-                    actualizado y práctico.
-                </p>
-            </div>
 
-            <div class="contenedor-filtros">
-                <div class="filtro limpiar">
-                    <label>&nbsp;</label>
-                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
-                </div>
 
-                <div class="filtro">
-                    <label for="explorar">Explorar</label>
-                    <select id="explorar" name="explorar">
-                        <option value="">Selecciona una opción</option>
-                        <option value="">Destacados</option>
-                        <option value="">Popupares</option>
-                        <option value="">Gratuitos</option>
-                    </select>
-                </div>
-
-                <div class="filtro">
-                    <label for="categoria">Categoría</label>
-                    <select id="categoria" name="categoria">
-                        <option value="">Selecciona una categoría</option>
-                        <!-- Se llenará con JS -->
-                    </select>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- seccion 3 -->
-        <section id="cursos-destacados">
-            <h3>Cursos disponibles</h3>
-
-            <div class="carousel-container" id="carousel-container">
-                <button class="carousel-btn prev" aria-label="Anterior">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                    </svg>
-                </button>
-
-                <div class="carousel-track-container">
-                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
-                        <!-- Las cards se insertan desde JS -->
-                    </div>
-                </div>
-
-                <button class="carousel-btn next" aria-label="Siguiente">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
-                    </svg>
-                </button>
-            </div>
+        <!-- Seccion 4  -->
+        <section id="otros-productos">
+            <h2>Otros Productos</h2>
+            <div class="productos-random"></div>
         </section>
 
     </main>

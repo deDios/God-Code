@@ -1,0 +1,343 @@
+/*----------------- css global ------------------------*/
+/*cosas que no estan renderizadas en pantallas de resoluciones grandes*/
+.social-bar-mobile {
+    display: none;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Segoe UI", sans-serif;
+    background: #f9f9f9;
+    color: #222;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    margin-top: 120px;
+}
+
+header {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    z-index: 1001;
+    white-space: nowrap;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+
+header.scrolled .top-bar {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.subnav {
+    position: fixed;
+    top: 74px;
+    left: 0;
+    right: 0;
+    background-color: #f1f1f1;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 1rem;
+    z-index: 1000;
+    white-space: nowrap;
+    transition: all 0.4s ease-in-out;
+}
+
+.subnav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+}
+
+header.scrolled .subnav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0a61d0;
+}
+
+.logo-icon {
+    height: 40px;
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.user-icon img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+    max-width: 200px;
+}
+
+.btn-outline {
+    border: 1px solid #0a61d0;
+    color: #0a61d0;
+    background-color: white;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #0a61d0;
+    color: white;
+    text-decoration: none;
+}
+
+footer {
+    background-color: #004393;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer div {
+    margin-bottom: 10px;
+}
+
+footer small {
+    display: block;
+    font-size: 0.8rem;
+}
+
+#submenu-productos {
+    position: relative;
+}
+
+#submenu-productos .megamenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 100vw;
+    max-width: 1000px;
+    padding: 2rem;
+    border-radius: 10px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#submenu-productos .megamenu.show {
+    display: flex;
+}
+
+#submenu-productos .col {
+    flex: 1 1 200px;
+}
+
+#submenu-productos .full-width {
+    flex: 1 1 100%;
+    text-align: center;
+}
+
+#submenu-productos h4 {
+    font-size: 1rem;
+    color: #0a61d0;
+    margin-bottom: 1rem;
+}
+
+#submenu-productos ul {
+    list-style: none;
+    padding: 0;
+}
+
+#submenu-productos ul li {
+    margin-bottom: 0.5rem;
+}
+
+#submenu-productos ul li a {
+    text-decoration: none;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#submenu-productos ul li a img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+#submenu-productos .tech-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+#submenu-productos .tech-icons span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: #444;
+}
+
+#submenu-productos .tech-icons img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+#submenu-productos>a {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
+
+/*el menu de hamburguesa estara oculto por defecto*/
+.hamburger {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 10px 40px;
+    text-align: right;
+    margin-left: auto;
+}
+
+/*---------------------------Animaciones para los botones-----------------------------*/
+/*estos son botones / iconos del tope de pagina*/
+/* Logo, se hace mas grande*/
+.logo:hover {
+    color: #094bb0;
+    cursor: pointer;
+}
+
+/* Imagen del logo se hace mas grande*/
+.logo-icon:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/*el contorno del boton cambia de color*/
+.btn-outline:hover {
+    background-color: #0a61d0;
+    color: white;
+    transition: 0.3s ease;
+}
+
+/*boton principal cambia de color*/
+.btn-primary:hover {
+    background-color: #094bb0;
+    transition: 0.3s ease;
+}
+
+/*Barra de navegacion mas pequeña*/
+.subnav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 5px;
+}
+
+/*----------------css para los iconos de redes sociales-----------------*/
+.subnav .social-icons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    width: 100%;
+    padding-right: 10px;
+}
+
+
+.subnav .circle-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 0;
+    overflow: visible;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subnav .circle-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+/* efecto hover sencillo para los iconos */
+.subnav .social-icons img:hover {
+    transform: scale(1.1);
+}
+
+/*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
+.subnav a:hover {
+    background-color: #e0eaff;
+    color: #0a61d0;
+}
+
+/*cambia la fuente según que pagina este activa */
+.subnav a.active {
+    color: #0a61d0;
+    font-weight: 700;
+    text-decoration: underline;
+}

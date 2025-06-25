@@ -67,19 +67,16 @@
                             <li><a href="../VIEW/DesarrolloMobile.php"><img
                                         src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
                                     Mobile</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
-                                    Nearshore</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png"
-                                        alt="Offshore">Desarrollo Offshore</a>
-                            </li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png"
-                                        alt="Nube">Servicios en la Nube</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la
+                                    Nube</a></li>
+                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png"
+                                        alt="UX/UI">Diseño
                                     UX/UI</a></li>
                             <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
