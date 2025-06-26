@@ -204,7 +204,7 @@
 
         <!-------------- seccion 3  ------------------>
         <section class="potencial">
-            <h2>El potencial de Google <span>para tu negocio</span></h2>
+            <h2>El potencial de GodCode <span>para tu negocio</span></h2>
 
             <div class="bloque">
                 <div class="imagen">
@@ -310,11 +310,6 @@
                             negocio.
                         </div>
                     </div>
-
-                    <div class="contenedor-boton">
-                        <button id="ver-mas-preguntas" class="btn-contacto">Más preguntas</button>
-                    </div>
-
 
                     <div class="item extra">
                         <button class="pregunta" onclick="toggleItem(this)">
@@ -424,6 +419,10 @@
                             Estamos en Ixtlahuacán de los Membrillos, pero trabajamos con clientes en todo el mundo de
                             forma remota. Nuestra tecnología no tiene fronteras.
                         </div>
+                    </div>
+
+                    <div class="contenedor-boton">
+                        <button id="ver-mas-preguntas" class="btn-contacto">Más preguntas</button>
                     </div>
 
                 </div>
