@@ -184,7 +184,7 @@
                     <label for="explorar">Explorar</label>
                     <select id="explorar" name="explorar">
                         <option value="">Selecciona una opción</option>
-                        <option value="Popupares">Popupares</option>
+                        <option value="Populares">Populares</option>
                         <option value="Gratuitos">Gratuitos</option>
                     </select>
                 </div>
