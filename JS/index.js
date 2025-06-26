@@ -127,13 +127,9 @@ if (window.location.pathname.includes("index.php")) {
       crearPaginacion();
     }, 6000);
   });
+
   document.addEventListener("DOMContentLoaded", () => {
-    //seccion 4 de ayuda
-    function toggleItem(btn) {
-      const respuesta = btn.nextElementSibling;
-      respuesta.style.display =
-        respuesta.style.display === "block" ? "none" : "block";
-    }
+    //seccion de preguntas frecuentes
     //las demas preguntas
     const botonVerMas = document.getElementById("ver-mas-preguntas");
     const contenedorBoton = botonVerMas?.parentElement;
@@ -161,6 +157,15 @@ if (window.location.pathname.includes("index.php")) {
       }
     });
   });
+  function toggleItem(btn) {
+    const respuesta = btn.nextElementSibling;
+
+    if (respuesta.style.display === "block") {
+      respuesta.style.display = "none";
+    } else {
+      respuesta.style.display = "block";
+    }
+  }
 }
 
 //solo carga si estamos en la vista ----------------------------------Nosotros----------------------------------------------
