@@ -551,6 +551,43 @@ header.scrolled .subnav {
     line-height: 1.5;
 }
 
+.item.extra {
+    display: none;
+}
+
+.ayuda-faq .contenedor-boton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+  transition: all 0.3s ease;
+}
+
+.ayuda-faq .contenedor-boton.oculto {
+  display: none;
+}
+
+.ayuda-faq .btn-contacto {
+  display: inline-block;
+  padding: 12px 28px;
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.ayuda-faq .btn-contacto:hover {
+  background-color: #1a73e8;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
 /* Responsive ajustes */
 @media (max-width: 768px) {
     .ayuda-faq {

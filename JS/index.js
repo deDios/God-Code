@@ -127,13 +127,40 @@ if (window.location.pathname.includes("index.php")) {
       crearPaginacion();
     }, 6000);
   });
+  document.addEventListener("DOMContentLoaded", () => {
+    //seccion 4 de ayuda
+    function toggleItem(btn) {
+      const respuesta = btn.nextElementSibling;
+      respuesta.style.display =
+        respuesta.style.display === "block" ? "none" : "block";
+    }
+    //las demas preguntas
+    const botonVerMas = document.getElementById("ver-mas-preguntas");
+    const contenedorBoton = botonVerMas?.parentElement;
+    const preguntasExtras = document.querySelectorAll(".acordeon .item.extra");
 
-  //seccion 4 de ayuda
-  function toggleItem(btn) {
-    const respuesta = btn.nextElementSibling;
-    respuesta.style.display =
-      respuesta.style.display === "block" ? "none" : "block";
-  }
+    preguntasExtras.forEach((item) => (item.style.display = "none"));
+
+    let mostrando = false;
+
+    botonVerMas?.addEventListener("click", () => {
+      mostrando = !mostrando;
+
+      preguntasExtras.forEach((item) => {
+        item.style.display = mostrando ? "block" : "none";
+      });
+
+      if (mostrando) {
+        botonVerMas.textContent = "Ver menos";
+      } else {
+        botonVerMas.textContent = "Más preguntas";
+        window.scrollTo({
+          top: contenedorBoton.offsetTop - 100,
+          behavior: "smooth",
+        });
+      }
+    });
+  });
 }
 
 //solo carga si estamos en la vista ----------------------------------Nosotros----------------------------------------------
@@ -242,7 +269,8 @@ if (
 
     function renderizarCursos(cursos) {
       cursosContainer.innerHTML = "";
-      cursos.forEach((curso) => { //aca se cargan los cursos con este foreach
+      cursos.forEach((curso) => {
+        //aca se cargan los cursos con este foreach
         const card = document.createElement("div");
         card.classList.add("card");
 
