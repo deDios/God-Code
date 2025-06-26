@@ -281,6 +281,7 @@ if (
 
         const img = document.createElement("img");
         img.src = `../ASSETS/cursos/img<?php echo ${curso.id}; ?>.png`; //aqui esta lo de la imagen + el id de la card
+        console.log("Ruta de la imagen:", img.src);
         img.alt = curso.nombre;
 
         const contenido = document.createElement("div");
