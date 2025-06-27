@@ -78,24 +78,29 @@
     margin: auto;
     position: relative;
     gap: 1rem;
+    flex-direction: row;
 }
 
 #ventajas-uxui .ventajas-uxui__carousel {
     display: flex;
-    overflow: hidden;
+    overflow-x: auto;
     scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
     max-width: 800px;
 }
 
 #ventajas-uxui .ventaja {
     flex: 0 0 100%;
+    scroll-snap-align: start;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2rem;
     padding: 2rem 1rem;
     text-align: left;
+    box-sizing: border-box;
 }
 
 #ventajas-uxui .ventaja img {
@@ -132,6 +137,8 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     z-index: 10;
+    min-width: 40px;
+    min-height: 40px;
 }
 
 #ventajas-uxui .ventajas-uxui__btn:hover {
@@ -159,61 +166,29 @@
     #ventajas-uxui .ventaja__texto {
         text-align: center;
     }
+
+    #ventajas-uxui .ventajas-uxui__contenedor {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    #ventajas-uxui .ventajas-uxui__btn {
+        position: static;
+        margin: 0 auto;
+    }
+
+    .uxui-contenido {
+        flex-direction: column-reverse;
+    }
 }
 
-/*------- seccion 3 -----------*/
-.seccion-uxui {
-    background: #ffffff;
-    padding: 60px 20px;
-    font-family: Arial, sans-serif;
-    margin: auto;
+#ventajas-uxui .ventajas-uxui__carousel {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
 }
 
-.uxui-contenido {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 30px;
-    max-width: 1100px;
-    margin: auto;
+#ventajas-uxui .ventajas-uxui__carousel::-webkit-scrollbar {
+    display: none;
 }
-
-.uxui-imagen {
-    flex: 1 1 350px;
-    text-align: center;
-}
-
-.uxui-imagen img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-}
-
-.uxui-texto {
-    flex: 2 1 500px;
-}
-
-.uxui-texto h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: #1a73e8;
-}
-
-.uxui-texto h3 span {
-    color: #1a73e8;
-}
-
-.uxui-texto p {
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 12px;
-    color: #333;
-}
-
-.uxui-texto a {
-    color: #1a73e8;
-    text-decoration: none;
-    font-weight: bold;
-}
-

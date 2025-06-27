@@ -1,0 +1,246 @@
+#servicios-nube {
+    padding: 4rem 1rem;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+#servicios-nube .servicios-nube__contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+#servicios-nube .servicios-nube__texto {
+    flex: 1 1 400px;
+    max-width: 600px;
+}
+
+#servicios-nube h2 {
+    color: #0562EF;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#servicios-nube p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #222;
+    text-align: justify;
+}
+
+#servicios-nube .link-godcode {
+    color: #0562EF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#servicios-nube .link-godcode:hover {
+    text-decoration: underline;
+}
+
+#servicios-nube .servicios-nube__imagen {
+    flex: 1 1 300px;
+    text-align: center;
+}
+
+#servicios-nube .servicios-nube__imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    #servicios-nube .servicios-nube__contenedor {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+#ventajas-nube {
+    background: #f2f2f2;
+    padding: 3rem 1rem;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+#ventajas-nube .ventajas-nube__intro {
+    font-size: 1.1rem;
+    color: #222;
+    margin-bottom: 2rem;
+}
+
+#ventajas-nube .ventajas-nube__contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: auto;
+    gap: 1rem;
+    position: relative;
+}
+
+#ventajas-nube .ventajas-nube__carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 800px;
+    scroll-snap-type: x mandatory;
+    overflow-x: hidden;
+}
+
+#ventajas-nube .ventaja {
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    text-align: left;
+    scroll-snap-align: start;
+}
+
+#ventajas-nube .ventaja img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 12px;
+}
+
+#ventajas-nube .ventaja__texto {
+    max-width: 500px;
+}
+
+#ventajas-nube .ventaja__texto h3 {
+    color: #0562EF;
+    font-size: 1.3rem;
+    margin-bottom: 0.8rem;
+}
+
+#ventajas-nube .ventaja__texto p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+#ventajas-nube .ventajas-nube__btn {
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    z-index: 10;
+}
+
+#ventajas-nube .ventajas-nube__btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+#ventajas-nube .ventajas-nube__btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+#ventajas-nube .ventajas-nube__btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.3);
+}
+
+#ventajas-nube .ventajas-nube__btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#ventajas-nube .ventajas-nube__btn:hover svg {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    #ventajas-nube .ventaja {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #ventajas-nube .ventaja img {
+        max-width: 120px;
+    }
+
+    #ventajas-nube .ventaja__texto {
+        max-width: 100%;
+    }
+
+    #ventajas-nube .ventaja__texto p {
+        max-width: 100%;
+    }
+
+    #ventajas-nube .ventajas-nube__btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #ventajas-nube .ventajas-nube__btn.prev {
+        left: 10px;
+    }
+
+    #ventajas-nube .ventajas-nube__btn.next {
+        right: 10px;
+    }
+}
+
+#nube-final {
+    background-color: #f5f5f5;
+    padding: 3rem 1rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#nube-final .nube-final__contenido {
+    max-width: 960px;
+    margin: auto;
+}
+
+#nube-final p {
+    color: #222;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+#nube-final .nube-final__imagen {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+#nube-final .nube-final__imagen img {
+    max-width: 100%;
+    width: 400px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+    #nube-final p {
+        font-size: 1rem;
+    }
+
+    #nube-final .nube-final__imagen img {
+        width: 100%;
+    }
+}

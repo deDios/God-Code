@@ -11,7 +11,7 @@
 <body>
     <!-- Tope de pagina -->
     <header id="header">
-       <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
+        <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
         <div class="social-bar-mobile">
             <div class="social-icons">
@@ -54,7 +54,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="index.php" class="active">Inicio</a>
+            <a href="index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -114,7 +114,7 @@
                 <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
             </div>
 
-            <a href="../VIEW/Nosotros.php">Nosotros</a>
+            <a href="../VIEW/Nosotros.php" class="active">Nosotros</a>
             <a href="../VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
@@ -135,13 +135,14 @@
     <main>
 
         <section class="nosotros">
-            <h2 class="nosotros-titulo">En <span>GOD CODE </span>desarrollamos tecnología pensada específicamente para
+            <h2 class="nosotros-titulo">En <span>GOD CODE</span> desarrollamos tecnología pensada específicamente para
                 tu negocio</h2>
 
-            <!-- Acerca de nosotros -->
             <div class="bloque-nosotros fila normal animado">
                 <div class="decoracion"></div>
-                <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros" class="imagen-nosotros">
+                <div class="imagen-nosotros">
+                    <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros">
+                </div>
                 <div class="texto-nosotros">
                     <h3>Acerca de nosotros.</h3>
                     <p>En GodCode creamos soluciones tecnológicas personalizadas que se
@@ -152,10 +153,11 @@
                 </div>
             </div>
 
-            <!-- Nuestra misión -->
             <div class="bloque-nosotros fila invertida animado">
                 <div class="decoracion"></div>
-                <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión" class="imagen-nosotros">
+                <div class="imagen-nosotros">
+                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión">
+                </div>
                 <div class="texto-nosotros">
                     <h3>Nuestra misión.</h3>
                     <p>Convertirnos en un referente del desarrollo tecnológico a nivel
@@ -164,13 +166,13 @@
                         se conectan con su audiencia, sin importar el canal o el
                         dispositivo.</p>
                 </div>
-
             </div>
 
-            <!-- Nuestra historia -->
             <div class="bloque-nosotros fila normal animado">
                 <div class="decoracion"></div>
-                <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia" class="imagen-nosotros">
+                <div class="imagen-nosotros">
+                    <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia">
+                </div>
                 <div class="texto-nosotros">
                     <h3>Nuestra historia.</h3>
                     <p>GodCode nació como una solución interna para Luna Café, un
@@ -181,7 +183,6 @@
                         transformación digital.</p>
                 </div>
             </div>
-
         </section>
 
         <section class="testimonios">

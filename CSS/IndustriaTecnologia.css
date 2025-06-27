@@ -1,4 +1,4 @@
-/* ---------------------- seccion 1 -------------------*/
+/* ---------------------- Sección 1 ------------------- */
 #industria-tecnologia-1 {
     padding: 4rem 1rem;
     background: #f9fbff;
@@ -45,6 +45,7 @@
     #industria-tecnologia-1 .contenido-seccion {
         flex-direction: column;
         text-align: justify;
+        padding: 0 1rem;
     }
 
     #industria-tecnologia-1 h2 {
@@ -53,18 +54,19 @@
 
     #industria-tecnologia-1 .contenido-seccion .texto {
         font-size: 1rem;
+        width: 100%;
     }
 
     #industria-tecnologia-1 .contenido-seccion img {
-        flex: 1 1 350px;
+        flex: 1 1 auto;
         max-width: 100%;
         border-radius: 20px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
     }
 }
 
-
-/*--------------- seccion 2 --------------- */
+/*--------------- Sección 2 --------------- */
 #industria-tecnologia-2 {
     padding: 4rem 1rem;
     background: #ffffff;
@@ -100,14 +102,22 @@
     #industria-tecnologia-2 .contenido-seccion {
         flex-direction: column;
         text-align: justify;
+        padding: 0 1rem;
     }
 
     #industria-tecnologia-2 .contenido-seccion .texto {
         font-size: 1rem;
+        width: 100%;
+        margin-top: 1rem;
     }
 }
 
-/*---------- seccion 3 ------------------*/
+/*---------- Sección 3 ------------------*/
+#cta-tecnologia {
+    padding: 4rem 1rem;
+    background: #fff;
+    font-family: 'Segoe UI', sans-serif;
+}
 
 #cta-tecnologia .contenido {
     max-width: 1000px;
@@ -144,7 +154,6 @@
     }
 }
 
-
 #cta-tecnologia .contenedor-boton {
     display: flex;
     align-items: center;
@@ -153,7 +162,7 @@
 }
 
 #cta-tecnologia .btn-contacto {
-    display: inline-block;
+    display: inline-flex;
     padding: 12px 28px;
     background-color: #e8f0fe;
     color: #1a73e8;
@@ -164,7 +173,6 @@
     border: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;

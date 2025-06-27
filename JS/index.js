@@ -457,11 +457,6 @@ if (
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [
     {
-      texto: "Desarrollo offshore",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloOffshore.png",
-      link: "../VIEW/DesarrolloWeb.php",
-    },
-    {
       texto: "Desarrollo web",
       icono: "../ASSETS/ProductosPopUp/DesarrolloWeb.png",
       link: "../VIEW/DesarrolloWeb.php",
@@ -470,11 +465,6 @@ if (
       texto: "Desarrollo Mobile",
       icono: "../ASSETS/ProductosPopUp/DesarrolloMobile.png",
       link: "../VIEW/DesarrolloMobile.php",
-    },
-    {
-      texto: "Desarrollo nearshore",
-      icono: "../ASSETS/ProductosPopUp/DesarrolloNearshore.png",
-      link: "../VIEW/DesarrolloWeb.php",
     },
     {
       texto: "Servicios en la nube",
@@ -564,8 +554,15 @@ if (window.location.pathname.includes("ServiciosEnLaNube.php")) {
       }
     });
 
-    window.addEventListener("resize", () => {
-      updateCarousel();
+    window.addEventListener("resize", updateCarousel);
+
+    carousel.addEventListener("scroll", () => {
+      const slideWidth = carousel.offsetWidth;
+      currentIndex = Math.round(carousel.scrollLeft / slideWidth);
+
+      prevBtn.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+      nextBtn.style.visibility =
+        currentIndex === totalSlides - 1 ? "hidden" : "visible";
     });
 
     updateCarousel();
@@ -576,19 +573,18 @@ if (window.location.pathname.includes("ServiciosEnLaNube.php")) {
 //------------------------------- VISTA PRODUCTOS/DiseñoUXUI.php -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 if (window.location.href.includes("DisenoUXUI")) {
-  const path = window.location.pathname.toLowerCase();
-  console.log("Página actual:", path);
-
   document.addEventListener("DOMContentLoaded", () => {
     const carousel = document.getElementById("ventajas-uxui-carousel");
     const prevBtn = document.querySelector(".ventajas-uxui__btn.prev");
     const nextBtn = document.querySelector(".ventajas-uxui__btn.next");
-    const slides = carousel.querySelectorAll(".ventaja");
+    const slides = carousel?.querySelectorAll(".ventaja");
+
+    if (!carousel || !prevBtn || !nextBtn || !slides.length) return;
 
     let currentIndex = 0;
 
     function updateCarousel() {
-      const slideWidth = carousel.offsetWidth;
+      const slideWidth = carousel.clientWidth;
       carousel.scrollTo({
         left: slideWidth * currentIndex,
         behavior: "smooth",

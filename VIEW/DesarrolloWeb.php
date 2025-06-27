@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/index.css" />
+    <link rel="stylesheet" href="../CSS/DesarrolloWeb.css" />
+    <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
 <body>
@@ -54,9 +55,9 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="index.php" class="active">Inicio</a>
+            <a href="index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#">Productos</a>
+                <a href="#" class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -111,7 +112,7 @@
             </div>
 
             <div class="nav-item mobile-only">
-                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
             </div>
 
             <a href="../VIEW/Nosotros.php">Nosotros</a>
