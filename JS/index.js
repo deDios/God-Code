@@ -352,6 +352,14 @@ if (
         prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
         nextButton.style.visibility =
           currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+
+        if (window.innerWidth <= 480) {
+          prevButton.style.display = "none";
+          nextButton.style.display = "none";
+        } else {
+          prevButton.style.display = "flex";
+          nextButton.style.display = "flex";
+        }
       }
 
       window.addEventListener("resize", () => {

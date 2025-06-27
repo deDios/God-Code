@@ -1,0 +1,463 @@
+#blog-godcode {
+    text-align: center;
+    padding: 3rem 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(180deg, #f9fbff 0%, #eef3fb 100%);
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#blog-godcode h2 {
+    color: #1a73e8;
+    font-size: 2.75rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    letter-spacing: 1px;
+}
+
+#blog-godcode h3 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+#blog-godcode .descripcion {
+    margin: 1rem auto 2.5rem;
+    max-width: 640px;
+    line-height: 1.6;
+    font-size: 1.05rem;
+    color: #4a4a4a;
+}
+
+#blog-godcode .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    justify-content: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+#blog-godcode .card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #e1e9f0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    padding: 0;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+#blog-godcode .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 15px rgba(26, 115, 232, 0.15);
+}
+
+#blog-godcode .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+}
+
+#blog-godcode .contenido {
+    padding: 1.2rem;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.5;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#blog-godcode .contenido p {
+    margin: 0;
+}
+
+#blog-godcode button {
+    margin-top: 1rem;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+#blog-godcode button:hover {
+    background: #125ab3;
+}
+
+@media (max-width: 768px) {
+    #blog-godcode h2 {
+        font-size: 2rem;
+    }
+
+    #blog-godcode h3 {
+        font-size: 1.4rem;
+    }
+
+    #blog-godcode .descripcion {
+        font-size: 0.95rem;
+        margin: 1rem auto 2rem;
+    }
+
+    #blog-godcode .grid-cards {
+        padding: 0.5rem;
+        gap: 1.5rem;
+    }
+
+    #blog-godcode .card img {
+        height: 180px;
+    }
+
+    #blog-godcode .contenido {
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    #blog-godcode button {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #blog-godcode h2 {
+        font-size: 1.7rem;
+    }
+
+    #blog-godcode h3 {
+        font-size: 1.2rem;
+    }
+
+    #blog-godcode .card img {
+        height: 160px;
+    }
+
+    #blog-godcode .contenido {
+        font-size: 0.85rem;
+    }
+
+    #blog-godcode button {
+        width: 100%;
+    }
+}
+
+#filtros-cursos {
+    background: #f9f9f9;
+    padding: 4rem 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 3rem auto;
+}
+
+#filtros-cursos h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1a73e8;
+    margin-bottom: 0.5rem;
+}
+
+#filtros-cursos h3 {
+    font-size: 1.5rem;
+    color: black;
+    margin-bottom: 1rem;
+}
+
+#filtros-cursos .descripcion {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin-bottom: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.contenedor-filtros {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    border: 2px solid #1a73e8;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.filtro {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    min-width: 180px;
+}
+
+.filtro label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+    text-transform: capitalize;
+}
+
+.filtro select {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.filtro select:focus {
+    border-color: #1a73e8;
+    outline: none;
+}
+
+.btn-limpiar {
+    padding: 0.6rem 1rem;
+    background-color: white;
+    color: #1a73e8;
+    border: 2px solid #1a73e8;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn-limpiar:hover {
+    background-color: #1a73e8;
+    color: white;
+}
+
+.filtro.limpiar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 160px;
+}
+
+@media (max-width: 768px) {
+    #filtros-cursos {
+        padding: 3rem 1rem;
+    }
+
+    .contenedor-filtros {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .filtro {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .filtro.limpiar {
+        min-width: auto;
+        justify-content: flex-start;
+    }
+}
+
+#cursos-destacados {
+    padding: 5rem 1rem;
+    background: #f9fbff;
+    max-width: 1280px;
+    margin: 0 auto 4rem;
+    text-align: center;
+}
+
+#cursos-destacados h3 {
+    font-size: 1.5rem;
+    color: #555;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.carousel-container {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.carousel-track-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+}
+
+.carousel-track-container::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    will-change: transform;
+}
+
+#cursos-container .card {
+    flex: 0 0 calc((100% - 3 * 2rem) / 4);
+    max-width: 280px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #e1e9f0;
+    display: flex;
+    flex-direction: column;
+    height: 420px;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+#cursos-container .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+#cursos-container .card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+}
+
+#cursos-container .card .contenido {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+#cursos-container .card .contenido h4 {
+    color: #0562EF;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+#cursos-container .card .contenido h4::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #e1e9f0;
+    margin-top: 0.5rem;
+}
+
+#cursos-container .card .contenido p {
+    font-size: 0.95rem;
+    color: #222;
+    line-height: 1.6;
+    margin-top: 0.5rem;
+}
+
+#cursos-container .card .contenido .horas,
+#cursos-container .card .contenido .precio {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #444;
+    margin-top: auto;
+}
+
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.carousel-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.carousel-btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+.carousel-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    pointer-events: none;
+}
+
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
+}
+
+
+@media (max-width: 1024px) {
+    #cursos-container .card {
+        flex: 0 0 48%;
+        max-width: 48%;
+    }
+}
+
+@media (max-width: 768px) {
+    #cursos-container .card {
+        flex: 0 0 80%;
+        max-width: 80%;
+    }
+
+    .carousel-btn {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    #cursos-container .card {
+        flex: 0 0 90%;
+        max-width: 90%;
+    }
+
+    .carousel-btn.prev,
+    .carousel-btn.next {
+        display: none;
+    }
+
+    .carousel-container {
+        padding: 1rem 0.5rem;
+    }
+}
