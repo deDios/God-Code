@@ -203,8 +203,6 @@
                                 demanda, sin necesidad de infraestructura física adicional.</p>
                         </div>
                     </div>
-
-
                 </div>
 
                 <button class="ventajas-nube__btn next" aria-label="Siguiente">

@@ -1,4 +1,3 @@
-/*----------------- seccion 1 ----------------*/
 .seccion-uxui {
     background: #ffffff;
     padding: 60px 20px;
@@ -54,7 +53,6 @@
     font-weight: bold;
 }
 
-/*--------------- seccion 2 --------------*/
 #ventajas-uxui {
     background: #f9f9f9;
     padding: 3rem 1rem;
@@ -179,6 +177,12 @@
 
     .uxui-contenido {
         flex-direction: column-reverse;
+        align-items: center;
+        text-align: center;
+    }
+
+    .uxui-texto {
+        text-align: center;
     }
 }
 

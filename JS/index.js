@@ -367,7 +367,10 @@ if (
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------- VISTE PRODUCTOS/DesarrolloWeb.php -------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------------------------------
-if (window.location.pathname.includes("DesarrolloWeb.php")) {
+if (
+  window.location.pathname.includes("DesarrolloWeb.php") ||
+  window.location.pathname.includes("DesarrolloMobile.php")
+) {
   document.addEventListener("DOMContentLoaded", function () {
     const track = document.querySelector(
       "#desarrollo-web-carrusel .carousel-track"
@@ -554,8 +557,6 @@ if (window.location.pathname.includes("ServiciosEnLaNube.php")) {
       }
     });
 
-    window.addEventListener("resize", updateCarousel);
-
     carousel.addEventListener("scroll", () => {
       const slideWidth = carousel.offsetWidth;
       currentIndex = Math.round(carousel.scrollLeft / slideWidth);
@@ -564,6 +565,8 @@ if (window.location.pathname.includes("ServiciosEnLaNube.php")) {
       nextBtn.style.visibility =
         currentIndex === totalSlides - 1 ? "hidden" : "visible";
     });
+
+    window.addEventListener("resize", updateCarousel);
 
     updateCarousel();
   });

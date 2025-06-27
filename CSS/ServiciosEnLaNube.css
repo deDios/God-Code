@@ -92,7 +92,7 @@
     width: 100%;
     max-width: 800px;
     scroll-snap-type: x mandatory;
-    overflow-x: hidden;
+    touch-action: pan-x;
 }
 
 #ventajas-nube .ventaja {
@@ -242,5 +242,20 @@
 
     #nube-final .nube-final__imagen img {
         width: 100%;
+    }
+}
+
+#ventajas-nube .ventajas-nube__carousel {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#ventajas-nube .ventajas-nube__carousel::-webkit-scrollbar {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .ventajas-nube__btn {
+        display: none !important;
     }
 }

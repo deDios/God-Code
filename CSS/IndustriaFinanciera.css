@@ -1,4 +1,3 @@
-/*--- seccion 1 -------*/
 #industria-financiera {
     padding: 4rem 1rem;
     background-color: #fff;
@@ -60,7 +59,7 @@
 @media (max-width: 768px) {
     .contenedor-industria {
         flex-direction: column;
-        text-align: justify;
+        text-align: center;
         padding: 0 1rem;
     }
 
@@ -71,6 +70,7 @@
 
     .contenedor-industria .texto {
         width: 100%;
+        text-align: center;
     }
 
     .contenedor-industria .imagen {
@@ -84,7 +84,6 @@
     }
 }
 
-/*------ seccion 2 ---------*/
 .industria-financiera-2 {
     background-color: #f2f2f2;
     padding: 4rem 1rem;
@@ -128,13 +127,14 @@
 @media (max-width: 768px) {
     .industria-financiera-2 .contenedor-industria {
         flex-direction: column;
-        text-align: justify;
+        text-align: center;
         padding: 0 1rem;
     }
 
     .industria-financiera-2 .texto {
         width: 100%;
         margin-top: 1rem;
+        text-align: center;
     }
 
     .industria-financiera-2 .imagen {
@@ -156,10 +156,9 @@
     }
 }
 
-/*--------------------- seccion 3 ------------------------*/
 #industria-financiera {
     background-color: #f9fbff;
-    padding: 4rem 1rem;
+    padding: 4rem 1rem; 
     text-align: center;
 }
 
@@ -208,6 +207,7 @@
     #industria-financiera .industria-financiera__contenido {
         padding: 0 1rem;
         font-size: 0.95rem;
+        text-align: center;
     }
 
     #industria-financiera .contenedor-boton {

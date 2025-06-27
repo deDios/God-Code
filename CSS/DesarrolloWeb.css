@@ -1,5 +1,3 @@
-/*--------- seccion 1 ---------------*/
-
 #desarrollo-web-carrusel {
     font-family: Arial, sans-serif;
 }
@@ -11,7 +9,7 @@
     flex-wrap: wrap;
     gap: 2rem;
     max-width: 1280px;
-    margin: 2rem auto;
+    margin: 2rem auto; 
     padding: 0 2rem;
 }
 
@@ -239,8 +237,6 @@
     }
 }
 
-/*----------- seccion 2 --------------------*/
-
 #descripcion-pagina-Productos {
     background-color: #f9f9f9;
     padding: 4rem 2rem;
@@ -306,5 +302,10 @@
 
     #descripcion-pagina-Productos .descripcion-pagina-Productos__bloque p {
         font-size: 0.95rem;
+    }
+
+    #descripcion-pagina-Productos .descripcion-pagina-Productos__bloque {
+        align-items: center;
+        text-align: center;
     }
 }

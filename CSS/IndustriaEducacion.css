@@ -1,4 +1,3 @@
-/*------ seccion 1 -----------*/
 #industria-educacion {
   padding: 3rem 1.5rem;
   font-family: Arial, sans-serif;
@@ -12,7 +11,7 @@
   margin-bottom: 2rem;
 }
 
-.industria-educacion__contenido {
+.industria-educacion__contenido { 
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -61,11 +60,10 @@
   }
 
   .industria-educacion__texto {
-    text-align: left;
+    text-align: center;
   }
 }
 
-/*-------- seccion 2 ---------*/
 .seccion-educacion {
   background-color: #f2f2f2;
   padding: 60px 20px;
@@ -99,8 +97,6 @@
   max-width: 800px;
 }
 
-
-/*-------- seccion 3 ----------*/
 .seccion-educacion-cta {
   background-color: #ffffff;
   padding: 60px 20px;
@@ -134,4 +130,3 @@
   text-decoration: underline;
   font-size: 16px;
 }
-
