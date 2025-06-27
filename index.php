@@ -55,7 +55,7 @@
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
             <a href="index.php" class="active">Inicio</a>
-            <div class="nav-item has-megamenu" id="submenu-productos">
+            <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
                     <div class="col">
@@ -71,24 +71,24 @@
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                            <li><a href="VIEW/ServiciosEnLaNube.php"><img
                                         src="ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios
                                     en la Nube</a></li>
-                            <li><a href="../VIEW/DisenoUXUI.php"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png"
+                            <li><a href="VIEW/DisenoUXUI.php"><img src="ASSETS/ProductosPopUp/DiseñoUXUI.png"
                                         alt="UX/UI">Diseño UX/UI</a>
                             </li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
+                            <li><a href="VIEW/ServicioEducativo.php"><img src="ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
                                     educativo</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
+                            <li><a href="VIEW/ServicioEducativo.php"><img src="ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
                             </li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Tecnologia.png"
+                            <li><a href="VIEW/IndustriaTecnologia.php"><img src="ASSETS/ProductosPopUp/Tecnologia.png"
                                         alt="Tecnología">Tecnología</a></li>
-                            <li><a href="#"><img src="ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
+                            <li><a href="VIEW/IndustriaFinanciera.php"><img src="ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
                             </li>
                         </ul>
                     </div>
@@ -103,6 +103,11 @@
                     </div>
                 </div>
             </div>
+
+            <div class="nav-item mobile-only">
+                <a href="VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
+            </div>
+
             <a href="VIEW/Nosotros.php">Nosotros</a>
             <a href="VIEW/Blog.php">Blog</a>
 

@@ -21,6 +21,7 @@ body {
 
 main {
     margin-top: 120px;
+    flex: 1;
 }
 
 header {
@@ -390,7 +391,152 @@ footer small {
     object-fit: contain;
 }
 
-.lista-ajustada {
-  padding-left: 1.2rem;
-  list-style-position: inside;
+
+/*esto es para que el menu de produstos solo se vea en vista desktop y en mobile redirige a una view*/
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+}
+
+/*--------------------------------Resuluciones pequeñas-----------------------------------*/
+@media (max-width: 700px) {
+
+    /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
+    .social-bar-mobile {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding: 5px 20px;
+        width: 100%;
+        background-color: #f1f1f1;
+        position: fixed;
+        top: 86px;
+        z-index: 999;
+        transition: top 0.4s ease-in-out, background-color 0.3s ease;
+    }
+
+    header.scrolled .social-bar-mobile {
+        top: 1px;
+        /* ajusta según el nuevo top del subnav */
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /*----------------css para los iconos de redes sociales MOBILE-----------------*/
+    .social-bar-mobile .social-icons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+    }
+
+    /*css para el icono mobile de usuario*/
+    .user-icon-mobile img {
+        display: flex;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* contenedor circular para que no se vea feo */
+    .social-bar-mobile .icon-mobile {
+        width: 24px;
+        height: 24px;
+        border-radius: 0;
+        overflow: visible;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-bar-mobile .icon-mobile img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        background-color: transparent;
+    }
+
+    /* efecto hover sencillo para los iconos */
+    .social-bar-mobile .social-icons img:hover {
+        transform: scale(1.1);
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: flex-start;
+        display: none;
+    }
+
+    .botones {
+        margin-top: 4rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
+    .subnav {
+        display: none;
+    }
+
+    .subnav .social-icons {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+        font-size: 1.8rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: auto;
+        padding: 8px;
+        color: #0a61d0;
+    }
+
+    .subnav.show {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    /*----------------cosas que no renderizan en MOBILE-----------------*/
+    .actions {
+        display: none;
+    }
+
+    .imagen img {
+        display: none;
+    }
+
+    .noticias {
+        display: none;
+    }
+
+    .columna.noticias {
+        display: none;
+    }
 }

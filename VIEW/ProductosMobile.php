@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/IndustriaTecnologia.css" />
+    <link rel="stylesheet" href="../CSS/ProductosMobile.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -134,113 +134,89 @@
 
 
     <main>
-        <!-- seccion 1 -->
-        <section id="industria-tecnologia-1">
-            <h2>Tecnología</h2>
-            <div class="contenido-seccion">
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion1_img1.png"
-                    alt="Industria 4.0">
-                <div class="texto">
-                    <p>
-                        Nuestros programas de formación están diseñados para responder a los desafíos reales de las
-                        industrias tecnológicas, ofreciendo contenidos actualizados, metodologías ágiles y herramientas
-                        prácticas que impulsan el desarrollo de habilidades técnicas y estratégicas.
-                    </p>
-                    <p>
-                        Formamos profesionales capaces de enfrentar entornos digitales en constante evolución,
-                        preparados para innovar, adaptarse y liderar en sectores altamente competitivos. Desde el
-                        desarrollo de software y la gestión de datos, hasta la ciberseguridad, inteligencia artificial y
-                        diseño de experiencias digitales, nuestros cursos están alineados con las exigencias del mercado
-                        actual y pensados para aportar valor real a empresas, startups y sectores de tecnología.
-                    </p>
-                </div>
-            </div>
-            <div class="contenido-seccion">
-                <div class="texto">
-                    <p>
-                    <p>
-                        Creemos que la educación tecnológica no solo transforma carreras, sino que también acelera el
-                        progreso de las organizaciones. Por eso, cada uno de nuestros programas se enfoca en construir
-                        talento especializado, preparado para tomar decisiones, crear soluciones eficientes y generar
-                        impacto en el ecosistema digital. Haz crecer tu capital humano con formación de calidad,
-                        relevante y alineada a las tendencias tecnológicas globales. <a href="#">GodCode</a>.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <section class="productos-mobile">
+            <h1 style="color: #1a73e8;">Productos</h1>
+            <h2>Lo que hacemos</h2>
 
-        <!-- seccion 2 -->
-        <section id="industria-tecnologia-2">
-            <div class="contenido-seccion">
-                <div class="texto">
-                    <p>
-                        Ofrecemos una propuesta integral orientada a la industria tecnológica, en la que utilizamos
-                        diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas a las
-                        necesidades del entorno digital actual.
-                    </p>
-                    <p>
-                        Aplicamos herramientas modernas, y entornos de desarrollo actualizados que nos permiten crear
-                        productos y servicios de alto valor, como sistemas basados en arquitectura de microservicios,
-                        plataformas móviles y web interactivas, hasta interfaces inteligentes y sistemas de
-                        automatización. Nuestros especialistas trabajan con tecnologías vérsatiles y escalables que
-                        garantizan resultados eficientes.
-                    </p>
-                    <p>
-                        Ya sea que se trate de crear, optimizar o transformar procesos digitales, ofrecemos soluciones
-                        personalizadas para alcanzar mayor calidad, flexibilidad e impacto real.
-                    </p>
-                </div>
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion2_img1.png"
-                    alt="Soluciones tecnológicas">
+            <!-- Productos -->
+            <div class="card-producto">
+                <a href="../VIEW/DesarrolloWeb.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Desarrollo Web">
+                    <h3>Desarrollo Web</h3>
+                    <p>Diseñamos y desarrollamos sitios web que atraen, funcionan y convierten. Impulsa tu presencia
+                        digital con soluciones a medida enfocadas en resultados reales.</p>
+                </a>
             </div>
-        </section>
 
-        <!-- seccion 3 -->
-        <section id="cta-tecnologia">
-            <div class="contenido">
-                <h3>
-                    ¿Estás listo para llevar tus proyectos digitales al siguiente nivel o potenciar las
-                    capacidades tecnológicas de tu equipo?
-                </h3>
+            <div class="card-producto">
+                <a href="../VIEW/DesarrolloMobile.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Desarrollo Mobile">
+                    <h3>Desarrollo Mobile</h3>
+                    <p>Creamos apps móviles intuitivas, rápidas y efectivas. Lleva tu idea al siguiente nivel con
+                        soluciones que conectan y generan resultados.</p>
+                </a>
+            </div>
 
-                <p>
-                    En GodCode, utilizamos una amplia gama de tecnologías para desarrollar soluciones modernas,
-                    escalables y
-                    adaptadas a las exigencias de la industria tecnológica actual.
-                </p>
-                <p>
-                    Ya sea que necesites construir una plataforma digital desde cero, optimizar tus sistemas existentes
-                    o
-                    integrar herramientas inteligentes en tus procesos, contamos con la experiencia y los recursos para
-                    hacerlo
-                    realidad.
-                </p>
-                <p>
-                    Aplicamos metodologías ágiles, frameworks actualizados, infraestructura en la nube y tecnologías de
-                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos.
-                </p>
-                <p>
-                    Solicita más información sobre nuestros servicios tecnológicos, agenda una asesoría con nuestro
-                    equipo o
-                    descubre cómo podemos ayudarte a impulsar la transformación digital de tu empresa.
-                </p>
+            <h2>Servicios</h2>
+
+            <!-- Servicios -->
+            <div class="card-producto">
+                <a href="../VIEW/ServiciosEnLaNube.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Servicios en la Nube">
+                    <h3>Servicios en la Nube</h3>
+                    <p>Escala tu negocio con servicios en la nube seguros, flexibles y de alto rendimiento. Optimiza tus
+                        sistemas, automatiza procesos y mantén todo disponible en cualquier momento y lugar.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/DisenoUXUI.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="Diseño UX/UI">
+                    <h3>Diseño UX/UI</h3>
+                    <p>Diseñamos experiencias digitales intuitivas, atractivas y centradas en el usuario. Conecta con tu
+                        audiencia desde el primer clic y convierte diseño en resultados.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/ServicioEducativo.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/ServicioEducativo.png" alt="Servicio educativo">
+                    <h3>Servicio educativo</h3>
+                    <p>Transforma el aprendizaje con experiencias educativas dinámicas, accesibles y personalizadas.
+                        Ofrecemos soluciones que inspiran, forman y potencian el crecimiento real.</p>
+                </a>
+            </div>
+
+            <h2>Industrias</h2>
+
+            <!-- Industrias -->
+            <div class="card-producto">
+                <a href="../VIEW/ServicioEducativo.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">
+                    <h3>Educación</h3>
+                    <p>Impulsa el conocimiento con propuestas educativas innovadoras, inclusivas y de calidad. Formamos
+                        mentes preparadas para enfrentar los retos del presente y del futuro.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/IndustriaTecnologia.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">
+                    <h3>Tecnología</h3>
+                    <p>Impulsa tu negocio con soluciones tecnológicas innovadoras, seguras y escalables. Conecta
+                        procesos, personas y datos para avanzar hacia un futuro digital más inteligente.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/IndustriaFinanciera.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">
+                    <h3>Finanzas</h3>
+                    <p>Optimiza la gestión financiera con soluciones precisas, seguras y adaptadas a tus necesidades.
+                        Toma decisiones informadas que impulsen el crecimiento y la estabilidad de tu negocio.</p>
+                </a>
             </div>
         </section>
-
-        <section id="cta-tecnologia">
-            <div class="contenedor-boton">
-                <button class="btn-contacto">
-                    <span style="margin-left: 8px;">Contáctanos!</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Seccion otros productos  -->
-        <section id="otros-productos">
-            <h2>Otros Productos</h2>
-            <div class="productos-random"></div>
-        </section>
-
     </main>
 
     <!-- Pie de pagina -->
