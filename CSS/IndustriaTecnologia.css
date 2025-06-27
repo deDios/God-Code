@@ -107,57 +107,72 @@
     }
 }
 
-/*---------- seccion 3 ---------------*/
-#cta-tecnologia {
-    background: #f9fbff;
-    padding: 4rem 1rem;
-    font-family: 'Segoe UI', sans-serif;
-    color: #222;
+/*---------- seccion 3 ------------------*/
+
+#cta-tecnologia .contenido {
+    max-width: 1000px;
+    margin: 0 auto;
     text-align: center;
 }
 
-#cta-tecnologia .contenido {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
 #cta-tecnologia h3 {
+    font-size: 1.8rem;
     color: #1a73e8;
-    font-size: 1.6rem;
     margin-bottom: 2rem;
+    line-height: 1.4;
     font-weight: 600;
-    line-height: 1.5;
 }
 
 #cta-tecnologia p {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    color: #444;
 }
 
-#cta-tecnologia .btn-cta {
-    background: white;
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
+@media (max-width: 768px) {
+    #cta-tecnologia {
+        padding: 3rem 1rem;
+    }
+
+    #cta-tecnologia h3 {
+        font-size: 1.4rem;
+    }
+
+    #cta-tecnologia p {
+        font-size: 1rem;
+    }
+}
+
+
+#cta-tecnologia .contenedor-boton {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding-block: 3rem;
+}
+
+#cta-tecnologia .btn-contacto {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    z-index: 10;
-    margin: 2rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
 }
 
-#cta-tecnologia .btn-cta:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transform: scale(1.1);
-}
-
-#cta-tecnologia .btn-cta svg {
-    width: 24px;
-    height: 24px;
-    fill: #1a73e8;
-    pointer-events: none;
+#cta-tecnologia .btn-contacto:hover {
+    background-color: #1a73e8;
+    color: #fff;
+    transform: translateY(-2px);
 }

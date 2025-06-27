@@ -1,0 +1,175 @@
+/*--- seccion 1 -------*/
+#industria-financiera {
+    padding: 4rem 1rem;
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
+}
+
+.contenedor-industria {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.contenedor-industria .texto {
+    flex: 1;
+    min-width: 280px;
+}
+
+.contenedor-industria .texto h2 {
+    color: #1a73e8;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.contenedor-industria .texto p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #333;
+    font-size: 1rem;
+}
+
+.contenedor-industria .texto a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.contenedor-industria .texto a:hover {
+    text-decoration: underline;
+}
+
+.contenedor-industria .imagen {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-industria .imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .contenedor-industria {
+        flex-direction: column;
+        text-align: justify;
+    }
+
+    .contenedor-industria .texto h2 {
+        text-align: center;
+    }
+}
+
+/*------ seccion 2 ---------*/
+.industria-financiera-2 {
+    background-color: #f2f2f2;
+    padding: 4rem 1rem;
+}
+
+.industria-financiera-2 .contenedor-industria {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.industria-financiera-2 .imagen {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    justify-content: center;
+}
+
+.industria-financiera-2 .imagen img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.industria-financiera-2 .texto {
+    flex: 1;
+    min-width: 280px;
+}
+
+.industria-financiera-2 .texto p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #333;
+    font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .industria-financiera-2 .contenedor-industria {
+        flex-direction: column;
+        text-align: justify;
+    }
+}
+
+/*--------------------- seccion 3 ------------------------*/
+#industria-financiera {
+    background-color: #f9fbff;
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+#industria-financiera .industria-financiera__contenido {
+    max-width: 1000px;
+    margin: 0 auto;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #333;
+    text-align: justify;
+}
+
+#industria-financiera .contenedor-boton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 3rem;
+}
+
+#industria-financiera .btn-contacto {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+#industria-financiera .btn-contacto:hover {
+    background-color: #1a73e8;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .industria-financiera-2 .contenedor-industria {
+        flex-direction: column;
+        text-align: justify;
+    }
+}

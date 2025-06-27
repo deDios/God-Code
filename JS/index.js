@@ -189,7 +189,7 @@ if (window.location.pathname.includes("Nosotros.php")) {
   mostrarSlide(indice);
 }
 
-//------------------------------- vista blog JS --------------------------
+//--------------------------------------------------------------- vista blog JS --------------------------
 if (
   window.location.pathname.includes("Blog.php") ||
   window.location.pathname.includes("ejemplo_api.php")
@@ -202,7 +202,7 @@ if (
 
     let cursosOriginales = [];
 
-    // Cargar categorías
+    // Cargar categorias
     fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
       {

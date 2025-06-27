@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/IndustriaTecnologia.css" />
+    <link rel="stylesheet" href="../CSS/IndustriaFinanciera.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -126,105 +126,108 @@
 
     <main>
         <!-- seccion 1 -->
-        <section id="industria-tecnologia-1">
-            <h2>Tecnología</h2>
-            <div class="contenido-seccion">
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion1_img1.png"
-                    alt="Industria 4.0">
+        <section id="industria-financiera" class="industria-financiera seccion">
+            <div class="contenedor-industria">
                 <div class="texto">
+                    <h2>Finanzas</h2>
                     <p>
-                        Nuestros programas de formación están diseñados para responder a los desafíos reales de las
-                        industrias tecnológicas, ofreciendo contenidos actualizados, metodologías ágiles y herramientas
-                        prácticas que impulsan el desarrollo de habilidades técnicas y estratégicas.
+                        Nuestros programas de formación están diseñados para responder a los desafíos reales tanto de
+                        las industrias tecnológicas como del sector financiero, ofreciendo contenidos actualizados,
+                        metodologías ágiles y herramientas prácticas que impulsan el desarrollo de habilidades técnicas,
+                        analíticas y estratégicas.
                     </p>
                     <p>
-                        Formamos profesionales capaces de enfrentar entornos digitales en constante evolución,
-                        preparados para innovar, adaptarse y liderar en sectores altamente competitivos. Desde el
-                        desarrollo de software y la gestión de datos, hasta la ciberseguridad, inteligencia artificial y
-                        diseño de experiencias digitales, nuestros cursos están alineados con las exigencias del mercado
-                        actual y pensados para aportar valor real a empresas, startups y sectores de tecnología.
+                        Formamos profesionales capaces de enfrentar entornos complejos, altamente digitalizados y en
+                        constante evolución, preparados para innovar, adaptarse y liderar en sectores cada vez más
+                        competitivos y regulados.
+                    </p>
+                    <p>
+                        Desde el desarrollo de software, la gestión de datos y la inteligencia artificial, hasta la
+                        administración financiera, el análisis de riesgos y la planificación estratégica, nuestros
+                        programas están alineados con las demandas actuales del mercado.
+                    </p>
+                    <p>
+                        Diseñamos nuestras formaciones para aportar valor real a empresas, instituciones financieras,
+                        startups y equipos multidisciplinarios que buscan mejorar su eficiencia operativa y su capacidad
+                        de respuesta.
+                    </p>
+                    <p>
+                        Creemos que la educación especializada no solo transforma carreras individuales, sino que
+                        acelera el crecimiento y la transformación digital de las organizaciones.
+                    </p>
+                    <p>
+                        Haz crecer tu capital humano con formación de calidad, actualizada y adaptada a las tendencias
+                        que están redefiniendo el futuro de la industria. <a>GodCode</a>
                     </p>
                 </div>
-            </div>
-            <div class="contenido-seccion">
-                <div class="texto">
-                    <p>
-                    <p>
-                        Creemos que la educación tecnológica no solo transforma carreras, sino que también acelera el
-                        progreso de las organizaciones. Por eso, cada uno de nuestros programas se enfoca en construir
-                        talento especializado, preparado para tomar decisiones, crear soluciones eficientes y generar
-                        impacto en el ecosistema digital. Haz crecer tu capital humano con formación de calidad,
-                        relevante y alineada a las tendencias tecnológicas globales. <a href="#">GodCode</a>.
-                    </p>
+
+                <div class="imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaFinanciera_seccion1_img1.png" alt="Finanzas y tecnología">
                 </div>
             </div>
         </section>
 
         <!-- seccion 2 -->
-        <section id="industria-tecnologia-2">
-            <div class="contenido-seccion">
+        <section class="industria-financiera-2">
+            <div class="contenedor-industria">
+                <div class="imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaFinanciera_seccion2_img1.png"
+                        alt="Soluciones tecnológicas financieras">
+                </div>
+
                 <div class="texto">
                     <p>
-                        Ofrecemos una propuesta integral orientada a la industria tecnológica, en la que utilizamos
-                        diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas a las
-                        necesidades del entorno digital actual.
+                        Ofrecemos una propuesta integral orientada a las industrias tecnológica y financiera, en la que
+                        utilizamos diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas
+                        a las necesidades del entorno digital y económico actual.
                     </p>
                     <p>
-                        Aplicamos herramientas modernas, y entornos de desarrollo actualizados que nos permiten crear
-                        productos y servicios de alto valor, como sistemas basados en arquitectura de microservicios,
-                        plataformas móviles y web interactivas, hasta interfaces inteligentes y sistemas de
-                        automatización. Nuestros especialistas trabajan con tecnologías vérsatiles y escalables que
-                        garantizan resultados eficientes.
+                        Aplicamos herramientas modernas, entornos de desarrollo actualizados y metodologías ágiles que
+                        nos permiten crear productos y servicios de alto valor, adaptados a distintos contextos,
+                        sectores y desafíos del mercado.
                     </p>
                     <p>
-                        Ya sea que se trate de crear, optimizar o transformar procesos digitales, ofrecemos soluciones
-                        personalizadas para alcanzar mayor calidad, flexibilidad e impacto real.
+                        Desde programación avanzada, gestión de datos, automatización y seguridad informática, hasta
+                        sistemas de análisis financiero, plataformas de gestión contable y soluciones para fintech,
+                        trabajamos con tecnologías versátiles que garantizan resultados sólidos, escalables y
+                        sostenibles.
+                    </p>
+                    <p>
+                        Ya sea que se trate de crear, optimizar o transformar procesos digitales y financieros, nuestras
+                        soluciones están diseñadas para ofrecer calidad, flexibilidad e impacto real en cada proyecto.
                     </p>
                 </div>
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion2_img1.png"
-                    alt="Soluciones tecnológicas">
             </div>
         </section>
 
         <!-- seccion 3 -->
-        <section id="cta-tecnologia">
-            <div class="contenido">
-                <h3>
-                    ¿Estás listo para llevar tus proyectos digitales al siguiente nivel o potenciar las
-                    capacidades tecnológicas de tu equipo?
-                </h3>
-
+        <section id="industria-financiera">
+            <div class="industria-financiera__contenido">
                 <p>
                     En GodCode, utilizamos una amplia gama de tecnologías para desarrollar soluciones modernas,
-                    escalables y
-                    adaptadas a las exigencias de la industria tecnológica actual.
-                </p>
-                <p>
-                    Ya sea que necesites construir una plataforma digital desde cero, optimizar tus sistemas existentes
-                    o
-                    integrar herramientas inteligentes en tus procesos, contamos con la experiencia y los recursos para
-                    hacerlo
-                    realidad.
-                </p>
-                <p>
+                    escalables y adaptadas a las exigencias de las industrias tecnológica y financiera.<br><br>
+
+                    Ya sea que necesites construir una plataforma digital desde cero, implementar sistemas de análisis
+                    financiero, optimizar procesos administrativos o integrar herramientas inteligentes en tus
+                    operaciones, contamos con la experiencia y los recursos para hacerlo realidad.<br><br>
+
                     Aplicamos metodologías ágiles, frameworks actualizados, infraestructura en la nube y tecnologías de
-                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos.
-                </p>
-                <p>
-                    Solicita más información sobre nuestros servicios tecnológicos, agenda una asesoría con nuestro
-                    equipo o
-                    descubre cómo podemos ayudarte a impulsar la transformación digital de tu empresa.
+                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos,
+                    tanto en el ámbito digital como en la gestión financiera.<br><br>
+
+                    Solicita más información sobre nuestros servicios tecnológicos y financieros, agenda una asesoría
+                    con nuestro equipo o descubre cómo podemos ayudarte a impulsar la transformación digital de tu
+                    empresa.
                 </p>
             </div>
-        </section>
 
-        <section id="cta-tecnologia">
             <div class="contenedor-boton">
                 <button class="btn-contacto">
-                    <span style="margin-left: 8px;">Contáctanos!</span>
+                    <span>Contáctanos!</span>
                 </button>
             </div>
         </section>
+        <!-- seccion 4 -->
 
         <!-- Seccion otros productos  -->
         <section id="otros-productos">
