@@ -463,7 +463,9 @@ if (
   window.location.pathname.includes("IndustriaEducacion.php") ||
   window.location.pathname.includes("ServicioEducativo") ||
   window.location.pathname.includes("DisenoUXUI.php") ||
-  window.location.pathname.includes("IndustriaTecnologia.php")
+  window.location.pathname.includes("IndustriaTecnologia.php") ||
+  window.location.pathname.includes("IndustriaEducacion.php") || 
+  window.location.pathname.includes("IndustriaFinanciera.php") 
 ) {
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [
