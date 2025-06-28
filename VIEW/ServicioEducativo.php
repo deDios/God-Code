@@ -55,7 +55,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="index.php">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#" class="active">Productos</a>
                 <div class="megamenu">
@@ -87,7 +87,7 @@
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="../VIEW/ServicioEducativo.php"><img
+                            <li><a href="../VIEW/IndustriaEducacion.php"><img
                                         src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
                             </li>
                             <li><a href="../VIEW/IndustriaTecnologia.php"><img
@@ -170,8 +170,28 @@
         </section>
 
         <!-- Seccion 2 cursos disponibles -->
-        <section>
-            seccion de cursos pendiente
+        <section id="cursos-servicio-educativo">
+            <h3>Esta es la variedad de estudios que manejamos en las instalaciones.</h3>
+
+            <div class="carousel-container-servicio">
+                <button class="carousel-btn-servicio prev" aria-label="Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+
+                <div class="carousel-track-container-servicio">
+                    <div class="carousel-track-servicio" id="cursos-servicio-container">
+                        <!-- Las cards se insertan desde JS -->
+                    </div>
+                </div>
+
+                <button class="carousel-btn-servicio next" aria-label="Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
+                </button>
+            </div>
         </section>
 
         <!-- Seccion 3 -->

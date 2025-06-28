@@ -625,6 +625,126 @@ if (window.location.href.includes("DisenoUXUI")) {
   });
 }
 
+// -------------------- carrusel para los cursos de la vista servicio educativo
+
+if (window.location.pathname.includes("ServicioEducativo.php")) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const cursosContainer = document.getElementById(
+      "cursos-servicio-container"
+    );
+    const prevButton = document.querySelector(".carousel-btn-servicio.prev");
+    const nextButton = document.querySelector(".carousel-btn-servicio.next");
+
+    let cursos = [];
+
+    fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        cursos = data;
+        renderizarCursos(cursos);
+        inicializarCarrusel();
+      })
+      .catch((err) => console.error("Error al cargar cursos:", err));
+
+    function renderizarCursos(cursos) {
+      cursosContainer.innerHTML = "";
+      cursos.forEach((curso) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+
+        const img = document.createElement("img");
+        img.src = `../ASSETS/cursos/img${curso.id}.png`;
+        img.alt = curso.nombre;
+
+        const contenido = document.createElement("div");
+        contenido.classList.add("contenido");
+
+        const titulo = document.createElement("h4");
+        titulo.textContent = curso.nombre;
+
+        const descripcion = document.createElement("p");
+        descripcion.textContent = curso.descripcion_breve;
+
+        const info = document.createElement("p");
+        info.classList.add("info");
+        info.textContent = `${curso.horas} hr | $${curso.precio} mx`;
+
+        contenido.appendChild(titulo);
+        contenido.appendChild(descripcion);
+        contenido.appendChild(info);
+
+        card.appendChild(img);
+        card.appendChild(contenido);
+        cursosContainer.appendChild(card);
+      });
+    }
+
+    function inicializarCarrusel() {
+      const track = document.querySelector(".carousel-track-servicio");
+      if (!track || !prevButton || !nextButton) return;
+
+      const cards = Array.from(track.children);
+      if (cards.length === 0) return;
+
+      let cardWidth = cards[0].getBoundingClientRect().width + 16;
+      let currentIndex = 0;
+
+      prevButton.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        }
+      });
+
+      nextButton.addEventListener("click", () => {
+        const cardsVisibles = Math.floor(
+          track.parentElement.offsetWidth / cardWidth
+        );
+        if (currentIndex < cards.length - cardsVisibles) {
+          currentIndex++;
+          updateCarousel();
+        }
+      });
+
+      function updateCarousel() {
+        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        actualizarBotones();
+      }
+
+      function actualizarBotones() {
+        const cardsVisibles = Math.floor(
+          track.parentElement.offsetWidth / cardWidth
+        );
+        prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
+        nextButton.style.visibility =
+          currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
+
+        if (window.innerWidth <= 480) {
+          prevButton.style.display = "none";
+          nextButton.style.display = "none";
+        } else {
+          prevButton.style.display = "flex";
+          nextButton.style.display = "flex";
+        }
+      }
+
+      window.addEventListener("resize", () => {
+        cardWidth = cards[0].getBoundingClientRect().width + 16;
+        updateCarousel();
+      });
+
+      updateCarousel();
+    }
+  });
+}
+
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {

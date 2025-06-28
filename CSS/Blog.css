@@ -4,6 +4,10 @@
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(180deg, #f9fbff 0%, #eef3fb 100%);
     color: #333;
+    margin: 0 auto;
+}
+
+.limite {
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -276,8 +280,7 @@
 #cursos-destacados {
     padding: 5rem 1rem;
     background: #f9fbff;
-    max-width: 1280px;
-    margin: 0 auto 4rem;
+    margin: 0 auto 0rem;
     text-align: center;
 }
 
@@ -402,10 +405,6 @@
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
-.carousel-btn:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
-}
 
 .carousel-btn:active {
     background: rgba(0, 0, 0, 0.1);

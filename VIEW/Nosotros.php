@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/index.css" />
+    <link rel="stylesheet" href="../CSS/plantilla.css" />
+    <link rel="stylesheet" href="../CSS/Nosotros.css" />
 </head>
 
 <body>
@@ -54,7 +55,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="index.php">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -86,7 +87,7 @@
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="../VIEW/ServicioEducativo.php"><img
+                            <li><a href="../VIEW/IndustriaEducacion.php"><img
                                         src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
                             </li>
                             <li><a href="../VIEW/IndustriaTecnologia.php"><img
@@ -135,52 +136,55 @@
     <main>
 
         <section class="nosotros">
-            <h2 class="nosotros-titulo">En <span>GOD CODE</span> desarrollamos tecnología pensada específicamente para
-                tu negocio</h2>
+            <div class="limite">
+                <h2 class="nosotros-titulo">En <span>GOD CODE</span> desarrollamos tecnología pensada específicamente
+                    para
+                    tu negocio</h2>
 
-            <div class="bloque-nosotros fila normal animado">
-                <div class="decoracion"></div>
-                <div class="imagen-nosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros">
+                <div class="bloque-nosotros fila normal animado">
+                    <div class="decoracion"></div>
+                    <div class="imagen-nosotros">
+                        <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Acerca de nosotros">
+                    </div>
+                    <div class="texto-nosotros">
+                        <h3>Acerca de nosotros.</h3>
+                        <p>En GodCode creamos soluciones tecnológicas personalizadas que se
+                            adaptan a las necesidades de cada empresa. Desarrollamos plataformas
+                            web, apps móviles, sistemas inteligentes y procesos conectados que
+                            ayudan a nuestros clientes a alcanzar sus objetivos y crecer de forma
+                            sostenible.</p>
+                    </div>
                 </div>
-                <div class="texto-nosotros">
-                    <h3>Acerca de nosotros.</h3>
-                    <p>En GodCode creamos soluciones tecnológicas personalizadas que se
-                        adaptan a las necesidades de cada empresa. Desarrollamos plataformas
-                        web, apps móviles, sistemas inteligentes y procesos conectados que
-                        ayudan a nuestros clientes a alcanzar sus objetivos y crecer de forma
-                        sostenible.</p>
-                </div>
-            </div>
 
-            <div class="bloque-nosotros fila invertida animado">
-                <div class="decoracion"></div>
-                <div class="imagen-nosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión">
+                <div class="bloque-nosotros fila invertida animado">
+                    <div class="decoracion"></div>
+                    <div class="imagen-nosotros">
+                        <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Nuestra misión">
+                    </div>
+                    <div class="texto-nosotros">
+                        <h3>Nuestra misión.</h3>
+                        <p>Convertirnos en un referente del desarrollo tecnológico a nivel
+                            global, creando experiencias digitales innovadoras, integradas
+                            y accesibles, que transformen la manera en que las empresas
+                            se conectan con su audiencia, sin importar el canal o el
+                            dispositivo.</p>
+                    </div>
                 </div>
-                <div class="texto-nosotros">
-                    <h3>Nuestra misión.</h3>
-                    <p>Convertirnos en un referente del desarrollo tecnológico a nivel
-                        global, creando experiencias digitales innovadoras, integradas
-                        y accesibles, que transformen la manera en que las empresas
-                        se conectan con su audiencia, sin importar el canal o el
-                        dispositivo.</p>
-                </div>
-            </div>
 
-            <div class="bloque-nosotros fila normal animado">
-                <div class="decoracion"></div>
-                <div class="imagen-nosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia">
-                </div>
-                <div class="texto-nosotros">
-                    <h3>Nuestra historia.</h3>
-                    <p>GodCode nació como una solución interna para Luna Café, un
-                        emprendimiento que necesitaba digitalizar sus procesos y conectar
-                        mejor con sus clientes. El éxito de esa primera experiencia nos mostró
-                        que muchas otras empresas enfrentaban los mismos desafíos.
-                        Así comenzó nuestro camino: ayudando a negocios reales a lograr su
-                        transformación digital.</p>
+                <div class="bloque-nosotros fila normal animado">
+                    <div class="decoracion"></div>
+                    <div class="imagen-nosotros">
+                        <img src="../ASSETS/Nosotros/seccion1_img3.png" alt="Nuestra historia">
+                    </div>
+                    <div class="texto-nosotros">
+                        <h3>Nuestra historia.</h3>
+                        <p>GodCode nació como una solución interna para Luna Café, un
+                            emprendimiento que necesitaba digitalizar sus procesos y conectar
+                            mejor con sus clientes. El éxito de esa primera experiencia nos mostró
+                            que muchas otras empresas enfrentaban los mismos desafíos.
+                            Así comenzó nuestro camino: ayudando a negocios reales a lograr su
+                            transformación digital.</p>
+                    </div>
                 </div>
             </div>
         </section>

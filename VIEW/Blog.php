@@ -55,7 +55,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="index.php">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -87,7 +87,7 @@
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="../VIEW/ServicioEducativo.php"><img
+                            <li><a href="../VIEW/IndustriaEducacion.php"><img
                                         src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
                             </li>
                             <li><a href="../VIEW/IndustriaTecnologia.php"><img
@@ -135,35 +135,38 @@
     <main>
         <!-- seccion 1 -->
         <section id="blog-godcode" class="animado">
-            <h2>Blog GodCode</h2>
-            <h3>Lo Nuevo</h3>
-            <p class="descripcion">
-                Explora el futuro hoy<br>
-                Descubre las últimas noticias en tecnología, innovación y avances que están transformando el mundo.<br>
-                Mantente al día con lo más relevante, todo en un solo lugar.
-            </p>
-            <div class="grid-cards">
-                <div class="card" data-id="meta">
-                    <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
-                    <div class="contenido">
-                        <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+            <div class="limite">
+                <h2>Blog GodCode</h2>
+                <h3>Lo Nuevo</h3>
+                <p class="descripcion">
+                    Explora el futuro hoy<br>
+                    Descubre las últimas noticias en tecnología, innovación y avances que están transformando el
+                    mundo.<br>
+                    Mantente al día con lo más relevante, todo en un solo lugar.
+                </p>
+                <div class="grid-cards">
+                    <div class="card" data-id="meta">
+                        <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
+                        <div class="contenido">
+                            <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card" data-id="apple">
-                    <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
-                    <div class="contenido">
-                        <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                    <div class="card" data-id="apple">
+                        <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
+                        <div class="contenido">
+                            <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card" data-id="nato">
-                    <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
-                    <div class="contenido">
-                        <p>NATO lanza nueva estrategia para investigación científica...</p>
-                        <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                    <div class="card" data-id="nato">
+                        <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
+                        <div class="contenido">
+                            <p>NATO lanza nueva estrategia para investigación científica...</p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,37 +174,39 @@
 
         <!-- seccion 2 -->
         <section id="filtros-cursos">
-            <div class="filtros-cursos__contenido">
-                <h2>Cursos destacados</h2>
-                <h3>Explora nuestras mejores opciones</h3>
-                <p class="descripcion">
-                    Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
-                    actualizado y práctico.
-                </p>
-            </div>
-
-            <div class="contenedor-filtros">
-
-                <div class="filtro">
-                    <label for="categoria">Categoría</label>
-                    <select id="categoria" name="categoria">
-                        <option value="">Selecciona una categoría</option>
-                        <!-- Se llenara con JS -->
-                    </select>
+            <div class="limite">
+                <div class="filtros-cursos__contenido">
+                    <h2>Cursos destacados</h2>
+                    <h3>Explora nuestras mejores opciones</h3>
+                    <p class="descripcion">
+                        Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
+                        actualizado y práctico.
+                    </p>
                 </div>
 
-                <div class="filtro">
-                    <label for="explorar">Explorar</label>
-                    <select id="explorar" name="explorar">
-                        <option value="">Selecciona una opción</option>
-                        <option value="Populares">Populares</option>
-                        <option value="Gratuitos">Gratuitos</option>
-                    </select>
-                </div>
+                <div class="contenedor-filtros">
 
-                <div class="filtro limpiar">
-                    <label>&nbsp;</label>
-                    <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+                    <div class="filtro">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria">
+                            <option value="">Selecciona una categoría</option>
+                            <!-- Se llenara con JS -->
+                        </select>
+                    </div>
+
+                    <div class="filtro">
+                        <label for="explorar">Explorar</label>
+                        <select id="explorar" name="explorar">
+                            <option value="">Selecciona una opción</option>
+                            <option value="Populares">Populares</option>
+                            <option value="Gratuitos">Gratuitos</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro limpiar">
+                        <label>&nbsp;</label>
+                        <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+                    </div>
                 </div>
             </div>
         </section>
