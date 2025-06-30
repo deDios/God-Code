@@ -142,11 +142,10 @@
                     <p>
                         Las grandes soluciones digitales comienzan con una estrategia sólida en la nube. Desde la
                         planificación de la infraestructura hasta la implementación y escalabilidad, cada etapa es clave
-                        para construir entornos seguros, flexibles y eficientes.
-                        Aprovecha el poder del cómputo en la nube para alojar tus aplicaciones, gestionar datos,
-                        automatizar procesos y optimizar el rendimiento de tus sistemas. Desarrolla soluciones que no
-                        solo funcionan bien, sino que evolucionan contigo, impulsan la innovación y logran resultados
-                        reales.
+                        para construir entornos seguros, flexibles y eficientes. Aprovecha el poder del cómputo en la
+                        nube para alojar tus aplicaciones, gestionar datos, automatizar procesos y optimizar el
+                        rendimiento de tus sistemas. Desarrolla soluciones que no solo funcionan bien, sino que
+                        evolucionan contigo, impulsan la innovación y logran resultados reales.
                         <a href="#" class="link-godcode">GodCode</a>
                     </p>
                 </div>

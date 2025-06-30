@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/IndustriaTecnologia.css" />
+    <link rel="stylesheet" href="../CSS/DiseñoUXUI.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -134,114 +134,9 @@
 
 
     <main>
-        <!-- seccion 1 -->
-        <section id="industria-tecnologia-1">
-            <h2>Tecnología</h2>
-            <div class="contenido-seccion">
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion1_img1.png"
-                    alt="Industria 4.0">
-                <div class="texto">
-                    <p>
-                        Nuestros programas de formación están diseñados para responder a los desafíos reales de las
-                        industrias tecnológicas, ofreciendo contenidos actualizados, metodologías ágiles y herramientas
-                        prácticas que impulsan el desarrollo de habilidades técnicas y estratégicas.
-                    </p>
-                    <p>
-                        Formamos profesionales capaces de enfrentar entornos digitales en constante evolución,
-                        preparados para innovar, adaptarse y liderar en sectores altamente competitivos. Desde el
-                        desarrollo de software y la gestión de datos, hasta la ciberseguridad, inteligencia artificial y
-                        diseño de experiencias digitales, nuestros cursos están alineados con las exigencias del mercado
-                        actual y pensados para aportar valor real a empresas, startups y sectores de tecnología.
-                    </p>
-                </div>
-            </div>
-            <div class="contenido-seccion">
-                <div class="texto">
-                    <p>
-                    <p>
-                        Creemos que la educación tecnológica no solo transforma carreras, sino que también acelera el
-                        progreso de las organizaciones. Por eso, cada uno de nuestros programas se enfoca en construir
-                        talento especializado, preparado para tomar decisiones, crear soluciones eficientes y generar
-                        impacto en el ecosistema digital. Haz crecer tu capital humano con formación de calidad,
-                        relevante y alineada a las tendencias tecnológicas globales. <a>GodCode</a>.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <!-- Seccion 1 -->
 
-        <!-- seccion 2 -->
-        <section id="industria-tecnologia-2">
-            <div class="contenido-seccion">
-                <div class="texto">
-                    <p>
-                        Ofrecemos una propuesta integral orientada a la industria tecnológica, en la que utilizamos
-                        diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas a las
-                        necesidades del entorno digital actual.
-                    </p>
-                    <p>
-                        Aplicamos herramientas modernas, y entornos de desarrollo actualizados que nos permiten crear
-                        productos y servicios de alto valor, como sistemas basados en arquitectura de microservicios,
-                        plataformas móviles y web interactivas, hasta interfaces inteligentes y sistemas de
-                        automatización. Nuestros especialistas trabajan con tecnologías vérsatiles y escalables que
-                        garantizan resultados eficientes.
-                    </p>
-                    <p>
-                        Ya sea que se trate de crear, optimizar o transformar procesos digitales, ofrecemos soluciones
-                        personalizadas para alcanzar mayor calidad, flexibilidad e impacto real.
-                    </p>
-                </div>
-                <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaTecnologiaSeccion2_img1.png"
-                    alt="Soluciones tecnológicas">
-            </div>
-        </section>
-
-        <!-- seccion 3 -->
-        <section id="cta-tecnologia">
-            <div class="contenido">
-                <h3>
-                    ¿Estás listo para llevar tus proyectos digitales al siguiente nivel o potenciar las
-                    capacidades tecnológicas de tu equipo?
-                </h3>
-
-                <p>
-                    En GodCode, utilizamos una amplia gama de tecnologías para desarrollar soluciones modernas,
-                    escalables y
-                    adaptadas a las exigencias de la industria tecnológica actual.
-                </p>
-                <p>
-                    Ya sea que necesites construir una plataforma digital desde cero, optimizar tus sistemas existentes
-                    o
-                    integrar herramientas inteligentes en tus procesos, contamos con la experiencia y los recursos para
-                    hacerlo
-                    realidad.
-                </p>
-                <p>
-                    Aplicamos metodologías ágiles, frameworks actualizados, infraestructura en la nube y tecnologías de
-                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos.
-                </p>
-                <p>
-                    Solicita más información sobre nuestros servicios tecnológicos, agenda una asesoría con nuestro
-                    equipo o
-                    descubre cómo podemos ayudarte a impulsar la transformación digital de tu empresa.
-                </p>
-            </div>
-        </section>
-
-        <section id="cta-tecnologia">
-            <div class="contenedor-boton">
-                <button class="btn-contacto" onclick="location.href='../VIEW/Contacto.php'">
-                    <span style="margin-left: 8px;">¡Contáctanos!</span>
-                </button>
-            </div>
-        </section>
-
-
-        <!-- Seccion otros productos  -->
-        <section id="otros-productos">
-            <h2>Otros Productos</h2>
-            <div class="productos-random"></div>
-        </section>
-
+pendiente
     </main>
 
     <!-- Pie de pagina -->

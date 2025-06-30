@@ -1,0 +1,105 @@
+#contacto {
+    padding: 4rem 2rem;
+    background-color: #f8f9fc;
+    font-family: 'Segoe UI', sans-serif;
+    color: #222;
+}
+
+#contacto .titulo {
+    text-align: center;
+    color: #1a73e8;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.contacto-contenedor {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.info-contacto,
+.formulario-contacto {
+    flex: 1 1 300px;
+}
+
+.info-contacto h3,
+.formulario-contacto h3,
+.formulario-contacto h4 {
+    color: #1a73e8;
+    margin-bottom: 0.8rem;
+}
+
+.bloque-info {
+    background: #eee;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.formulario-contacto p {
+    margin-bottom: 1rem;
+}
+
+.formulario-contacto form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.formulario-contacto input,
+.formulario-contacto textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #eee;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.input-doble {
+    display: flex;
+    gap: 1rem;
+}
+
+.input-doble input {
+    flex: 1;
+}
+
+textarea {
+    height: 120px;
+    overflow-y: auto;
+}
+
+.formulario-contacto button {
+    background-color: #1a73e8;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.formulario-contacto button:hover {
+    background-color: #155ec5;
+}
+
+.contacto-pie {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+}

@@ -231,11 +231,12 @@
             </div>
 
             <div class="contenedor-boton">
-                <button class="btn-contacto">
+                <button class="btn-contacto" onclick="location.href='../VIEW/Contacto.php'">
                     <span>Contáctanos!</span>
                 </button>
             </div>
         </section>
+
 
         <!-- Seccion otros productos  -->
         <section id="otros-productos">

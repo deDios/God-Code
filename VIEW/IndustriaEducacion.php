@@ -158,7 +158,7 @@
                     </p>
                     <p>
                         Impulsa el crecimiento de tu talento humano con una formación relevante, dinámica y aplicada. <a
-                            href="#" class="link-godcode">GodCode</a>
+                         class="link-godcode">GodCode</a>
                     </p>
                 </div>
 

@@ -142,9 +142,12 @@
                 <div class="info-text">
                     <h2>Desarrollo Web</h2>
                     <p>
-                        Los grandes sitios web comienzan con una buena estrategia de desarrollo. Desde la planificación
-                        hasta el diseño y la programación, cada paso cuenta para construir experiencias digitales que
-                        realmente conectan con tus usuarios y logran resultados medibles. <a>GodCode</a>
+                        Los grandes sitios web comienzan con una
+                        buena estrategia de desarrollo. Desde la
+                        planificación hasta el diseño y la programación,
+                        cada paso cuenta para construir experiencias
+                        digitales que realmente conectan con tus
+                        usuarios y logran resultados medibles. <a>GodCode</a>
                     </p>
                 </div>
                 <div class="cta-box">
@@ -207,28 +210,41 @@
         <section id="descripcion-pagina-Productos" class="animado">
             <div class="descripcion-pagina-Productos__wrapper">
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza aplicaciones móviles que marcan la diferencia</span></h2>
+                    <h2><span>Diseña, construye y lanza sitios web impactantes</span></h2>
                     <p>
-                        Desde sitios informativos hasta plataformas personalizadas, planifica cada etapa del desarrollo
-                        con claridad.
-                        Organiza el contenido, define la estructura, establece los objetivos y colabora con diseñadores
-                        y desarrolladores en
-                        un solo flujo de trabajo. Asigna tareas, establece prioridades, revisa avances en tiempo real y
-                        asegúrate de que cada
-                        detalle esté alineado con la experiencia del usuario. Lanza sitios web que no solo se ven bien,
-                        sino que también cumplen
-                        resultados.
+                        Desde sitios informativos hasta plataformas personalizadas y complejas, planifica cada etapa del
+                        desarrollo con claridad, estrategia y propósito. Define objetivos claros desde el inicio,
+                        identifica las necesidades de tus usuarios y construye una estructura sólida que te permita
+                        escalar a futuro.Organiza el contenido de forma coherente, establece la jerarquía visual y
+                        funcional, y colabora estrechamente con diseñadores, desarrolladores, redactores y otros
+                        perfiles clave para asegurar una ejecución impecable.
+                        Adapta cada parte del proceso a tu flujo de trabajo: asigna tareas, establece prioridades,
+                        visualiza avances en tiempo real y mantén un control preciso sobre cada componente del proyecto.
+                        Integra herramientas modernas de diseño, programación, análisis y gestión para maximizar la
+                        eficiencia y reducir errores.Asegúrate de que cada detalle esté alineado con la experiencia del
+                        usuario, desde la navegación hasta la velocidad de carga, la accesibilidad y la adaptabilidad
+                        móvil. Lanza sitios web que no solo se ven bien, sino que realmente funcionan, conectan con tu
+                        audiencia, generan resultados medibles y fortalecen tu presencia digital.
                     </p>
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
                     <h2><span>Lleva el control total del desarrollo de tu app móvil</span></h2>
-                    <p> Visualiza cada etapa del proyecto con tableros, listas y cronogramas adaptados a tus procesos.
-                        Desde la arquitectura
-                        inicial hasta la publicación final, crea flujos de trabajo personalizados para diseño,
-                        desarrollo, contenido y pruebas. Integra tus herramientas favoritas como editores de código,
-                        gestores de contenido y plataformas de análisis y
-                        mantén todo centralizado para que tu equipo avance con claridad y sin perder el rumbo.</p>
+                    <p> Supervisa y gestiona cada etapa del proyecto con precisión y eficiencia, utilizando tableros
+                        visuales, listas personalizadas, cronogramas interactivos y herramientas adaptadas a tus
+                        procesos internos. Desde la planificación de la arquitectura inicial hasta la publicación final,
+                        cada fase del desarrollo puede ser organizada, optimizada y monitoreada en un entorno claro y
+                        estructurado.
+                        Crea flujos de trabajo completamente personalizados que se ajusten a las necesidades de tu
+                        equipo y proyecto: desde el diseño visual y la creación de contenido hasta la programación, las
+                        pruebas de calidad y la revisión final. Asignar tareas, establecer dependencias, definir
+                        prioridades y coordinar entregables nunca ha sido tan simple. Integra tus herramientas favoritas
+                        —como editores de código, plataformas de diseño, gestores de contenido (CMS), sistemas de
+                        control de versiones y herramientas de análisis— en un solo entorno colaborativo. Centraliza la
+                        comunicación, automatiza procesos repetitivos y obtén visibilidad en tiempo real sobre el avance
+                        del proyecto para que tu equipo trabaje alineado, sin desvíos y con enfoque total en los
+                        objetivos. Asegura un desarrollo web ágil, ordenado y de alta calidad, con todo bajo control,
+                        desde el primer boceto hasta el clic de publicación.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
                             alt="img" />
@@ -237,12 +253,19 @@
 
                 <div class="descripcion-pagina-Productos__bloque">
                     <h2><span>Optimiza tu app móvil con datos que importan</span></h2>
-                    <p>Supervisa el avance de cada etapa del desarrollo en tiempo real: diseño, contenido, programación
-                        y pruebas. Detecta
-                        cuellos de botella, identifica errores a tiempo y toma decisiones basadas en datos
-                        concretos. Comprende el rendimiento de tu equipo y del proyecto, anticipa riesgos y mejora
-                        continuamente la eficiencia para
-                        entregar sitios web de mayor calidad, en menos tiempo.</p>
+                    <p>Toma decisiones inteligentes en cada fase del desarrollo apoyándote en información precisa,
+                        medible y en tiempo real. Supervisa el avance de tu proyecto desde el diseño inicial hasta las
+                        pruebas finales, incluyendo la planificación de contenido, la implementación de funcionalidades
+                        y la validación de cada componente técnico y visual. Detecta cuellos de botella antes de que se
+                        conviertan en problemas mayores, identifica errores o inconsistencias de forma anticipada y
+                        mantén una visión clara del desempeño general de tu equipo.Utiliza métricas clave para evaluar
+                        tiempos de entrega, cumplimiento de tareas, eficiencia en los flujos de trabajo y calidad del
+                        código, asegurando un proceso de desarrollo más predecible y transparente. Además, analiza el
+                        comportamiento de los usuarios en tu sitio para ajustar funcionalidades, mejorar la experiencia
+                        de navegación y aumentar la conversión. Con una gestión basada en datos, puedes anticipar
+                        riesgos, responder rápidamente a los cambios del entorno y optimizar cada recurso invertido en
+                        tu proyecto. Logra sitios web más rápidos, seguros, funcionales y alineados con tus objetivos,
+                        reduciendo tiempos de entrega y elevando la calidad final del producto.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
                             alt="img" />

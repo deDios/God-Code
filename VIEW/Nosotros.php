@@ -302,7 +302,7 @@
                 </div>
 
                 <div class="contenedor-boton">
-                    <a href="#contacto" class="btn-contacto">Deja tus datos y CV aquí</a>
+                    <a href="../VIEW/ContactoCV.php" class="btn-contacto">Deja tus datos y CV aquí</a>
                 </div>
             </div>
         </section>

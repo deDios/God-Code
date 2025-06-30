@@ -12,7 +12,7 @@
 <body>
     <!-- Tope de pagina -->
     <header id="header">
-       <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
+        <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
         <div class="social-bar-mobile">
             <div class="social-icons">
@@ -115,7 +115,7 @@
                 <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
             </div>
 
-            <a href="../VIEW/Nosotros.php" >Nosotros</a>
+            <a href="../VIEW/Nosotros.php">Nosotros</a>
             <a href="../VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
@@ -149,7 +149,7 @@
                         funcionales y alineadas con las necesidades reales
                         de tus usuarios. Desarrolla aplicaciones que no
                         solo se ven bien, sino que generan impacto,
-                        engagement y resultados medibles. GodCode
+                        engagement y resultados medibles. <a>GodCode</a>
                     </p>
                 </div>
                 <div class="cta-box">
@@ -211,27 +211,40 @@
         <section id="descripcion-pagina-Productos" class="animado">
             <div class="descripcion-pagina-Productos__wrapper">
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza aplicaciones mobiles que marcan la diferenciaDesde ideas
-                            simples</span></h2>
+                    <h2><span>Diseña, construye y lanza aplicaciones móviles que marcan la diferencia</span></h2>
                     <p>
-                        hasta soluciones móviles complejas, planifica cada fase del desarrollo con precisión.Define
-                        funcionalidades clave, diseña interfaces intuitivas, establece objetivos claros y colabora con
-                        diseñadores,
-                        programadores y testers en un flujo de trabajo unificado. Asigna tareas, gestiona prioridades,
-                        realiza pruebas en
-                        tiempo real y asegúrate de que cada interacción sea fluida y centrada en el usuario.Lanza apps
-                        que no solo funcionan, sino que también cautivan, fidelizan y generan resultados reales.
+                        Desde ideas simples hasta soluciones móviles robustas y escalables, planifica cada etapa del
+                        desarrollo con visión estratégica y atención al detalle. Define funcionalidades clave que
+                        respondan a las verdaderas necesidades de tus usuarios, diseña interfaces intuitivas que
+                        ofrezcan una experiencia fluida, y establece objetivos claros que orienten cada decisión del
+                        proyecto. Colabora de forma integrada con diseñadores UI/UX, desarrolladores front y back-end,
+                        testers y gestores de producto en un flujo de trabajo bien estructurado, que favorezca la
+                        comunicación, la agilidad y la eficiencia. Asigna tareas según prioridades, gestiona los tiempos
+                        de entrega, realiza pruebas en tiempo real y ajusta cada componente para lograr una aplicación
+                        estable, rápida y centrada en la experiencia del usuario. Aprovecha herramientas modernas de
+                        desarrollo, análisis, control de calidad y despliegue continuo para acelerar el proceso sin
+                        comprometer la calidad. Lanza aplicaciones móviles que no solo funcionan correctamente, sino que
+                        conectan emocionalmente con los usuarios, generan fidelización, fortalecen tu marca y entregan
+                        resultados medibles. Transforma tus ideas en soluciones móviles funcionales, atractivas y
+                        preparadas para competir en un mercado digital cada vez más exigente.
                     </p>
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
                     <h2><span>Lleva el control total del desarrollo de tu app móvil</span></h2>
-                    <p> Visualiza cada etapa del proyecto con tableros, listas y cronogramas adaptados a tus procesos.
-                        Desde la arquitectura
-                        inicial hasta la publicación final, crea flujos de trabajo personalizados para diseño,
-                        desarrollo, contenido y pruebas. Integra tus herramientas favoritas —como editores de código,
-                        gestores de contenido y plataformas de análisis y
-                        mantén todo centralizado para que tu equipo avance con claridad y sin perder el rumbo.</p>
+                    <p> Gestiona cada etapa de tu proyecto de forma organizada, visual y eficiente con tableros, listas,
+                        cronogramas y flujos de trabajo adaptados a tus procesos. Desde la concepción de la idea hasta
+                        el despliegue en las tiendas de aplicaciones, mantén todo bajo control con una metodología
+                        estructurada y colaborativa. Diseña flujos personalizados para cada fase: conceptualización,
+                        prototipado, diseño de interfaz, desarrollo de funcionalidades, pruebas de calidad, optimización
+                        de rendimiento y publicación final. Asigna tareas con claridad, define prioridades, establece
+                        fechas clave y asegúrate de que cada integrante del equipo conozca su rol y objetivos en tiempo
+                        real .Integra tus herramientas preferidas como entornos de desarrollo (IDE), sistemas de control
+                        de versiones como Git, gestores de tareas, plataformas de analítica y testing en un solo entorno
+                        centralizado que facilite la comunicación y evite errores.
+                        Optimiza el trabajo en equipo, reduce retrabajos y acelera los tiempos de entrega sin
+                        comprometer la calidad. Con una gestión clara y estructurada, tu app no solo llegará a tiempo,
+                        sino que será más estable, intuitiva y lista para destacar en el mercado.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
                             alt="Diseño de app móvil" />
@@ -239,14 +252,19 @@
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu app móvil con datos que importanSupervisa el progreso de cada etapa del
-                            desarrollo en tiempo real: diseño de interfaz, desarrollo de funcionalidades,
-                            pruebas y despliegue.</span></h2>
-                    <p> Detecta cuellos de botella, identifica errores antes del lanzamiento y toma decisiones
-                        informadas
-                        basadas en datos reales. Evalúa el rendimiento de tu equipo y de la aplicación, anticipa riesgos
-                        y mejora continuamente
-                        tus procesos para lanzar apps móviles de mayor calidad, en menos tiempo.</p>
+                    <h2><span>Optimiza tu app móvil con datos que realmente importan.</span></h2>
+                    <p> Gestiona tu proceso de desarrollo con información precisa, actualizada y accionable. Supervisa
+                        el avance de cada etapa —desde el diseño de la interfaz y la experiencia del usuario, hasta la
+                        programación de funcionalidades, pruebas internas y despliegue en tiendas— con total visibilidad
+                        en tiempo real. Identifica cuellos de botella en los flujos de trabajo, detecta errores antes de
+                        que impacten al usuario final y toma decisiones respaldadas por datos reales, no suposiciones.
+                        Evalúa el rendimiento individual y colectivo de tu equipo, mide la eficiencia de cada fase del
+                        proyecto y ajusta las estrategias según métricas claras y objetivos definidos. Además, analiza
+                        el comportamiento de los usuarios dentro de tu app una vez publicada: tasa de retención, caídas,
+                        errores, interacciones y conversiones. Esta retroalimentación continua te permitirá iterar,
+                        mejorar y escalar tu aplicación de forma más ágil y precisa. Con un enfoque basado en datos, no
+                        solo reduces tiempos de desarrollo, sino que aseguras una entrega de mayor calidad, alineada a
+                        las necesidades del mercado y preparada para crecer de forma sostenible.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
                             alt="Datos de aplicación móvil" />
