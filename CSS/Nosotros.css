@@ -31,7 +31,6 @@
     gap: 20px;
     flex-wrap: wrap;
     padding: 40px;
-    overflow: hidden;
     max-width: 1280px;
     width: 100%;
     margin: 0 auto;
@@ -99,31 +98,16 @@
 }
 
 @media (max-width: 768px) {
-
     .bloque-nosotros {
         flex-direction: column;
         text-align: center;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
         padding: 20px;
-        width: 100%;
-        max-width: 100%;
-        margin: 0 auto;
-        box-sizing: border-box;
+        gap: 20px;
     }
 
     .imagen-nosotros {
         width: 100%;
         max-width: 400px;
-        margin: 0 auto 20px;
-        text-align: center;
-    }
-
-    .imagen-nosotros img {
-        display: block;
-        max-width: 100%;
-        height: auto;
         margin: 0 auto;
     }
 
@@ -207,11 +191,9 @@
     cursor: pointer;
     user-select: none;
     z-index: 10;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
@@ -250,9 +232,6 @@
 @media (max-width: 768px) {
     .slide {
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
         padding: 30px 20px;
     }
 
@@ -263,8 +242,8 @@
     }
 
     .slide .imagen img {
-        margin: 0 auto;
         max-width: 300px;
+        margin: 0 auto;
     }
 
     .slide .texto p {
@@ -276,8 +255,8 @@
     }
 }
 
-/*----------------------------------------------- sseccion 3 ---------------------------------------*/
 
+/*----------------------------------------------- sseccion 3 ---------------------------------------*/
 .proyectos {
     background: white;
     padding: 60px 30px;
@@ -298,7 +277,7 @@
 .proyecto {
     max-width: 1280px;
     width: 100%;
-    margin: 0 auto 80px auto;
+    margin: 0 auto 80px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -333,9 +312,7 @@
     color: #444;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-
     .proyectos {
         padding: 40px 20px;
     }
@@ -370,7 +347,6 @@
 
 
 /*--------------------------------- seccion 4 ---------------------------------*/
-
 .creciendoJuntos {
     background-color: #f9f9f9;
     padding: 60px 40px;
@@ -452,4 +428,23 @@
     .creciendoJuntos .bloque {
         text-align: center;
     }
+}
+
+body {
+    overflow-x: hidden;
+}
+
+section,
+.bloque-nosotros,
+.slide,
+.proyecto,
+.creciendoJuntos-contenido {
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }

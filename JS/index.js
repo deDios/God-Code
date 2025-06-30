@@ -202,7 +202,6 @@ if (
 
     let cursosOriginales = [];
 
-    // Cargar categorias
     fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
       {
@@ -221,6 +220,25 @@ if (
         });
       })
       .catch((err) => console.error("Error al cargar categorías:", err));
+
+    fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    )
+      .then((res) => res.json())
+      .then((prioridades) => {
+        prioridades.forEach((item) => {
+          const option = document.createElement("option");
+          option.value = item.nombre;
+          option.textContent = item.nombre;
+          explorarSelect.appendChild(option);
+        });
+      })
+      .catch((err) => console.error("Error al cargar prioridades:", err));
 
     fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
@@ -248,24 +266,35 @@ if (
       inicializarCarrusel();
     });
 
+    // ------------------- funcion para aplicar filtros -------------------
     function aplicarFiltros() {
       const categoriaSeleccionada = categoriaSelect.value;
       const explorarSeleccionado = explorarSelect.value;
 
       let cursosFiltrados = [...cursosOriginales];
 
+      // filtrar por categoria
       if (categoriaSeleccionada) {
         cursosFiltrados = cursosFiltrados.filter(
           (curso) => curso.categoria == categoriaSeleccionada
         );
       }
 
+      // filtrar por prioridad
       if (explorarSeleccionado === "Populares") {
         cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
-      } else if (explorarSeleccionado === "Gratuitos") {
+      } else if (explorarSeleccionado === "Gratuito") {
         cursosFiltrados = cursosFiltrados.filter(
           (curso) => parseFloat(curso.precio) === 0
         );
+      } else if (explorarSeleccionado === "Nuevo") {
+        cursosFiltrados.sort(
+          (a, b) =>
+            new Date(b.fecha_creacion).getTime() -
+            new Date(a.fecha_creacion).getTime()
+        );
+      } else if (explorarSeleccionado === "Lo más buscado") {
+        // de momento no hace nada
       }
 
       renderizarCursos(cursosFiltrados);
@@ -274,13 +303,14 @@ if (
 
     function renderizarCursos(cursos) {
       cursosContainer.innerHTML = "";
+
       cursos.forEach((curso) => {
-        //aca se cargan los cursos con este foreach
+        // aca se cargan los cursos con este foreach
         const card = document.createElement("div");
         card.classList.add("card");
 
         const img = document.createElement("img");
-        img.src = `../ASSETS/cursos/img${curso.id}.png`; //aqui esta lo de la imagen + el id de la card
+        img.src = `../ASSETS/cursos/img${curso.id}.png`; // aqui esta lo de la imagen + el id de la card
         console.log("Ruta de la imagen:", img.src);
         img.alt = curso.nombre;
 
@@ -314,60 +344,16 @@ if (
 
       if (!track || !prevButton || !nextButton) return;
 
-      const cards = Array.from(track.children);
-      if (cards.length === 0) return;
+      const cardWidth = track.querySelector(".card")?.offsetWidth || 300;
+      const scrollStep = cardWidth + 16;
 
-      let cardWidth = cards[0].getBoundingClientRect().width + 16;
-      let currentIndex = 0;
-
-      prevButton.addEventListener("click", moverAnterior);
-      nextButton.addEventListener("click", moverSiguiente);
-
-      function moverAnterior() {
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateCarousel();
-        }
-      }
-
-      function moverSiguiente() {
-        const cardsVisibles = Math.floor(
-          track.parentElement.offsetWidth / cardWidth
-        );
-        if (currentIndex < cards.length - cardsVisibles) {
-          currentIndex++;
-          updateCarousel();
-        }
-      }
-
-      function updateCarousel() {
-        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-        actualizarBotones();
-      }
-
-      function actualizarBotones() {
-        const cardsVisibles = Math.floor(
-          track.parentElement.offsetWidth / cardWidth
-        );
-        prevButton.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-        nextButton.style.visibility =
-          currentIndex >= cards.length - cardsVisibles ? "hidden" : "visible";
-
-        if (window.innerWidth <= 480) {
-          prevButton.style.display = "none";
-          nextButton.style.display = "none";
-        } else {
-          prevButton.style.display = "flex";
-          nextButton.style.display = "flex";
-        }
-      }
-
-      window.addEventListener("resize", () => {
-        cardWidth = cards[0].getBoundingClientRect().width + 16;
-        updateCarousel();
+      prevButton.addEventListener("click", () => {
+        track.scrollBy({ left: -scrollStep, behavior: "smooth" });
       });
 
-      updateCarousel();
+      nextButton.addEventListener("click", () => {
+        track.scrollBy({ left: scrollStep, behavior: "smooth" });
+      });
     }
   });
 }
@@ -464,8 +450,8 @@ if (
   window.location.pathname.includes("ServicioEducativo") ||
   window.location.pathname.includes("DisenoUXUI.php") ||
   window.location.pathname.includes("IndustriaTecnologia.php") ||
-  window.location.pathname.includes("IndustriaEducacion.php") || 
-  window.location.pathname.includes("IndustriaFinanciera.php") 
+  window.location.pathname.includes("IndustriaEducacion.php") ||
+  window.location.pathname.includes("IndustriaFinanciera.php")
 ) {
   //funcion para el apartado de OTROS PRODUCTOS para las vistas del megamenu de productos
   const productos = [
