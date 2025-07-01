@@ -368,7 +368,7 @@ if (
         const card = cursosContainer.querySelector(".card");
         if (!card) return;
 
-        const cardWidth = card.offsetWidth + 24; // 24px = espacio (gap) entre tarjetas
+        const cardWidth = card.offsetWidth + 24;
 
         const prevButton = prevBtn.cloneNode(true);
         const nextButton = nextBtn.cloneNode(true);
@@ -741,7 +741,7 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       });
 
       function updateCarousel() {
-        track.style.transition = "transform 0.4s ease"; // transición suave
+        track.style.transition = "transform 0.4s ease"; 
         track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
         actualizarBotones();
       }
