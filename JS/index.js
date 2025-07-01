@@ -385,7 +385,7 @@ if (
           console.log("click hacia adelante");
         });
 
-        if (window.innerWidth <= 480) {
+        if (window.innerWidth <= 768) {
           prevButton.style.display = "none";
           nextButton.style.display = "none";
         } else {

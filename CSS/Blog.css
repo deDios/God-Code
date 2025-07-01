@@ -446,6 +446,11 @@
     .carousel-btn {
         padding: 8px;
     }
+
+    .carousel-btn.prev,
+    .carousel-btn.next {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
