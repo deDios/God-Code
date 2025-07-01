@@ -250,7 +250,7 @@
         </div>
     </footer>
 
-    <script src="../JS/pruebasBlog.js"></script>
+    <script src="../JS/index.js"></script>
 </body>
 
 </html>
