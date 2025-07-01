@@ -675,8 +675,8 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       .then((res) => res.json())
       .then((data) => {
         cursos = data;
-        renderizarCursos(cursos);
-        inicializarCarrusel();
+        renderizarCursos(cursos); 
+        inicializarCarrusel(); 
       })
       .catch((err) => console.error("Error al cargar cursos:", err));
 
@@ -741,6 +741,7 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       });
 
       function updateCarousel() {
+        track.style.transition = "transform 0.4s ease"; // transición suave
         track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
         actualizarBotones();
       }
@@ -764,10 +765,16 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
 
       window.addEventListener("resize", () => {
         cardWidth = cards[0].getBoundingClientRect().width + 16;
+        const cardsVisibles = Math.floor(
+          track.parentElement.offsetWidth / cardWidth
+        );
+        if (currentIndex > cards.length - cardsVisibles) {
+          currentIndex = Math.max(cards.length - cardsVisibles, 0);
+        }
         updateCarousel();
       });
 
-      updateCarousel();
+      updateCarousel(); 
     }
   });
 }
