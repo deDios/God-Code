@@ -371,10 +371,12 @@ if (
 
         prevButton.addEventListener("click", () => {
           track.scrollBy({ left: -cardWidth, behavior: "smooth" });
+          console.log("click hacia atras");
         });
 
         nextButton.addEventListener("click", () => {
           track.scrollBy({ left: cardWidth, behavior: "smooth" });
+          console.log("click hacia adelante");
         });
 
         if (window.innerWidth <= 480) {
