@@ -267,7 +267,7 @@
                     experiencia omnicanal completa. Creamos tu plan tecnológico a medida, guiado por expertos en
                     desarrollo e innovación.
                 </p>
-                <a href="#contacto" class="btn-contacto">Contáctanos</a>
+                <a href="VIEW/Contacto.php" class="btn-contacto">Contáctanos</a>
             </div>
 
             <div class="faq">

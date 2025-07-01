@@ -277,7 +277,7 @@
                         diseñar con intención y aprender continuamente, este lugar es para ti.
                     </p>
                     <p>
-                        Que tus ideas cobren vida y marca la diferencia con nosotros. <a href="../VIEW/ContactoCV">Deja tus datos
+                        Que tus ideas cobren vida y marca la diferencia con nosotros. <a href="../VIEW/ContactoCV.php">Deja tus datos
                             y CV aquí </a>
                     </p>
                 </div>
