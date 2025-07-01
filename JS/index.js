@@ -233,7 +233,13 @@ if (
       .then((prioridades) => {
         prioridades.forEach((item) => {
           const option = document.createElement("option");
-          option.value = item.nombre;
+          option.value = item.id;
+          console.log(
+            "el value de esta opcion es:",
+            item.id,
+            " y su id es:",
+            item.nombre
+          );
           option.textContent = item.nombre;
           explorarSelect.appendChild(option);
         });
@@ -293,8 +299,18 @@ if (
             new Date(b.fecha_creacion).getTime() -
             new Date(a.fecha_creacion).getTime()
         );
-      } else if (explorarSeleccionado === "Lo más buscado") {
-        // de momento no hace nada
+      } else if (explorarSeleccionado === "2") {
+        //Con costo su id es 2
+        cursosFiltrados = cursosFiltrados.filter(
+          (curso) => parseFloat(curso.precio) !== 0
+        );
+      } else if (explorarSeleccionado === "5") {
+        // esclusivo con suscripcion su id es 5
+      } else if (explorarSeleccionado === "1") {
+        cursosFiltrados = cursosFiltrados.filter(
+          // gratuito su id es 1
+          (curso) => parseFloat(curso.precio) === 0
+        );
       }
 
       renderizarCursos(cursosFiltrados);
@@ -339,21 +355,36 @@ if (
 
     function inicializarCarrusel() {
       const track = document.querySelector(".carousel-track");
-      const prevButton = document.querySelector(".carousel-btn.prev");
-      const nextButton = document.querySelector(".carousel-btn.next");
+      const prevBtnOld = document.querySelector(".carousel-btn.prev");
+      const nextBtnOld = document.querySelector(".carousel-btn.next");
 
-      if (!track || !prevButton || !nextButton) return;
+      if (!track || !prevBtnOld || !nextBtnOld) return;
 
-      const cardWidth = track.querySelector(".card")?.offsetWidth || 300;
-      const scrollStep = cardWidth + 16;
+      const card = track.querySelector(".card");
+      if (!card) return;
+
+      const cardWidth = card.offsetWidth + 16;
+
+      const prevButton = prevBtnOld.cloneNode(true);
+      const nextButton = nextBtnOld.cloneNode(true);
+      prevBtnOld.parentNode.replaceChild(prevButton, prevBtnOld);
+      nextBtnOld.parentNode.replaceChild(nextButton, nextBtnOld);
 
       prevButton.addEventListener("click", () => {
-        track.scrollBy({ left: -scrollStep, behavior: "smooth" });
+        track.scrollBy({ left: -cardWidth, behavior: "smooth" });
       });
 
       nextButton.addEventListener("click", () => {
-        track.scrollBy({ left: scrollStep, behavior: "smooth" });
+        track.scrollBy({ left: cardWidth, behavior: "smooth" });
       });
+
+      if (window.innerWidth <= 480) {
+        prevButton.style.display = "none";
+        nextButton.style.display = "none";
+      } else {
+        prevButton.style.display = "flex";
+        nextButton.style.display = "flex";
+      }
     }
   });
 }
