@@ -306,7 +306,6 @@
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 10px;
-    white-space: nowrap;
     scroll-behavior: smooth;
 }
 
@@ -329,7 +328,8 @@
     border: 1px solid #e1e9f0;
     display: flex;
     flex-direction: column;
-    height: 420px;
+    min-height: 420px;
+    height: auto;
     color: inherit;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -348,14 +348,15 @@
     height: 200px;
     object-fit: cover;
     border-radius: 20px 20px 0 0;
+    flex-shrink: 0;
 }
 
 #cursos-container .card .contenido {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 #cursos-container .card .contenido h4 {
@@ -363,6 +364,8 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 #cursos-container .card .contenido h4::after {
@@ -379,6 +382,22 @@
     color: #222;
     line-height: 1.6;
     margin-top: 0.5rem;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 4;
+    box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    flex-grow: 1;
+    min-height: 3.2em;
+}
+
+#cursos-container .card .contenido .metadata {
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 #cursos-container .card .contenido .horas,
@@ -386,9 +405,8 @@
     font-weight: 500;
     font-size: 0.9rem;
     color: #444;
-    margin-top: auto;
+    white-space: normal;
 }
-
 
 .carousel-btn {
     position: absolute;
@@ -407,7 +425,6 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
-
 
 .carousel-btn:active {
     background: rgba(0, 0, 0, 0.1);
@@ -429,11 +446,11 @@
     right: 10px;
 }
 
-
 @media (max-width: 1024px) {
     #cursos-container .card {
         flex: 0 0 48%;
         max-width: 48%;
+        min-height: 400px;
     }
 }
 
@@ -441,6 +458,7 @@
     #cursos-container .card {
         flex: 0 0 80%;
         max-width: 80%;
+        min-height: 380px;
     }
 
     .carousel-btn {
@@ -457,6 +475,7 @@
     #cursos-container .card {
         flex: 0 0 90%;
         max-width: 90%;
+        min-height: 360px;
     }
 
     .carousel-btn.prev,
