@@ -135,12 +135,12 @@
 
     <main>
         <!-- Seccion 1 -->
-
+         
         <section id="contacto">
             <h2 class="titulo">Contacto</h2>
 
             <div class="contacto-contenedor">
-                <!-- Información de contacto -->
+
                 <div class="info-contacto">
                     <h3>Información de Contacto</h3>
                     <div class="bloque-info">
@@ -158,7 +158,6 @@
                     </div>
                 </div>
 
-                <!-- Formulario -->
                 <div class="formulario-contacto">
                     <h3>¿Requieres más información?</h3>
                     <p>
@@ -181,7 +180,7 @@
                         <button type="submit">Enviar</button>
                     </form>
                 </div>
-                <!-- Pie de página -->
+
                 <div class="contacto-pie">
                     <p>© 2025 GodCode. Todos los derechos reservados.<br>
                         Queda prohibida la reproducción total o parcial de este contenido sin autorización previa por

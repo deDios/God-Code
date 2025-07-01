@@ -143,7 +143,6 @@
             </p>
 
             <div class="contacto-contenedor">
-                <!-- Formulario -->
                 <div class="formulario-contacto">
                     <p>
                         Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
@@ -176,7 +175,6 @@
                     </form>
                 </div>
 
-                <!-- Info lateral -->
                 <div class="info-contacto">
                     <div class="bloque-infoNoFondo">
                         <p>¿Qué buscamos?</p>
