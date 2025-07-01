@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/DiseñoUXUI.css" />
+    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -135,8 +135,77 @@
 
     <main>
         <!-- Seccion 1 -->
+        <section id="trabaja-con-nosotros">
+            <h2 class="titulo">Trabaja con nosotros</h2>
+            <p class="intro">
+                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
+                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
+            </p>
 
-pendiente
+            <div class="contacto-contenedor">
+                <!-- Formulario -->
+                <div class="formulario-contacto">
+                    <p>
+                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
+                    </p>
+
+                    <form>
+                        <div class="input-doble">
+                            <input type="text" placeholder="Nombre completo" required />
+                            <input type="email" placeholder="Correo electrónico" required />
+                        </div>
+
+                        <div class="input-doble">
+                            <input type="tel" placeholder="Teléfono" required />
+                            <select required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="#">Puesto1</option>
+                                <option value="#">Puesto2</option>
+                            </select>
+                        </div>
+
+                        <textarea placeholder="Háblanos sobre ti"></textarea>
+
+                        <div class="bloque-info file-upload">
+                            <strong>Adjunta tu CV:</strong><br />
+                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
+                            <input type="file" id="cv-file" />
+                        </div>
+
+                        <button type="submit">Enviar</button>
+                    </form>
+                </div>
+
+                <!-- Info lateral -->
+                <div class="info-contacto">
+                    <div class="bloque-infoNoFondo">
+                        <p>¿Qué buscamos?</p>
+                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
+                        </p>
+                        <p>Buscamos personas que...</p>
+                        <ul>
+                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
+                            <li>Disfruten del trabajo colaborativo</li>
+                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
+                        </ul>
+                    </div>
+
+                    <div class="bloque-infoNoFondo">
+                        <p>¿Qué ofrecemos?</p>
+                        <ul>
+                            <li>Trabajo remoto o híbrido</li>
+                            <li>Horarios flexibles</li>
+                            <li>Proyectos innovadores y con impacto real</li>
+                            <li>Oportunidades de desarrollo profesional</li>
+                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
+                        </ul>
+                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
     </main>
 
     <!-- Pie de pagina -->
