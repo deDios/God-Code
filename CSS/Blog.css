@@ -306,6 +306,8 @@
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 10px;
+    white-space: nowrap;
+    scroll-behavior: smooth;
 }
 
 .carousel-track-container::-webkit-scrollbar {

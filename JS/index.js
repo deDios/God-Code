@@ -314,7 +314,7 @@ if (
         }
 
         renderizarCursos(cursosFiltrados);
-        inicializarCarrusel(); 
+        inicializarCarrusel();
       }
 
       function renderizarCursos(cursos) {
@@ -353,16 +353,22 @@ if (
       }
 
       function inicializarCarrusel() {
-        const track = document.querySelector(".carousel-track");
+        const scrollContainer = document.querySelector(
+          ".carousel-track-container"
+        );
+
+        const cursosContainer = document.getElementById("cursos-container");
+
         const prevBtn = document.querySelector(".carousel-btn.prev");
         const nextBtn = document.querySelector(".carousel-btn.next");
 
-        if (!track || !prevBtn || !nextBtn) return;
+        if (!scrollContainer || !cursosContainer || !prevBtn || !nextBtn)
+          return;
 
-        const card = track.querySelector(".card");
+        const card = cursosContainer.querySelector(".card");
         if (!card) return;
 
-        const cardWidth = card.offsetWidth + 24; 
+        const cardWidth = card.offsetWidth + 24; // 24px = espacio (gap) entre tarjetas
 
         const prevButton = prevBtn.cloneNode(true);
         const nextButton = nextBtn.cloneNode(true);
@@ -370,12 +376,12 @@ if (
         nextBtn.parentNode.replaceChild(nextButton, nextBtn);
 
         prevButton.addEventListener("click", () => {
-          track.scrollBy({ left: -cardWidth, behavior: "smooth" });
-          console.log("click hacia atras");
+          scrollContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
+          console.log("click hacia atrás");
         });
 
         nextButton.addEventListener("click", () => {
-          track.scrollBy({ left: cardWidth, behavior: "smooth" });
+          scrollContainer.scrollBy({ left: cardWidth, behavior: "smooth" });
           console.log("click hacia adelante");
         });
 
