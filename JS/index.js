@@ -305,7 +305,7 @@ if (
           );
         } else if (explorarSeleccionado === "5") {
           // exclusivo con suscripción su id es 5
-          // puedes definir una condición aquí cuando tengas la propiedad
+          // de momento no hace nada
         } else if (explorarSeleccionado === "1") {
           // gratuito su id es 1
           cursosFiltrados = cursosFiltrados.filter(
