@@ -194,199 +194,199 @@ if (
   window.location.pathname.includes("Blog.php") ||
   window.location.pathname.includes("ejemplo_api.php")
 ) {
-  document.addEventListener("DOMContentLoaded", () => {
-    const cursosContainer = document.getElementById("cursos-container");
-    const categoriaSelect = document.getElementById("categoria");
-    const explorarSelect = document.getElementById("explorar");
-    const limpiarBtn = document.getElementById("limpiar-filtros");
+  if (
+    window.location.pathname.includes("Blog.php") ||
+    window.location.pathname.includes("ejemplo_api.php")
+  ) {
+    document.addEventListener("DOMContentLoaded", () => {
+      const cursosContainer = document.getElementById("cursos-container");
+      const categoriaSelect = document.getElementById("categoria");
+      const explorarSelect = document.getElementById("explorar");
+      const limpiarBtn = document.getElementById("limpiar-filtros");
 
-    let cursosOriginales = [];
+      let cursosOriginales = [];
 
-    fetch(
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estatus: 1 }),
-      }
-    )
-      .then((res) => res.json())
-      .then((categorias) => {
-        categorias.forEach((cat) => {
-          const option = document.createElement("option");
-          option.value = cat.id;
-          option.textContent = cat.nombre;
-          categoriaSelect.appendChild(option);
-        });
-      })
-      .catch((err) => console.error("Error al cargar categorías:", err));
+      fetch(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estatus: 1 }),
+        }
+      )
+        .then((res) => res.json())
+        .then((categorias) => {
+          categorias.forEach((cat) => {
+            const option = document.createElement("option");
+            option.value = cat.id;
+            option.textContent = cat.nombre;
+            categoriaSelect.appendChild(option);
+          });
+        })
+        .catch((err) => console.error("Error al cargar categorías:", err));
 
-    fetch(
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estatus: 1 }),
-      }
-    )
-      .then((res) => res.json())
-      .then((prioridades) => {
-        prioridades.forEach((item) => {
-          const option = document.createElement("option");
-          option.value = item.id;
-          console.log(
-            "el value de esta opcion es:",
-            item.id,
-            " y su id es:",
-            item.nombre
-          );
-          option.textContent = item.nombre;
-          explorarSelect.appendChild(option);
-        });
-      })
-      .catch((err) => console.error("Error al cargar prioridades:", err));
+      fetch(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estatus: 1 }),
+        }
+      )
+        .then((res) => res.json())
+        .then((prioridades) => {
+          prioridades.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item.id;
+            console.log(
+              "el value de esta opcion es:",
+              item.id,
+              " y su id es:",
+              item.nombre
+            );
+            option.textContent = item.nombre;
+            explorarSelect.appendChild(option);
+          });
+        })
+        .catch((err) => console.error("Error al cargar prioridades:", err));
 
-    fetch(
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estatus: 1 }),
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        cursosOriginales = data;
-        renderizarCursos(data);
+      fetch(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estatus: 1 }),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          cursosOriginales = data;
+          renderizarCursos(data);
+          inicializarCarrusel();
+        })
+        .catch((err) => console.error("Error al cargar cursos:", err));
+
+      categoriaSelect.addEventListener("change", aplicarFiltros);
+      explorarSelect.addEventListener("change", aplicarFiltros);
+
+      limpiarBtn.addEventListener("click", () => {
+        categoriaSelect.value = "";
+        explorarSelect.value = "";
+        renderizarCursos(cursosOriginales);
         inicializarCarrusel();
-      })
-      .catch((err) => console.error("Error al cargar cursos:", err));
+      });
 
-    categoriaSelect.addEventListener("change", aplicarFiltros);
-    explorarSelect.addEventListener("change", aplicarFiltros);
+      function aplicarFiltros() {
+        const categoriaSeleccionada = categoriaSelect.value;
+        const explorarSeleccionado = explorarSelect.value;
 
-    limpiarBtn.addEventListener("click", () => {
-      categoriaSelect.value = "";
-      explorarSelect.value = "";
-      renderizarCursos(cursosOriginales);
-      inicializarCarrusel();
-    });
+        let cursosFiltrados = [...cursosOriginales];
 
-    // ------------------- funcion para aplicar filtros -------------------
-    function aplicarFiltros() {
-      const categoriaSeleccionada = categoriaSelect.value;
-      const explorarSeleccionado = explorarSelect.value;
+        // filtrar por categoria
+        if (categoriaSeleccionada) {
+          cursosFiltrados = cursosFiltrados.filter(
+            (curso) => curso.categoria == categoriaSeleccionada
+          );
+        }
 
-      let cursosFiltrados = [...cursosOriginales];
-
-      // filtrar por categoria
-      if (categoriaSeleccionada) {
-        cursosFiltrados = cursosFiltrados.filter(
-          (curso) => curso.categoria == categoriaSeleccionada
-        );
-      }
-
-      // filtrar por prioridad
-      if (explorarSeleccionado === "Populares") {
-        cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
-      } else if (explorarSeleccionado === "Gratuito") {
-        cursosFiltrados = cursosFiltrados.filter(
-          (curso) => parseFloat(curso.precio) === 0
-        );
-      } else if (explorarSeleccionado === "Nuevo") {
-        cursosFiltrados.sort(
-          (a, b) =>
-            new Date(b.fecha_creacion).getTime() -
-            new Date(a.fecha_creacion).getTime()
-        );
-      } else if (explorarSeleccionado === "2") {
-        //Con costo su id es 2
-        cursosFiltrados = cursosFiltrados.filter(
-          (curso) => parseFloat(curso.precio) !== 0
-        );
-      } else if (explorarSeleccionado === "5") {
-        // esclusivo con suscripcion su id es 5
-      } else if (explorarSeleccionado === "1") {
-        cursosFiltrados = cursosFiltrados.filter(
+        // filtrar por prioridad o tipo
+        if (explorarSeleccionado === "Populares") {
+          cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
+        } else if (explorarSeleccionado === "Nuevo") {
+          cursosFiltrados.sort(
+            (a, b) =>
+              new Date(b.fecha_creacion).getTime() -
+              new Date(a.fecha_creacion).getTime()
+          );
+        } else if (explorarSeleccionado === "2") {
+          // Con costo su id es 2
+          cursosFiltrados = cursosFiltrados.filter(
+            (curso) => parseFloat(curso.precio) !== 0
+          );
+        } else if (explorarSeleccionado === "5") {
+          // exclusivo con suscripción su id es 5
+          // puedes definir una condición aquí cuando tengas la propiedad
+        } else if (explorarSeleccionado === "1") {
           // gratuito su id es 1
-          (curso) => parseFloat(curso.precio) === 0
-        );
+          cursosFiltrados = cursosFiltrados.filter(
+            (curso) => parseFloat(curso.precio) === 0
+          );
+        }
+
+        renderizarCursos(cursosFiltrados);
+        inicializarCarrusel(); 
       }
 
-      renderizarCursos(cursosFiltrados);
-      inicializarCarrusel();
-    }
+      function renderizarCursos(cursos) {
+        cursosContainer.innerHTML = "";
 
-    function renderizarCursos(cursos) {
-      cursosContainer.innerHTML = "";
+        cursos.forEach((curso) => {
+          const card = document.createElement("div");
+          card.classList.add("card");
 
-      cursos.forEach((curso) => {
-        // aca se cargan los cursos con este foreach
-        const card = document.createElement("div");
-        card.classList.add("card");
+          const img = document.createElement("img");
+          img.src = `../ASSETS/cursos/img${curso.id}.png`;
+          console.log("Ruta de la imagen:", img.src);
+          img.alt = curso.nombre;
 
-        const img = document.createElement("img");
-        img.src = `../ASSETS/cursos/img${curso.id}.png`; // aqui esta lo de la imagen + el id de la card
-        console.log("Ruta de la imagen:", img.src);
-        img.alt = curso.nombre;
+          const contenido = document.createElement("div");
+          contenido.classList.add("contenido");
 
-        const contenido = document.createElement("div");
-        contenido.classList.add("contenido");
+          const titulo = document.createElement("h4");
+          titulo.textContent = curso.nombre;
 
-        const titulo = document.createElement("h4");
-        titulo.textContent = curso.nombre;
+          const descripcion = document.createElement("p");
+          descripcion.textContent = curso.descripcion_breve;
 
-        const descripcion = document.createElement("p");
-        descripcion.textContent = curso.descripcion_breve;
+          const info = document.createElement("p");
+          info.classList.add("info");
+          info.textContent = `${curso.horas} hr | $${curso.precio} mx`;
 
-        const info = document.createElement("p");
-        info.classList.add("info");
-        info.textContent = `${curso.horas} hr | $${curso.precio} mx`;
+          contenido.appendChild(titulo);
+          contenido.appendChild(descripcion);
+          contenido.appendChild(info);
 
-        contenido.appendChild(titulo);
-        contenido.appendChild(descripcion);
-        contenido.appendChild(info);
-
-        card.appendChild(img);
-        card.appendChild(contenido);
-        cursosContainer.appendChild(card);
-      });
-    }
-
-    function inicializarCarrusel() {
-      const track = document.querySelector(".carousel-track");
-      const prevBtnOld = document.querySelector(".carousel-btn.prev");
-      const nextBtnOld = document.querySelector(".carousel-btn.next");
-
-      if (!track || !prevBtnOld || !nextBtnOld) return;
-
-      const card = track.querySelector(".card");
-      if (!card) return;
-
-      const cardWidth = card.offsetWidth + 16;
-
-      const prevButton = prevBtnOld.cloneNode(true);
-      const nextButton = nextBtnOld.cloneNode(true);
-      prevBtnOld.parentNode.replaceChild(prevButton, prevBtnOld);
-      nextBtnOld.parentNode.replaceChild(nextButton, nextBtnOld);
-
-      prevButton.addEventListener("click", () => {
-        track.scrollBy({ left: -cardWidth, behavior: "smooth" });
-      });
-
-      nextButton.addEventListener("click", () => {
-        track.scrollBy({ left: cardWidth, behavior: "smooth" });
-      });
-
-      if (window.innerWidth <= 480) {
-        prevButton.style.display = "none";
-        nextButton.style.display = "none";
-      } else {
-        prevButton.style.display = "flex";
-        nextButton.style.display = "flex";
+          card.appendChild(img);
+          card.appendChild(contenido);
+          cursosContainer.appendChild(card);
+        });
       }
-    }
-  });
+
+      function inicializarCarrusel() {
+        const track = document.querySelector(".carousel-track");
+        const prevBtn = document.querySelector(".carousel-btn.prev");
+        const nextBtn = document.querySelector(".carousel-btn.next");
+
+        if (!track || !prevBtn || !nextBtn) return;
+
+        const card = track.querySelector(".card");
+        if (!card) return;
+
+        const cardWidth = card.offsetWidth + 24; 
+
+        const prevButton = prevBtn.cloneNode(true);
+        const nextButton = nextBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(prevButton, prevBtn);
+        nextBtn.parentNode.replaceChild(nextButton, nextBtn);
+
+        prevButton.addEventListener("click", () => {
+          track.scrollBy({ left: -cardWidth, behavior: "smooth" });
+        });
+
+        nextButton.addEventListener("click", () => {
+          track.scrollBy({ left: cardWidth, behavior: "smooth" });
+        });
+
+        if (window.innerWidth <= 480) {
+          prevButton.style.display = "none";
+          nextButton.style.display = "none";
+        } else {
+          prevButton.style.display = "flex";
+          nextButton.style.display = "flex";
+        }
+      }
+    });
+  }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
