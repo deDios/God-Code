@@ -400,11 +400,15 @@ if (
 if (window.location.pathname.includes("CursoInfo.php")) {
   //apartado para recuperar los datos del curso segun su id
   document.addEventListener("DOMContentLoaded", () => {
-    // se rescata e lid del curso con la url
+    console.log("1. DOM completamente cargado - Iniciando script");
+
+    // se rescata el id del curso con la url
     const urlParams = new URLSearchParams(window.location.search);
     const cursoId = urlParams.get("id");
+    console.log("2. ID obtenido de la URL:", cursoId);
 
     if (!cursoId) {
+      console.error("3. No se encontró ID de curso en la URL");
       mostrarError("No se encontró ID de curso en la URL");
       return;
     }
@@ -419,12 +423,10 @@ if (window.location.pathname.includes("CursoInfo.php")) {
       descripcion: document.querySelector(
         "#curso .curso-contenido .texto-descriptivo"
       ),
-
       precio: document.querySelector("#curso .curso-info .precio"),
       horas: document.querySelector(
         "#curso .curso-info .detalles-lista li:first-child"
       ),
-
       tutorImg: document.querySelector("#curso-detalle-extra .instructor img"),
       tutorNombre: document.querySelector(
         "#curso-detalle-extra .instructor strong"
@@ -432,12 +434,17 @@ if (window.location.pathname.includes("CursoInfo.php")) {
       tutorBio: document.querySelector(
         "#curso-detalle-extra .instructor p:last-child"
       ),
-
       otrosCursosContainer: document.querySelector(
         "#otros-cursos .cards-cursos"
       ),
     };
 
+    console.log("4. Elementos encontrados en el DOM:");
+    Object.entries(elementos).forEach(([key, element]) => {
+      console.log(`   - ${key}:`, element ? "Encontrado" : "NO encontrado");
+    });
+
+    console.log("5. Iniciando fetch para obtener cursos...");
     fetch(
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
       {
@@ -447,15 +454,29 @@ if (window.location.pathname.includes("CursoInfo.php")) {
       }
     )
       .then((response) => {
-        if (!response.ok) throw new Error("Error al cargar cursos");
+        console.log(
+          "6. Respuesta recibida del servidor, status:",
+          response.status
+        );
+        if (!response.ok) {
+          console.error("7. Error en la respuesta:", response.statusText);
+          throw new Error("Error al cargar cursos");
+        }
         return response.json();
       })
       .then((cursos) => {
+        console.log("8. Datos de cursos recibidos:", cursos);
+
         const curso = cursos.find((c) => c.id == cursoId);
-        if (!curso) throw new Error("Curso no encontrado");
+        console.log("9. Curso encontrado con ID", cursoId, ":", curso);
 
-        console.log("Curso encontrado:", curso); // Para debugging
+        if (!curso) {
+          console.error("10. No se encontro curso con ID:", cursoId);
+          throw new Error("Curso no encontrado");
+        }
 
+        // Mostrar datos del curso
+        console.log("11. Insertando datos del curso en el DOM...");
         elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id">(ID: ${curso.id})</span>`;
         elementos.titulo.textContent = curso.nombre;
         elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
@@ -469,78 +490,99 @@ if (window.location.pathname.includes("CursoInfo.php")) {
           "es-MX",
           { minimumFractionDigits: 2 }
         )}`;
+        console.log("12. Precio formateado:", elementos.precio.textContent);
 
         elementos.horas.innerHTML = `<img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> ${curso.horas} Horas totales`;
+        console.log("13. Horas asignadas:", elementos.horas.textContent);
 
-        //datos del tutor (placeholder por ahora)
+        // Datos del tutor (placeholder)
+        console.log("14. Asignando placeholder para tutor...");
         elementos.tutorImg.src = "../ASSETS/cursoInfo/perfil_img.png";
         elementos.tutorImg.alt = "Tutor por confirmar";
         elementos.tutorNombre.textContent = "Tutor por confirmar";
         elementos.tutorBio.textContent =
           "Información del instructor disponible próximamente";
 
-        const otrosCursos = cursos.filter((c) => c.id != cursoId).slice(0, 4); // Limitar a 4 cursos
+        // Otros cursos
+        const otrosCursos = cursos.filter((c) => c.id != cursoId).slice(0, 4);
+        console.log("15. Otros cursos encontrados:", otrosCursos.length);
 
         if (otrosCursos.length > 0) {
+          console.log("16. Insertando otros cursos en el DOM...");
           elementos.otrosCursosContainer.innerHTML = otrosCursos
             .map(
               (curso) => `
-        <div class="card-curso">
-          <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre}">
-          <div class="card-contenido">
-            <a href="cursoInfo.php?id=${curso.id}">${curso.nombre}</a>
-            <p>${curso.descripcion_breve}</p>
-            <p class="horas">${curso.horas} horas</p>
-            <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
-              "es-MX",
-              { minimumFractionDigits: 2 }
-            )}</strong></p>
-          </div>
-        </div>
-      `
+                <div class="card-curso">
+                    <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
+                curso.nombre
+              }">
+                    <div class="card-contenido">
+                        <a href="cursoInfo.php?id=${curso.id}">${
+                curso.nombre
+              }</a>
+                        <p>${curso.descripcion_breve}</p>
+                        <p class="horas">${curso.horas} horas</p>
+                        <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
+                          "es-MX",
+                          { minimumFractionDigits: 2 }
+                        )}</strong></p>
+                    </div>
+                </div>
+            `
             )
             .join("");
         } else {
+          console.log("17. No hay otros cursos para mostrar");
           document.querySelector("#otros-cursos").style.display = "none";
         }
 
+        console.log("18. Inicializando acordeones...");
         inicializarAcordeones();
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error("19. Error en la carga:", error);
         mostrarError(error.message);
       });
 
     function formatearTexto(texto) {
-      return (texto || "").toString().replace(/\n/g, "<br>");
+      const textoFormateado = (texto || "").toString().replace(/\n/g, "<br>");
+      console.log("Formateando texto:", textoFormateado);
+      return textoFormateado;
     }
 
     function mostrarError(mensaje) {
+      console.error("Mostrando error al usuario:", mensaje);
       const main = document.querySelector("main");
       if (main) {
         main.innerHTML = `
-        <div class="error-message">
-          <h3>¡Ocurrió un error!</h3>
-          <p>${mensaje}</p>
-          <a href="../cursos.php" class="btn-principal">Volver a los cursos</a>
-        </div>
-      `;
+                <div class="error-message">
+                    <h3>¡Ocurrió un error!</h3>
+                    <p>${mensaje}</p>
+                    <a href="../VIEW/Blog.php" class="btn-principal">Volver a los cursos</a>
+                </div>
+            `;
       }
     }
 
     function inicializarAcordeones() {
+      console.log("Inicializando acordeones...");
       const acordeones = document.querySelectorAll(
         "#curso-detalle-extra .cabecera"
       );
+      console.log("Acordeones encontrados:", acordeones.length);
+
       acordeones.forEach((acordeon) => {
         acordeon.addEventListener("click", function () {
+          console.log("Acordeón clickeado:", this);
           const contenido = this.nextElementSibling;
           const icono = this.querySelector(".arrow-icon");
 
           if (contenido.style.display === "block") {
+            console.log("Cerrando acordeón");
             contenido.style.display = "none";
             icono.style.transform = "rotate(0deg)";
           } else {
+            console.log("Abriendo acordeón");
             contenido.style.display = "block";
             icono.style.transform = "rotate(180deg)";
           }

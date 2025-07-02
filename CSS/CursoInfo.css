@@ -377,7 +377,6 @@
     }
 }
 
-/* Estilos para el ID del curso */
 .curso-id {
     font-size: 0.8em;
     color: #666;
@@ -385,7 +384,6 @@
     margin-left: 8px;
 }
 
-/* Estilos para el mensaje de error */
 .error-message {
     text-align: center;
     padding: 2rem;
