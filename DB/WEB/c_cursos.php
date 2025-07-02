@@ -25,6 +25,13 @@ $query = "SELECT
             nombre,
             descripcion_breve,
             descripcion_curso,
+            descripcion_media,
+            actividades,
+            tipo_evaluacion,
+            calendario,
+            certificado,
+            dirigido,
+            competencias,
             tutor,
             horas,
             precio,
@@ -45,6 +52,10 @@ if ($result && $result->num_rows > 0) {
 
     while ($row = $result->fetch_assoc()) {
         $row['id'] = (int)$row['id'];
+        $row['actividades'] = (int)$row['actividades'];
+        $row['tipo_evaluacion'] = (int)$row['tipo_evaluacion'];
+        $row['calendario'] = (int)$row['calendario'];
+        $row['certificado'] = (bool)$row['certificado'];
         $row['tutor'] = (int)$row['tutor'];
         $row['horas'] = (float)$row['horas'];
         $row['precio'] = (int)$row['precio'];
