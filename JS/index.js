@@ -205,7 +205,7 @@ if (
       const limpiarBtn = document.getElementById("limpiar-filtros");
 
       let cursosOriginales = [];
-      let prioridadesData = []; 
+      let prioridadesData = [];
 
       fetch(
         "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
@@ -236,9 +236,8 @@ if (
       )
         .then((res) => res.json())
         .then((prioridades) => {
-          prioridadesData = prioridades; +
-
-          prioridades
+          prioridadesData = prioridades;
+          +prioridades
             .sort((a, b) => a.id - b.id)
             .forEach((item) => {
               const option = document.createElement("option");
@@ -291,7 +290,7 @@ if (
           cursosFiltrados = cursosFiltrados.filter(
             (curso) => curso.categoria == categoriaSeleccionada
           );
-          console.log(categoriaSeleccionada);
+          console.log(`filtro por categoria:  ${categoriaSeleccionada}`);
         }
 
         if (explorarSeleccionado) {
@@ -303,9 +302,7 @@ if (
             (p) => p.id == explorarSeleccionado
           );
           if (prioridadSeleccionada) {
-            console.log(
-              `Filtrando por prioridad: ${prioridadSeleccionada.nombre}`
-            );
+            console.log(`filtro por prioridad:  ${prioridadSeleccionada}`);
           }
         }
 
