@@ -397,10 +397,11 @@ if (
 
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 
-if (window.location.pathname.includes("CursoInfo.php")) {
+if (window.location.pathname.includes("cursoInfo.php")) {
   //apartado para recuperar los datos del curso segun su id
+  console.log("Bandera 1");
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("1. DOM completamente cargado - Iniciando script");
+    console.log("1. DOM completamente cargado");
 
     // se rescata el id del curso con la url
     const urlParams = new URLSearchParams(window.location.search);
