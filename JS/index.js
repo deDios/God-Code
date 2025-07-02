@@ -205,6 +205,7 @@ if (
       const limpiarBtn = document.getElementById("limpiar-filtros");
 
       let cursosOriginales = [];
+      let prioridadesData = []; 
 
       fetch(
         "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
@@ -235,18 +236,22 @@ if (
       )
         .then((res) => res.json())
         .then((prioridades) => {
-          prioridades.forEach((item) => {
-            const option = document.createElement("option");
-            option.value = item.id;
-            console.log(
-              "el value de esta opcion es:",
-              item.id,
-              " y su id es:",
-              item.nombre
-            );
-            option.textContent = item.nombre;
-            explorarSelect.appendChild(option);
-          });
+          prioridadesData = prioridades; +
+
+          prioridades
+            .sort((a, b) => a.id - b.id)
+            .forEach((item) => {
+              const option = document.createElement("option");
+              option.value = item.id;
+              console.log(
+                "el value de esta opcion es:",
+                item.id,
+                " y su id es:",
+                item.nombre
+              );
+              option.textContent = item.nombre;
+              explorarSelect.appendChild(option);
+            });
         })
         .catch((err) => console.error("Error al cargar prioridades:", err));
 
@@ -282,7 +287,6 @@ if (
 
         let cursosFiltrados = [...cursosOriginales];
 
-        // filtrar por categoria
         if (categoriaSeleccionada) {
           cursosFiltrados = cursosFiltrados.filter(
             (curso) => curso.categoria == categoriaSeleccionada
@@ -290,21 +294,19 @@ if (
           console.log(categoriaSeleccionada);
         }
 
-        // filtrar por prioridad o tipo
-        if (explorarSeleccionado === "2") {
-          // Con costo su id es 2
+        if (explorarSeleccionado) {
           cursosFiltrados = cursosFiltrados.filter(
-            (curso) => parseFloat(curso.precio) !== 0
+            (curso) => curso.prioridad == explorarSeleccionado
           );
-        } else if (explorarSeleccionado === "5") {
-          // exclusivo con suscripción su id es 5
-          (curso) => curso.descripcion_breve.includes("suscripción");
-          // de momento no hace nada
-        } else if (explorarSeleccionado === "1") {
-          // gratuito su id es 1
-          cursosFiltrados = cursosFiltrados.filter(
-            (curso) => parseFloat(curso.precio) === 0
+
+          const prioridadSeleccionada = prioridadesData.find(
+            (p) => p.id == explorarSeleccionado
           );
+          if (prioridadSeleccionada) {
+            console.log(
+              `Filtrando por prioridad: ${prioridadSeleccionada.nombre}`
+            );
+          }
         }
 
         renderizarCursos(cursosFiltrados);
@@ -319,12 +321,11 @@ if (
           card.classList.add("card");
 
           const cardLink = document.createElement("a");
-          cardLink.href = `../VIEW/cursoInfo.php?id=${curso.id}`; //aca lo del curso con el id de la card para pintarlo en el  titulo
+          cardLink.href = `../VIEW/cursoInfo.php?id=${curso.id}`; // redirecciona con el id de lcurso
           cardLink.classList.add("curso-link");
 
           const img = document.createElement("img");
-          img.src = `../ASSETS/cursos/img${curso.id}.png`; //aca esta lo de la imagen con id
-          console.log("Ruta de la imagen:", img.src);
+          img.src = `../ASSETS/cursos/img${curso.id}.png`;
           img.alt = curso.nombre;
 
           const contenido = document.createElement("div");
