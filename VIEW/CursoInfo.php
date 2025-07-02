@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Academia GodCode</title>
-    <link rel="stylesheet" href="../CSS/index.css" />
+    <link rel="stylesheet" href="../CSS/CursoInfo.css" />
+    <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
 <body>
@@ -144,14 +145,14 @@
                 <h2 class="titulo">Curso Administrativo</h2>
                 <p class="descripcion-corta">
                     Desarrolla habilidades clave para organizar, planificar y tomar decisiones efectivas.<br>
-                    Aprende a gestionar equipos y recursos con eficiencia en cualquier entorno empresarial.
+                    Aprende a gestionar equipos y recursos con eficiencia en cualquier entorno empresarial.(descripcion breve)
                 </p>
                 <img src="../ASSETS/cursoInfo/cursoInfo_img1.png" alt="Curso Administrativo">
 
                 <div class="texto-descriptivo">
                     <p>
                         En el entorno organizacional actual, la administración eficiente de recursos, procesos y equipos
-                        se ha convertido en una competencia esencial para el éxito de cualquier empresa...
+                        se ha convertido en una competencia esencial para el éxito de cualquier empresa...(descripcuion del curso)
                     </p>
                     <p>
                         Este curso administrativo está diseñado para brindarte una formación integral en las principales
@@ -256,7 +257,7 @@
             <div class="cards-cursos">
 
                 <div class="card-curso">
-                    <img src="../ASSETS/cursos/cursos_img1.png" alt="Curso de PHP">
+                    <img src="../ASSETS/cursos/img1.png" alt="Curso de PHP">
                     <div class="card-contenido">
                         <a href="#">Curso de PHP</a>
                         <p>Domina PHP desde cero y aprende a desarrollar sitios web dinámicos y funcionales.</p>
@@ -266,7 +267,7 @@
                 </div>
 
                 <div class="card-curso">
-                    <img src="../ASSETS/cursos/cursos_img2.png" alt="Gestión Financiera">
+                    <img src="../ASSETS/cursos/img2.png" alt="Gestión Financiera">
                     <div class="card-contenido">
                         <a href="#">Curso de Gestión Financiera</a>
                         <p>Adquiere herramientas clave para tomar decisiones financieras acertadas y mejorar tu salud
@@ -277,7 +278,7 @@
                 </div>
 
                 <div class="card-curso">
-                    <img src="../ASSETS/cursos/cursos_img3.png" alt="Curso de Economía">
+                    <img src="../ASSETS/cursos/img3.png" alt="Curso de Economía">
                     <div class="card-contenido">
                         <a href="#">Curso de Economía</a>
                         <p>Comprende cómo funcionan los mercados y cómo se toman decisiones económicas en empresas y
@@ -288,7 +289,7 @@
                 </div>
 
                 <div class="card-curso">
-                    <img src="../ASSETS/cursos/cursos_img4.png" alt="Curso de Contaduría">
+                    <img src="../ASSETS/cursos/img4.png" alt="Curso de Contaduría">
                     <div class="card-contenido">
                         <a href="#">Curso de Contaduría</a>
                         <p>Aprende a registrar, analizar y comunicar información financiera con precisión.</p>

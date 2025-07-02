@@ -287,26 +287,18 @@ if (
           cursosFiltrados = cursosFiltrados.filter(
             (curso) => curso.categoria == categoriaSeleccionada
           );
+          console.log(categoriaSeleccionada);
         }
 
         // filtrar por prioridad o tipo
-        if (explorarSeleccionado === "Populares") {
-          //no esta dado de alta pero por si acaso aqui esta
-          cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
-        } else if (explorarSeleccionado === "Nuevo") {
-          //no esta dado de alta pero por si acaso aqui esta
-          cursosFiltrados.sort(
-            (a, b) =>
-              new Date(b.fecha_creacion).getTime() -
-              new Date(a.fecha_creacion).getTime()
-          );
-        } else if (explorarSeleccionado === "2") {
+        if (explorarSeleccionado === "2") {
           // Con costo su id es 2
           cursosFiltrados = cursosFiltrados.filter(
             (curso) => parseFloat(curso.precio) !== 0
           );
         } else if (explorarSeleccionado === "5") {
           // exclusivo con suscripción su id es 5
+          (curso) => curso.descripcion_breve.includes("suscripción");
           // de momento no hace nada
         } else if (explorarSeleccionado === "1") {
           // gratuito su id es 1
