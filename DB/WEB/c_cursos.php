@@ -8,13 +8,16 @@ if ($path && file_exists($path)) {
     die(json_encode(["error" => "No se encontró Conexion.php en la ruta $path"]));
 }
 
+// Obtener datos JSON del cuerpo de la solicitud
 $input = json_decode(file_get_contents("php://input"), true);
 
+// Validar parámetro obligatorio
 if (!isset($input['estatus'])) {
     die(json_encode(["error" => "El parámetro 'estatus' es obligatorio en el cuerpo JSON (ej. { \"estatus\": 1 })"]));
 }
 $estatus = (int)$input['estatus'];
 
+// Conexión a la base de datos
 $con = conectar();
 if (!$con) {
     die(json_encode(["error" => "No se pudo conectar a la base de datos"]));
@@ -39,6 +42,7 @@ $query = "SELECT
             creado_por,
             fecha_creacion,
             fecha_modif,
+            fecha_inicio,
             categoria,
             prioridad
           FROM god_code.GC_Cursos
@@ -47,6 +51,7 @@ $query = "SELECT
 
 $result = mysqli_query($con, $query);
 
+// Procesar resultados
 if ($result && $result->num_rows > 0) {
     $data = [];
 
@@ -65,6 +70,7 @@ if ($result && $result->num_rows > 0) {
         $row['prioridad'] = (int)$row['prioridad'];
         $row['fecha_creacion'] = $row['fecha_creacion'];
         $row['fecha_modif'] = $row['fecha_modif'];
+        $row['fecha_inicio'] = $row['fecha_inicio']; 
         $data[] = $row;
     }
 
@@ -73,5 +79,6 @@ if ($result && $result->num_rows > 0) {
     echo json_encode(["mensaje" => "No se encontraron cursos con estatus = $estatus"]);
 }
 
+// Cerrar conexión
 $con->close();
 ?>
