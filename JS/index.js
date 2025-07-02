@@ -398,6 +398,157 @@ if (
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 
 if (window.location.pathname.includes("CursoInfo.php")) {
+  //apartado para recuperar los datos del curso segun su id
+  document.addEventListener("DOMContentLoaded", () => {
+    // se rescata e lid del curso con la url
+    const urlParams = new URLSearchParams(window.location.search);
+    const cursoId = urlParams.get("id");
+
+    if (!cursoId) {
+      mostrarError("No se encontró ID de curso en la URL");
+      return;
+    }
+
+    const elementos = {
+      nombre: document.querySelector("#curso .curso-contenido h4"),
+      titulo: document.querySelector("#curso .curso-contenido .titulo"),
+      descCorta: document.querySelector(
+        "#curso .curso-contenido .descripcion-corta"
+      ),
+      imagen: document.querySelector("#curso .curso-contenido img"),
+      descripcion: document.querySelector(
+        "#curso .curso-contenido .texto-descriptivo"
+      ),
+
+      precio: document.querySelector("#curso .curso-info .precio"),
+      horas: document.querySelector(
+        "#curso .curso-info .detalles-lista li:first-child"
+      ),
+
+      tutorImg: document.querySelector("#curso-detalle-extra .instructor img"),
+      tutorNombre: document.querySelector(
+        "#curso-detalle-extra .instructor strong"
+      ),
+      tutorBio: document.querySelector(
+        "#curso-detalle-extra .instructor p:last-child"
+      ),
+
+      otrosCursosContainer: document.querySelector(
+        "#otros-cursos .cards-cursos"
+      ),
+    };
+
+    fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estatus: 1 }),
+      }
+    )
+      .then((response) => {
+        if (!response.ok) throw new Error("Error al cargar cursos");
+        return response.json();
+      })
+      .then((cursos) => {
+        const curso = cursos.find((c) => c.id == cursoId);
+        if (!curso) throw new Error("Curso no encontrado");
+
+        console.log("Curso encontrado:", curso); // Para debugging
+
+        elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id">(ID: ${curso.id})</span>`;
+        elementos.titulo.textContent = curso.nombre;
+        elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
+        elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
+        elementos.imagen.alt = curso.nombre;
+        elementos.descripcion.innerHTML = formatearTexto(
+          curso.descripcion_curso
+        );
+
+        elementos.precio.textContent = `$${curso.precio.toLocaleString(
+          "es-MX",
+          { minimumFractionDigits: 2 }
+        )}`;
+
+        elementos.horas.innerHTML = `<img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> ${curso.horas} Horas totales`;
+
+        //datos del tutor (placeholder por ahora)
+        elementos.tutorImg.src = "../ASSETS/cursoInfo/perfil_img.png";
+        elementos.tutorImg.alt = "Tutor por confirmar";
+        elementos.tutorNombre.textContent = "Tutor por confirmar";
+        elementos.tutorBio.textContent =
+          "Información del instructor disponible próximamente";
+
+        const otrosCursos = cursos.filter((c) => c.id != cursoId).slice(0, 4); // Limitar a 4 cursos
+
+        if (otrosCursos.length > 0) {
+          elementos.otrosCursosContainer.innerHTML = otrosCursos
+            .map(
+              (curso) => `
+        <div class="card-curso">
+          <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre}">
+          <div class="card-contenido">
+            <a href="cursoInfo.php?id=${curso.id}">${curso.nombre}</a>
+            <p>${curso.descripcion_breve}</p>
+            <p class="horas">${curso.horas} horas</p>
+            <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
+              "es-MX",
+              { minimumFractionDigits: 2 }
+            )}</strong></p>
+          </div>
+        </div>
+      `
+            )
+            .join("");
+        } else {
+          document.querySelector("#otros-cursos").style.display = "none";
+        }
+
+        inicializarAcordeones();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        mostrarError(error.message);
+      });
+
+    function formatearTexto(texto) {
+      return (texto || "").toString().replace(/\n/g, "<br>");
+    }
+
+    function mostrarError(mensaje) {
+      const main = document.querySelector("main");
+      if (main) {
+        main.innerHTML = `
+        <div class="error-message">
+          <h3>¡Ocurrió un error!</h3>
+          <p>${mensaje}</p>
+          <a href="../cursos.php" class="btn-principal">Volver a los cursos</a>
+        </div>
+      `;
+      }
+    }
+
+    function inicializarAcordeones() {
+      const acordeones = document.querySelectorAll(
+        "#curso-detalle-extra .cabecera"
+      );
+      acordeones.forEach((acordeon) => {
+        acordeon.addEventListener("click", function () {
+          const contenido = this.nextElementSibling;
+          const icono = this.querySelector(".arrow-icon");
+
+          if (contenido.style.display === "block") {
+            contenido.style.display = "none";
+            icono.style.transform = "rotate(0deg)";
+          } else {
+            contenido.style.display = "block";
+            icono.style.transform = "rotate(180deg)";
+          }
+        });
+      });
+    }
+  });
+
   function toggleAcordeon(header) {
     const item = header.parentElement;
     const contenido = item.querySelector(".contenido");

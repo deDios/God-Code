@@ -376,3 +376,80 @@
         max-width: 350px;
     }
 }
+
+/* Estilos para el ID del curso */
+.curso-id {
+    font-size: 0.8em;
+    color: #666;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+/* Estilos para el mensaje de error */
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+.error-message h3 {
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.btn-principal {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #1a73e8;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-principal:hover {
+    background: #0d5bba;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#curso-detalle-extra .contenido {
+    display: none;
+    padding: 0.5rem 0;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#otros-cursos .card-curso {
+    transition: all 0.3s ease;
+}
+
+#otros-cursos .card-curso:hover {
+    transform: translateY(-5px) scale(1.02);
+}
+
+#otros-cursos .card-contenido a {
+    transition: color 0.2s ease;
+}
+
+#otros-cursos .card-contenido a:hover {
+    color: #0d5bba;
+    text-decoration: underline;
+}
