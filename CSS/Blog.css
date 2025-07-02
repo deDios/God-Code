@@ -487,3 +487,37 @@
         padding: 1rem 0.5rem;
     }
 }
+
+.curso-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    flex: 0 0 calc((100% - 3 * 2rem) / 4);
+    max-width: 280px;
+}
+
+.curso-link:hover .card {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 1024px) {
+    .curso-link {
+        flex: 0 0 48%;
+        max-width: 48%;
+    }
+}
+
+@media (max-width: 768px) {
+    .curso-link {
+        flex: 0 0 80%;
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 480px) {
+    .curso-link {
+        flex: 0 0 90%;
+        max-width: 90%;
+    }
+}

@@ -291,8 +291,10 @@ if (
 
         // filtrar por prioridad o tipo
         if (explorarSeleccionado === "Populares") {
+          //no esta dado de alta pero por si acaso aqui esta
           cursosFiltrados.sort((a, b) => b.prioridad - a.prioridad);
         } else if (explorarSeleccionado === "Nuevo") {
+          //no esta dado de alta pero por si acaso aqui esta
           cursosFiltrados.sort(
             (a, b) =>
               new Date(b.fecha_creacion).getTime() -
@@ -324,8 +326,12 @@ if (
           const card = document.createElement("div");
           card.classList.add("card");
 
+          const cardLink = document.createElement("a");
+          cardLink.href = `../VIEW/cursoInfo.php?id=${curso.id}`; //aca lo del curso con el id de la card para pintarlo en el  titulo
+          cardLink.classList.add("curso-link");
+
           const img = document.createElement("img");
-          img.src = `../ASSETS/cursos/img${curso.id}.png`;
+          img.src = `../ASSETS/cursos/img${curso.id}.png`; //aca esta lo de la imagen con id
           console.log("Ruta de la imagen:", img.src);
           img.alt = curso.nombre;
 
@@ -348,7 +354,9 @@ if (
 
           card.appendChild(img);
           card.appendChild(contenido);
-          cursosContainer.appendChild(card);
+
+          cardLink.appendChild(card);
+          cursosContainer.appendChild(cardLink);
         });
       }
 
@@ -394,9 +402,32 @@ if (
         }
       }
     });
-
-    
   }
+}
+
+//------------------------------- vista CursoInfo -------------------------------------------------------------
+
+if (window.location.pathname.includes("CursoInfo.php")) {
+  function toggleAcordeon(header) {
+    const item = header.parentElement;
+    const contenido = item.querySelector(".contenido");
+    const isOpen = contenido.style.display === "block";
+
+    // Cerrar todos si deseas modo exclusivoMore actions
+    document
+      .querySelectorAll("#curso-detalle-extra .contenido")
+      .forEach((el) => (el.style.display = "none"));
+    document
+      .querySelectorAll("#curso-detalle-extra .cabecera")
+      .forEach((el) => el.classList.remove("abierto"));
+
+    if (!isOpen) {
+      contenido.style.display = "block";
+      header.classList.add("abierto");
+    }
+  }
+
+  const id = new URLSearchParams(window.location.search).get("id");
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -677,8 +708,8 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       .then((res) => res.json())
       .then((data) => {
         cursos = data;
-        renderizarCursos(cursos); 
-        inicializarCarrusel(); 
+        renderizarCursos(cursos);
+        inicializarCarrusel();
       })
       .catch((err) => console.error("Error al cargar cursos:", err));
 
@@ -743,7 +774,7 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       });
 
       function updateCarousel() {
-        track.style.transition = "transform 0.4s ease"; 
+        track.style.transition = "transform 0.4s ease";
         track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
         actualizarBotones();
       }
@@ -776,7 +807,7 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
         updateCarousel();
       });
 
-      updateCarousel(); 
+      updateCarousel();
     }
   });
 }

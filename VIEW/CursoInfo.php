@@ -9,7 +9,7 @@
 </head>
 
 <body>
-     <!-- Tope de pagina -->
+    <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
@@ -54,35 +54,47 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
-            <div class="nav-item has-megamenu" id="submenu-productos">
+            <a href="../index.php">Inicio</a>
+            <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
                         <ul>
-                            <li><a href="../VIEW/DesarrolloWeb.php"><img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a></li>
-                            <li><a href="../VIEW/DesarrolloMobile.php"><img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo Mobile</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloNearshore.png">Desarrollo
-                                    Nearshore</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DesarrolloOffshore.png" alt="Offshore">Desarrollo Offshore</a>
+                            <li><a href="../VIEW/DesarrolloWeb.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Web">Desarrollo Web</a>
                             </li>
+                            <li><a href="../VIEW/DesarrolloMobile.php"><img
+                                        src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Mobile">Desarrollo
+                                    Mobile</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Servicios</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios en la Nube</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="UX/UI">Diseño UX/UI</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio educativo</a></li>
+                            <li><a href="../VIEW/ServiciosEnLaNube.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Nube">Servicios
+                                    en la Nube</a></li>
+                            <li><a href="../VIEW/DisenoUXUI.php"><img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png"
+                                        alt="UX/UI">Diseño UX/UI</a>
+                            </li>
+                            <li><a href="../VIEW/ServicioEducativo.php"><img
+                                        src="../ASSETS/ProductosPopUp/ServicioEducativo.png">Servicio
+                                    educativo</a></li>
                         </ul>
                     </div>
                     <div class="col">
                         <h4>Industrias</h4>
                         <ul>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">Tecnología</a></li>
-                            <li><a href="#"><img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a></li>
+                            <li><a href="../VIEW/IndustriaEducacion.php"><img
+                                        src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">Educación</a>
+                            </li>
+                            <li><a href="../VIEW/IndustriaTecnologia.php"><img
+                                        src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">Tecnología</a>
+                            </li>
+                            <li><a href="../VIEW/IndustriaFinanciera.php"><img
+                                        src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">Finanzas</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col tecnologias full-width">
@@ -91,13 +103,19 @@
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Azure.png" alt="Azure"> Azure</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Php.png" alt="PHP"> PHP</span>
                             <span><img src="../ASSETS/ProductosPopUp/Tecnologias/Kotlin.png" alt="Kotlin"> Kotlin</span>
-                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI"> SwiftUI</span>
+                            <span><img src="../ASSETS/ProductosPopUp/Tecnologias/SwiftUI.png" alt="SwiftUI">
+                                SwiftUI</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="nav-item mobile-only">
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
+            </div>
+
             <a href="../VIEW/Nosotros.php">Nosotros</a>
-            <a href="../VIEW/Blog.php">Blog</a>
+            <a href="../VIEW/Blog.php" class="active">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">
@@ -115,9 +133,14 @@
 
     <main>
         <!-- seccion 1 -->
+        <?php
+        $curso_id = isset($_GET['id']) ? $_GET['id'] : null;
+        ?>
         <section id="curso" class="curso-detalle">
             <div class="curso-contenido">
-                <h4>Habilidades Financieras</h4>
+                <h4>Habilidades Financieras
+                    <?php echo $curso_id ? '<span class="curso-id">(el ID del curso es: ' . htmlspecialchars($curso_id) . '</span>' : ''; ?>
+                </h4>
                 <h2 class="titulo">Curso Administrativo</h2>
                 <p class="descripcion-corta">
                     Desarrolla habilidades clave para organizar, planificar y tomar decisiones efectivas.<br>
