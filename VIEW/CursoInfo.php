@@ -133,14 +133,11 @@
     </header>
 
     <main>
-        <?php $curso_id = isset($_GET['id']) ? $_GET['id'] : null; ?>
-
         <!-- Sección 1 -->
         <section id="curso" class="curso-detalle">
             <div class="curso-contenido">
                 <h4>
                     Habilidades Financieras
-                    <?php echo $curso_id ? '<span class="curso-id">(el ID del curso es: ' . htmlspecialchars($curso_id) . ')</span>' : ''; ?>
                 </h4>
                 <h2 class="titulo">Curso Administrativo</h2>
 
@@ -174,7 +171,7 @@
             <aside class="curso-info">
                 <div class="info-box">
                     <p class="pregunta">¿Tienes alguna duda?<br><strong>No dudes en contactarnos.</strong></p>
-                    <button class="btn-secundario">Solicita más información</button>
+                    <button class="btn-secundario-centrado">Solicita más información</button>
                 </div>
 
                 <div class="precio-box">

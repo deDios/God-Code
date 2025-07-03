@@ -522,9 +522,9 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
       elementos.imagen.alt = curso.nombre;
       elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
-      //elementos.fechaInicio.textContent = `Inicia: ${formatearFecha(
-      //  curso.fecha_inicio
-      //)}`;
+      elementos.fechaInicio.textContent = `Inicia: ${formatearFecha(
+        curso.fecha_inicio
+      )}`;
       elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", {
         minimumFractionDigits: 2,
       })}`;
@@ -542,7 +542,10 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       }
 
       if (calendario) {
-        elementos.calendario.innerHTML = `<img src="../ASSETS/cursoInfo/icono-horarios.png" alt=""> ${calendario.nombre}`;
+        const fechaFormateada = formatearFecha(curso.fecha_inicio);
+        elementos.calendario.innerHTML = `
+    <img src="../ASSETS/cursoInfo/icono-horarios.png" alt=""> Inicia: ${fechaFormateada} (${calendario.nombre})
+  `;
       }
 
       if (tutor) {
@@ -630,11 +633,11 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       return (texto || "").toString().replace(/\n/g, "<br>");
     }
 
-    //function formatearFecha(fecha) {
-    //  if (!fecha) return "Por definir";
-    //  const opciones = { year: "numeric", month: "long", day: "numeric" };
-    //  return new Date(fecha).toLocaleDateString("es-MX", opciones);
-    //}
+    function formatearFecha(fecha) {
+      if (!fecha) return "Por definir";
+      const opciones = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(fecha).toLocaleDateString("es-MX", opciones);
+    }
 
     function mostrarError(mensaje) {
       const main = document.querySelector("main");

@@ -58,6 +58,7 @@
 #curso .pregunta {
     font-size: 1rem;
     margin-bottom: 1rem;
+    text-align: center;
 }
 
 #curso .btn-secundario,
@@ -69,6 +70,20 @@
     border-radius: 50px;
     cursor: pointer;
     transition: background 0.3s ease;
+}
+
+#curso .btn-secundario-centrado,
+#curso .btn-principal-centrado {
+    background-color: #1a73e8;
+    color: white;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: block;
+    margin: 2rem auto;
+    text-align: center;
 }
 
 #curso .btn-secundario:hover,
