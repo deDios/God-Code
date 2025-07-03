@@ -223,6 +223,7 @@ if (
             option.textContent = cat.nombre;
             categoriaSelect.appendChild(option);
           });
+          console.log("el id de la categoria es: ", cat.nombre, " y su nombre es", cat.nombre);
         })
         .catch((err) => console.error("Error al cargar categorías:", err));
 
@@ -243,9 +244,9 @@ if (
               const option = document.createElement("option");
               option.value = item.id;
               console.log(
-                "el value de esta opcion es:",
+                "el id de esta opcion es:",
                 item.id,
-                " y su id es:",
+                " y su nombre es:",
                 item.nombre
               );
               option.textContent = item.nombre;
