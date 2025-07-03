@@ -72,6 +72,14 @@
     transition: background 0.3s ease;
 }
 
+.info-curso-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
 #curso .btn-secundario-centrado,
 #curso .btn-principal-centrado {
     background-color: #1a73e8;

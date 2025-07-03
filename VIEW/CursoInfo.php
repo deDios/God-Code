@@ -175,9 +175,11 @@
                 </div>
 
                 <div class="precio-box">
-                    <p class="precio">$300</p>
-                    <small>Curso más libre acceso a la zona común</small>
-                    <button class="btn-principal">Inscribirme al curso</button>
+                    <div class="info-curso-vertical">
+                        <p class="precio">$300</p>
+                        <small>Curso más libre acceso a la zona común</small>
+                        <button class="btn-principal">Inscribirme al curso</button>
+                    </div>
 
                     <ul class="detalles-lista">
                         <li><img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> <span class="horas">2 Horas al

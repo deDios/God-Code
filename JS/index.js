@@ -480,7 +480,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
 
       // cargar curso en DOM
       console.log("9. Actualizando DOM con datos del curso...");
-      elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id">(ID: ${curso.id})</span>`;
+      elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id"></span>`;
       elementos.titulo.textContent = curso.nombre;
       elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
       elementos.descMedia.innerHTML = formatearTexto(curso.descripcion_media);
