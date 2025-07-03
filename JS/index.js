@@ -427,7 +427,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       descripcion: document.querySelector(
         "#curso .curso-contenido .texto-descriptivo"
       ),
-      fechaInicio: document.querySelector("#curso .fecha-inicio"),
+      //fechaInicio: document.querySelector("#curso .fecha-inicio"),
 
       precio: document.querySelector("#curso .curso-info .precio"),
       horas: document.querySelector(
