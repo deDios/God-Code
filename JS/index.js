@@ -336,7 +336,8 @@ if (
 
           const info = document.createElement("p");
           info.classList.add("info");
-          info.textContent = `${curso.horas} hr | $${curso.precio} mx`;
+          const precioTexto = curso.precio == 0 ? "Gratuito" : `$${curso.precio} mx`;
+          info.textContent = `${curso.horas} hr | ${precioTexto}`;
 
           contenido.appendChild(titulo);
           contenido.appendChild(descripcion);
@@ -480,14 +481,19 @@ if (window.location.pathname.includes("cursoInfo.php")) {
 
       // cargar curso en DOM
       console.log("9. Actualizando DOM con datos del curso...");
-      elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id"></span>`;
+      elementos.nombre.innerHTML = ``; //este es un espacio vacio para pruebas
       elementos.titulo.textContent = curso.nombre;
       elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
       elementos.descMedia.innerHTML = formatearTexto(curso.descripcion_media);
       elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
       elementos.imagen.alt = curso.nombre;
       elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
-      elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+      elementos.precio.textContent =
+        curso.precio == 0
+          ? "Gratuito"
+          : `$${curso.precio.toLocaleString("es-MX", {
+            minimumFractionDigits: 2,
+          })}`;
 
       elementos.horas.textContent = `${curso.horas} Horas totales`;
       elementos.actividades.textContent = actividades.nombre;
@@ -590,26 +596,24 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       `;
       }
     }
-
-    function inicializarAcordeones() {
-      const acordeones = document.querySelectorAll("#curso-detalle-extra .cabecera");
-      acordeones.forEach((acordeon) => {
-        acordeon.addEventListener("click", function () {
-          const contenido = this.nextElementSibling;
-          const icono = this.querySelector(".arrow-icon");
-
-          if (contenido.style.display === "block") {
-            contenido.style.display = "none";
-            icono.style.transform = "rotate(0deg)";
-          } else {
-            contenido.style.display = "block";
-            icono.style.transform = "rotate(180deg)";
-          }
-        });
-      });
-    }
   });
+  function inicializarAcordeones() {
+    const acordeones = document.querySelectorAll("#curso-detalle-extra .cabecera");
+    acordeones.forEach((acordeon) => {
+      acordeon.addEventListener("click", function () {
+        const contenido = this.nextElementSibling;
+        const icono = this.querySelector(".arrow-icon");
 
+        if (contenido.style.display === "block") {
+          contenido.style.display = "none";
+          icono.style.transform = "rotate(0deg)";
+        } else {
+          contenido.style.display = "block";
+          icono.style.transform = "rotate(180deg)";
+        }
+      });
+    });
+  }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
