@@ -512,13 +512,10 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
       elementos.imagen.alt = curso.nombre;
       elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
-      elementos.fechaInicio.textContent = `Inicia: ${formatearFecha(
-        curso.fecha_inicio
-      )}`;
       elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", {
         minimumFractionDigits: 2,
       })}`;
-      
+
       elementos.horas.textContent = `${curso.horas} Horas totales`;
       elementos.actividades.textContent = actividades.nombre;
       elementos.evaluacion.textContent = tipoEvaluacion.nombre;
