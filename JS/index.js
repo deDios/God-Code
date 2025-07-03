@@ -222,8 +222,8 @@ if (
             option.value = cat.id;
             option.textContent = cat.nombre;
             categoriaSelect.appendChild(option);
+            console.log("el id de la categoria es: ", cat.nombre, " y su nombre es", cat.nombre);
           });
-          console.log("el id de la categoria es: ", cat.nombre, " y su nombre es", cat.nombre);
         })
         .catch((err) => console.error("Error al cargar categorías:", err));
 
