@@ -414,20 +414,13 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     }
 
     const elementos = {
-      // aca se arma el curso
       nombre: document.querySelector("#curso .curso-contenido h4"),
       titulo: document.querySelector("#curso .curso-contenido .titulo"),
-      descCorta: document.querySelector(
-        "#curso .curso-contenido .descripcion-corta"
-      ),
-      descMedia: document.querySelector(
-        "#curso .curso-contenido .descripcion-media"
-      ),
+      descCorta: document.querySelector("#curso .curso-contenido .descripcion-corta"),
+      descMedia: document.querySelector("#curso .curso-contenido .descripcion-media"),
       imagen: document.querySelector("#curso .curso-contenido img"),
-      descripcion: document.querySelector(
-        "#curso .curso-contenido .texto-descriptivo"
-      ),//aca se carga la fecha inicio pero no supe donde colocarla
-      fechaInicio: document.querySelector("#curso .fecha-inicio"),
+      descripcion: document.querySelector("#curso .curso-contenido .texto-descriptivo"),
+      fechaInicio: document.querySelector("#curso .fecha-inicio"), // si decides usarlo
 
       precio: document.querySelector("#curso .curso-info .precio"),
       horas: document.querySelector("#curso .curso-info .horas"),
@@ -437,22 +430,12 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       certificado: document.querySelector("#curso .curso-info .certificado"),
 
       tutorImg: document.querySelector("#curso-detalle-extra .instructor img"),
-      tutorNombre: document.querySelector(
-        "#curso-detalle-extra .instructor strong"
-      ),
-      tutorBio: document.querySelector(
-        "#curso-detalle-extra .instructor p:last-child"
-      ),
-      dirigido: document.querySelector(
-        "#curso-detalle-extra .dirigido .contenido p"
-      ),
-      competencias: document.querySelector(
-        "#curso-detalle-extra .competencias .contenido p"
-      ),
+      tutorNombre: document.querySelector("#curso-detalle-extra .instructor strong"),
+      tutorBio: document.querySelector("#curso-detalle-extra .instructor p:last-child"),
+      dirigido: document.querySelector("#curso-detalle-extra .dirigido .contenido p"),
+      competencias: document.querySelector("#curso-detalle-extra .competencias .contenido p"),
 
-      otrosCursosContainer: document.querySelector(
-        "#otros-cursos .cards-cursos"
-      ),
+      otrosCursosContainer: document.querySelector("#otros-cursos .cards-cursos"),
       otrosCursosSection: document.querySelector("#otros-cursos"),
     };
 
@@ -472,38 +455,30 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       if (!curso) throw new Error("Curso no encontrado");
       console.log("6. Curso encontrado:", curso);
 
-      // carga los demas cursos
+      // carga los demas cursos relacionados
       console.log("7. Cargando datos relacionados...");
-      const [tutor, actividades, tipoEvaluacion, calendario] =
-        await Promise.all([
-          fetchData(
-            "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
-            { estatus: 1 }
-          ).then((tutores) => tutores.find((t) => t.id == curso.tutor)),
-          fetchData(
-            "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
-            { estatus: 1 }
-          ).then((acts) => acts.find((a) => a.id == curso.actividades)),
-          fetchData(
-            "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
-            { estatus: 1 }
-          ).then((evaluaciones) =>
-            evaluaciones.find((e) => e.id == curso.tipo_evaluacion)
-          ),
-          fetchData(
-            "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
-            { estatus: 1 }
-          ).then((dias) => dias.find((d) => d.id == curso.calendario)),
-        ]);
+      const [tutor, actividades, tipoEvaluacion, calendario] = await Promise.all([
+        fetchData(
+          "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
+          { estatus: 1 }
+        ).then((tutores) => tutores.find((t) => t.id == curso.tutor)),
+        fetchData(
+          "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+          { estatus: 1 }
+        ).then((acts) => acts.find((a) => a.id == curso.actividades)),
+        fetchData(
+          "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
+          { estatus: 1 }
+        ).then((evaluaciones) => evaluaciones.find((e) => e.id == curso.tipo_evaluacion)),
+        fetchData(
+          "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
+          { estatus: 1 }
+        ).then((dias) => dias.find((d) => d.id == curso.calendario)),
+      ]);
 
-      console.log("8. Datos relacionados cargados:", {
-        tutor,
-        actividades,
-        tipoEvaluacion,
-        calendario,
-      });
+      console.log("8. Datos relacionados cargados:", { tutor, actividades, tipoEvaluacion, calendario });
 
-      // cargar curso
+      // cargar curso en DOM
       console.log("9. Actualizando DOM con datos del curso...");
       elementos.nombre.innerHTML = `${curso.nombre} <span class="curso-id">(ID: ${curso.id})</span>`;
       elementos.titulo.textContent = curso.nombre;
@@ -512,68 +487,58 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
       elementos.imagen.alt = curso.nombre;
       elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
-      elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", {
-        minimumFractionDigits: 2,
-      })}`;
+      elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
 
       elementos.horas.textContent = `${curso.horas} Horas totales`;
       elementos.actividades.textContent = actividades.nombre;
       elementos.evaluacion.textContent = tipoEvaluacion.nombre;
+
+      const fechaFormateada = formatearFecha(curso.fecha_inicio);
       elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
+
       elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"}`;
 
       if (tutor) {
-        // se carga la imagen con el id del tutor concatenado
         elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
         elementos.tutorImg.alt = "../ASSETS/tutor/tutor_noEncontrado.png";
         elementos.tutorImg.onerror = function () {
-          // si no se encuentra la imagen se carga una por defecto
           console.log("error al cargar imagen de tutor");
           this.src = "../ASSETS/tutor/tutor_noEncontrado.png";
         };
         elementos.tutorNombre.textContent = tutor.nombre;
-        elementos.tutorBio.textContent =
-          tutor.biografia || "Experto en su campo";
+        elementos.tutorBio.textContent = tutor.biografia || "Experto en su campo";
       }
 
       elementos.dirigido.textContent = curso.dirigido;
       elementos.competencias.textContent = curso.competencias;
 
-      // carga cursos de la misma categoria
+      // cargar cursos de la misma categoria
       console.log("10. Cargando otros cursos de la misma categoría...");
       const todosCursos = await fetchData(
         "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
         { estatus: 1 }
       );
 
-      // filtra cursos de la misma categoria (menos el actual)
       const otrosCursos = todosCursos
         .filter((c) => c.categoria == curso.categoria && c.id != cursoId)
-        .slice(0, 4); // muestra 4 cursos a la vez
+        .slice(0, 4);
 
-      console.log(
-        `11. Encontrados ${otrosCursos.length} cursos de la categoría ${curso.categoria}`
-      );
+      console.log(`11. Encontrados ${otrosCursos.length} cursos de la categoría ${curso.categoria}`);
 
       if (otrosCursos.length > 0) {
         elementos.otrosCursosContainer.innerHTML = otrosCursos
           .map(
             (curso) => `
-                <div class="card-curso">
-                    <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
-              }">
-                    <div class="card-contenido">
-                        <a href="cursoInfo.php?id=${curso.id}">${curso.nombre
-              }</a>
-                        <p>${curso.descripcion_breve}</p>
-                        <p class="horas">${curso.horas} horas</p>
-                        <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
-                "es-MX",
-                { minimumFractionDigits: 2 }
-              )}</strong></p>
-                    </div>
-                </div>
-            `
+            <div class="card-curso">
+              <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre}">
+              <div class="card-contenido">
+                <a href="cursoInfo.php?id=${curso.id}">${curso.nombre}</a>
+                <p>${curso.descripcion_breve}</p>
+                <p class="horas">${curso.horas} horas</p>
+                <p class="precio">Precio: <strong>$${curso.precio.toLocaleString("es-MX", { minimumFractionDigits: 2 })}</strong></p>
+              </div>
+            </div>
+          `
           )
           .join("");
       } else {
@@ -617,19 +582,17 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       const main = document.querySelector("main");
       if (main) {
         main.innerHTML = `
-                <div class="error-message">
-                    <h3>¡Ocurrió un error!</h3>
-                    <p>${mensaje}</p>
-                    <a href="../VIEW/Blog.php" class="btn-principal">Volver a los cursos</a>
-                </div>
-            `;
+        <div class="error-message">
+          <h3>¡Ocurrió un error!</h3>
+          <p>${mensaje}</p>
+          <a href="../VIEW/Blog.php" class="btn-principal">Volver a los cursos</a>
+        </div>
+      `;
       }
     }
 
     function inicializarAcordeones() {
-      const acordeones = document.querySelectorAll(
-        "#curso-detalle-extra .cabecera"
-      );
+      const acordeones = document.querySelectorAll("#curso-detalle-extra .cabecera");
       acordeones.forEach((acordeon) => {
         acordeon.addEventListener("click", function () {
           const contenido = this.nextElementSibling;
@@ -646,6 +609,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       });
     }
   });
+
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
