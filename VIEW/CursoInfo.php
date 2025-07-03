@@ -204,7 +204,7 @@
             <div class="acordeon-box">
 
                 <div class="item">
-                    <div class="cabecera" onclick="toggleAcordeon(this)">
+                    <div class="cabecera">
                         <h4>Impartido por</h4>
                         <button class="arrow-btn" aria-label="Mostrar/Ocultar sección">
                             <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -224,7 +224,7 @@
                 </div>
 
                 <div class="item dirigido">
-                    <div class="cabecera" onclick="toggleAcordeon(this)">
+                    <div class="cabecera">
                         <h4>Dirigido a</h4>
                         <button class="arrow-btn" aria-label="Mostrar/Ocultar sección">
                             <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -242,7 +242,7 @@
                 </div>
 
                 <div class="item competencias">
-                    <div class="cabecera" onclick="toggleAcordeon(this)">
+                    <div class="cabecera">
                         <h4>¿Qué competencias vas a adquirir?</h4>
                         <button class="arrow-btn" aria-label="Mostrar/Ocultar sección">
                             <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

@@ -597,6 +597,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       }
     }
   });
+
   function inicializarAcordeones() {
     const acordeones = document.querySelectorAll("#curso-detalle-extra .cabecera");
     acordeones.forEach((acordeon) => {
@@ -614,6 +615,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       });
     });
   }
+  
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
