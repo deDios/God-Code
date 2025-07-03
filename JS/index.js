@@ -426,8 +426,8 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       imagen: document.querySelector("#curso .curso-contenido img"),
       descripcion: document.querySelector(
         "#curso .curso-contenido .texto-descriptivo"
-      ),
-      //fechaInicio: document.querySelector("#curso .fecha-inicio"),
+      ),//aca se carga la fecha inicio pero no supe donde colocarla
+      fechaInicio: document.querySelector("#curso .fecha-inicio"),
 
       precio: document.querySelector("#curso .curso-info .precio"),
       horas: document.querySelector(
@@ -522,16 +522,15 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
       elementos.imagen.alt = curso.nombre;
       elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
-      elementos.fechaInicio.textContent = `Inicia: ${formatearFecha(
-        curso.fecha_inicio
-      )}`;
+      //elementos.fechaInicio.textContent = `Inicia: ${formatearFecha(
+      //  curso.fecha_inicio
+      //)}`;
       elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", {
         minimumFractionDigits: 2,
       })}`;
       elementos.horas.innerHTML = `<img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> ${curso.horas} Horas totales`;
-      elementos.certificado.innerHTML = `<img src="../ASSETS/cursoInfo/icono-certificado.png" alt=""> Certificado ${
-        curso.certificado ? "incluido" : "no incluido"
-      }`;
+      elementos.certificado.innerHTML = `<img src="../ASSETS/cursoInfo/icono-certificado.png" alt=""> Certificado ${curso.certificado ? "incluido" : "no incluido"
+        }`;
 
       // aca se cargan los datos nuevos para cursos
       if (actividades) {
@@ -584,19 +583,17 @@ if (window.location.pathname.includes("cursoInfo.php")) {
           .map(
             (curso) => `
                 <div class="card-curso">
-                    <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
-              curso.nombre
-            }">
+                    <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
+              }">
                     <div class="card-contenido">
-                        <a href="cursoInfo.php?id=${curso.id}">${
-              curso.nombre
-            }</a>
+                        <a href="cursoInfo.php?id=${curso.id}">${curso.nombre
+              }</a>
                         <p>${curso.descripcion_breve}</p>
                         <p class="horas">${curso.horas} horas</p>
                         <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
-                          "es-MX",
-                          { minimumFractionDigits: 2 }
-                        )}</strong></p>
+                "es-MX",
+                { minimumFractionDigits: 2 }
+              )}</strong></p>
                     </div>
                 </div>
             `
@@ -633,11 +630,11 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       return (texto || "").toString().replace(/\n/g, "<br>");
     }
 
-    function formatearFecha(fecha) {
-      if (!fecha) return "Por definir";
-      const opciones = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(fecha).toLocaleDateString("es-MX", opciones);
-    }
+    //function formatearFecha(fecha) {
+    //  if (!fecha) return "Por definir";
+    //  const opciones = { year: "numeric", month: "long", day: "numeric" };
+    //  return new Date(fecha).toLocaleDateString("es-MX", opciones);
+    //}
 
     function mostrarError(mensaje) {
       const main = document.querySelector("main");
