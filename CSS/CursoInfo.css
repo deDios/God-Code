@@ -451,3 +451,17 @@
     color: #0d5bba;
     text-decoration: underline;
 }
+
+#curso .descripcion-media {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+#curso-detalle-extra .dirigido .contenido p,
+#curso-detalle-extra .competencias .contenido p {
+    color: #444;
+    font-size: 1rem;
+    line-height: 1.6;
+}

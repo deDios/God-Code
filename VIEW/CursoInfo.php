@@ -133,26 +133,32 @@
     </header>
 
     <main>
-        <!-- seccion 1 -->
-        <?php
-        $curso_id = isset($_GET['id']) ? $_GET['id'] : null;
-        ?>
+        <?php $curso_id = isset($_GET['id']) ? $_GET['id'] : null; ?>
+
+        <!-- Sección 1 -->
         <section id="curso" class="curso-detalle">
             <div class="curso-contenido">
-                <h4>Habilidades Financieras
-                    <?php echo $curso_id ? '<span class="curso-id">(el ID del curso es: ' . htmlspecialchars($curso_id) . '</span>' : ''; ?>
+                <h4>
+                    Habilidades Financieras
+                    <?php echo $curso_id ? '<span class="curso-id">(el ID del curso es: ' . htmlspecialchars($curso_id) . ')</span>' : ''; ?>
                 </h4>
                 <h2 class="titulo">Curso Administrativo</h2>
+
                 <p class="descripcion-corta">
-                    Desarrolla habilidades clave para organizar, planificar y tomar decisiones efectivas.<br>
-                    Aprende a gestionar equipos y recursos con eficiencia en cualquier entorno empresarial.(descripcion breve)
+                    Desarrolla habilidades clave para organizar, planificar y tomar decisiones efectivas.
+                    Aprende a gestionar equipos y recursos con eficiencia en cualquier entorno empresarial.
                 </p>
+
+                <p class="descripcion-media">
+                    <!-- Este campo se llenará dinámicamente por JavaScript con la descripción media -->
+                </p>
+
                 <img src="../ASSETS/cursoInfo/cursoInfo_img1.png" alt="Curso Administrativo">
 
                 <div class="texto-descriptivo">
                     <p>
                         En el entorno organizacional actual, la administración eficiente de recursos, procesos y equipos
-                        se ha convertido en una competencia esencial para el éxito de cualquier empresa...(descripcuion del curso)
+                        se ha convertido en una competencia esencial para el éxito de cualquier empresa.
                     </p>
                     <p>
                         Este curso administrativo está diseñado para brindarte una formación integral en las principales
@@ -190,9 +196,10 @@
             </aside>
         </section>
 
-        <!-- seccion 2 -->
+        <!-- Sección 2 -->
         <section id="curso-detalle-extra">
             <div class="acordeon-box">
+
                 <div class="item">
                     <div class="cabecera" onclick="toggleAcordeon(this)">
                         <h4>Impartido por</h4>
@@ -213,9 +220,9 @@
                     </div>
                 </div>
 
-                <div class="item">
+                <div class="item dirigido">
                     <div class="cabecera" onclick="toggleAcordeon(this)">
-                        <h4>Dirigido a </h4>
+                        <h4>Dirigido a</h4>
                         <button class="arrow-btn" aria-label="Mostrar/Ocultar sección">
                             <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
@@ -226,13 +233,12 @@
                         <p>
                             Este curso está dirigido a profesionales, asistentes, coordinadores, supervisores y líderes
                             de áreas administrativas en empresas públicas y privadas que deseen fortalecer sus
-                            habilidades
-                            en organización, planificación y gestión eficiente de recursos.
+                            habilidades en organización, planificación y gestión eficiente de recursos.
                         </p>
                     </div>
                 </div>
 
-                <div class="item">
+                <div class="item competencias">
                     <div class="cabecera" onclick="toggleAcordeon(this)">
                         <h4>¿Qué competencias vas a adquirir?</h4>
                         <button class="arrow-btn" aria-label="Mostrar/Ocultar sección">
@@ -248,14 +254,16 @@
                         </p>
                     </div>
                 </div>
+
             </div>
         </section>
 
-        <!-- seccion 3 -->
+        <!-- Sección 3 -->
         <section id="otros-cursos">
             <h2>Otros cursos que te pueden interesar</h2>
             <div class="cards-cursos">
 
+                <!-- Cursos fijos (pueden ser reemplazados por JS si hay dinámicos) -->
                 <div class="card-curso">
                     <img src="../ASSETS/cursos/img1.png" alt="Curso de PHP">
                     <div class="card-contenido">
@@ -301,6 +309,7 @@
             </div>
         </section>
     </main>
+
 
     <!-- Pie de pagina -->
     <footer>

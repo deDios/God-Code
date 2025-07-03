@@ -549,10 +549,11 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       if (tutor) {
         // se carga la imagen con el id del tutor concatenado
         elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
-        elementos.tutorImg.alt = tutor.nombre;
+        elementos.tutorImg.alt = "../ASSETS/tutor/tutor_noEncontrado.png";
         elementos.tutorImg.onerror = function () {
           // si no se encuentra la imagen se carga una por defecto
-          this.src = "../ASSETS/cursoInfo/perfil_img.png";
+          console.log("error al cargar imagen de tutor");
+          this.src = "../ASSETS/tutor/tutor_noEncontrado.png";
         };
         elementos.tutorNombre.textContent = tutor.nombre;
         elementos.tutorBio.textContent =
