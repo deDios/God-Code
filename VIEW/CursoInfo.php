@@ -180,14 +180,18 @@
                     <button class="btn-principal">Inscribirme al curso</button>
 
                     <ul class="detalles-lista">
-                        <li><img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> 2 Horas al día</li>
-                        <li><img src="../ASSETS/cursoInfo/icono-actividades.png" alt=""> Diversas actividades</li>
-                        <li><img src="../ASSETS/cursoInfo/icono-evaluacion.png" alt=""> Evaluación semanal</li>
-                        <li><img src="../ASSETS/cursoInfo/icono-horarios.png" alt=""> Diversos horarios disponibles</li>
-                        <li><img src="../ASSETS/cursoInfo/icono-certificado.png" alt=""> Certificado disponible según
-                            modalidad</li>
-                        <li><img src="../ASSETS/cursoInfo/icono-curriculum.png" alt=""> ¡Empieza tu formación hoy mismo!
-                        </li>
+                        <li><img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> <span class="horas">2 Horas al
+                                día</span></li>
+                        <li><img src="../ASSETS/cursoInfo/icono-actividades.png" alt=""> <span
+                                class="actividades">Diversas actividades</span></li>
+                        <li><img src="../ASSETS/cursoInfo/icono-evaluacion.png" alt=""> <span
+                                class="evaluacion">Evaluación semanal</span></li>
+                        <li><img src="../ASSETS/cursoInfo/icono-horarios.png" alt=""> <span class="calendario">Diversos
+                                horarios disponibles</span></li>
+                        <li><img src="../ASSETS/cursoInfo/icono-certificado.png" alt=""> <span
+                                class="certificado">Certificado disponible según modalidad</span></li>
+                        <li><img src="../ASSETS/cursoInfo/icono-curriculum.png" alt=""> <span>¡Empieza tu formación hoy
+                                mismo!</span></li>
                     </ul>
                 </div>
             </aside>

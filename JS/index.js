@@ -430,21 +430,11 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       fechaInicio: document.querySelector("#curso .fecha-inicio"),
 
       precio: document.querySelector("#curso .curso-info .precio"),
-      horas: document.querySelector(
-        "#curso .curso-info .detalles-lista li:nth-child(1)"
-      ),
-      certificado: document.querySelector(
-        "#curso .curso-info .detalles-lista li:nth-child(5)"
-      ),
-      actividades: document.querySelector(
-        "#curso .curso-info .detalles-lista li:nth-child(2)"
-      ),
-      evaluacion: document.querySelector(
-        "#curso .curso-info .detalles-lista li:nth-child(3)"
-      ),
-      calendario: document.querySelector(
-        "#curso .curso-info .detalles-lista li:nth-child(4)"
-      ),
+      horas: document.querySelector("#curso .curso-info .horas"),
+      actividades: document.querySelector("#curso .curso-info .actividades"),
+      evaluacion: document.querySelector("#curso .curso-info .evaluacion"),
+      calendario: document.querySelector("#curso .curso-info .calendario"),
+      certificado: document.querySelector("#curso .curso-info .certificado"),
 
       tutorImg: document.querySelector("#curso-detalle-extra .instructor img"),
       tutorNombre: document.querySelector(
@@ -528,25 +518,12 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       elementos.precio.textContent = `$${curso.precio.toLocaleString("es-MX", {
         minimumFractionDigits: 2,
       })}`;
-      elementos.horas.innerHTML = `<img src="../ASSETS/cursoInfo/icono-tiempo.png" alt=""> ${curso.horas} Horas totales`;
-      elementos.certificado.innerHTML = `<img src="../ASSETS/cursoInfo/icono-certificado.png" alt=""> Certificado ${curso.certificado ? "incluido" : "no incluido"
-        }`;
-
-      // aca se cargan los datos nuevos para cursos
-      if (actividades) {
-        elementos.actividades.innerHTML = `<img src="../ASSETS/cursoInfo/icono-actividades.png" alt=""> ${actividades.nombre}`;
-      }
-
-      if (tipoEvaluacion) {
-        elementos.evaluacion.innerHTML = `<img src="../ASSETS/cursoInfo/icono-evaluacion.png" alt=""> ${tipoEvaluacion.nombre}`;
-      }
-
-      if (calendario) {
-        const fechaFormateada = formatearFecha(curso.fecha_inicio);
-        elementos.calendario.innerHTML = `
-    <img src="../ASSETS/cursoInfo/icono-horarios.png" alt=""> Inicia: ${fechaFormateada} (${calendario.nombre})
-  `;
-      }
+      
+      elementos.horas.textContent = `${curso.horas} Horas totales`;
+      elementos.actividades.textContent = actividades.nombre;
+      elementos.evaluacion.textContent = tipoEvaluacion.nombre;
+      elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
+      elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"}`;
 
       if (tutor) {
         // se carga la imagen con el id del tutor concatenado
