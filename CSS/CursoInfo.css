@@ -317,76 +317,109 @@
 /*---------------------------- seccion 3 ---------------------------------------*/
 
 #otros-cursos {
-    padding: 4rem 1rem;
+    padding: 5rem 1rem;
     background: #f9fbff;
-    text-align: center;
-    font-family: Arial, sans-serif;
+    margin: 0 auto 0rem;
+    text-align: left;
 }
 
 #otros-cursos h2 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+    color: #555;
+    margin-top: 0.5rem;
     margin-bottom: 2rem;
-    color: #333;
-    font-weight: 600;
+    font-weight: 500;
+    letter-spacing: 0.5px;
     text-align: center;
 }
 
-#otros-cursos .cards-cursos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
+.carousel-container {
+    position: relative;
     max-width: 1280px;
     margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.carousel-track-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+
+.carousel-track-container::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem 0;
+    will-change: transform;
+    flex-wrap: nowrap;
 }
 
 #otros-cursos .card-curso {
+    flex: 0 0 calc((100% - 3 * 2rem) / 4);
+    max-width: 280px;
     background: #fff;
     border-radius: 20px;
     border: 1px solid #e1e9f0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    width: 280px;
     display: flex;
     flex-direction: column;
     min-height: 420px;
+    height: auto;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    padding: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
 }
 
 #otros-cursos .card-curso:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Imagen - Exactamente igual */
 #otros-cursos .card-curso img {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: 20px 20px 0 0;
+    flex-shrink: 0;
 }
 
+/* Contenido - Mismos estilos */
 #otros-cursos .card-contenido {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    overflow: hidden;
 }
 
-#otros-cursos .card-contenido a {
+#otros-cursos .card-contenido h4 {
+    color: #0562EF;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #0562EF;
     margin-bottom: 0.5rem;
-    text-decoration: none;
-    transition: color 0.2s ease;
+    white-space: normal;
+    word-wrap: break-word;
 }
 
-#otros-cursos .card-contenido a:hover {
-    color: #0d5bba;
-    text-decoration: underline;
+#otros-cursos .card-contenido h4::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #e1e9f0;
+    margin-top: 0.5rem;
 }
 
-#cursos-container .card .contenido p {
+#otros-cursos .card-contenido p {
     font-size: 0.95rem;
     color: #222;
     line-height: 1.6;
@@ -395,13 +428,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    line-clamp: 4;
-    box-orient: vertical;
-    display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     flex-grow: 1;
     min-height: 3.2em;
+}
+
+#otros-cursos .card-contenido .metadata {
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 #otros-cursos .card-contenido .horas,
@@ -409,113 +444,155 @@
     font-weight: 500;
     font-size: 0.9rem;
     color: #444;
-    margin-top: 0.5rem;
+    white-space: normal;
+}
+
+#otros-cursos .card-contenido .precio strong {
+    color: #0562EF;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.carousel-btn:active {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(0.95);
+}
+
+.carousel-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #1a73e8;
+    pointer-events: none;
+}
+
+.carousel-btn.prev {
+    left: 10px;
+}
+
+.carousel-btn.next {
+    right: 10px;
+}
+
+#otros-cursos .curso-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    flex: 0 0 calc((100% - 3 * 2rem) / 4);
+    max-width: 280px;
+}
+
+#otros-cursos .curso-link:hover .card-curso {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* RESPONSIVE - IDÉNTICO */
+@media (max-width: 1024px) {
+
+    #otros-cursos .card-curso,
+    #otros-cursos .curso-link {
+        flex: 0 0 48%;
+        max-width: 48%;
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    #otros-cursos .card-curso,
+    #otros-cursos .curso-link {
+        flex: 0 0 80%;
+        max-width: 80%;
+        min-height: 380px;
+    }
+
+    .carousel-btn {
+        padding: 8px;
+    }
+
+    .carousel-btn.prev,
+    .carousel-btn.next {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+
+    #otros-cursos .card-curso,
+    #otros-cursos .curso-link {
+        flex: 0 0 90%;
+        max-width: 90%;
+        min-height: 360px;
+    }
+
+    .carousel-btn.prev,
+    .carousel-btn.next {
+        display: none;
+    }
+
+    .carousel-container {
+        padding: 1rem 0.5rem;
+    }
+}
+
+#otros-cursos .cards-cursos {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    padding-bottom: 10px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+#otros-cursos .cards-cursos::-webkit-scrollbar {
+    display: none;
+}
+
+#otros-cursos .card-curso {
+    flex: 0 0 280px;
+    max-width: 280px;
 }
 
 @media (max-width: 1024px) {
     #otros-cursos .card-curso {
-        width: 48%;
+        flex: 0 0 48%;
+        max-width: 48%;
+        min-height: 400px;
     }
 }
 
 @media (max-width: 768px) {
     #otros-cursos .card-curso {
-        width: 80%;
-        max-width: 360px;
+        flex: 0 0 80%;
+        max-width: 80%;
+        min-height: 380px;
     }
 }
 
 @media (max-width: 480px) {
     #otros-cursos .card-curso {
-        width: 90%;
+        flex: 0 0 90%;
+        max-width: 90%;
+        min-height: 360px;
     }
-}
-
-.curso-id {
-    font-size: 0.8em;
-    color: #666;
-    font-weight: normal;
-    margin-left: 8px;
-}
-
-.error-message {
-    text-align: center;
-    padding: 2rem;
-    margin: 2rem auto;
-    max-width: 600px;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-}
-
-.error-message h3 {
-    color: #dc3545;
-    margin-bottom: 1rem;
-}
-
-.btn-principal {
-    display: inline-block;
-    margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: #1a73e8;
-    color: white;
-    text-decoration: none;
-    border-radius: 50px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-principal:hover {
-    background: #0d5bba;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-#curso-detalle-extra .contenido {
-    display: none;
-    padding: 0.5rem 0;
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-#curso .descripcion-media {
-    font-size: 1rem;
-    color: #444;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-#curso-detalle-extra .dirigido .contenido p,
-#curso-detalle-extra .competencias .contenido p {
-    color: #444;
-    font-size: 1rem;
-    line-height: 1.6;
-}
-
-.curso-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
-
-.curso-link:hover .card-curso {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-#cursos-container .card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 }

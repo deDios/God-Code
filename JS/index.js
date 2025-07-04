@@ -579,13 +579,15 @@ if (window.location.pathname.includes("cursoInfo.php")) {
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
-                <p class="horas">${curso.horas} horas</p>
-                <p class="precio">Precio: <strong>$${curso.precio.toLocaleString(
-                  "es-MX",
-                  {
+                <p class="info-curso">
+                ${curso.horas} hrs | ${
+              curso.precio === 0
+                ? "Gratuito"
+                : `$${curso.precio.toLocaleString("es-MX", {
                     minimumFractionDigits: 2,
-                  }
-                )}</strong></p>
+                  })}`
+            }
+                </p>
             </div>
         </div>
       </a>
