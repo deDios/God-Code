@@ -266,50 +266,54 @@
         <!-- Sección 3 -->
         <section id="otros-cursos">
             <h2>Cursos similares</h2>
-            <div class="cards-cursos">
+            <div class="cards-cursos" id="otros-cursos-container">
 
-                <!-- Cursos fijos (pueden ser reemplazados por JS si hay dinámicos) -->
-                <div class="card-curso">
-                    <img src="../ASSETS/cursos/img1.png" alt="Curso de PHP">
-                    <div class="card-contenido">
-                        <a href="#">Curso de PHP</a>
-                        <p>Domina PHP desde cero y aprende a desarrollar sitios web dinámicos y funcionales.</p>
-                        <p class="horas">Cant. de horas separadas de duración</p>
-                        <p class="precio">Precio: <strong>$300</strong></p>
+                <!-- Las cards se inyectan aquí vía JS -->
+                <a href="cursoInfo.php?id=1" class="curso-link">
+                    <div class="card-curso">
+                        <img src="../ASSETS/cursos/img1.png" alt="Curso de PHP">
+                        <div class="card-contenido">
+                            <h4>Curso de PHP</h4>
+                            <p>Domina PHP desde cero y aprende a desarrollar sitios web dinámicos y funcionales.</p>
+                            <p class="info-curso">40 hrs | $300.00</p>
+                        </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="card-curso">
-                    <img src="../ASSETS/cursos/img2.png" alt="Gestión Financiera">
-                    <div class="card-contenido">
-                        <a href="#">Curso de Gestión Financiera</a>
-                        <p>Adquiere herramientas clave para tomar decisiones financieras acertadas y mejorar tu salud
-                            económica.</p>
-                        <p class="horas">Cant. de horas separadas de duración</p>
-                        <p class="precio">Precio: <strong>$300</strong></p>
+                <a href="cursoInfo.php?id=2" class="curso-link">
+                    <div class="card-curso">
+                        <img src="../ASSETS/cursos/img2.png" alt="Gestión Financiera">
+                        <div class="card-contenido">
+                            <h4>Curso de Gestión Financiera</h4>
+                            <p>Adquiere herramientas clave para tomar decisiones financieras acertadas y mejorar tu
+                                salud económica.</p>
+                            <p class="info-curso">36 hrs | $300.00</p>
+                        </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="card-curso">
-                    <img src="../ASSETS/cursos/img3.png" alt="Curso de Economía">
-                    <div class="card-contenido">
-                        <a href="#">Curso de Economía</a>
-                        <p>Comprende cómo funcionan los mercados y cómo se toman decisiones económicas en empresas y
-                            gobiernos.</p>
-                        <p class="horas">Cant. de horas separadas de duración</p>
-                        <p class="precio">Precio: <strong>$300</strong></p>
+                <a href="cursoInfo.php?id=3" class="curso-link">
+                    <div class="card-curso">
+                        <img src="../ASSETS/cursos/img3.png" alt="Curso de Economía">
+                        <div class="card-contenido">
+                            <h4>Curso de Economía</h4>
+                            <p>Comprende cómo funcionan los mercados y cómo se toman decisiones económicas en empresas y
+                                gobiernos.</p>
+                            <p class="info-curso">30 hrs | $300.00</p>
+                        </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="card-curso">
-                    <img src="../ASSETS/cursos/img4.png" alt="Curso de Contaduría">
-                    <div class="card-contenido">
-                        <a href="#">Curso de Contaduría</a>
-                        <p>Aprende a registrar, analizar y comunicar información financiera con precisión.</p>
-                        <p class="horas">Cant. de horas separadas de duración</p>
-                        <p class="precio">Precio: <strong>$300</strong></p>
+                <a href="cursoInfo.php?id=4" class="curso-link">
+                    <div class="card-curso">
+                        <img src="../ASSETS/cursos/img4.png" alt="Curso de Contaduría">
+                        <div class="card-contenido">
+                            <h4>Curso de Contaduría</h4>
+                            <p>Aprende a registrar, analizar y comunicar información financiera con precisión.</p>
+                            <p class="info-curso">32 hrs | $300.00</p>
+                        </div>
                     </div>
-                </div>
+                </a>
 
             </div>
         </section>

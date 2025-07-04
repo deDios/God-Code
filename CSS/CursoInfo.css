@@ -317,58 +317,40 @@
 /*---------------------------- seccion 3 ---------------------------------------*/
 
 #otros-cursos {
-    padding: 5rem 1rem;
-    background: #f9fbff;
-    margin: 0 auto 0rem;
+    padding: 2rem 1rem;
+    font-family: Arial, sans-serif;
     text-align: left;
+    max-width: 1280px;
+    margin: 0 auto;
 }
 
 #otros-cursos h2 {
-    font-size: 1.5rem;
-    color: #555;
-    margin-top: 0.5rem;
+    font-size: 1.8rem;
     margin-bottom: 2rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
+    color: #222;
     text-align: center;
 }
 
-.carousel-container {
-    position: relative;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-}
-
-.carousel-track-container {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 10px;
-    scroll-behavior: smooth;
-}
-
-.carousel-track-container::-webkit-scrollbar {
-    display: none;
-}
-
-.carousel-track {
-    display: flex;
+#otros-cursos .cards-cursos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
-    padding: 1rem 0;
-    will-change: transform;
-    flex-wrap: nowrap;
+    overflow: visible;
 }
 
-#otros-cursos .card-curso {
-    flex: 0 0 calc((100% - 3 * 2rem) / 4);
-    max-width: 280px;
+.curso-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-curso {
     background: #fff;
     border-radius: 20px;
     border: 1px solid #e1e9f0;
     display: flex;
     flex-direction: column;
-    min-height: 420px;
+    min-height: 500px;
     height: auto;
     color: inherit;
     cursor: pointer;
@@ -378,13 +360,12 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
 }
 
-#otros-cursos .card-curso:hover {
+.card-curso:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Imagen - Exactamente igual */
-#otros-cursos .card-curso img {
+.card-curso img {
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -392,8 +373,7 @@
     flex-shrink: 0;
 }
 
-/* Contenido - Mismos estilos */
-#otros-cursos .card-contenido {
+.card-contenido {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
@@ -401,16 +381,16 @@
     overflow: hidden;
 }
 
-#otros-cursos .card-contenido h4 {
+.card-contenido h4 {
     color: #0562EF;
-    font-size: 1.1rem;
+    font-size: .9rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
     white-space: normal;
     word-wrap: break-word;
 }
 
-#otros-cursos .card-contenido h4::after {
+.card-contenido h4::after {
     content: "";
     display: block;
     width: 100%;
@@ -419,8 +399,8 @@
     margin-top: 0.5rem;
 }
 
-#otros-cursos .card-contenido p {
-    font-size: 0.95rem;
+.card-contenido p {
+    font-size: 0.75rem;
     color: #222;
     line-height: 1.6;
     margin-top: 0.5rem;
@@ -434,165 +414,49 @@
     min-height: 3.2em;
 }
 
-#otros-cursos .card-contenido .metadata {
-    margin-top: auto;
-    padding-top: 1rem;
-}
-
-#otros-cursos .card-contenido .horas,
-#otros-cursos .card-contenido .precio {
+.info-curso {
     font-weight: 500;
     font-size: 0.9rem;
     color: #444;
     white-space: normal;
-}
-
-#otros-cursos .card-contenido .precio strong {
-    color: #0562EF;
-}
-
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: white;
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    user-select: none;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-}
-
-.carousel-btn:active {
-    background: rgba(0, 0, 0, 0.1);
-    transform: scale(0.95);
-}
-
-.carousel-btn svg {
-    width: 24px;
-    height: 24px;
-    fill: #1a73e8;
-    pointer-events: none;
-}
-
-.carousel-btn.prev {
-    left: 10px;
-}
-
-.carousel-btn.next {
-    right: 10px;
-}
-
-#otros-cursos .curso-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    flex: 0 0 calc((100% - 3 * 2rem) / 4);
-    max-width: 280px;
-}
-
-#otros-cursos .curso-link:hover .card-curso {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* RESPONSIVE - IDÉNTICO */
-@media (max-width: 1024px) {
-
-    #otros-cursos .card-curso,
-    #otros-cursos .curso-link {
-        flex: 0 0 48%;
-        max-width: 48%;
-        min-height: 400px;
-    }
+    margin-top: auto;
 }
 
 @media (max-width: 768px) {
+    #otros-cursos .cards-cursos {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 10px;
+        scroll-behavior: smooth;
+    }
 
-    #otros-cursos .card-curso,
-    #otros-cursos .curso-link {
+    #otros-cursos .cards-cursos::-webkit-scrollbar {
+        display: none;
+    }
+
+    .curso-link {
         flex: 0 0 80%;
         max-width: 80%;
+    }
+
+    .card-curso {
         min-height: 380px;
-    }
-
-    .carousel-btn {
-        padding: 8px;
-    }
-
-    .carousel-btn.prev,
-    .carousel-btn.next {
-        display: none;
+        height: 500px;
     }
 }
 
 @media (max-width: 480px) {
-
-    #otros-cursos .card-curso,
-    #otros-cursos .curso-link {
+    .curso-link {
         flex: 0 0 90%;
         max-width: 90%;
+    }
+
+    .card-curso {
         min-height: 360px;
-    }
-
-    .carousel-btn.prev,
-    .carousel-btn.next {
-        display: none;
-    }
-
-    .carousel-container {
-        padding: 1rem 0.5rem;
-    }
-}
-
-#otros-cursos .cards-cursos {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 1.5rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    padding-bottom: 10px;
-    max-width: 1280px;
-    margin: 0 auto;
-}
-
-#otros-cursos .cards-cursos::-webkit-scrollbar {
-    display: none;
-}
-
-#otros-cursos .card-curso {
-    flex: 0 0 280px;
-    max-width: 280px;
-}
-
-@media (max-width: 1024px) {
-    #otros-cursos .card-curso {
-        flex: 0 0 48%;
-        max-width: 48%;
-        min-height: 400px;
-    }
-}
-
-@media (max-width: 768px) {
-    #otros-cursos .card-curso {
-        flex: 0 0 80%;
-        max-width: 80%;
-        min-height: 380px;
-    }
-}
-
-@media (max-width: 480px) {
-    #otros-cursos .card-curso {
-        flex: 0 0 90%;
-        max-width: 90%;
-        min-height: 360px;
+        height: 500px;
     }
 }
