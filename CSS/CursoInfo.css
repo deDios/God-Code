@@ -90,7 +90,17 @@
     background-color: #125ab3;
 }
 
+.info-curso-vertical {
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
 #curso .precio {
+    text-align: center;
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 0.2rem;
@@ -402,24 +412,24 @@
 }
 
 @media (max-width: 768px) {
-  #curso .curso-contenido {
-    max-width: 100%;
-    text-align: center;
-  }
+    #curso .curso-contenido {
+        max-width: 100%;
+        text-align: center;
+    }
 
-  #curso .descripcion-media {
-    text-align: center;
-  }
+    #curso .descripcion-media {
+        text-align: center;
+    }
 
-  #curso .curso-contenido img {
-    margin: 1rem auto;
-  }
+    #curso .curso-contenido img {
+        margin: 1rem auto;
+    }
 
-  #curso .texto-descriptivo {
-    text-align: center;
-  }
+    #curso .texto-descriptivo {
+        text-align: center;
+    }
 
-  #curso .texto-descriptivo p {
-    text-align: center;
-  }
+    #curso .texto-descriptivo p {
+        text-align: center;
+    }
 }
