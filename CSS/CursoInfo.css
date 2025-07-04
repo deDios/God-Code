@@ -97,6 +97,7 @@
     align-items: center;
     gap: 0.5rem;
     text-align: center;
+    padding-bottom: 2rem;
 }
 
 #curso .precio {
