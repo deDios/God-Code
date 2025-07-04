@@ -1,9 +1,9 @@
-/*-------------------------------- VISTA CURSO INFO -------------------------------------------*/
+/* ------------------------------------ seccion 1 ------------------------------------------ */
 #curso.curso-detalle {
     display: flex;
+    flex-wrap: wrap;
     gap: 2rem;
     padding: 2rem;
-    flex-wrap: wrap;
 }
 
 #curso .curso-contenido {
@@ -31,8 +31,8 @@
 #curso .curso-contenido img {
     display: block;
     max-width: 90%;
-    border-radius: 8px;
     margin: 0 auto 1.5rem;
+    border-radius: 8px;
 }
 
 #curso .texto-descriptivo p {
@@ -57,32 +57,13 @@
 }
 
 #curso .pregunta {
-    font-size: 1rem;
+    font-size: 1.3rem;
     margin-bottom: 1rem;
     text-align: center;
 }
 
 #curso .btn-secundario,
-#curso .btn-principal {
-    font-size: 1.2rem;
-    background-color: #1a73e8;
-    color: white;
-    padding: 0.6rem 1rem;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.info-curso-vertical {
-    font-size: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    text-align: center;
-}
-
+#curso .btn-principal,
 #curso .btn-secundario-centrado,
 #curso .btn-principal-centrado {
     font-size: 1.2rem;
@@ -93,16 +74,17 @@
     border-radius: 50px;
     cursor: pointer;
     transition: background 0.3s ease;
-    display: block;
-    margin: 2rem auto;
     text-align: center;
 }
 
-#curso .btn-secundario:hover,
-#curso .btn-principal:hover {
-    background-color: #125ab3;
+#curso .btn-secundario-centrado,
+#curso .btn-principal-centrado {
+    display: block;
+    margin: 2rem auto;
 }
 
+#curso .btn-secundario:hover,
+#curso .btn-principal:hover,
 #curso .btn-secundario-centrado:hover,
 #curso .btn-principal-centrado:hover {
     background-color: #125ab3;
@@ -134,8 +116,8 @@
     margin-right: 0.7rem;
 }
 
-/*------------------- seccion 2 -----------------------*/
 
+/* ------------------------ seccion 2 ----------------------------------- */
 #curso-detalle-extra {
     display: flex;
     justify-content: flex-start;
@@ -166,26 +148,6 @@
     color: #0052b8;
 }
 
-#curso-detalle-extra .cabecera .arrow {
-    background: white;
-    border: none;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    user-select: none;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-    font-size: 0.9rem;
-    width: 32px;
-    height: 32px;
-    color: #1a73e8;
-}
-
 #curso-detalle-extra .arrow-btn {
     background: white;
     border: none;
@@ -193,11 +155,9 @@
     border-radius: 50%;
     cursor: pointer;
     user-select: none;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
@@ -253,75 +213,14 @@
     background-color: #eee;
 }
 
-/*responsive*/
-@media (max-width: 768px) {
-    #curso-detalle-extra {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-    }
 
-    #curso-detalle-extra .acordeon-box {
-        max-width: 100%;
-    }
-
-    #curso-detalle-extra .cabecera {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    #curso-detalle-extra .cabecera h4 {
-        font-size: 1rem;
-    }
-
-    #curso-detalle-extra .arrow-btn,
-    #curso-detalle-extra .cabecera .arrow {
-        width: 28px;
-        height: 28px;
-        padding: 6px;
-    }
-
-    #curso-detalle-extra .arrow-icon {
-        width: 18px;
-        height: 18px;
-    }
-
-    #curso-detalle-extra .instructor {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-
-    #curso-detalle-extra .instructor img {
-        width: 40px;
-        height: 40px;
-    }
-
-    #curso-detalle-extra .contenido p {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 480px) {
-    #curso-detalle-extra .cabecera h4 {
-        font-size: 0.95rem;
-    }
-
-    #curso-detalle-extra .contenido p {
-        font-size: 0.9rem;
-    }
-}
-
-/*---------------------------- seccion 3 ---------------------------------------*/
-
+/* ------------------------------------ Seccion 3 ------------------------------ */
 #otros-cursos {
     padding: 2rem 1rem;
     font-family: Arial, sans-serif;
-    text-align: left;
     max-width: 1280px;
     margin: 0 auto;
+    text-align: left;
 }
 
 #otros-cursos h2 {
@@ -338,13 +237,13 @@
     overflow: visible;
 }
 
-.curso-link {
+#otros-cursos .curso-link {
     display: block;
     text-decoration: none;
     color: inherit;
 }
 
-.card-curso {
+#otros-cursos .card-curso {
     background: #fff;
     border-radius: 20px;
     border: 1px solid #e1e9f0;
@@ -352,20 +251,18 @@
     flex-direction: column;
     min-height: 500px;
     height: auto;
-    color: inherit;
-    cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
-    padding: 0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
 }
 
-.card-curso:hover {
+#otros-cursos .card-curso:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.card-curso img {
+#otros-cursos .card-curso img {
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -373,7 +270,7 @@
     flex-shrink: 0;
 }
 
-.card-contenido {
+#otros-cursos .card-contenido {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
@@ -381,16 +278,16 @@
     overflow: hidden;
 }
 
-.card-contenido h4 {
+#otros-cursos .card-contenido h4 {
     color: #0562EF;
-    font-size: .9rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
     white-space: normal;
     word-wrap: break-word;
 }
 
-.card-contenido h4::after {
+#otros-cursos .card-contenido h4::after {
     content: "";
     display: block;
     width: 100%;
@@ -399,38 +296,41 @@
     margin-top: 0.5rem;
 }
 
-.card-contenido p {
-    font-size: 0.75rem;
+#otros-cursos .card-contenido p {
+    font-size: 0.9rem;
     color: #222;
     line-height: 1.6;
     margin-top: 0.5rem;
-    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
     flex-grow: 1;
-    min-height: 3.2em;
 }
 
-.info-curso {
+#otros-cursos .card-contenido .info-curso {
     font-weight: 500;
     font-size: 0.9rem;
     color: #444;
-    white-space: normal;
     margin-top: auto;
+    white-space: nowrap;
 }
 
+
 @media (max-width: 768px) {
+    #curso-detalle-extra {
+        padding: 0 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     #otros-cursos .cards-cursos {
         display: flex;
         flex-wrap: nowrap;
-        gap: 1rem;
         overflow-x: auto;
+        gap: 1rem;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 10px;
         scroll-behavior: smooth;
     }
 
@@ -438,25 +338,65 @@
         display: none;
     }
 
-    .curso-link {
+    #otros-cursos .curso-link {
         flex: 0 0 80%;
         max-width: 80%;
     }
 
-    .card-curso {
+    #otros-cursos .card-curso {
         min-height: 380px;
-        height: 500px;
+    }
+
+    #curso-detalle-extra .cabecera {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    #curso-detalle-extra .cabecera h4 {
+        font-size: 1rem;
+    }
+
+    #curso-detalle-extra .arrow-btn {
+        width: 28px;
+        height: 28px;
+        padding: 6px;
+    }
+
+    #curso-detalle-extra .arrow-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    #curso-detalle-extra .instructor {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #curso-detalle-extra .instructor img {
+        width: 40px;
+        height: 40px;
+    }
+
+    #curso-detalle-extra .contenido p {
+        font-size: 0.95rem;
     }
 }
 
 @media (max-width: 480px) {
-    .curso-link {
+    #otros-cursos .curso-link {
         flex: 0 0 90%;
         max-width: 90%;
     }
 
-    .card-curso {
+    #otros-cursos .card-curso {
         min-height: 360px;
-        height: 500px;
+    }
+
+    #curso-detalle-extra .cabecera h4 {
+        font-size: 0.95rem;
+    }
+
+    #curso-detalle-extra .contenido p {
+        font-size: 0.9rem;
     }
 }

@@ -470,12 +470,18 @@ header.scrolled .subnav {
 
 /*------------------------ css para la seccion 4 --------------------------------------*/
 
+/*background: #f9fbff;*/
+
 .ayuda-faq {
-    background-color: #f8fbfd;
+    background: linear-gradient(180deg, #f9fbff 0%, #eef3fb 100%);
     border-radius: 20px;
     text-align: center;
     padding: 4rem 2rem;
-    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.limite {
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -1012,7 +1018,7 @@ footer small {
 
 /*--------------------------------Resuluciones pequeñas-----------------------------------*/
 @media (max-width: 700px) {
-    
+
     #seccion-innovacion .noticias {
         display: none;
     }
