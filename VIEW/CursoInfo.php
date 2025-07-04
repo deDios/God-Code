@@ -141,7 +141,8 @@
                 </h4>
                 <h2 class="titulo">Curso Administrativo</h2>
 
-                <p class="descripcion-corta">
+                <p class="descripcion-corta" style="display: none;">
+                    <!-- ya no se mostrara pero por si acaso aca esta -->
                     Desarrolla habilidades clave para organizar, planificar y tomar decisiones efectivas.
                     Aprende a gestionar equipos y recursos con eficiencia en cualquier entorno empresarial.
                 </p>
@@ -171,13 +172,14 @@
             <aside class="curso-info">
                 <div class="info-box">
                     <p class="pregunta">¿Tienes alguna duda?<br><strong>No dudes en contactarnos.</strong></p>
-                    <button class="btn-secundario-centrado">Solicita más información</button>
+                    <button class="btn-secundario-centrado" onclick="location.href='../VIEW/Contacto.php'">Solicita más
+                        información</button>
                 </div>
 
                 <div class="precio-box">
                     <div class="info-curso-vertical">
                         <p class="precio">$300</p>
-                        <small>Curso más libre acceso a la zona común</small>
+                        <small>Inscríbete al curso y obtén acceso al área común.</small>
                         <button class="btn-principal">Inscribirme al curso</button>
                     </div>
 
@@ -263,7 +265,7 @@
 
         <!-- Sección 3 -->
         <section id="otros-cursos">
-            <h2>Otros cursos que te pueden interesar</h2>
+            <h2>Cursos similares</h2>
             <div class="cards-cursos">
 
                 <!-- Cursos fijos (pueden ser reemplazados por JS si hay dinámicos) -->
