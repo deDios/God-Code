@@ -218,8 +218,8 @@
 }
 
 #curso-detalle-extra .instructor img {
-    width: 48px;
-    height: 48px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background-color: #eee;
 }
@@ -384,8 +384,8 @@
     }
 
     #curso-detalle-extra .instructor img {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
 
     #curso-detalle-extra .contenido p {
