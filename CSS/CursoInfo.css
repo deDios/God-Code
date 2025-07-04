@@ -400,3 +400,26 @@
         font-size: 0.9rem;
     }
 }
+
+@media (max-width: 768px) {
+  #curso .curso-contenido {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  #curso .descripcion-media {
+    text-align: center;
+  }
+
+  #curso .curso-contenido img {
+    margin: 1rem auto;
+  }
+
+  #curso .texto-descriptivo {
+    text-align: center;
+  }
+
+  #curso .texto-descriptivo p {
+    text-align: center;
+  }
+}
