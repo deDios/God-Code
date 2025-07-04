@@ -1,9 +1,11 @@
-/* ------------------------------------ seccion 1 ------------------------------------------ */
+/* ------------------------------- seccion 1 ----------------------------- */
+
 #curso.curso-detalle {
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
     padding: 2rem;
+    margin-bottom: 4rem;
 }
 
 #curso .curso-contenido {
@@ -32,7 +34,8 @@
     display: block;
     max-width: 90%;
     margin: 0 auto 1.5rem;
-    border-radius: 8px;
+    border-radius: 20px;
+    padding: 1rem;
 }
 
 #curso .texto-descriptivo p {
@@ -90,7 +93,7 @@
     background-color: #125ab3;
 }
 
-.info-curso-vertical {
+#curso .info-curso-vertical {
     font-size: 1.2rem;
     display: flex;
     flex-direction: column;
@@ -128,12 +131,15 @@
 }
 
 
-/* ------------------------ seccion 2 ----------------------------------- */
+/* ------------------------- seccion 2 ----------------------- */
+
 #curso-detalle-extra {
     display: flex;
     justify-content: flex-start;
     padding-left: 2rem;
     font-family: Arial, sans-serif;
+    margin-bottom: 4rem;
+    /* 👉 Espacio hacia la siguiente sección */
 }
 
 #curso-detalle-extra .acordeon-box {
@@ -225,9 +231,11 @@
 }
 
 
-/* ------------------------------------ Seccion 3 ------------------------------ */
+/* ------------------------- seccion 3 ------------------------ */
+
 #otros-cursos {
-    padding: 2rem 1rem;
+    padding: 2rem 1rem 4rem;
+    /* 👉 padding-bottom extra para final limpio */
     font-family: Arial, sans-serif;
     max-width: 1280px;
     margin: 0 auto;
@@ -235,6 +243,7 @@
 }
 
 #otros-cursos h2 {
+    padding-bottom: 2rem;
     font-size: 1.8rem;
     margin-bottom: 2rem;
     color: #222;
@@ -328,34 +337,34 @@
 }
 
 
+
 @media (max-width: 768px) {
+    #curso .curso-contenido {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    #curso .descripcion-media {
+        text-align: center;
+    }
+
+    #curso .curso-contenido img {
+        margin: 1rem auto;
+    }
+
+    #curso .texto-descriptivo {
+        text-align: center;
+        padding: 0 1rem 2rem;
+    }
+
+    #curso .texto-descriptivo p {
+        text-align: center;
+    }
+
     #curso-detalle-extra {
         padding: 0 1rem;
         flex-direction: column;
         align-items: flex-start;
-    }
-
-    #otros-cursos .cards-cursos {
-        display: flex;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        gap: 1rem;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-    }
-
-    #otros-cursos .cards-cursos::-webkit-scrollbar {
-        display: none;
-    }
-
-    #otros-cursos .curso-link {
-        flex: 0 0 80%;
-        max-width: 80%;
-    }
-
-    #otros-cursos .card-curso {
-        min-height: 380px;
     }
 
     #curso-detalle-extra .cabecera {
@@ -391,6 +400,29 @@
     #curso-detalle-extra .contenido p {
         font-size: 0.95rem;
     }
+
+    #otros-cursos .cards-cursos {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 1rem;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    #otros-cursos .cards-cursos::-webkit-scrollbar {
+        display: none;
+    }
+
+    #otros-cursos .curso-link {
+        flex: 0 0 80%;
+        max-width: 80%;
+    }
+
+    #otros-cursos .card-curso {
+        min-height: 380px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -400,7 +432,7 @@
     }
 
     #otros-cursos .card-curso {
-        min-height: 360px;
+        min-height: 460px;
     }
 
     #curso-detalle-extra .cabecera h4 {
@@ -409,28 +441,5 @@
 
     #curso-detalle-extra .contenido p {
         font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 768px) {
-    #curso .curso-contenido {
-        max-width: 100%;
-        text-align: center;
-    }
-
-    #curso .descripcion-media {
-        text-align: center;
-    }
-
-    #curso .curso-contenido img {
-        margin: 1rem auto;
-    }
-
-    #curso .texto-descriptivo {
-        text-align: center;
-    }
-
-    #curso .texto-descriptivo p {
-        text-align: center;
     }
 }
