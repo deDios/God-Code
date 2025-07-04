@@ -408,6 +408,7 @@ if (
 if (window.location.pathname.includes("cursoInfo.php")) {
   //apartado para recuperar los datos del curso segun su id
   document.addEventListener("DOMContentLoaded", async () => {
+    let nombreCursoGlobal = "";
     console.log("1. DOM completamente cargado - Iniciando script");
 
     // se obtiene el curso con la id que enviamos por la url
@@ -478,7 +479,8 @@ if (window.location.pathname.includes("cursoInfo.php")) {
 
       if (!curso) throw new Error("Curso no encontrado");
       console.log("6. Curso encontrado:", curso);
-
+      nombreCursoGlobal = curso.nombre;
+      console.log("cursoNombre:", curso.nombre);
       // carga los demas cursos relacionados
       console.log("7. Cargando datos relacionados...");
       const [tutor, actividades, tipoEvaluacion, calendario] =
@@ -642,6 +644,128 @@ if (window.location.pathname.includes("cursoInfo.php")) {
         </div>
       `;
       }
+    }
+
+    // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+
+    const modal = document.getElementById("modal-inscripcion");
+    const abrirBtn = document.getElementById("abrir-modal-inscripcion"); // boton para inscribirme
+    const cerrarBtn = document.querySelector(".cerrar-modal");
+
+    const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
+    const camposRegistro = document.querySelector(".campos-registro");
+    const camposLogin = document.querySelector(".campos-login");
+    const errorCuenta = document.getElementById("error-cuenta");
+    const volverRegistro = document.getElementById("volver-a-registro");
+    const buscarBtn = document.getElementById("buscar-cuenta");
+
+    const nombreInput = document.getElementById("nombre");
+    const telefonoInput = document.getElementById("telefono");
+    const correoInput = document.getElementById("correo");
+    const fechaInput = document.getElementById("fecha-nacimiento");
+    const medioContactoInput = document.getElementById("medio-contacto");
+    const cursoNombreInput = document.getElementById("curso-nombre");
+    const loginInput = document.getElementById("login-identificador");
+
+    // abre la pestaña emergente
+    abrirBtn.addEventListener("click", () => {
+      modal.style.display = "flex";
+
+      // carga el nombre de curso
+      const nombreCurso = document.querySelector("#curso .curso-contenido h4");
+      if (nombreCurso) {
+        if (cursoNombreInput && nombreCursoGlobal) {
+          cursoNombreInput.value = nombreCursoGlobal;
+        }
+      }
+    });
+
+    // boton de cerrar pestaña
+    cerrarBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      limpiarFormulario();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        modal.style.display = "none";
+        limpiarFormulario();
+      }
+    });
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+        limpiarFormulario();
+      }
+    });
+
+    // cambia entre registro o crear contacto
+    checkboxCuenta.addEventListener("change", () => {
+      if (checkboxCuenta.checked) {
+        camposRegistro.style.display = "none";
+        camposLogin.style.display = "flex";
+      } else {
+        camposRegistro.style.display = "flex";
+        camposLogin.style.display = "none";
+        errorCuenta.style.display = "none";
+      }
+    });
+
+    // buscar
+    buscarBtn.addEventListener("click", () => {
+      const valor = loginInput.value.trim().toLowerCase();
+
+      // informacion dummy de busqueda, aca se puede colocar el fetch real
+      const cuentasSimuladas = [
+        {
+          nombre: "Juan Pérez",
+          telefono: "5551234567",
+          correo: "juan@godcode.com",
+          fecha: "1990-01-01",
+          medio: "correo",
+        },
+      ];
+
+      const cuenta = cuentasSimuladas.find(
+        (c) => c.telefono === valor || c.correo === valor
+      );
+
+      if (cuenta) {
+        // cuando encuentra rellena los datos
+        nombreInput.value = cuenta.nombre;
+        telefonoInput.value = cuenta.telefono;
+        correoInput.value = cuenta.correo;
+        fechaInput.value = cuenta.fecha;
+        medioContactoInput.value = cuenta.medio;
+        camposRegistro.style.display = "flex";
+        camposLogin.style.display = "none";
+        checkboxCuenta.checked = false;
+        errorCuenta.style.display = "none";
+      } else {
+        // muestra el mensaje de error
+        errorCuenta.style.display = "block";
+        setTimeout(() => {
+          errorCuenta.style.display = "none";
+        }, 4000);
+      }
+    });
+
+    volverRegistro.addEventListener("click", (e) => {
+      e.preventDefault();
+      checkboxCuenta.checked = false;
+      camposRegistro.style.display = "flex";
+      camposLogin.style.display = "none";
+      errorCuenta.style.display = "none";
+      loginInput.value = "";
+    });
+
+    // limpia el formulario cuando se cierra
+    function limpiarFormulario() {
+      document.getElementById("form-inscripcion").reset();
+      camposRegistro.style.display = "flex";
+      camposLogin.style.display = "none";
+      errorCuenta.style.display = "none";
     }
   });
 

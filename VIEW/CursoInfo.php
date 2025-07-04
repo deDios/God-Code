@@ -148,7 +148,7 @@
                 </p>
 
                 <p class="descripcion-media">
-                    <!-- Este campo se llenará dinámicamente por JavaScript con la descripción media -->
+                    <!-- se llena con el js -->
                 </p>
 
                 <img src="../ASSETS/cursoInfo/cursoInfo_img1.png" alt="Curso Administrativo">
@@ -180,7 +180,7 @@
                     <div class="info-curso-vertical">
                         <p class="precio">$300</p>
                         <small>Inscríbete al curso y obtén acceso al área común.</small>
-                        <button class="btn-principal">Inscribirme al curso</button>
+                        <button class="btn-principal" id="abrir-modal-inscripcion">Inscribirme al curso</button>
                     </div>
 
                     <ul class="detalles-lista">
@@ -333,6 +333,50 @@
             <small>De 9:00AM a 8:00PM</small>
         </div>
     </footer>
+
+    <!--- esto es la pestaña emergente para suscribirse al curso --->
+    <div id="modal-inscripcion" class="modal-inscripcion">
+        <div class="modal-contenido">
+            <button class="cerrar-modal" aria-label="Cerrar">&times;</button>
+            <h2>Inscripción al curso</h2>
+
+            <form id="form-inscripcion">
+                <label>
+                    <input type="checkbox" id="ya-tengo-cuenta" />
+                    ¿Ya tienes cuenta?
+                </label>
+
+                <div class="campos-registro">
+                    <input type="text" id="nombre" placeholder="Nombre completo" required />
+                    <input type="tel" id="telefono" placeholder="Teléfono" required />
+                    <input type="email" id="correo" placeholder="Correo electrónico" required />
+                    <input type="date" id="fecha-nacimiento" required />
+                    <select id="medio-contacto" required>
+                        <option value="">Medio de contacto preferido</option>
+                        <option value="telefono">Teléfono</option>
+                        <option value="correo">Correo electrónico</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                    <input type="text" id="curso-nombre" readonly />
+                    <button type="submit" class="btn-principal">Enviar inscripción</button>
+                </div>
+
+                <div class="campos-login" style="display: none;">
+                    <input type="text" id="login-identificador" placeholder="Correo electrónico o teléfono" />
+                    <button type="button" class="btn-principal" id="buscar-cuenta">Buscar</button>
+                </div>
+
+                <!-- error cuenta no encontrada -->
+                <div id="error-cuenta" class="error-cuenta" style="display: none;">
+                    <p>Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
+                        escritos correctamente o regístrate para crear una nueva cuenta.</p>
+                    <p class="registro-texto">¿No tienes una cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="../JS/index.js"></script>
 </body>
