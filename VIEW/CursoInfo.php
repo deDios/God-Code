@@ -338,54 +338,60 @@
     <div id="modal-inscripcion" class="modal-inscripcion">
         <div class="modal-contenido">
             <button class="cerrar-modal" aria-label="Cerrar">&times;</button>
-            <h2>Inscripción al curso</h2>
+
+            <h2>Inscribirme al curso</h2>
+
+            <div class="switch-container">
+                <span>¿Ya tienes cuenta?</span>
+                <label class="switch">
+                    <input type="checkbox" id="ya-tengo-cuenta">
+                    <span class="slider round"></span>
+                </label>
+            </div>
 
             <form id="form-inscripcion">
-                <div class="switch-container">
-                    <span>¿Ya tienes cuenta?</span>
-                    <label class="switch">
-                        <input type="checkbox" id="ya-tengo-cuenta" />
-                        <span class="slider round"></span>
-                    </label>
+                <h3>Datos de Inscripción</h3>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" placeholder="Juan Pablo Garcías Casillas" required>
                 </div>
 
-                <div class="campos-registro">
-                    <div class="form-row">
-                        <input type="text" id="nombre" placeholder="Nombre completo" required />
-                        <input type="tel" id="telefono" placeholder="Teléfono" required />
-                    </div>
-
-                    <div class="form-row">
-                        <input type="email" id="correo" placeholder="Correo electrónico" required />
-                        <input type="date" id="fecha-nacimiento" required />
-                    </div>
-
-                    <div class="form-row">
-                        <select id="medio-contacto" required>
-                            <option value="">Medio de contacto preferido</option>
-                            <option value="telefono">Teléfono</option>
-                            <option value="correo">Correo electrónico</option>
-                            <option value="whatsapp">WhatsApp</option>
-                        </select>
-                        <input type="text" id="curso-nombre" readonly />
-                    </div>
-
-                    <button type="submit" class="btn-principal-modal">Enviar inscripción</button>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" id="telefono" placeholder="3333 3333 33" required>
                 </div>
 
-                <div class="campos-login" style="display: none;">
-                    <input type="text" id="login-identificador" placeholder="Correo electrónico o teléfono" />
-                    <button type="button" class="btn-principal" id="buscar-cuenta">Buscar</button>
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" placeholder="correodesjemplo@godcode.com" required>
                 </div>
 
-                <div id="error-cuenta" class="error-cuenta" style="display: none;">
-                    <p>
-                        Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de
-                        teléfono estén escritos correctamente o regístrate para crear una nueva cuenta.
-                    </p>
-                    <p class="registro-texto">
-                        ¿No tienes una cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
-                    </p>
+                <div class="form-group">
+                    <label for="fecha-nacimiento">Fecha de nacimiento</label>
+                    <input type="date" id="fecha-nacimiento" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="medio-contacto">Medio de contacto</label>
+                    <select id="medio-contacto" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="telefono">Teléfono</option>
+                        <option value="correo">Correo electrónico</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="curso-nombre">Curso seleccionado</label>
+                    <input type="text" id="curso-nombre" readonly>
+                </div>
+
+                <button type="submit" class="btn-inscribirme">Inscribirme al curso</button>
+
+                <div class="texto-legal">
+                    Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus datos
+                    para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para confirmar tu
+                    registro.
                 </div>
             </form>
         </div>
