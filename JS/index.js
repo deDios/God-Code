@@ -647,9 +647,9 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     }
 
     // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
-
+    // Selección de elementos
     const modal = document.getElementById("modal-inscripcion");
-    const abrirBtn = document.getElementById("abrir-modal-inscripcion"); // boton para inscribirme
+    const abrirBtn = document.getElementById("abrir-modal-inscripcion");
     const cerrarBtn = document.querySelector(".cerrar-modal");
 
     const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
@@ -659,106 +659,80 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     const volverRegistro = document.getElementById("volver-a-registro");
     const buscarBtn = document.getElementById("buscar-cuenta");
 
-    const nombreInput = document.getElementById("nombre");
-    const telefonoInput = document.getElementById("telefono");
-    const correoInput = document.getElementById("correo");
-    const fechaInput = document.getElementById("fecha-nacimiento");
-    const medioContactoInput = document.getElementById("medio-contacto");
+    const formInscripcion = document.getElementById("form-inscripcion");
     const cursoNombreInput = document.getElementById("curso-nombre");
     const loginInput = document.getElementById("login-identificador");
 
-    // Verificación inicial de elementos
+    // verificacion inicial de elementos
     console.group("Elementos del modal:");
     console.log("Modal:", modal);
     console.log("Botón abrir:", abrirBtn);
     console.log("Botón cerrar:", cerrarBtn);
     console.groupEnd();
 
-    if (abrirBtn) {
-      abrirBtn.addEventListener("click", () => {
-        console.log("[Modal] Abriendo ventana...");
-        modal.style.display = "flex";
+    // funcion para abrir el modal
+    function abrirModal() {
+      console.log("[Modal] Abriendo ventana...");
+      modal.classList.add("mostrar");
 
-        const nombreCursoElement = document.querySelector(
-          "#curso .curso-contenido h4"
-        );
-        console.log("Elemento nombre curso:", nombreCursoElement);
-        console.log("Valor global:", nombreCursoGlobal);
-
-        if (cursoNombreInput) {
-          cursoNombreInput.value =
-            nombreCursoGlobal || nombreCursoElement?.textContent || "";
-          console.log("Nombre asignado:", cursoNombreInput.value);
-        }
-      });
-    } //------------------------
-
-    // abre la pestaña emergente
-    abrirBtn.addEventListener("click", () => {
-      modal.style.display = "flex";
-      console.log("abrir modal click");
-      // carga el nombre de curso
+      // cargar nombre del curso
       const nombreCurso = document.querySelector("#curso .curso-contenido h4");
-      if (nombreCurso) {
-        if (cursoNombreInput && nombreCursoGlobal) {
-          cursoNombreInput.value = nombreCursoGlobal;
-        }
+      if (cursoNombreInput) {
+        cursoNombreInput.value =
+          nombreCursoGlobal || nombreCurso?.textContent || "";
+        console.log("Nombre asignado:", cursoNombreInput.value);
       }
-    });
+    }
 
-    // boton de cerrar pestaña
-    cerrarBtn.addEventListener("click", () => {
-      modal.style.display = "none";
+    // funcion para cerrar el modal
+    function cerrarModal() {
+      console.log("[Modal] Cerrando ventana");
+      modal.classList.remove("mostrar");
       limpiarFormulario();
-    });
+    }
+
+    // funcion para limpiar el formulario
+    function limpiarFormulario() {
+      formInscripcion.reset();
+      camposRegistro.style.display = "flex";
+      camposLogin.style.display = "none";
+      errorCuenta.style.display = "none";
+      checkboxCuenta.checked = false;
+    }
+
+    if (abrirBtn) {
+      abrirBtn.addEventListener("click", abrirModal);
+    }
+
+    if (cerrarBtn) {
+      cerrarBtn.addEventListener("click", cerrarModal);
+    }
 
     window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        modal.style.display = "none";
-        limpiarFormulario();
+      if (e.key === "Escape" && modal.classList.contains("mostrar")) {
+        cerrarModal();
       }
     });
 
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
-        modal.style.display = "none";
-        limpiarFormulario();
+        cerrarModal();
       }
     });
 
-    // Cierre del modal
-    [cerrarBtn, window, modal].forEach((element) => {
-      const eventType = element === window ? "keydown" : "click";
-      element.addEventListener(eventType, (e) => {
-        if (
-          e.key === "Escape" ||
-          e.target === cerrarBtn ||
-          e.target === modal
-        ) {
-          console.log("[Modal] Cerrando ventana");
-          modal.style.display = "none";
-          limpiarFormulario();
-        }
-      });
-    }); //------------------------
-
-    // cambia entre registro o crear contacto
     checkboxCuenta.addEventListener("change", () => {
-      if (checkboxCuenta.checked) {
-        camposRegistro.style.display = "none";
-        camposLogin.style.display = "flex";
-      } else {
-        camposRegistro.style.display = "flex";
-        camposLogin.style.display = "none";
-        errorCuenta.style.display = "none";
-      }
+      camposRegistro.style.display = checkboxCuenta.checked ? "none" : "flex";
+      camposLogin.style.display = checkboxCuenta.checked ? "flex" : "none";
+      if (!checkboxCuenta.checked) errorCuenta.style.display = "none";
     });
 
-    // buscar
-    buscarBtn.addEventListener("click", () => {
+    // buscar cuenta existente
+    buscarBtn.addEventListener("click", buscarCuentaExistente);
+
+    function buscarCuentaExistente() {
       const valor = loginInput.value.trim().toLowerCase();
 
-      // informacion dummy de busqueda, aca se puede colocar el fetch real
+      // datos dummy (reemplazar con fetch real)
       const cuentasSimuladas = [
         {
           nombre: "Juan Pérez",
@@ -774,25 +748,33 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       );
 
       if (cuenta) {
-        // cuando encuentra rellena los datos
-        nombreInput.value = cuenta.nombre;
-        telefonoInput.value = cuenta.telefono;
-        correoInput.value = cuenta.correo;
-        fechaInput.value = cuenta.fecha;
-        medioContactoInput.value = cuenta.medio;
-        camposRegistro.style.display = "flex";
-        camposLogin.style.display = "none";
-        checkboxCuenta.checked = false;
-        errorCuenta.style.display = "none";
+        llenarFormulario(cuenta);
       } else {
-        // muestra el mensaje de error
-        errorCuenta.style.display = "block";
-        setTimeout(() => {
-          errorCuenta.style.display = "none";
-        }, 4000);
+        mostrarErrorCuenta();
       }
-    });
+    }
 
+    function llenarFormulario(cuenta) {
+      document.getElementById("nombre").value = cuenta.nombre;
+      document.getElementById("telefono").value = cuenta.telefono;
+      document.getElementById("correo").value = cuenta.correo;
+      document.getElementById("fecha-nacimiento").value = cuenta.fecha;
+      document.getElementById("medio-contacto").value = cuenta.medio;
+
+      camposRegistro.style.display = "flex";
+      camposLogin.style.display = "none";
+      checkboxCuenta.checked = false;
+      errorCuenta.style.display = "none";
+    }
+
+    function mostrarErrorCuenta() {
+      errorCuenta.style.display = "block";
+      setTimeout(() => {
+        errorCuenta.style.display = "none";
+      }, 4000);
+    }
+
+    // volver al formulario de registro
     volverRegistro.addEventListener("click", (e) => {
       e.preventDefault();
       checkboxCuenta.checked = false;
@@ -801,14 +783,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       errorCuenta.style.display = "none";
       loginInput.value = "";
     });
-
-    // limpia el formulario cuando se cierra
-    function limpiarFormulario() {
-      document.getElementById("form-inscripcion").reset();
-      camposRegistro.style.display = "flex";
-      camposLogin.style.display = "none";
-      errorCuenta.style.display = "none";
-    }
+    //--------------- aca termina el js de la pesteña emergente
   });
 
   function inicializarAcordeones() {
