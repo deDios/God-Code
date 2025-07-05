@@ -648,6 +648,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
 
     // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
     // Selección de elementos
+    console.log("llegamos a la ventana emergente");
     const modal = document.getElementById("modal-inscripcion");
     const abrirBtn = document.getElementById("abrir-modal-inscripcion");
     const cerrarBtn = document.querySelector(".cerrar-modal");
@@ -662,6 +663,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     const formInscripcion = document.getElementById("form-inscripcion");
     const cursoNombreInput = document.getElementById("curso-nombre");
     const loginInput = document.getElementById("login-identificador");
+    console.log("se encontraron los elementos del DOM");
 
     const cuentasSimuladas = [
       {
