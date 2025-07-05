@@ -447,105 +447,106 @@
 
 
 /* --------------------- seccion para la ventana emergente -----------------------------*/
-.modal-inscripcion {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.modal-contenido {
-    background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.cerrar-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.5rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.modal-contenido h2 {
-    margin-bottom: 1.5rem;
-    color: #1a73e8;
-    text-align: center;
-}
-
-.modal-contenido form {
+.campos-registro {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-}
-
-.modal-contenido input,
-.modal-contenido select {
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-    background: #f9f9f9;
-}
-
-.modal-contenido input:focus,
-.modal-contenido select:focus {
-    outline: none;
-    border-color: #1a73e8;
-}
-
-.btn-principal {
-    background: #1a73e8;
-    color: white;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-principal:hover {
-    background: #155ec5;
-}
-
-.error-cuenta {
-    background-color: #e53935;
-    color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 0.9rem;
+    gap: 1.5rem;
     margin-top: 1rem;
 }
 
-.error-cuenta p {
-    margin: 0.5rem 0;
+.form-row {
+    display: flex;
+    gap: 1rem;
 }
 
-.registro-texto a {
+.form-row input,
+.form-row select {
+    flex: 1;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+button.btn-principal {
+    align-self: flex-end;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #1d61e7;
     color: white;
-    font-weight: bold;
-    text-decoration: underline;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.campos-login,
-.error-cuenta {
-    display: none;
+button.btn-principal:hover {
+    background-color: #154dc2;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    button.btn-principal {
+        align-self: center;
+    }
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 26px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #1d61e7;
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 26px;
 }
