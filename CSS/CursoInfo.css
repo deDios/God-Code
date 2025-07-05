@@ -523,10 +523,40 @@
     font-size: 1rem;
 }
 
-.campos-registro {
+.campos-registro,
+.campos-login {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.campos-login {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.campos-registro {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#ya-tengo-cuenta:checked~.campos-registro {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#ya-tengo-cuenta:checked~.campos-login {
+    display: flex;
+    opacity: 1;
+    height: auto;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .form-group {
@@ -542,7 +572,8 @@
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+#login-identificador {
     width: 100%;
     padding: 0.9rem;
     border: 1px solid #ddd;
@@ -553,7 +584,8 @@
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+#login-identificador:focus {
     border-color: #3498db;
     background-color: #fff;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -590,30 +622,6 @@
     transform: translateY(0);
 }
 
-.texto-legal {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #ecf0f1;
-    color: #7f8c8d;
-    font-size: 0.85rem;
-    line-height: 1.6;
-    text-align: center;
-}
-
-.campos-login {
-    display: none;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-#login-identificador {
-    width: 100%;
-    padding: 0.9rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
 #buscar-cuenta {
     width: 100%;
     padding: 1rem;
@@ -630,7 +638,7 @@
     background-color: #2980b9;
 }
 
-.error-cuenta {
+#error-cuenta {
     background-color: #fde8e8;
     border-left: 4px solid #e74c3c;
     padding: 1rem;
@@ -639,6 +647,13 @@
     color: #c0392b;
     font-size: 0.9rem;
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#error-cuenta.show {
+    display: block;
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
@@ -658,7 +673,8 @@
     }
 
     .form-group input,
-    .form-group select {
+    .form-group select,
+    #login-identificador {
         padding: 0.8rem;
     }
 
@@ -666,35 +682,4 @@
     #buscar-cuenta {
         padding: 0.9rem;
     }
-}
-
-.campos-registro, 
-.campos-login {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.campos-login {
-  flex-direction: column;
-  gap: 1.5rem;
-  opacity: 0;
-  height: 0;
-  overflow: hidden;
-  transform: translateY(-10px);
-}
-
-.campos-registro {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#ya-tengo-cuenta:checked ~ .campos-registro {
-  display: none;
-  opacity: 0;
-}
-
-#ya-tengo-cuenta:checked ~ .campos-login {
-  display: flex;
-  opacity: 1;
-  height: auto;
-  transform: translateY(0);
 }

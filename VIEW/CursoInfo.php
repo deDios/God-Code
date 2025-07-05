@@ -335,75 +335,62 @@
     </footer>
 
     <!--- esto es la pestaña emergente para suscribirse al curso --->
+    <button id="abrir-modal-inscripcion">Inscribirme</button>
+
     <div id="modal-inscripcion">
         <div class="modal-contenido">
-            <button class="cerrar-modal" aria-label="Cerrar">&times;</button>
+            <button class="cerrar-modal">&times;</button>
 
-            <h2>Inscribirme al curso</h2>
+            <h2>Inscripción al Curso</h2>
 
-            <div class="switch-container">
-                <span>¿Ya tienes cuenta?</span>
-                <label class="switch">
-                    <input type="checkbox" id="ya-tengo-cuenta">
-                    <span class="slider"></span>
+            <div class="form-group">
+                <label for="curso-nombre">Curso</label>
+                <input type="text" id="curso-nombre" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="ya-tengo-cuenta" /> Ya tengo cuenta
                 </label>
+            </div>
+
+            <div class="campos-login">
+                <label for="login-identificador">Correo o Teléfono</label>
+                <input type="text" id="login-identificador" />
+                <button type="button" id="buscar-cuenta">Buscar Cuenta</button>
+                <div id="error-cuenta" style="display:none; color: red;">
+                    Cuenta no encontrada.
+                </div>
+                <a href="#" id="volver-a-registro">Volver al registro</a>
             </div>
 
             <form id="form-inscripcion">
                 <div class="campos-registro">
                     <div class="form-group">
-                        <label for="nombre">Nombre completo</label>
-                        <input type="text" id="nombre" placeholder="Nombre" required>
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" />
                     </div>
-
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
-                        <input type="tel" id="telefono" placeholder="Telefono" required>
+                        <input type="text" id="telefono" />
                     </div>
-
                     <div class="form-group">
-                        <label for="correo">Correo electrónico</label>
-                        <input type="email" id="correo" placeholder="usuario@email.com" required>
+                        <label for="correo">Correo</label>
+                        <input type="email" id="correo" />
                     </div>
-
                     <div class="form-group">
-                        <label for="fecha-nacimiento">Fecha de nacimiento</label>
-                        <input type="date" id="fecha-nacimiento" required>
+                        <label for="fecha-nacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="fecha-nacimiento" />
                     </div>
-
                     <div class="form-group">
-                        <label for="medio-contacto">Medio de contacto preferido</label>
-                        <select id="medio-contacto" required>
-                            <option value="">Selecciona una opción</option>
+                        <label for="medio-contacto">Medio de Contacto</label>
+                        <select id="medio-contacto">
+                            <option value="">Selecciona</option>
+                            <option value="correo">Correo</option>
                             <option value="telefono">Teléfono</option>
-                            <option value="correo">Correo electrónico</option>
-                            <option value="whatsapp">WhatsApp</option>
                         </select>
                     </div>
-
-                    <div class="form-group">
-                        <label for="curso-nombre">Curso seleccionado</label>
-                        <input type="text" id="curso-nombre" readonly>
-                    </div>
-
-                    <button type="submit" class="btn-inscribirme">Enviar inscripción</button>
-                </div>
-
-                <div class="campos-login">
-                    <div class="form-group">
-                        <label for="login-identificador">Correo electrónico o teléfono</label>
-                        <input type="text" id="login-identificador"
-                            placeholder="Ingresa tu correo o teléfono registrado">
-                    </div>
-                    <button type="button" id="buscar-cuenta" class="btn-inscribirme">Buscar cuenta</button>
-                    <div id="error-cuenta" class="error-cuenta" style="display: none;">
-                        <p>No encontramos tu cuenta. Verifica tus datos o regístrate.</p>
-                    </div>
-                </div>
-
-                <div class="texto-legal">
-                    Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus datos
-                    para fines académicos y administrativos.
+                    <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
                 </div>
             </form>
         </div>
