@@ -344,11 +344,6 @@
             <h2>Inscripción al Curso</h2>
 
             <div class="form-group">
-                <label for="curso-nombre">Curso</label>
-                <input type="text" id="curso-nombre" readonly />
-            </div>
-
-            <div class="form-group">
                 <label>
                     <input type="checkbox" id="ya-tengo-cuenta" /> Ya tengo cuenta
                 </label>
@@ -381,6 +376,10 @@
                     <div class="form-group">
                         <label for="fecha-nacimiento">Fecha de Nacimiento</label>
                         <input type="date" id="fecha-nacimiento" />
+                    </div>
+                    <div class="form-group">
+                        <label for="curso-nombre">Curso</label>
+                        <input type="text" id="curso-nombre" readonly />
                     </div>
                     <div class="form-group">
                         <label for="medio-contacto">Medio de Contacto</label>

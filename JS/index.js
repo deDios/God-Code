@@ -693,7 +693,7 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     const abrirModal = () => {
       console.log("Abriendo modal...");
       modal.classList.add("mostrar");
-      cursoNombreInput.value = "Curso DEMO";
+      cursoNombreInput.value = "aca buscare el nombre del curso con una variable del fetch";
     };
 
     const cerrarModal = () => {
