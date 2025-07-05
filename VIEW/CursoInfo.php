@@ -335,7 +335,6 @@
     </footer>
 
     <!--- esto es la pestaña emergente para suscribirse al curso --->
-    <!-- Modal de inscripción -->
     <div id="modal-inscripcion" class="modal-inscripcion">
         <div class="modal-contenido">
             <button class="cerrar-modal" aria-label="Cerrar">&times;</button>
@@ -371,10 +370,9 @@
                         <input type="text" id="curso-nombre" readonly />
                     </div>
 
-                    <button type="submit" class="btn-principal">Enviar inscripción</button>
+                    <button type="submit" class="btn-principal-modal">Enviar inscripción</button>
                 </div>
 
-                <!-- Campos de login -->
                 <div class="campos-login" style="display: none;">
                     <input type="text" id="login-identificador" placeholder="Correo electrónico o teléfono" />
                     <button type="button" class="btn-principal" id="buscar-cuenta">Buscar</button>

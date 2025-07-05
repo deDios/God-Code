@@ -667,10 +667,36 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     const cursoNombreInput = document.getElementById("curso-nombre");
     const loginInput = document.getElementById("login-identificador");
 
+    // Verificación inicial de elementos
+    console.group("Elementos del modal:");
+    console.log("Modal:", modal);
+    console.log("Botón abrir:", abrirBtn);
+    console.log("Botón cerrar:", cerrarBtn);
+    console.groupEnd();
+
+    if (abrirBtn) {
+      abrirBtn.addEventListener("click", () => {
+        console.log("[Modal] Abriendo ventana...");
+        modal.style.display = "flex";
+
+        const nombreCursoElement = document.querySelector(
+          "#curso .curso-contenido h4"
+        );
+        console.log("Elemento nombre curso:", nombreCursoElement);
+        console.log("Valor global:", nombreCursoGlobal);
+
+        if (cursoNombreInput) {
+          cursoNombreInput.value =
+            nombreCursoGlobal || nombreCursoElement?.textContent || "";
+          console.log("Nombre asignado:", cursoNombreInput.value);
+        }
+      });
+    } //------------------------
+
     // abre la pestaña emergente
     abrirBtn.addEventListener("click", () => {
       modal.style.display = "flex";
-
+      console.log("abrir modal click");
       // carga el nombre de curso
       const nombreCurso = document.querySelector("#curso .curso-contenido h4");
       if (nombreCurso) {
@@ -699,6 +725,22 @@ if (window.location.pathname.includes("cursoInfo.php")) {
         limpiarFormulario();
       }
     });
+
+    // Cierre del modal
+    [cerrarBtn, window, modal].forEach((element) => {
+      const eventType = element === window ? "keydown" : "click";
+      element.addEventListener(eventType, (e) => {
+        if (
+          e.key === "Escape" ||
+          e.target === cerrarBtn ||
+          e.target === modal
+        ) {
+          console.log("[Modal] Cerrando ventana");
+          modal.style.display = "none";
+          limpiarFormulario();
+        }
+      });
+    }); //------------------------
 
     // cambia entre registro o crear contacto
     checkboxCuenta.addEventListener("change", () => {
