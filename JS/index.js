@@ -648,10 +648,25 @@ if (window.location.pathname.includes("cursoInfo.php")) {
 
     // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
     // Selección de elementos
-    console.log("llegamos a la ventana emergente");
+    console.log("Iniciando script de modal...");
+
     const modal = document.getElementById("modal-inscripcion");
     const abrirBtn = document.getElementById("abrir-modal-inscripcion");
     const cerrarBtn = document.querySelector(".cerrar-modal");
+
+    if (!modal || !abrirBtn || !cerrarBtn) {
+      console.error("ERROR: Elementos esenciales del modal no encontrados");
+      if (!modal)
+        console.error("- No se encontró el modal (ID: modal-inscripcion)");
+      if (!abrirBtn)
+        console.error(
+          "- No se encontró el botón abrir (ID: abrir-modal-inscripcion)"
+        );
+      if (!cerrarBtn)
+        console.error("- No se encontró el botón cerrar (clase: cerrar-modal)");
+    } else {
+      console.log("Elementos principales del modal encontrados correctamente");
+    }
 
     const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
     const camposRegistro = document.querySelector(".campos-registro");
@@ -659,11 +674,9 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     const errorCuenta = document.getElementById("error-cuenta");
     const volverRegistro = document.getElementById("volver-a-registro");
     const buscarBtn = document.getElementById("buscar-cuenta");
-
     const formInscripcion = document.getElementById("form-inscripcion");
     const cursoNombreInput = document.getElementById("curso-nombre");
     const loginInput = document.getElementById("login-identificador");
-    console.log("se encontraron los elementos del DOM");
 
     const cuentasSimuladas = [
       {
@@ -675,73 +688,69 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       },
     ];
 
-    function verificarElementos() {
-      console.group("Elementos del modal:");
-      console.log("Modal:", modal);
-      console.log("Botón abrir:", abrirBtn);
-      console.log("Botón cerrar:", cerrarBtn);
-      console.log("Checkbox cuenta:", checkboxCuenta);
-      console.log("Formulario:", formInscripcion);
-      console.groupEnd();
-    }
-
     function abrirModal() {
-      console.log("[Modal] Abriendo ventana...");
+      console.log("Abriendo modal...");
       modal.classList.add("mostrar");
 
-      const nombreCurso = document.querySelector("#curso .curso-contenido h4");
+      const nombreCursoElement = document.querySelector(
+        "#curso .curso-contenido h4"
+      );
       if (cursoNombreInput) {
         cursoNombreInput.value =
-          nombreCursoGlobal || nombreCurso?.textContent || "";
-        console.log("Nombre asignado:", cursoNombreInput.value);
+          nombreCursoGlobal ||
+          nombreCursoElement?.textContent ||
+          "Nombre del curso";
+        console.log("Nombre del curso asignado:", cursoNombreInput.value);
       }
     }
 
     function cerrarModal() {
-      console.log("[Modal] Cerrando ventana");
+      console.log("Cerrando modal...");
       modal.classList.remove("mostrar");
       limpiarFormulario();
     }
 
     function limpiarFormulario() {
-      if (formInscripcion) {
-        formInscripcion.reset();
-      }
+      console.log("Limpiando formulario...");
+      if (formInscripcion) formInscripcion.reset();
       toggleFormularios(false);
       if (errorCuenta) errorCuenta.style.display = "none";
     }
 
     function toggleFormularios(mostrarLogin) {
-      if (camposRegistro) {
+      console.log(`Cambiando a ${mostrarLogin ? "LOGIN" : "REGISTRO"}`);
+      if (camposRegistro)
         camposRegistro.style.display = mostrarLogin ? "none" : "flex";
-      }
-      if (camposLogin) {
+      if (camposLogin)
         camposLogin.style.display = mostrarLogin ? "flex" : "none";
-      }
-      if (checkboxCuenta) {
-        checkboxCuenta.checked = mostrarLogin;
-      }
+      if (checkboxCuenta) checkboxCuenta.checked = mostrarLogin;
     }
 
     function buscarCuentaExistente() {
+      console.log("Buscando cuenta existente...");
       if (!loginInput) return;
 
       const valor = loginInput.value.trim().toLowerCase();
+      console.log("Buscando:", valor);
+
       const cuenta = cuentasSimuladas.find(
         (c) => c.telefono === valor || c.correo === valor
       );
 
       if (cuenta) {
+        console.log("Cuenta encontrada:", cuenta);
         llenarFormulario(cuenta);
       } else {
+        console.log("Cuenta NO encontrada");
         mostrarErrorCuenta();
       }
     }
 
     function llenarFormulario(cuenta) {
+      console.log("Llenando formulario con datos...");
       if (!cuenta) return;
 
-      const elementos = {
+      const campos = {
         nombre: document.getElementById("nombre"),
         telefono: document.getElementById("telefono"),
         correo: document.getElementById("correo"),
@@ -749,14 +758,15 @@ if (window.location.pathname.includes("cursoInfo.php")) {
         medio: document.getElementById("medio-contacto"),
       };
 
-      for (const [key, element] of Object.entries(elementos)) {
+      Object.entries(campos).forEach(([key, element]) => {
         if (element) element.value = cuenta[key] || "";
-      }
+      });
 
       toggleFormularios(false);
     }
 
     function mostrarErrorCuenta() {
+      console.log("Mostrando error de cuenta...");
       if (errorCuenta) {
         errorCuenta.style.display = "block";
         setTimeout(() => {
@@ -766,8 +776,17 @@ if (window.location.pathname.includes("cursoInfo.php")) {
     }
 
     function inicializarEventListeners() {
-      if (abrirBtn) abrirBtn.addEventListener("click", abrirModal);
-      if (cerrarBtn) cerrarBtn.addEventListener("click", cerrarModal);
+      console.log("Inicializando event listeners...");
+
+      if (abrirBtn) {
+        abrirBtn.addEventListener("click", abrirModal);
+        console.log("Evento click agregado a abrirBtn");
+      }
+
+      if (cerrarBtn) {
+        cerrarBtn.addEventListener("click", cerrarModal);
+        console.log("Evento click agregado a cerrarBtn");
+      }
 
       window.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && modal?.classList.contains("mostrar")) {
@@ -788,9 +807,13 @@ if (window.location.pathname.includes("cursoInfo.php")) {
             errorCuenta.style.display = "none";
           }
         });
+        console.log("Evento change agregado a checkboxCuenta");
       }
 
-      if (buscarBtn) buscarBtn.addEventListener("click", buscarCuentaExistente);
+      if (buscarBtn) {
+        buscarBtn.addEventListener("click", buscarCuentaExistente);
+        console.log("Evento click agregado a buscarBtn");
+      }
 
       if (volverRegistro) {
         volverRegistro.addEventListener("click", (e) => {
@@ -798,11 +821,13 @@ if (window.location.pathname.includes("cursoInfo.php")) {
           limpiarFormulario();
           if (loginInput) loginInput.value = "";
         });
+        console.log("Evento click agregado a volverRegistro");
       }
     }
 
+    // Inicialización principal
     document.addEventListener("DOMContentLoaded", () => {
-      verificarElementos();
+      console.log("DOM completamente cargado - Iniciando modal");
       inicializarEventListeners();
     });
     //--------------- aca termina el js de la pesteña emergente
