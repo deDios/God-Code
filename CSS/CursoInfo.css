@@ -455,14 +455,25 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    z-index: 10000;
     justify-content: center;
     align-items: center;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
 #modal-inscripcion.mostrar {
     display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-contenido {
@@ -471,50 +482,35 @@
     border-radius: 12px;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.cerrar-modal:hover {
+    color: #34495e;
 }
 
 .modal-contenido h2 {
     color: #2c3e50;
     font-size: 1.8rem;
-    margin-bottom: 1.5rem;
+    margin: 0 0 1.5rem 0;
     text-align: center;
     font-weight: 600;
-}
-
-.modal-contenido h3 {
-    color: #3498db;
-    font-size: 1.2rem;
-    margin: 1.5rem 0 0.8rem;
-    font-weight: 500;
-}
-
-.form-group {
-    margin-bottom: 1.2rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #34495e;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .switch-container {
@@ -527,49 +523,47 @@
     font-size: 1rem;
 }
 
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
+.campos-registro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+.form-group {
+    margin-bottom: 0;
 }
 
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #bdc3c7;
-    transition: .4s;
-    border-radius: 34px;
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: all 0.3s;
 }
 
-input:checked+.slider {
-    background-color: #3498db;
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #3498db;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
 }
 
-input:checked+.slider:before {
-    transform: translateX(24px);
+#curso-nombre {
+    background-color: #f0f0f0;
+    color: #555;
+    cursor: not-allowed;
 }
 
 .btn-inscribirme {
@@ -578,16 +572,22 @@ input:checked+.slider:before {
     background-color: #2ecc71;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 1.1rem;
     font-weight: 500;
     cursor: pointer;
-    margin-top: 1.5rem;
-    transition: background-color 0.3s;
+    margin-top: 1rem;
+    transition: all 0.3s;
 }
 
 .btn-inscribirme:hover {
     background-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-inscribirme:active {
+    transform: translateY(0);
 }
 
 .texto-legal {
@@ -595,17 +595,59 @@ input:checked+.slider:before {
     padding-top: 1.5rem;
     border-top: 1px solid #ecf0f1;
     color: #7f8c8d;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.campos-login {
+    display: none;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+#login-identificador {
+    width: 100%;
+    padding: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+#buscar-cuenta {
+    width: 100%;
+    padding: 1rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#buscar-cuenta:hover {
+    background-color: #2980b9;
+}
+
+.error-cuenta {
+    background-color: #fde8e8;
+    border-left: 4px solid #e74c3c;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+    color: #c0392b;
     font-size: 0.9rem;
-    line-height: 1.5;
+    display: none;
 }
 
 @media (max-width: 768px) {
     .modal-contenido {
-        padding: 1.8rem;
+        padding: 2rem;
     }
 
     .modal-contenido h2 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
 }
 
@@ -617,6 +659,42 @@ input:checked+.slider:before {
 
     .form-group input,
     .form-group select {
-        padding: 0.7rem;
+        padding: 0.8rem;
     }
+
+    .btn-inscribirme,
+    #buscar-cuenta {
+        padding: 0.9rem;
+    }
+}
+
+.campos-registro, 
+.campos-login {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.campos-login {
+  flex-direction: column;
+  gap: 1.5rem;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+}
+
+.campos-registro {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#ya-tengo-cuenta:checked ~ .campos-registro {
+  display: none;
+  opacity: 0;
+}
+
+#ya-tengo-cuenta:checked ~ .campos-login {
+  display: flex;
+  opacity: 1;
+  height: auto;
+  transform: translateY(0);
 }
