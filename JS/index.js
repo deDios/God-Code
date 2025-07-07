@@ -405,16 +405,19 @@ if (
 
 //------------------------------- vista CursoInfo -------------------------------------------------------------
 
-if (window.location.pathname.includes("cursoInfo.php")) {
+if (window.location.pathname.includes("CursoInfo.php")) {
+  //--------------- aca termina el js de la pesteña emergente
   //apartado para recuperar los datos del curso segun su id
   document.addEventListener("DOMContentLoaded", async () => {
     let nombreCursoGlobal = "";
+    let idCursoGlobal = "";
     console.log("1. DOM completamente cargado - Iniciando script");
 
     // se obtiene el curso con la id que enviamos por la url
     const urlParams = new URLSearchParams(window.location.search);
     const cursoId = urlParams.get("id");
     console.log("2. ID obtenido de la URL:", cursoId);
+    idCursoGlobal = cursoId;
 
     if (!cursoId) {
       console.error("3. No se encontró ID de curso en la URL");
@@ -645,129 +648,6 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       `;
       }
     }
-
-    // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
-    console.log("DOM cargado - Modal Inscripción Ready");
-
-    const ruta = window.location.pathname.toLowerCase();
-    if (!ruta.includes("cursoinfo.php")) {
-      console.warn("No es cursoInfo.php, salta modal");
-      return;
-    }
-
-    const modal = document.getElementById("modal-inscripcion");
-    const abrirBtn = document.getElementById("abrir-modal-inscripcion");
-    const cerrarBtn = document.querySelector(".cerrar-modal");
-
-    const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
-    const camposRegistro = document.querySelector(".campos-registro");
-    const camposLogin = document.querySelector(".campos-login");
-    const errorCuenta = document.getElementById("error-cuenta");
-    const buscarBtn = document.getElementById("buscar-cuenta");
-    const volverRegistro = document.getElementById("volver-a-registro");
-    const cursoNombreInput = document.getElementById("curso-nombre");
-    const loginInput = document.getElementById("login-identificador");
-
-    const formInscripcion = document.getElementById("form-inscripcion");
-
-    const cuentasSimuladas = [
-      {
-        nombre: "Juan Pérez",
-        telefono: "5551234567",
-        correo: "juan@godcode.com",
-        fecha: "1990-01-01",
-        medio: "correo",
-      },
-    ];
-
-    console.log("Elementos capturados:", {
-      modal,
-      abrirBtn,
-      cerrarBtn,
-      checkboxCuenta,
-      buscarBtn,
-      volverRegistro,
-      formInscripcion,
-    });
-
-    const abrirModal = () => {
-      console.log("Abriendo modal...");
-      modal.classList.add("mostrar");
-      cursoNombreInput.value = "aca buscare el nombre del curso con una variable del fetch";
-    };
-
-    const cerrarModal = () => {
-      console.log("Cerrando modal...");
-      modal.classList.remove("mostrar");
-      limpiarFormulario();
-    };
-
-    const limpiarFormulario = () => {
-      console.log("Limpiando formulario...");
-      if (formInscripcion) formInscripcion.reset();
-      toggleFormularios(false);
-      errorCuenta.style.display = "none";
-      loginInput.value = "";
-    };
-
-    const toggleFormularios = (mostrarLogin) => {
-      console.log(`Cambio a ${mostrarLogin ? "LOGIN" : "REGISTRO"}`);
-      camposRegistro.style.display = mostrarLogin ? "none" : "flex";
-      camposLogin.style.display = mostrarLogin ? "flex" : "none";
-      checkboxCuenta.checked = mostrarLogin;
-    };
-
-    const buscarCuentaExistente = () => {
-      console.log("Buscando cuenta existente...");
-      const valor = loginInput.value.trim().toLowerCase();
-      const cuenta = cuentasSimuladas.find(
-        (c) => c.telefono === valor || c.correo === valor
-      );
-      if (cuenta) {
-        console.log("Cuenta encontrada:", cuenta);
-        llenarFormulario(cuenta);
-      } else {
-        console.warn("Cuenta no encontrada");
-        mostrarErrorCuenta();
-      }
-    };
-
-    const llenarFormulario = (cuenta) => {
-      document.getElementById("nombre").value = cuenta.nombre || "";
-      document.getElementById("telefono").value = cuenta.telefono || "";
-      document.getElementById("correo").value = cuenta.correo || "";
-      document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
-      document.getElementById("medio-contacto").value = cuenta.medio || "";
-      toggleFormularios(false);
-    };
-
-    const mostrarErrorCuenta = () => {
-      errorCuenta.style.display = "block";
-      setTimeout(() => (errorCuenta.style.display = "none"), 4000);
-    };
-
-    abrirBtn.addEventListener("click", abrirModal);
-    cerrarBtn.addEventListener("click", cerrarModal);
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) cerrarModal();
-    });
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") cerrarModal();
-    });
-
-    checkboxCuenta.addEventListener("change", (e) => {
-      toggleFormularios(e.target.checked);
-      errorCuenta.style.display = "none";
-    });
-
-    buscarBtn.addEventListener("click", buscarCuentaExistente);
-    volverRegistro.addEventListener("click", (e) => {
-      e.preventDefault();
-      limpiarFormulario();
-    });
-
-    console.log("Modal de inscripción inicializado");
-    //--------------- aca termina el js de la pesteña emergente
   });
 
   function inicializarAcordeones() {
@@ -789,6 +669,163 @@ if (window.location.pathname.includes("cursoInfo.php")) {
       });
     });
   }
+
+  // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+  
+  console.log("DOM cargado - Modal Inscripción Ready");
+
+  const modal = document.getElementById("modal-inscripcion");
+  const abrirBtn = document.getElementById("abrir-modal-inscripcion");
+  const cerrarBtn = document.querySelector(".cerrar-modal");
+
+  const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
+  const formGroupCuenta = document.querySelector(".form-group.checkbox-cuenta");
+
+  const titulo = document.querySelector(".titulo-modal");
+  const camposRegistro = document.querySelector(".campos-registro");
+  const camposLogin = document.querySelector(".campos-login");
+  const errorCuenta = document.getElementById("error-cuenta");
+  const buscarBtn = document.getElementById("buscar-cuenta");
+  const volverRegistro = document.getElementById("volver-a-registro");
+  const cursoNombreInput = document.getElementById("curso-nombre");
+  const loginInput = document.getElementById("login-identificador");
+
+  const formInscripcion = document.getElementById("form-inscripcion");
+
+  const cuentasSimuladas = [
+    {
+      nombre: "Juan Pérez",
+      telefono: "5551234567",
+      correo: "juan@godcode.com",
+      fecha: "1990-01-01",
+      medio: ["correo", "telefono"],
+    },
+  ];
+
+  let primeraVez = true;
+
+  const abrirModal = () => {
+    console.log("Abriendo modal...");
+    modal.classList.add("mostrar");
+
+    limpiarFormulario();
+
+    //lo toma con una variable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
+    cursoNombreInput.value = "Curso seleccionado desde fetch";
+  };
+
+  const cerrarModal = () => {
+    console.log("Cerrando modal...");
+    modal.classList.remove("mostrar");
+    limpiarFormulario();
+  };
+
+  const limpiarFormulario = () => {
+    if (formInscripcion) formInscripcion.reset();
+    toggleFormularios(false);
+
+    errorCuenta.classList.remove("mostrar");
+    volverRegistro.classList.remove("mostrar");
+
+    loginInput.value = "";
+
+    document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+      cb.checked = false;
+    });
+  };
+  //-------------------------- aca esta el toggle para buscar cuenta
+  const toggleFormularios = (mostrarLogin) => {
+    titulo.style.display = mostrarLogin ? "none" : "flex";
+    checkboxCuenta.checked = mostrarLogin;
+
+    if (mostrarLogin) {
+      camposLogin.classList.add("mostrar");
+      camposRegistro.classList.remove("mostrar");
+    } else {
+      camposRegistro.classList.add("mostrar");
+      camposLogin.classList.remove("mostrar");
+    }
+  };
+
+  const buscarCuentaExistente = () => {
+    const valor = loginInput.value.trim().toLowerCase();
+    const cuenta = cuentasSimuladas.find(
+      (c) => c.telefono === valor || c.correo === valor
+    );
+    if (cuenta) {
+      llenarFormulario(cuenta);
+    } else {
+      mostrarErrorCuenta();
+    }
+  };
+
+  const llenarFormulario = (cuenta) => {
+    document.getElementById("nombre").value = cuenta.nombre || "";
+    document.getElementById("telefono").value = cuenta.telefono || "";
+    document.getElementById("correo").value = cuenta.correo || "";
+    document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
+    cursoNombreInput.value = "Curso seleccionado"; //lo toma con unavariable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
+
+    document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+      cb.checked = cuenta.medio?.includes(cb.value);
+    });
+
+    toggleFormularios(false);
+  };
+
+  const mostrarErrorCuenta = () => {
+    const errorCuenta = document.getElementById("error-cuenta");
+    const volverRegistro = document.querySelector(".volver-a-registro");
+
+    errorCuenta.classList.add("mostrar");
+    volverRegistro.classList.add("mostrar");
+
+    setTimeout(() => {
+      errorCuenta.classList.remove("mostrar");
+      volverRegistro.classList.remove("mostrar");
+    }, 5000);
+  };
+
+  const ocultarErrorCuenta = () => {
+    document.getElementById("error-cuenta").classList.remove("mostrar");
+  };
+
+  const validarMediosContacto = () => {
+    const mediosSeleccionados = Array.from(
+      document.querySelectorAll('input[name="medios-contacto"]:checked')
+    );
+    return mediosSeleccionados.length > 0;
+  };
+
+  formInscripcion.addEventListener("submit", (e) => {
+    if (!validarMediosContacto()) {
+      e.preventDefault();
+      alert("Por favor selecciona al menos un medio de contacto.");
+    }
+  });
+
+  abrirBtn.addEventListener("click", abrirModal);
+  cerrarBtn.addEventListener("click", cerrarModal);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) cerrarModal();
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
+  });
+
+  checkboxCuenta.addEventListener("change", (e) => {
+    toggleFormularios(e.target.checked);
+    ocultarErrorCuenta();
+  });
+
+  buscarBtn.addEventListener("click", buscarCuentaExistente);
+
+  volverRegistro.addEventListener("click", (e) => {
+    e.preventDefault();
+    limpiarFormulario();
+  });
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------

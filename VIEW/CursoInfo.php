@@ -335,13 +335,11 @@
     </footer>
 
     <!--- esto es la pestaña emergente para suscribirse al curso --->
-    <button id="abrir-modal-inscripcion">Inscribirme</button>
-
     <div id="modal-inscripcion">
         <div class="modal-contenido">
             <button class="cerrar-modal">&times;</button>
 
-            <h2>Inscripción al Curso</h2>
+            <h2>Inscribirme al Curso</h2>
 
             <div class="form-group">
                 <label>
@@ -350,16 +348,27 @@
             </div>
 
             <div class="campos-login">
-                <label for="login-identificador">Correo o Teléfono</label>
-                <input type="text" id="login-identificador" />
-                <button type="button" id="buscar-cuenta">Buscar Cuenta</button>
-                <div id="error-cuenta" style="display:none; color: red;">
-                    Cuenta no encontrada.
+
+                <div class="form-group fila-buscar align-left-container">
+                    <label for="login-identificador" class="label-align-left">Correo o Teléfono</label>
+                    <div class="input-contenedor">
+                        <input type="text" id="login-identificador" placeholder="Ingresa tu correo o teléfono"
+                            class="input-size-control" />
+                        <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
+                    </div>
                 </div>
-                <a href="#" id="volver-a-registro">Volver al registro</a>
+                
+                <div id="error-cuenta" class="alerta-error">
+                    Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
+                    escritos correctamente o regístrate para crear una nueva cuenta.
+                </div>
+                <p class="volver-a-registro">
+                    ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
+                </p>
             </div>
 
             <form id="form-inscripcion">
+                <label class="titulo-modal">Datos de Inscripción</label>
                 <div class="campos-registro">
                     <div class="form-group">
                         <label for="nombre">Nombre</label>
@@ -378,18 +387,28 @@
                         <input type="date" id="fecha-nacimiento" />
                     </div>
                     <div class="form-group">
-                        <label for="curso-nombre">Curso</label>
-                        <input type="text" id="curso-nombre" readonly />
+                        <label>Medio de contacto</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                            <label>
+                                <input type="checkbox" name="medios-contacto" value="telefono" />
+                                Teléfono
+                            </label>
+                            <label>
+                                <input type="checkbox" name="medios-contacto" value="correo" />
+                                Correo electrónico
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="medio-contacto">Medio de Contacto</label>
-                        <select id="medio-contacto">
-                            <option value="">Selecciona</option>
-                            <option value="correo">Correo</option>
-                            <option value="telefono">Teléfono</option>
-                        </select>
+                        <label for="curso-nombre">Curso seleccionado</label>
+                        <input type="text" id="curso-nombre" readonly />
                     </div>
                     <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
+                    <p class="aviso">
+                        Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
+                        datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
+                        confirmar tu registro.
+                    </p>
                 </div>
             </form>
         </div>
