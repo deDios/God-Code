@@ -357,7 +357,7 @@
                         <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
                     </div>
                 </div>
-                
+
                 <div id="error-cuenta" class="alerta-error">
                     Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
                     escritos correctamente o regístrate para crear una nueva cuenta.
@@ -414,7 +414,8 @@
         </div>
     </div>
 
-    <script src="../JS/index.js"></script>
+    <script src="../JS/cursoInfo.js"></script>
+    <script src="../JS/JSglobal.js"></script>
 </body>
 
 </html>

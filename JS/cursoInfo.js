@@ -1,0 +1,418 @@
+//--------------- aca termina el js de la pesteña emergente
+
+//apartado para recuperar los datos del curso segun su id
+document.addEventListener("DOMContentLoaded", async () => {
+  let nombreCursoGlobal = "";
+  let idCursoGlobal = "";
+  console.log("1. DOM completamente cargado - Iniciando script");
+
+  // se obtiene el curso con la id que enviamos por la url
+  const urlParams = new URLSearchParams(window.location.search);
+  const cursoId = urlParams.get("id");
+  console.log("2. ID obtenido de la URL:", cursoId);
+  idCursoGlobal = cursoId;
+
+  if (!cursoId) {
+    console.error("3. No se encontró ID de curso en la URL");
+    mostrarError("No se encontró ID de curso en la URL");
+    return;
+  }
+
+  const elementos = {
+    nombre: document.querySelector("#curso .curso-contenido h4"),
+    titulo: document.querySelector("#curso .curso-contenido .titulo"),
+    descCorta: document.querySelector(
+      "#curso .curso-contenido .descripcion-corta"
+    ),
+    descMedia: document.querySelector(
+      "#curso .curso-contenido .descripcion-media"
+    ),
+    imagen: document.querySelector("#curso .curso-contenido img"),
+    descripcion: document.querySelector(
+      "#curso .curso-contenido .texto-descriptivo"
+    ),
+    fechaInicio: document.querySelector("#curso .fecha-inicio"), // si decides usarlo
+
+    precio: document.querySelector("#curso .curso-info .precio"),
+    horas: document.querySelector("#curso .curso-info .horas"),
+    actividades: document.querySelector("#curso .curso-info .actividades"),
+    evaluacion: document.querySelector("#curso .curso-info .evaluacion"),
+    calendario: document.querySelector("#curso .curso-info .calendario"),
+    certificado: document.querySelector("#curso .curso-info .certificado"),
+
+    tutorImg: document.querySelector("#curso-detalle-extra .instructor img"),
+    tutorNombre: document.querySelector(
+      "#curso-detalle-extra .instructor strong"
+    ),
+    tutorBio: document.querySelector(
+      "#curso-detalle-extra .instructor p:last-child"
+    ),
+    dirigido: document.querySelector(
+      "#curso-detalle-extra .dirigido .contenido p"
+    ),
+    competencias: document.querySelector(
+      "#curso-detalle-extra .competencias .contenido p"
+    ),
+
+    otrosCursosContainer: document.querySelector("#otros-cursos .cards-cursos"),
+    otrosCursosSection: document.querySelector("#otros-cursos"),
+  };
+
+  console.log("4. Elementos encontrados en el DOM:");
+  Object.entries(elementos).forEach(([key, element]) => {
+    console.log(`   - ${key}:`, element ? "Encontrado" : "NO encontrado");
+  });
+
+  try {
+    // carga datos del curso seleccionado
+    console.log("5. Cargando datos del curso...");
+    const curso = await fetchData(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      { estatus: 1 }
+    ).then((cursos) => cursos.find((c) => c.id == cursoId));
+
+    if (!curso) throw new Error("Curso no encontrado");
+    console.log("6. Curso encontrado:", curso);
+    nombreCursoGlobal = curso.nombre;
+    console.log("cursoNombre:", curso.nombre);
+    // carga los demas cursos relacionados
+    console.log("7. Cargando datos relacionados...");
+    const [tutor, actividades, tipoEvaluacion, calendario] = await Promise.all([
+      fetchData(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
+        { estatus: 1 }
+      ).then((tutores) => tutores.find((t) => t.id == curso.tutor)),
+      fetchData(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+        { estatus: 1 }
+      ).then((acts) => acts.find((a) => a.id == curso.actividades)),
+      fetchData(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
+        { estatus: 1 }
+      ).then((evaluaciones) =>
+        evaluaciones.find((e) => e.id == curso.tipo_evaluacion)
+      ),
+      fetchData(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
+        { estatus: 1 }
+      ).then((dias) => dias.find((d) => d.id == curso.calendario)),
+    ]);
+
+    console.log("8. Datos relacionados cargados:", {
+      tutor,
+      actividades,
+      tipoEvaluacion,
+      calendario,
+    });
+
+    // cargar curso en DOM
+    console.log("9. Actualizando DOM con datos del curso...");
+    elementos.nombre.innerHTML = ``; //este es un espacio vacio para pruebas
+    elementos.titulo.textContent = curso.nombre;
+    elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
+    elementos.descMedia.innerHTML = formatearTexto(curso.descripcion_media);
+    elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
+    elementos.imagen.alt = curso.nombre;
+    elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
+    elementos.precio.textContent =
+      curso.precio == 0
+        ? "Gratuito"
+        : `$${curso.precio.toLocaleString("es-MX", {
+            minimumFractionDigits: 2,
+          })}`;
+
+    elementos.horas.textContent = `${curso.horas} Horas totales`;
+    elementos.actividades.textContent = actividades.nombre;
+    elementos.evaluacion.textContent = tipoEvaluacion.nombre;
+
+    const fechaFormateada = formatearFecha(curso.fecha_inicio);
+    elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
+
+    elementos.certificado.textContent = `Certificado ${
+      curso.certificado ? "incluido" : "no incluido"
+    }`;
+
+    if (tutor) {
+      elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
+      elementos.tutorImg.alt = "../ASSETS/tutor/tutor_noEncontrado.png";
+      elementos.tutorImg.onerror = function () {
+        console.log("error al cargar imagen de tutor");
+        this.src = "../ASSETS/tutor/tutor_noEncontrado.png";
+      };
+      elementos.tutorNombre.textContent = tutor.nombre;
+      elementos.tutorBio.textContent =
+        tutor.descripcion || "Experto en su campo";
+    }
+
+    elementos.dirigido.textContent = curso.dirigido;
+    elementos.competencias.textContent = curso.competencias;
+
+    // cargar cursos de la misma categoria
+    console.log("10. Cargando otros cursos de la misma categoría...");
+    const todosCursos = await fetchData(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+      { estatus: 1 }
+    );
+
+    const otrosCursos = todosCursos
+      .filter((c) => c.categoria == curso.categoria && c.id != cursoId)
+      .slice(0, 4);
+
+    console.log(
+      `11. Encontrados ${otrosCursos.length} cursos de la categoría ${curso.categoria}`
+    );
+
+    if (otrosCursos.length > 0) {
+      elementos.otrosCursosContainer.innerHTML = otrosCursos
+        .map(
+          (curso) => `
+      <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
+        <div class="card-curso">
+            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
+            curso.nombre
+          }">
+            <div class="card-contenido">
+                <h4>${curso.nombre}</h4>
+                <p>${curso.descripcion_breve}</p>
+                <p class="info-curso">
+                ${curso.horas} hrs | ${
+            curso.precio === 0
+              ? "Gratuito"
+              : `$${curso.precio.toLocaleString("es-MX", {
+                  minimumFractionDigits: 2,
+                })}`
+          }
+                </p>
+            </div>
+        </div>
+      </a>
+    `
+        )
+        .join("");
+    } else {
+      console.log("12. No hay otros cursos de la misma categoría");
+      elementos.otrosCursosSection.style.display = "none";
+    }
+
+    console.log("13. Inicializando acordeones...");
+    inicializarAcordeones();
+  } catch (error) {
+    console.error("14. Error en la carga:", error);
+    mostrarError(error.message);
+  }
+
+  async function fetchData(url, body) {
+    console.log(`Fetching data from ${url}`, body);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error al cargar datos de ${url}`);
+    }
+
+    return response.json();
+  }
+
+  function formatearTexto(texto) {
+    return (texto || "").toString().replace(/\n/g, "<br>");
+  }
+
+  function formatearFecha(fecha) {
+    if (!fecha) return "Por definir";
+    const opciones = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(fecha).toLocaleDateString("es-MX", opciones);
+  }
+
+  function mostrarError(mensaje) {
+    const main = document.querySelector("main");
+    if (main) {
+      main.innerHTML = `
+        <div class="error-message">
+          <h3>¡Ocurrió un error!</h3>
+          <p>${mensaje}</p>
+          <a href="../VIEW/Blog.php" class="btn-principal">Volver a los cursos</a>
+        </div>
+      `;
+    }
+  }
+});
+
+function inicializarAcordeones() {
+  const acordeones = document.querySelectorAll(
+    "#curso-detalle-extra .cabecera"
+  );
+  acordeones.forEach((acordeon) => {
+    acordeon.addEventListener("click", function () {
+      const contenido = this.nextElementSibling;
+      const icono = this.querySelector(".arrow-icon");
+
+      if (contenido.style.display === "block") {
+        contenido.style.display = "none";
+        icono.style.transform = "rotate(0deg)";
+      } else {
+        contenido.style.display = "block";
+        icono.style.transform = "rotate(180deg)";
+      }
+    });
+  });
+}
+
+// ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+
+console.log("DOM cargado - Modal Inscripción Ready");
+
+const modal = document.getElementById("modal-inscripcion");
+const abrirBtn = document.getElementById("abrir-modal-inscripcion");
+const cerrarBtn = document.querySelector(".cerrar-modal");
+
+const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
+const formGroupCuenta = document.querySelector(".form-group.checkbox-cuenta");
+
+const titulo = document.querySelector(".titulo-modal");
+const camposRegistro = document.querySelector(".campos-registro");
+const camposLogin = document.querySelector(".campos-login");
+const errorCuenta = document.getElementById("error-cuenta");
+const buscarBtn = document.getElementById("buscar-cuenta");
+const volverRegistro = document.getElementById("volver-a-registro");
+const cursoNombreInput = document.getElementById("curso-nombre");
+const loginInput = document.getElementById("login-identificador");
+
+const formInscripcion = document.getElementById("form-inscripcion");
+
+const cuentasSimuladas = [
+  {
+    nombre: "Juan Pérez",
+    telefono: "5551234567",
+    correo: "juan@godcode.com",
+    fecha: "1990-01-01",
+    medio: ["correo", "telefono"],
+  },
+];
+
+let primeraVez = true;
+
+const abrirModal = () => {
+  console.log("Abriendo modal...");
+  modal.classList.add("mostrar");
+
+  limpiarFormulario();
+
+  //lo toma con una variable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
+  cursoNombreInput.value = "Curso seleccionado desde fetch";
+};
+
+const cerrarModal = () => {
+  console.log("Cerrando modal...");
+  modal.classList.remove("mostrar");
+  limpiarFormulario();
+};
+
+const limpiarFormulario = () => {
+  if (formInscripcion) formInscripcion.reset();
+  toggleFormularios(false);
+
+  errorCuenta.classList.remove("mostrar");
+  volverRegistro.classList.remove("mostrar");
+
+  loginInput.value = "";
+
+  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+    cb.checked = false;
+  });
+};
+//-------------------------- aca esta el toggle para buscar cuenta
+const toggleFormularios = (mostrarLogin) => {
+  titulo.style.display = mostrarLogin ? "none" : "flex";
+  checkboxCuenta.checked = mostrarLogin;
+
+  if (mostrarLogin) {
+    camposLogin.classList.add("mostrar");
+    camposRegistro.classList.remove("mostrar");
+  } else {
+    camposRegistro.classList.add("mostrar");
+    camposLogin.classList.remove("mostrar");
+  }
+};
+
+const buscarCuentaExistente = () => {
+  const valor = loginInput.value.trim().toLowerCase();
+  const cuenta = cuentasSimuladas.find(
+    (c) => c.telefono === valor || c.correo === valor
+  );
+  if (cuenta) {
+    llenarFormulario(cuenta);
+  } else {
+    mostrarErrorCuenta();
+  }
+};
+
+const llenarFormulario = (cuenta) => {
+  document.getElementById("nombre").value = cuenta.nombre || "";
+  document.getElementById("telefono").value = cuenta.telefono || "";
+  document.getElementById("correo").value = cuenta.correo || "";
+  document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
+  cursoNombreInput.value = "Curso seleccionado"; //lo toma con unavariable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
+
+  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+    cb.checked = cuenta.medio?.includes(cb.value);
+  });
+
+  toggleFormularios(false);
+};
+
+const mostrarErrorCuenta = () => {
+  const errorCuenta = document.getElementById("error-cuenta");
+  const volverRegistro = document.querySelector(".volver-a-registro");
+
+  errorCuenta.classList.add("mostrar");
+  volverRegistro.classList.add("mostrar");
+
+  setTimeout(() => {
+    errorCuenta.classList.remove("mostrar");
+    volverRegistro.classList.remove("mostrar");
+  }, 5000);
+};
+
+const ocultarErrorCuenta = () => {
+  document.getElementById("error-cuenta").classList.remove("mostrar");
+};
+
+const validarMediosContacto = () => {
+  const mediosSeleccionados = Array.from(
+    document.querySelectorAll('input[name="medios-contacto"]:checked')
+  );
+  return mediosSeleccionados.length > 0;
+};
+
+formInscripcion.addEventListener("submit", (e) => {
+  if (!validarMediosContacto()) {
+    e.preventDefault();
+    alert("Por favor selecciona al menos un medio de contacto.");
+  }
+});
+
+abrirBtn.addEventListener("click", abrirModal);
+cerrarBtn.addEventListener("click", cerrarModal);
+
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) cerrarModal();
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") cerrarModal();
+});
+
+checkboxCuenta.addEventListener("change", (e) => {
+  toggleFormularios(e.target.checked);
+  ocultarErrorCuenta();
+});
+
+buscarBtn.addEventListener("click", buscarCuentaExistente);
+
+volverRegistro.addEventListener("click", (e) => {
+  e.preventDefault();
+  limpiarFormulario();
+});
