@@ -369,32 +369,32 @@
                 </div>
 
                 <form id="form-inscripcion">
+                    <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                        Ya existe una cuenta con ese correo o teléfono.
+                    </div>
+
                     <div class="campos-registro">
                         <div class="registro-header">
                             <label class="titulo-modal">Datos de Inscripción</label>
                         </div>
 
-                        <div class="form-group fila-doble">
-                            <div>
+                        <div class="fila-doble">
+                            <div class="form-group">
                                 <label for="nombre">Nombre</label>
                                 <input type="text" id="nombre" />
                             </div>
-                            <div>
+                            <div class="form-group">
                                 <label for="telefono">Teléfono</label>
                                 <input type="text" id="telefono" />
                             </div>
                         </div>
 
-                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
-                            Ya existe una cuenta con ese correo o teléfono.
-                        </div>
-
-                        <div class="form-group fila-doble">
-                            <div>
+                        <div class="fila-doble">
+                            <div class="form-group">
                                 <label for="correo">Correo</label>
                                 <input type="email" id="correo" />
                             </div>
-                            <div>
+                            <div class="form-group">
                                 <label for="fecha-nacimiento">Fecha de Nacimiento</label>
                                 <input type="date" id="fecha-nacimiento" />
                             </div>
@@ -431,6 +431,7 @@
             </div>
         </div>
     </div>
+
 
 
 
