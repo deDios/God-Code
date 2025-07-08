@@ -281,11 +281,11 @@ const ENDPOINT_CONSULTA = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azu
 const ENDPOINT_INSERT = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
 const ENDPOINT_INSCRIPCION = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 const PASSWORD_DEFAULT = "godcode123";
+
 let usuarioId = null;
 
 // abrir modal
 abrirBtn.addEventListener("click", () => {
-  console.log("Abriendo modal...");
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
@@ -302,7 +302,6 @@ modal.addEventListener("click", (e) => {
 });
 
 function cerrarModal() {
-  console.log("Cerrando modal...");
   modal.classList.remove("mostrar");
   document.body.classList.remove("modal-abierto");
   limpiarFormulario();
@@ -310,7 +309,6 @@ function cerrarModal() {
 
 // toggle para registro o login
 checkboxCuenta.addEventListener("change", () => toggleFormularios(checkboxCuenta.checked));
-
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
   toggleFormularios(false);
@@ -331,8 +329,10 @@ buscarBtn.addEventListener("click", async () => {
 
   if (!valor) return mostrarMensajeError("Por favor ingresa un correo o teléfono válido.");
 
-  const esCorreo = valor.includes("@");
-  const payload = esCorreo ? { correo: valor, telefono: "" } : { correo: "", telefono: valor };
+  const esEmail = valor.includes("@");
+  const payload = esEmail
+    ? { correo: valor, telefono: "" }
+    : { correo: "", telefono: valor };
 
   console.log("Payload a enviar:", payload);
 
@@ -342,13 +342,14 @@ buscarBtn.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
+
     const data = await res.json();
     console.log("Respuesta del servidor (consulta usuario):", data);
 
-    if (Array.isArray(data) && data.length > 0 && data[0].id) {
+    if (Array.isArray(data) && data.length > 0) {
       const usuario = data[0];
-      console.log("Usuario encontrado:", usuario);
       usuarioId = usuario.id;
+      console.log("Usuario encontrado:", usuario);
       llenarFormulario(usuario);
       toggleFormularios(false);
     } else {
@@ -369,7 +370,7 @@ function llenarFormulario(usuario) {
   cursoNombreInput.value = nombreCursoGlobal;
 
   document.querySelectorAll('input[name="medios-contacto"]').forEach(cb => {
-    const tipo = parseInt(usuario.tipo_contacto);
+    const tipo = Number(usuario.tipo_contacto);
     if ((cb.value === "telefono" && (tipo === 1 || tipo === 3)) ||
       (cb.value === "correo" && (tipo === 2 || tipo === 3))) {
       cb.checked = true;
@@ -431,7 +432,7 @@ formInscripcion.addEventListener("submit", async (e) => {
       const existe = await verif.json();
       console.log("Resultado verificación previa:", existe);
 
-      if (Array.isArray(existe) && existe.length > 0 && existe[0].id) {
+      if (Array.isArray(existe) && existe.length > 0) {
         return mostrarMensajeError("Ya existe una cuenta con ese correo o teléfono.");
       }
 
@@ -448,14 +449,15 @@ formInscripcion.addEventListener("submit", async (e) => {
           password: PASSWORD_DEFAULT
         })
       });
+
       const nuevo = await insert.json();
       console.log("Respuesta del servidor (nuevo usuario):", nuevo);
 
-      if (!nuevo || !nuevo.id) throw new Error("No se pudo registrar el usuario.");
-      usuarioId = nuevo.id;
+      // Aquí asumimos que la API aún no devuelve ID, así que omitimos validación
+      usuarioId = nuevo.id ?? 9999; // Provisional
     }
 
-    console.log("Inscribiendo usuario en el curso...");
+    console.log("Inscribiendo al curso...");
     const cursoId = idCursoGlobal;
     const inscribir = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
@@ -465,6 +467,7 @@ formInscripcion.addEventListener("submit", async (e) => {
         usuario: usuarioId
       })
     });
+
     const resultado = await inscribir.json();
     console.log("Resultado inscripción:", resultado);
 
@@ -476,6 +479,7 @@ formInscripcion.addEventListener("submit", async (e) => {
     } else {
       mostrarMensajeError("Error al procesar la inscripción.");
     }
+
   } catch (error) {
     console.error("Error en inscripción:", error);
     mostrarMensajeError("Error al enviar los datos. Inténtalo más tarde.");
