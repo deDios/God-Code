@@ -366,7 +366,6 @@
                     <p class="volver-a-registro">
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
                     </p>
-
                 </div>
 
                 <form id="form-inscripcion">
@@ -427,12 +426,10 @@
                         </p>
                     </div>
                 </form>
-
-
-
             </div>
         </div>
     </div>
+
 
 
 
