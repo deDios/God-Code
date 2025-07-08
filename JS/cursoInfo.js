@@ -264,7 +264,9 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
-console.log("Modal Inscripción Ready");
+// ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+
+console.log("modal listo");
 
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
@@ -287,6 +289,7 @@ let usuarioId = null;
 
 // abrir modal
 abrirBtn.addEventListener("click", () => {
+  console.log("Abriendo modal...");
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
@@ -303,6 +306,7 @@ modal.addEventListener("click", (e) => {
 });
 
 function cerrarModal() {
+  console.log("Cerrando modal...");
   modal.classList.remove("mostrar");
   document.body.classList.remove("modal-abierto");
   limpiarFormulario();
@@ -317,6 +321,7 @@ volverRegistro.addEventListener("click", (e) => {
 });
 
 function toggleFormularios(mostrarLogin) {
+  console.log(`Toggle formularios - mostrarLogin: ${mostrarLogin}`);
   checkboxCuenta.checked = mostrarLogin;
   camposLogin.classList.toggle("mostrar", mostrarLogin);
   camposRegistro.classList.toggle("mostrar", !mostrarLogin);
@@ -326,11 +331,19 @@ function toggleFormularios(mostrarLogin) {
 // buscar cuenta ya existente
 buscarBtn.addEventListener("click", async () => {
   const valor = loginInput.value.trim();
-  if (!valor) return mostrarMensajeError("Por favor ingresa un correo o teléfono válido.");
+  console.log("Buscar cuenta - valor ingresado:", valor);
 
-  // detectar si es correo o teléfono
+  if (!valor) {
+    console.log("No se ingresó valor para buscar");
+    return mostrarMensajeError("Por favor ingresa un correo o teléfono válido.");
+  }
+
   const esCorreo = valor.includes("@");
-  const payload = esCorreo ? { correo: valor } : { telefono: valor };
+  const payload = esCorreo
+    ? { correo: valor, telefono: "" }
+    : { correo: "", telefono: valor };
+
+  console.log("Payload a enviar:", payload);
 
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
@@ -338,13 +351,17 @@ buscarBtn.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
+
     const data = await res.json();
+    console.log("Respuesta del servidor (consulta usuario):", data);
 
     if (data && data.id) {
+      console.log("Usuario encontrado:", data);
       usuarioId = data.id;
       llenarFormulario(data);
       toggleFormularios(false);
     } else {
+      console.log("No se encontró usuario con ese identificador.");
       mostrarMensajeError("Cuenta no encontrada. Puedes registrarte.");
     }
   } catch (error) {
@@ -354,6 +371,7 @@ buscarBtn.addEventListener("click", async () => {
 });
 
 function llenarFormulario(usuario) {
+  console.log("Llenando formulario con datos del usuario:", usuario);
   document.getElementById("nombre").value = usuario.nombre || "";
   document.getElementById("telefono").value = usuario.telefono || "";
   document.getElementById("correo").value = usuario.correo || "";
@@ -362,14 +380,14 @@ function llenarFormulario(usuario) {
 
   document.querySelectorAll('input[name="medios-contacto"]').forEach(cb => {
     const tipo = usuario.tipo_contacto;
-    if ((cb.value === "telefono" && (tipo === 1 || tipo === 3)) ||
-      (cb.value === "correo" && (tipo === 2 || tipo === 3))) {
-      cb.checked = true;
-    }
+    cb.checked =
+      (cb.value === "telefono" && (tipo === 1 || tipo === 3)) ||
+      (cb.value === "correo" && (tipo === 2 || tipo === 3));
   });
 }
 
 function limpiarFormulario() {
+  console.log("Limpiando formulario...");
   formInscripcion.reset();
   usuarioId = null;
   loginInput.value = "";
@@ -381,6 +399,8 @@ function limpiarFormulario() {
 function obtenerTipoContacto() {
   const seleccionados = Array.from(document.querySelectorAll('input[name="medios-contacto"]:checked'))
     .map(cb => cb.value);
+  console.log("Medios de contacto seleccionados:", seleccionados);
+
   if (seleccionados.length === 2) return 3;
   if (seleccionados.includes("telefono")) return 1;
   if (seleccionados.includes("correo")) return 2;
@@ -389,6 +409,7 @@ function obtenerTipoContacto() {
 
 // mensaje de error o confirmacion
 function mostrarMensajeError(mensaje) {
+  console.warn("Mensaje de error:", mensaje);
   errorCuenta.textContent = mensaje;
   errorCuenta.classList.add("mostrar");
 }
@@ -401,6 +422,7 @@ function ocultarMensajeError() {
 // se envia la inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
+  console.log("Formulario enviado");
 
   const nombre = document.getElementById("nombre").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
@@ -408,25 +430,28 @@ formInscripcion.addEventListener("submit", async (e) => {
   const fecha = document.getElementById("fecha-nacimiento").value;
   const tipo_contacto = obtenerTipoContacto();
 
+  console.log("Datos del formulario:", { nombre, telefono, correo, fecha, tipo_contacto });
+
   if (!nombre || !telefono || !correo || !fecha || tipo_contacto === 0) {
     return mostrarMensajeError("Por favor completa todos los campos y selecciona al menos un medio de contacto.");
   }
 
   try {
     if (!usuarioId) {
-      // revisamos si el usuario o telefono ya estan registrados
+      console.log("Usuario no existe, verificando existencia previa...");
       const verif = await fetch(ENDPOINT_CONSULTA, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, telefono })
       });
       const existe = await verif.json();
+      console.log("Resultado verificación de existencia:", existe);
 
       if (existe && existe.id) {
         return mostrarMensajeError("Ya existe una cuenta con ese correo o teléfono.");
       }
 
-      // nuevo usuario
+      console.log("Insertando nuevo usuario...");
       const insert = await fetch(ENDPOINT_INSERT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -440,21 +465,22 @@ formInscripcion.addEventListener("submit", async (e) => {
         })
       });
       const nuevo = await insert.json();
+      console.log("Resultado del insert:", nuevo);
+
       if (!nuevo || !nuevo.id) throw new Error("No se pudo registrar el usuario.");
       usuarioId = nuevo.id;
     }
 
-    // inscripcion
-    const cursoId = idCursoGlobal; // este se rescata desde el fetch donde rescatamos el curso
+    const cursoId = idCursoGlobal;
+    console.log("Inscribiendo al curso ID:", cursoId);
+
     const inscribir = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        curso: cursoId,
-        usuario: usuarioId
-      })
+      body: JSON.stringify({ curso: cursoId, usuario: usuarioId })
     });
     const resultado = await inscribir.json();
+    console.log("Resultado de la inscripción:", resultado);
 
     if (resultado?.mensaje === "Inscripción realizada correctamente") {
       alert("¡Te has inscrito correctamente!");
