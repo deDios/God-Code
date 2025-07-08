@@ -453,7 +453,6 @@ formInscripcion.addEventListener("submit", async (e) => {
       const nuevo = await insert.json();
       console.log("Respuesta del servidor (nuevo usuario):", nuevo);
 
-      // Aquí asumimos que la API aún no devuelve ID, así que omitimos validación
       usuarioId = nuevo.id ?? 9999; // Provisional
     }
 
