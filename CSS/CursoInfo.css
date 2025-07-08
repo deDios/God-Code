@@ -760,7 +760,6 @@ body.modal-abierto {
     flex-shrink: 0;
 }
 
-/* === RESPONSIVE === */
 @media (max-width: 600px) {
     .modal-contenido {
         padding: 1.5rem;
@@ -789,7 +788,6 @@ body.modal-abierto {
     }
 }
 
-/* Ajusta el contenedor de login y registro */
 .campos-login,
 .campos-registro {
     display: flex;
@@ -802,7 +800,6 @@ body.modal-abierto {
     transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
 }
 
-/* Login en columna, registro distribuido */
 .campos-login {
     flex-direction: column;
 }
@@ -811,16 +808,13 @@ body.modal-abierto {
     justify-content: space-between;
 }
 
-/* Visibilidad cuando se muestra */
 .campos-login.mostrar,
 .campos-registro.mostrar {
     opacity: 1;
     max-height: 2000px;
-    /* Alto generoso para contener todo */
     transform: translateY(0);
 }
 
-/* Ocultos por defecto */
 .campos-login:not(.mostrar),
 .campos-registro:not(.mostrar) {
     opacity: 0;
@@ -828,14 +822,11 @@ body.modal-abierto {
     transform: translateY(-10px);
 }
 
-/* CONTENEDOR FLEXIBLE PARA APILAR FORMULARIOS */
 .form-contenedor {
     position: relative;
     min-height: 500px;
-    /* Ajusta según tu contenido mínimo */
 }
 
-/* FORMULARIOS SUPERPUESTOS CON TRANSICIÓN SUAVE */
 .campos-login,
 .campos-registro {
     position: absolute;
@@ -863,7 +854,6 @@ body.modal-abierto {
     z-index: 1;
 }
 
-/* Bloque que asegura que el título ocupe 100% */
 .campos-registro .registro-header {
     width: 100%;
     margin-bottom: 1rem;

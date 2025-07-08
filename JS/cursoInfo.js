@@ -296,7 +296,7 @@ const abrirModal = () => {
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
-  cursoNombreInput.value = "Curso seleccionado desde fetch";
+  cursoNombreInput.value = nombreCursoGlobal;
 };
 
 const cerrarModal = () => {
@@ -349,7 +349,7 @@ const llenarFormulario = (cuenta) => {
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
   document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
-  cursoNombreInput.value = "Curso seleccionado";
+  cursoNombreInput.value = nombreCursoGlobal;
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked = cuenta.medio?.includes(cb.value);
   });
