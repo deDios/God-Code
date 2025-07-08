@@ -262,6 +262,8 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
+// ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+
 console.log("Modal Inscripción Ready");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -276,7 +278,6 @@ const volverRegistro = document.getElementById("volver-a-registro");
 const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
-
 
 const ENDPOINT_CONSULTA = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 const ENDPOINT_INSERT = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
@@ -327,11 +328,15 @@ buscarBtn.addEventListener("click", async () => {
   const valor = loginInput.value.trim();
   if (!valor) return mostrarMensajeError("Por favor ingresa un correo o teléfono válido.");
 
+  // detectar si es correo o teléfono
+  const esCorreo = valor.includes("@");
+  const payload = esCorreo ? { correo: valor } : { telefono: valor };
+
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ correo: valor, telefono: valor })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
 
@@ -440,7 +445,7 @@ formInscripcion.addEventListener("submit", async (e) => {
     }
 
     // inscripcion
-    const cursoId = cursoIdGlobal; // este se rescata desde el fetch donde rescatamos el curso
+    const cursoId = idCursoGlobal; // este se rescata desde el fetch donde rescatamos el curso
     const inscribir = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
