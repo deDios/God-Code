@@ -839,3 +839,59 @@ input[type="checkbox"] {
         flex: 1 1 100%;
     }
 }
+
+.grupo-contacto {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.label-contacto {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.inputs-contacto {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inputs-contacto input {
+    flex: 1 1 45%;
+    min-width: 140px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
+}
+
+.inputs-contacto input:focus {
+    border-color: #1a73e8;
+}
+
+@media (max-width: 600px) {
+    .inputs-contacto {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .inputs-contacto input {
+        flex: 1 1 100%;
+    }
+}
+
+.alerta-usuario-repetido {
+    display: none;
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border: 1px solid #fcd34d;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
