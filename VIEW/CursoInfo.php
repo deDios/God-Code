@@ -366,12 +366,10 @@
                     <p class="volver-a-registro">
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
                     </p>
+
                 </div>
 
                 <form id="form-inscripcion">
-                    <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
-                        Ya existe una cuenta con ese correo o teléfono.
-                    </div>
                     <div class="campos-registro">
                         <div class="registro-header">
                             <label class="titulo-modal">Datos de Inscripción</label>
@@ -424,6 +422,9 @@
                             datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
                             confirmar tu registro.
                         </p>
+                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                            Ya existe una cuenta con ese correo o teléfono.
+                        </div>
                     </div>
                 </form>
             </div>
