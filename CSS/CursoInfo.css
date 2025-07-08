@@ -884,3 +884,10 @@ input[type="checkbox"] {
     border-radius: 4px;
     margin-top: 0.5rem;
 }
+
+.alerta-usuario-repetido.centrado {
+    text-align: center;
+    margin: 1rem auto;
+    width: 100%;
+    max-width: 450px;
+}
