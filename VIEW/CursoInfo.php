@@ -347,72 +347,81 @@
                 </label>
             </div>
 
-            <div class="campos-login">
-
-                <div class="form-group fila-buscar align-left-container">
-                    <label for="login-identificador" class="label-align-left">Correo o Teléfono</label>
-                    <div class="input-contenedor">
-                        <input type="text" id="login-identificador" placeholder="Ingresa tu correo o teléfono"
-                            class="input-size-control" />
-                        <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
-                    </div>
-                </div>
-
-                <div id="error-cuenta" class="alerta-error">
-                    Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
-                    escritos correctamente o regístrate para crear una nueva cuenta.
-                </div>
-                <p class="volver-a-registro">
-                    ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
-                </p>
-            </div>
-
-            <form id="form-inscripcion">
-                <label class="titulo-modal">Datos de Inscripción</label>
-                <div class="campos-registro">
-                    <div class="form-group">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" id="nombre" />
-                    </div>
-                    <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input type="text" id="telefono" />
-                    </div>
-                    <div class="form-group">
-                        <label for="correo">Correo</label>
-                        <input type="email" id="correo" />
-                    </div>
-                    <div class="form-group">
-                        <label for="fecha-nacimiento">Fecha de Nacimiento</label>
-                        <input type="date" id="fecha-nacimiento" />
-                    </div>
-                    <div class="form-group">
-                        <label>Medio de contacto</label>
-                        <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                            <label>
-                                <input type="checkbox" name="medios-contacto" value="telefono" />
-                                Teléfono
-                            </label>
-                            <label>
-                                <input type="checkbox" name="medios-contacto" value="correo" />
-                                Correo electrónico
-                            </label>
+            <!-- 📌 NUEVO CONTENEDOR PARA APILAR LOS FORMULARIOS -->
+            <div class="form-contenedor">
+                <!-- LOGIN -->
+                <div class="campos-login">
+                    <div class="form-group fila-buscar align-left-container">
+                        <label for="login-identificador" class="label-align-left">Correo o Teléfono</label>
+                        <div class="input-contenedor">
+                            <input type="text" id="login-identificador" placeholder="Ingresa tu correo o teléfono"
+                                class="input-size-control" />
+                            <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="curso-nombre">Curso seleccionado</label>
-                        <input type="text" id="curso-nombre" readonly />
+
+                    <div id="error-cuenta" class="alerta-error">
+                        Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
+                        escritos correctamente o regístrate para crear una nueva cuenta.
                     </div>
-                    <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
-                    <p class="aviso">
-                        Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
-                        datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
-                        confirmar tu registro.
+
+                    <p class="volver-a-registro">
+                        ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
                     </p>
                 </div>
-            </form>
+
+                <!-- REGISTRO -->
+                <form id="form-inscripcion">
+                    <div class="campos-registro">
+                        <div class="registro-header">
+                            <label class="titulo-modal">Datos de Inscripción</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" />
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="text" id="telefono" />
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo</label>
+                            <input type="email" id="correo" />
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-nacimiento">Fecha de Nacimiento</label>
+                            <input type="date" id="fecha-nacimiento" />
+                        </div>
+                        <div class="form-group">
+                            <label>Medio de contacto preferido</label>
+                            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                                <label>
+                                    <input type="checkbox" name="medios-contacto" value="telefono" />
+                                    Teléfono
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="medios-contacto" value="correo" />
+                                    Correo electrónico
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="curso-nombre">Curso seleccionado</label>
+                            <input type="text" id="curso-nombre" readonly />
+                        </div>
+                        <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
+                        <p class="aviso">
+                            Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
+                            datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
+                            confirmar tu registro.
+                        </p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
 
     <script src="../JS/cursoInfo.js"></script>
     <script src="../JS/JSglobal.js"></script>

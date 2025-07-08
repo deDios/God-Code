@@ -466,11 +466,26 @@
     background: #fff;
     max-width: 700px;
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     border-radius: 12px;
     padding: 2rem 2.5rem;
     position: relative;
     font-family: "Segoe UI", sans-serif;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-contenido::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-contenido::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+body.modal-abierto {
+    overflow: hidden;
 }
 
 .modal-contenido h2 {
@@ -702,23 +717,12 @@
     line-height: 1.4;
 }
 
-@media (max-width: 600px) {
-    .campos-registro .form-group {
-        flex: 1 1 100%;
-    }
-
-    .modal-contenido {
-        padding: 1.5rem;
-    }
-}
-
 .fila-buscar {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     width: auto;
     max-width: 100%;
-    margin-right: auto;
 }
 
 .fila-buscar label {
@@ -734,8 +738,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    min-width: 300px;
-    max-width: 500px;
     width: 100%;
 }
 
@@ -756,39 +758,144 @@
 
 .fila-buscar .btn-buscar-cuenta {
     flex-shrink: 0;
-    padding: 0.5rem 1rem;
-    background-color: #1a73e8;
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.fila-buscar .btn-buscar-cuenta:hover {
-    background-color: #0d5bba;
-    transform: translateY(-2px);
-}
-
+/* === RESPONSIVE === */
 @media (max-width: 600px) {
+    .modal-contenido {
+        padding: 1.5rem;
+    }
+
+    .campos-registro .form-group {
+        flex: 1 1 100%;
+    }
+
     .fila-buscar {
         width: 100%;
     }
 
     .fila-buscar .input-contenedor {
-        min-width: 100%;
         flex-direction: column;
         align-items: stretch;
     }
 
     .fila-buscar input {
-        min-width: 100%;
         width: 100%;
     }
 
     .fila-buscar .btn-buscar-cuenta {
         width: 100%;
         margin-top: 0.5rem;
+    }
+}
+
+/* Ajusta el contenedor de login y registro */
+.campos-login,
+.campos-registro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
+}
+
+/* Login en columna, registro distribuido */
+.campos-login {
+    flex-direction: column;
+}
+
+.campos-registro {
+    justify-content: space-between;
+}
+
+/* Visibilidad cuando se muestra */
+.campos-login.mostrar,
+.campos-registro.mostrar {
+    opacity: 1;
+    max-height: 2000px;
+    /* Alto generoso para contener todo */
+    transform: translateY(0);
+}
+
+/* Ocultos por defecto */
+.campos-login:not(.mostrar),
+.campos-registro:not(.mostrar) {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+}
+
+/* CONTENEDOR FLEXIBLE PARA APILAR FORMULARIOS */
+.form-contenedor {
+    position: relative;
+    min-height: 500px;
+    /* Ajusta según tu contenido mínimo */
+}
+
+/* FORMULARIOS SUPERPUESTOS CON TRANSICIÓN SUAVE */
+.campos-login,
+.campos-registro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+}
+
+.campos-login.mostrar,
+.campos-registro.mostrar {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.campos-registro {
+    z-index: 2;
+}
+
+.campos-login {
+    z-index: 1;
+}
+
+/* Bloque que asegura que el título ocupe 100% */
+.campos-registro .registro-header {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.titulo-modal {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #111;
+    padding-top: 0.5rem;
+}
+
+.campos-registro .registro-campos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .campos-registro .registro-campos .form-group {
+        flex: 1 1 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .modal-contenido::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
+
+    .modal-contenido {
+        scrollbar-width: none;
     }
 }

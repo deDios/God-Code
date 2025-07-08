@@ -260,6 +260,8 @@ function inicializarAcordeones() {
   });
 }
 
+
+
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
 console.log("DOM cargado - Modal Inscripción Ready");
@@ -269,8 +271,6 @@ const abrirBtn = document.getElementById("abrir-modal-inscripcion");
 const cerrarBtn = document.querySelector(".cerrar-modal");
 
 const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
-const formGroupCuenta = document.querySelector(".form-group.checkbox-cuenta");
-
 const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
@@ -279,7 +279,6 @@ const buscarBtn = document.getElementById("buscar-cuenta");
 const volverRegistro = document.getElementById("volver-a-registro");
 const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
-
 const formInscripcion = document.getElementById("form-inscripcion");
 
 const cuentasSimuladas = [
@@ -292,46 +291,42 @@ const cuentasSimuladas = [
   },
 ];
 
-let primeraVez = true;
-
 const abrirModal = () => {
   console.log("Abriendo modal...");
   modal.classList.add("mostrar");
-
+  document.body.classList.add("modal-abierto");
   limpiarFormulario();
-
-  //lo toma con una variable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
   cursoNombreInput.value = "Curso seleccionado desde fetch";
 };
 
 const cerrarModal = () => {
   console.log("Cerrando modal...");
   modal.classList.remove("mostrar");
+  document.body.classList.remove("modal-abierto");
   limpiarFormulario();
 };
 
 const limpiarFormulario = () => {
   if (formInscripcion) formInscripcion.reset();
   toggleFormularios(false);
-
   errorCuenta.classList.remove("mostrar");
   volverRegistro.classList.remove("mostrar");
-
   loginInput.value = "";
-
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked = false;
   });
 };
-//-------------------------- aca esta el toggle para buscar cuenta
+
 const toggleFormularios = (mostrarLogin) => {
-  titulo.style.display = mostrarLogin ? "none" : "flex";
+  if (titulo) titulo.style.display = mostrarLogin ? "none" : "flex";
   checkboxCuenta.checked = mostrarLogin;
 
   if (mostrarLogin) {
-    camposLogin.classList.add("mostrar");
+    console.log("Se muestra login");
     camposRegistro.classList.remove("mostrar");
+    camposLogin.classList.add("mostrar");
   } else {
+    console.log("Se muestra registro");
     camposRegistro.classList.add("mostrar");
     camposLogin.classList.remove("mostrar");
   }
@@ -354,30 +349,20 @@ const llenarFormulario = (cuenta) => {
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
   document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
-  cursoNombreInput.value = "Curso seleccionado"; //lo toma con unavariable que esta hasta arriba let nombreCursoGlobal para el id: idCursoGlobal
-
+  cursoNombreInput.value = "Curso seleccionado";
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked = cuenta.medio?.includes(cb.value);
   });
-
   toggleFormularios(false);
 };
 
 const mostrarErrorCuenta = () => {
-  const errorCuenta = document.getElementById("error-cuenta");
-  const volverRegistro = document.querySelector(".volver-a-registro");
-
   errorCuenta.classList.add("mostrar");
   volverRegistro.classList.add("mostrar");
-
   setTimeout(() => {
     errorCuenta.classList.remove("mostrar");
     volverRegistro.classList.remove("mostrar");
   }, 5000);
-};
-
-const ocultarErrorCuenta = () => {
-  document.getElementById("error-cuenta").classList.remove("mostrar");
 };
 
 const validarMediosContacto = () => {
@@ -405,14 +390,13 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
 
-checkboxCuenta.addEventListener("change", (e) => {
-  toggleFormularios(e.target.checked);
-  ocultarErrorCuenta();
+checkboxCuenta.addEventListener("change", () => {
+  toggleFormularios(checkboxCuenta.checked);
 });
 
 buscarBtn.addEventListener("click", buscarCuentaExistente);
 
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
-  limpiarFormulario();
+  toggleFormularios(false);
 });
