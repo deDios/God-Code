@@ -386,6 +386,9 @@
                             <label for="correo">Correo</label>
                             <input type="email" id="correo" />
                         </div>
+                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                            Ya existe una cuenta con ese correo o teléfono.
+                        </div>
                         <div class="form-group">
                             <label for="fecha-nacimiento">Fecha de Nacimiento</label>
                             <input type="date" id="fecha-nacimiento" />
