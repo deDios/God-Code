@@ -687,17 +687,6 @@ input[type="checkbox"] {
     background-color: #e74c3c;
 }
 
-.alerta-usuario-repetido {
-    display: none;
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-    border: 1px solid #fcd34d;
-    border-radius: 4px;
-    margin-top: 0.5rem;
-}
-
 .volver-a-registro {
     display: block;
     opacity: 0;
@@ -894,26 +883,4 @@ input[type="checkbox"] {
     border: 1px solid #fcd34d;
     border-radius: 4px;
     margin-top: 0.5rem;
-}
-
-.fila-doble {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.fila-doble>div {
-    flex: 1 1 45%;
-    display: flex;
-    flex-direction: column;
-}
-
-@media (max-width: 600px) {
-    .fila-doble {
-        flex-direction: column;
-    }
-
-    .fila-doble>div {
-        flex: 1 1 100%;
-    }
 }

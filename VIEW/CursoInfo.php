@@ -418,13 +418,14 @@
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
 
                         <p class="aviso">
-                            Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
-                            datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
-                            confirmar tu registro.
-                        </p>
                         <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
                             Ya existe una cuenta con ese correo o teléfono.
                         </div>
+                        Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
+                        datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
+                        confirmar tu registro.
+                        </p>
+
                     </div>
                 </form>
             </div>
