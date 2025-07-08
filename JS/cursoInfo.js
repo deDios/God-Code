@@ -449,6 +449,7 @@ formInscripcion.addEventListener("submit", async (e) => {
         })
       });
       const nuevo = await insert.json();
+      console.log("Respuesta de inserción de usuario:", nuevo);
       if (!nuevo || !nuevo.id) throw new Error("No se pudo registrar el usuario.");
       usuarioId = nuevo.id;
     }
