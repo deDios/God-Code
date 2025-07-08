@@ -1,9 +1,9 @@
 //--------------- aca termina el js de la pesteña emergente
-
+let nombreCursoGlobal = "";
+let idCursoGlobal = 0;
 //apartado para recuperar los datos del curso segun su id
 document.addEventListener("DOMContentLoaded", async () => {
-  let nombreCursoGlobal = "";
-  let idCursoGlobal = 0;
+
   console.log("1. DOM completamente cargado - Iniciando script");
 
   // se obtiene el curso con la id que enviamos por la url
