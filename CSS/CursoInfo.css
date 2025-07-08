@@ -473,10 +473,12 @@
     position: relative;
     font-family: "Segoe UI", sans-serif;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    scrollbar-width: none;
 }
 
 .modal-contenido::-webkit-scrollbar {
-    width: 6px;
+    width: 0;
+    background: transparent;
 }
 
 .modal-contenido::-webkit-scrollbar-thumb {
@@ -496,12 +498,11 @@ body.modal-abierto {
 }
 
 .titulo-modal {
-    display: flex;
     font-size: 1.5rem;
     font-weight: 500;
-    margin-bottom: 0.3rem;
     color: #111;
-    padding-top: 1rem;
+    padding-top: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 .cerrar-modal {
@@ -514,8 +515,10 @@ body.modal-abierto {
     cursor: pointer;
 }
 
-.form-inscripcion {
-    margin-top: 1.5rem;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 45%;
 }
 
 .form-group label {
@@ -526,6 +529,29 @@ body.modal-abierto {
     font-weight: 500;
     margin-bottom: 0.3rem;
     color: #111;
+}
+
+.form-group input,
+.form-group select,
+.inputs-contacto input {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.inputs-contacto input:focus {
+    border-color: #1a73e8;
+}
+
+input[type="checkbox"] {
+    accent-color: #1a73e8;
+    transform: scale(1.1);
+    margin-right: 0.5rem;
 }
 
 #ya-tengo-cuenta {
@@ -559,8 +585,8 @@ body.modal-abierto {
     transform: translateX(20px);
 }
 
-.campos-registro,
-.campos-login {
+.campos-login,
+.campos-registro {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
@@ -569,59 +595,30 @@ body.modal-abierto {
     overflow: hidden;
     transform: translateY(-10px);
     transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.campos-login.mostrar,
+.campos-registro.mostrar {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .campos-registro {
     justify-content: space-between;
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
+    z-index: 2;
 }
 
-.campos-login {
-    flex-direction: column;
-}
-
-.campos-registro.mostrar,
-.campos-login.mostrar {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-.campos-registro:not(.mostrar),
-.campos-login:not(.mostrar) {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-}
-
-.campos-registro .form-group,
-.campos-login .form-group {
-    flex: 1 1 45%;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group input,
-.form-group select {
-    border: none;
-    border-bottom: 1px solid #ccc;
-    padding: 0.5rem 0;
-    font-size: 0.95rem;
-    background: transparent;
-    outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #1a73e8;
-}
-
-.form-group input[type="checkbox"] {
-    accent-color: #1a73e8;
-    transform: scale(1.1);
-    margin-right: 0.5rem;
+.campos-registro .registro-header {
+    width: 100%;
+    margin-bottom: 1rem;
 }
 
 .btn-inscribirme {
@@ -682,6 +679,25 @@ body.modal-abierto {
     max-height: 200px;
 }
 
+.alerta-error.exito {
+    background-color: #2ecc71;
+}
+
+.alerta-error.error {
+    background-color: #e74c3c;
+}
+
+.alerta-usuario-repetido {
+    display: none;
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    border: 1px solid #fcd34d;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
+
 .volver-a-registro {
     display: block;
     opacity: 0;
@@ -721,12 +737,10 @@ body.modal-abierto {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: auto;
-    max-width: 100%;
+    width: 100%;
 }
 
 .fila-buscar label {
-    text-align: left;
     width: 100%;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
@@ -760,6 +774,35 @@ body.modal-abierto {
     flex-shrink: 0;
 }
 
+.form-contenedor {
+    position: relative;
+    min-height: 500px;
+}
+
+.grupo-contacto {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.label-contacto {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.inputs-contacto {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inputs-contacto input {
+    flex: 1 1 45%;
+    min-width: 140px;
+}
+
 @media (max-width: 600px) {
     .modal-contenido {
         padding: 1.5rem;
@@ -786,125 +829,13 @@ body.modal-abierto {
         width: 100%;
         margin-top: 0.5rem;
     }
-}
 
-.campos-login,
-.campos-registro {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
-}
+    .inputs-contacto {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
 
-.campos-login {
-    flex-direction: column;
-}
-
-.campos-registro {
-    justify-content: space-between;
-}
-
-.campos-login.mostrar,
-.campos-registro.mostrar {
-    opacity: 1;
-    max-height: 2000px;
-    transform: translateY(0);
-}
-
-.campos-login:not(.mostrar),
-.campos-registro:not(.mostrar) {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-}
-
-.form-contenedor {
-    position: relative;
-    min-height: 500px;
-}
-
-.campos-login,
-.campos-registro {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-10px);
-}
-
-.campos-login.mostrar,
-.campos-registro.mostrar {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-.campos-registro {
-    z-index: 2;
-}
-
-.campos-login {
-    z-index: 1;
-}
-
-.campos-registro .registro-header {
-    width: 100%;
-    margin-bottom: 1rem;
-}
-
-.titulo-modal {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #111;
-    padding-top: 0.5rem;
-}
-
-.campos-registro .registro-campos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    width: 100%;
-}
-
-@media (max-width: 600px) {
-    .campos-registro .registro-campos .form-group {
+    .inputs-contacto input {
         flex: 1 1 100%;
     }
-}
-
-@media (min-width: 768px) {
-    .modal-contenido::-webkit-scrollbar {
-        width: 0px;
-        background: transparent;
-    }
-
-    .modal-contenido {
-        scrollbar-width: none;
-    }
-}
-
-.alerta-error.exito {
-    background-color: #2ecc71;
-}
-
-.alerta-error.error {
-    background-color: #e74c3c;
-}
-
-.alerta-usuario-repetido {
-    display: none;
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-    border: 1px solid #fcd34d;
-    border-radius: 4px;
-    margin-top: 0.5rem;
 }

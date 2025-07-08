@@ -378,21 +378,23 @@
                             <label for="nombre">Nombre</label>
                             <input type="text" id="nombre" />
                         </div>
+
                         <div class="form-group">
-                            <label for="telefono">Teléfono</label>
-                            <input type="text" id="telefono" />
+                            <label class="label-contacto">Número de Teléfono o Email</label>
+                            <div class="grupo-contacto">
+                                <input type="text" id="telefono" placeholder="Teléfono" />
+                                <input type="email" id="correo" placeholder="Correo electrónico" />
+                            </div>
+                            <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                                Ya existe una cuenta con ese correo o teléfono.
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="correo">Correo</label>
-                            <input type="email" id="correo" />
-                        </div>
-                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
-                            Ya existe una cuenta con ese correo o teléfono.
-                        </div>
+
                         <div class="form-group">
                             <label for="fecha-nacimiento">Fecha de Nacimiento</label>
                             <input type="date" id="fecha-nacimiento" />
                         </div>
+
                         <div class="form-group">
                             <label>Medio de contacto preferido</label>
                             <div style="display: flex; flex-direction: column; gap: 0.3rem;">
@@ -406,11 +408,14 @@
                                 </label>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="curso-nombre">Curso seleccionado</label>
                             <input type="text" id="curso-nombre" readonly />
                         </div>
+
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
+
                         <p class="aviso">
                             Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
                             datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
@@ -421,6 +426,7 @@
             </div>
         </div>
     </div>
+
 
 
     <script src="../JS/cursoInfo.js"></script>
