@@ -889,3 +889,11 @@ body.modal-abierto {
         scrollbar-width: none;
     }
 }
+
+.alerta-error.exito {
+    background-color: #2ecc71;
+}
+
+.alerta-error.error {
+    background-color: #e74c3c;
+}
