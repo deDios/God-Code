@@ -369,32 +369,35 @@
                 </div>
 
                 <form id="form-inscripcion">
-                    <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
-                        Ya existe una cuenta con ese correo o teléfono.
-                    </div>
                     <div class="campos-registro">
                         <div class="registro-header">
                             <label class="titulo-modal">Datos de Inscripción</label>
                         </div>
 
-                        <div class="form-group">
-                            <label for="nombre">Nombre</label>
-                            <input type="text" id="nombre" />
+                        <div class="form-group fila-doble">
+                            <div>
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" />
+                            </div>
+                            <div>
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" id="telefono" />
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="telefono">Teléfono</label>
-                            <input type="text" id="telefono" />
+                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                            Ya existe una cuenta con ese correo o teléfono.
                         </div>
 
-                        <div class="form-group">
-                            <label for="correo">Correo</label>
-                            <input type="email" id="correo" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fecha-nacimiento">Fecha de Nacimiento</label>
-                            <input type="date" id="fecha-nacimiento" />
+                        <div class="form-group fila-doble">
+                            <div>
+                                <label for="correo">Correo</label>
+                                <input type="email" id="correo" />
+                            </div>
+                            <div>
+                                <label for="fecha-nacimiento">Fecha de Nacimiento</label>
+                                <input type="date" id="fecha-nacimiento" />
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -416,7 +419,6 @@
                             <input type="text" id="curso-nombre" readonly />
                         </div>
 
-
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
 
                         <p class="aviso">
@@ -429,6 +431,7 @@
             </div>
         </div>
     </div>
+
 
 
 
