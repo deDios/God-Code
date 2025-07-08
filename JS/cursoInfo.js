@@ -3,7 +3,7 @@
 //apartado para recuperar los datos del curso segun su id
 document.addEventListener("DOMContentLoaded", async () => {
   let nombreCursoGlobal = "";
-  let idCursoGlobal = "";
+  let idCursoGlobal = 0;
   console.log("1. DOM completamente cargado - Iniciando script");
 
   // se obtiene el curso con la id que enviamos por la url
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     descripcion: document.querySelector(
       "#curso .curso-contenido .texto-descriptivo"
     ),
-    fechaInicio: document.querySelector("#curso .fecha-inicio"), // si decides usarlo
+    fechaInicio: document.querySelector("#curso .fecha-inicio"),
 
     precio: document.querySelector("#curso .curso-info .precio"),
     horas: document.querySelector("#curso .curso-info .horas"),
@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!curso) throw new Error("Curso no encontrado");
     console.log("6. Curso encontrado:", curso);
     nombreCursoGlobal = curso.nombre;
+    idCursoGlobal = curso.id;
     console.log("cursoNombre:", curso.nombre);
     // carga los demas cursos relacionados
     console.log("7. Cargando datos relacionados...");
@@ -118,8 +119,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       curso.precio == 0
         ? "Gratuito"
         : `$${curso.precio.toLocaleString("es-MX", {
-            minimumFractionDigits: 2,
-          })}`;
+          minimumFractionDigits: 2,
+        })}`;
 
     elementos.horas.textContent = `${curso.horas} Horas totales`;
     elementos.actividades.textContent = actividades.nombre;
@@ -128,9 +129,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fechaFormateada = formatearFecha(curso.fecha_inicio);
     elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
 
-    elementos.certificado.textContent = `Certificado ${
-      curso.certificado ? "incluido" : "no incluido"
-    }`;
+    elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"
+      }`;
 
     if (tutor) {
       elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
@@ -168,20 +168,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           (curso) => `
       <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
         <div class="card-curso">
-            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
-            curso.nombre
-          }">
+            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
+            }">
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
                 <p class="info-curso">
-                ${curso.horas} hrs | ${
-            curso.precio === 0
+                ${curso.horas} hrs | ${curso.precio === 0
               ? "Gratuito"
               : `$${curso.precio.toLocaleString("es-MX", {
-                  minimumFractionDigits: 2,
-                })}`
-          }
+                minimumFractionDigits: 2,
+              })}`
+            }
                 </p>
             </div>
         </div>
@@ -264,14 +262,12 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
-console.log("DOM cargado - Modal Inscripción Ready");
+console.log("Modal Inscripción Ready");
 
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
 const cerrarBtn = document.querySelector(".cerrar-modal");
-
 const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
-const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
 const errorCuenta = document.getElementById("error-cuenta");
@@ -281,122 +277,190 @@ const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
 
-const cuentasSimuladas = [
-  {
-    nombre: "Juan Pérez",
-    telefono: "5551234567",
-    correo: "juan@godcode.com",
-    fecha: "1990-01-01",
-    medio: ["correo", "telefono"],
-  },
-];
 
-const abrirModal = () => {
-  console.log("Abriendo modal...");
+const ENDPOINT_CONSULTA = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
+const ENDPOINT_INSERT = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
+const ENDPOINT_INSCRIPCION = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
+const PASSWORD_DEFAULT = "godcode123";
+let usuarioId = null;
+
+// abrir modal
+abrirBtn.addEventListener("click", () => {
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
   cursoNombreInput.value = nombreCursoGlobal;
-};
-
-const cerrarModal = () => {
-  console.log("Cerrando modal...");
-  modal.classList.remove("mostrar");
-  document.body.classList.remove("modal-abierto");
-  limpiarFormulario();
-};
-
-const limpiarFormulario = () => {
-  if (formInscripcion) formInscripcion.reset();
-  toggleFormularios(false);
-  errorCuenta.classList.remove("mostrar");
-  volverRegistro.classList.remove("mostrar");
-  loginInput.value = "";
-  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
-    cb.checked = false;
-  });
-};
-
-const toggleFormularios = (mostrarLogin) => {
-  if (titulo) titulo.style.display = mostrarLogin ? "none" : "flex";
-  checkboxCuenta.checked = mostrarLogin;
-
-  if (mostrarLogin) {
-    console.log("Se muestra login");
-    camposRegistro.classList.remove("mostrar");
-    camposLogin.classList.add("mostrar");
-  } else {
-    console.log("Se muestra registro");
-    camposRegistro.classList.add("mostrar");
-    camposLogin.classList.remove("mostrar");
-  }
-};
-
-const buscarCuentaExistente = () => {
-  const valor = loginInput.value.trim().toLowerCase();
-  const cuenta = cuentasSimuladas.find(
-    (c) => c.telefono === valor || c.correo === valor
-  );
-  if (cuenta) {
-    llenarFormulario(cuenta);
-  } else {
-    mostrarErrorCuenta();
-  }
-};
-
-const llenarFormulario = (cuenta) => {
-  document.getElementById("nombre").value = cuenta.nombre || "";
-  document.getElementById("telefono").value = cuenta.telefono || "";
-  document.getElementById("correo").value = cuenta.correo || "";
-  document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
-  cursoNombreInput.value = nombreCursoGlobal;
-  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
-    cb.checked = cuenta.medio?.includes(cb.value);
-  });
-  toggleFormularios(false);
-};
-
-const mostrarErrorCuenta = () => {
-  errorCuenta.classList.add("mostrar");
-  volverRegistro.classList.add("mostrar");
-  setTimeout(() => {
-    errorCuenta.classList.remove("mostrar");
-    volverRegistro.classList.remove("mostrar");
-  }, 5000);
-};
-
-const validarMediosContacto = () => {
-  const mediosSeleccionados = Array.from(
-    document.querySelectorAll('input[name="medios-contacto"]:checked')
-  );
-  return mediosSeleccionados.length > 0;
-};
-
-formInscripcion.addEventListener("submit", (e) => {
-  if (!validarMediosContacto()) {
-    e.preventDefault();
-    alert("Por favor selecciona al menos un medio de contacto.");
-  }
 });
 
-abrirBtn.addEventListener("click", abrirModal);
+// cerrar modal
 cerrarBtn.addEventListener("click", cerrarModal);
-
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") cerrarModal();
+});
 modal.addEventListener("click", (e) => {
   if (e.target === modal) cerrarModal();
 });
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") cerrarModal();
-});
+function cerrarModal() {
+  modal.classList.remove("mostrar");
+  document.body.classList.remove("modal-abierto");
+  limpiarFormulario();
+}
 
-checkboxCuenta.addEventListener("change", () => {
-  toggleFormularios(checkboxCuenta.checked);
-});
-
-buscarBtn.addEventListener("click", buscarCuentaExistente);
+// toggle para registro o login
+checkboxCuenta.addEventListener("change", () => toggleFormularios(checkboxCuenta.checked));
 
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
   toggleFormularios(false);
+});
+
+function toggleFormularios(mostrarLogin) {
+  checkboxCuenta.checked = mostrarLogin;
+  camposLogin.classList.toggle("mostrar", mostrarLogin);
+  camposRegistro.classList.toggle("mostrar", !mostrarLogin);
+  ocultarMensajeError();
+}
+
+// buscar cuenta ya existente
+buscarBtn.addEventListener("click", async () => {
+  const valor = loginInput.value.trim();
+  if (!valor) return mostrarMensajeError("Por favor ingresa un correo o teléfono válido.");
+
+  try {
+    const res = await fetch(ENDPOINT_CONSULTA, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo: valor, telefono: valor })
+    });
+    const data = await res.json();
+
+    if (data && data.id) {
+      usuarioId = data.id;
+      llenarFormulario(data);
+      toggleFormularios(false);
+    } else {
+      mostrarMensajeError("Cuenta no encontrada. Puedes registrarte.");
+    }
+  } catch (error) {
+    console.error("Error al consultar usuario:", error);
+    mostrarMensajeError("Ocurrió un error al buscar tu cuenta.");
+  }
+});
+
+function llenarFormulario(usuario) {
+  document.getElementById("nombre").value = usuario.nombre || "";
+  document.getElementById("telefono").value = usuario.telefono || "";
+  document.getElementById("correo").value = usuario.correo || "";
+  document.getElementById("fecha-nacimiento").value = usuario.fecha_nacimiento || "";
+  cursoNombreInput.value = nombreCursoGlobal;
+
+  document.querySelectorAll('input[name="medios-contacto"]').forEach(cb => {
+    const tipo = usuario.tipo_contacto;
+    if ((cb.value === "telefono" && (tipo === 1 || tipo === 3)) ||
+      (cb.value === "correo" && (tipo === 2 || tipo === 3))) {
+      cb.checked = true;
+    }
+  });
+}
+
+function limpiarFormulario() {
+  formInscripcion.reset();
+  usuarioId = null;
+  loginInput.value = "";
+  ocultarMensajeError();
+  toggleFormularios(false);
+}
+
+// validar metodos de contacto
+function obtenerTipoContacto() {
+  const seleccionados = Array.from(document.querySelectorAll('input[name="medios-contacto"]:checked'))
+    .map(cb => cb.value);
+  if (seleccionados.length === 2) return 3;
+  if (seleccionados.includes("telefono")) return 1;
+  if (seleccionados.includes("correo")) return 2;
+  return 0;
+}
+
+// mensaje de error o confirmacion
+function mostrarMensajeError(mensaje) {
+  errorCuenta.textContent = mensaje;
+  errorCuenta.classList.add("mostrar");
+}
+
+function ocultarMensajeError() {
+  errorCuenta.textContent = "";
+  errorCuenta.classList.remove("mostrar");
+}
+
+// se envia la inscripcion
+formInscripcion.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const fecha = document.getElementById("fecha-nacimiento").value;
+  const tipo_contacto = obtenerTipoContacto();
+
+  if (!nombre || !telefono || !correo || !fecha || tipo_contacto === 0) {
+    return mostrarMensajeError("Por favor completa todos los campos y selecciona al menos un medio de contacto.");
+  }
+
+  try {
+    if (!usuarioId) {
+      // revisamos si el usuario o telefono ya estan registrados
+      const verif = await fetch(ENDPOINT_CONSULTA, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, telefono })
+      });
+      const existe = await verif.json();
+
+      if (existe && existe.id) {
+        return mostrarMensajeError("Ya existe una cuenta con ese correo o teléfono.");
+      }
+
+      // nuevo usuario
+      const insert = await fetch(ENDPOINT_INSERT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre,
+          correo,
+          telefono,
+          tipo_contacto,
+          fecha_nacimiento: fecha,
+          password: PASSWORD_DEFAULT
+        })
+      });
+      const nuevo = await insert.json();
+      if (!nuevo || !nuevo.id) throw new Error("No se pudo registrar el usuario.");
+      usuarioId = nuevo.id;
+    }
+
+    // inscripcion
+    const cursoId = cursoIdGlobal; // este se rescata desde el fetch donde rescatamos el curso
+    const inscribir = await fetch(ENDPOINT_INSCRIPCION, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        curso: cursoId,
+        usuario: usuarioId
+      })
+    });
+    const resultado = await inscribir.json();
+
+    if (resultado?.mensaje === "Inscripción realizada correctamente") {
+      alert("¡Te has inscrito correctamente!");
+      cerrarModal();
+    } else if (resultado?.mensaje === "El usuario ya se encuentra registrado en el curso") {
+      mostrarMensajeError("Ya estás inscrito en este curso.");
+    } else {
+      mostrarMensajeError("Error al procesar la inscripción.");
+    }
+  } catch (error) {
+    console.error("Error en inscripción:", error);
+    mostrarMensajeError("Error al enviar los datos. Inténtalo más tarde.");
+  }
 });

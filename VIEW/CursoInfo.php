@@ -347,9 +347,7 @@
                 </label>
             </div>
 
-            <!-- 📌 NUEVO CONTENEDOR PARA APILAR LOS FORMULARIOS -->
             <div class="form-contenedor">
-                <!-- LOGIN -->
                 <div class="campos-login">
                     <div class="form-group fila-buscar align-left-container">
                         <label for="login-identificador" class="label-align-left">Correo o Teléfono</label>
@@ -370,7 +368,6 @@
                     </p>
                 </div>
 
-                <!-- REGISTRO -->
                 <form id="form-inscripcion">
                     <div class="campos-registro">
                         <div class="registro-header">
