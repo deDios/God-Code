@@ -264,33 +264,31 @@ function inicializarAcordeones() {
 
 console.log("DOM cargado - Modal Inscripción Ready");
 
+// Elementos principales
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
 const cerrarBtn = document.querySelector(".cerrar-modal");
-
 const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
 const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
 const errorCuenta = document.getElementById("error-cuenta");
+const alertaRepetido = document.getElementById("alerta-usuario-repetido");
 const buscarBtn = document.getElementById("buscar-cuenta");
 const volverRegistro = document.getElementById("volver-a-registro");
 const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
 
-const alertaRepetido = document.getElementById("alerta-usuario-repetido");
-const inputTelefono = document.getElementById("telefono");
-const inputCorreo = document.getElementById("correo");
-
+// ENDPOINTS
 const ENDPOINT_CONSULTA =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
-const ENDPOINT_INSERCION =
+const ENDPOINT_INSERTAR =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// ----------------------------- abrir/cerrar Modal -----------------------------
+// Mostrar modal
 const abrirModal = () => {
   console.log("Abriendo modal...");
   modal.classList.add("mostrar");
@@ -299,6 +297,7 @@ const abrirModal = () => {
   cursoNombreInput.value = nombreCursoGlobal;
 };
 
+// Cerrar modal
 const cerrarModal = () => {
   console.log("Cerrando modal...");
   modal.classList.remove("mostrar");
@@ -306,78 +305,36 @@ const cerrarModal = () => {
   limpiarFormulario();
 };
 
-// ----------------------------- limpiar formulario -----------------------------
-
+// Limpiar formulario
 const limpiarFormulario = () => {
-  formInscripcion.reset();
+  if (formInscripcion) formInscripcion.reset();
   toggleFormularios(false);
   ocultarMensaje();
-  alertaRepetido.style.display = "none";
   volverRegistro.classList.remove("mostrar");
   loginInput.value = "";
-  document
-    .querySelectorAll('input[name="medios-contacto"]')
-    .forEach((cb) => (cb.checked = false));
+  alertaRepetido.style.display = "none";
+  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+    cb.checked = false;
+  });
 };
 
-// ----------------------------- cambiar entre registro y encontrar usuario -----------------------------
+// Alternar entre login y registro
 const toggleFormularios = (mostrarLogin) => {
-  titulo.style.display = mostrarLogin ? "none" : "flex";
+  if (titulo) titulo.style.display = mostrarLogin ? "none" : "flex";
   checkboxCuenta.checked = mostrarLogin;
 
   if (mostrarLogin) {
+    console.log("Se muestra login");
     camposRegistro.classList.remove("mostrar");
     camposLogin.classList.add("mostrar");
   } else {
+    console.log("Se muestra registro");
     camposRegistro.classList.add("mostrar");
     camposLogin.classList.remove("mostrar");
   }
 };
 
-// ----------------------------- usuarios dummy -----------------------------
-const cuentasSimuladas = [
-  {
-    nombre: "Juan Pérez",
-    telefono: "5551234567",
-    correo: "juan@godcode.com",
-    fecha: "1990-01-01",
-    medio: ["correo", "telefono"],
-  },
-];
-
-const buscarCuentaExistente = () => {
-  const valor = loginInput.value.trim().toLowerCase();
-  const cuenta = cuentasSimuladas.find(
-    (c) => c.telefono === valor || c.correo === valor
-  );
-
-  if (cuenta) {
-    mostrarMensaje("Cuenta encontrada correctamente.", "exito");
-    llenarFormulario(cuenta);
-  } else {
-    mostrarMensaje(
-      "Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén escritos correctamente o regístrate para crear una nueva cuenta.",
-      "error"
-    );
-  }
-};
-
-const llenarFormulario = (cuenta) => {
-  document.getElementById("nombre").value = cuenta.nombre || "";
-  document.getElementById("telefono").value = cuenta.telefono || "";
-  document.getElementById("correo").value = cuenta.correo || "";
-  document.getElementById("fecha-nacimiento").value = cuenta.fecha || "";
-  cursoNombreInput.value = nombreCursoGlobal;
-
-  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
-    cb.checked = cuenta.medio?.includes(cb.value);
-  });
-
-  toggleFormularios(false);
-};
-
-// ----------------------------- mostrar mensajes de error -----------------------------
-
+// Mostrar/ocultar mensajes reutilizando #error-cuenta
 const mostrarMensaje = (mensaje, tipo = "error") => {
   errorCuenta.textContent = mensaje;
   errorCuenta.classList.add("mostrar");
@@ -396,7 +353,65 @@ const ocultarMensaje = () => {
   volverRegistro.classList.remove("mostrar");
 };
 
-// ----------------------------- validar medios -----------------------------
+// Buscar cuenta existente
+const buscarCuentaExistente = async () => {
+  const identificador = loginInput.value.trim().toLowerCase();
+  console.log("Buscar cuenta existente...");
+  console.log("Identificador ingresado:", identificador);
+
+  if (!identificador)
+    return mostrarMensaje(
+      "Ingresa un correo o teléfono para buscar tu cuenta.",
+      "error"
+    );
+
+  try {
+    const res = await fetch(ENDPOINT_CONSULTA, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo: identificador, telefono: identificador }),
+    });
+
+    const data = await res.json();
+    console.log("Respuesta del servidor (consulta usuario):", data);
+
+    if (Array.isArray(data) && data.length > 0) {
+      const usuario = data[0];
+      console.log("Usuario encontrado:", usuario);
+      mostrarMensaje("Cuenta encontrada correctamente.", "exito");
+      llenarFormulario(usuario);
+    } else {
+      mostrarMensaje(
+        "Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén escritos correctamente o regístrate para crear una nueva cuenta.",
+        "error"
+      );
+    }
+  } catch (err) {
+    console.error("Error al buscar cuenta:", err);
+    mostrarMensaje(
+      "Ocurrió un error al consultar tu cuenta. Intenta nuevamente.",
+      "error"
+    );
+  }
+};
+
+// Llenar campos desde cuenta encontrada
+const llenarFormulario = (cuenta) => {
+  document.getElementById("nombre").value = cuenta.nombre || "";
+  document.getElementById("telefono").value = cuenta.telefono || "";
+  document.getElementById("correo").value = cuenta.correo || "";
+  document.getElementById("fecha-nacimiento").value =
+    cuenta.fecha_nacimiento || "";
+  cursoNombreInput.value = nombreCursoGlobal;
+
+  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+    cb.checked =
+      cuenta.tipo_contacto == 3 ||
+      cb.value === (cuenta.tipo_contacto == 1 ? "telefono" : "correo");
+  });
+
+  toggleFormularios(false);
+};
 
 const validarMediosContacto = () => {
   const mediosSeleccionados = Array.from(
@@ -405,11 +420,10 @@ const validarMediosContacto = () => {
   return mediosSeleccionados.length > 0;
 };
 
-// ----------------------------- validar duplicados en tiempo real -----------------------------
-
-async function validarDuplicados() {
-  const telefono = inputTelefono.value.trim();
-  const correo = inputCorreo.value.trim();
+// Validar duplicados
+const validarDuplicados = async () => {
+  const telefono = document.getElementById("telefono").value.trim();
+  const correo = document.getElementById("correo").value.trim();
 
   if (!telefono && !correo) {
     alertaRepetido.style.display = "none";
@@ -432,10 +446,9 @@ async function validarDuplicados() {
   } catch (err) {
     console.warn("Error validando duplicados:", err);
   }
-}
+};
 
-// ----------------------------- enviar inscripcion -----------------------------
-
+// Envio de inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -444,110 +457,117 @@ formInscripcion.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (alertaRepetido.style.display === "block") {
-    alert("No puedes registrar un correo o teléfono ya existente.");
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const correo = document.getElementById("correo").value.trim();
+  const fecha_nacimiento = document.getElementById("fecha-nacimiento").value;
+  const tipo_contacto = obtenerTipoContacto();
+
+  if (!nombre || !telefono || !correo || !fecha_nacimiento) {
+    alert("Por favor completa todos los campos.");
     return;
   }
 
-  const nombre = document.getElementById("nombre").value.trim();
-  const telefono = inputTelefono.value.trim();
-  const correo = inputCorreo.value.trim();
-  const fecha_nacimiento = document.getElementById("fecha-nacimiento").value;
-  const tipo_contacto = calcularTipoContacto();
-  const password = "godcode123";
-
   try {
-    console.log("Registrando usuario nuevo...");
-    const resUsuario = await fetch(ENDPOINT_INSERCION, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nombre,
-        correo,
-        telefono,
-        tipo_contacto,
-        fecha_nacimiento,
-        password,
-      }),
-    });
-
-    const dataUsuario = await resUsuario.json();
-    console.log("Respuesta de registro:", dataUsuario);
-
-    if (dataUsuario.mensaje !== "Usuario registrado correctamente") {
-      throw new Error("No se pudo registrar el usuario.");
-    }
-
-    const resConsulta = await fetch(ENDPOINT_CONSULTA, {
+    // Validar duplicados antes de insertar
+    const checkRes = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correo, telefono }),
     });
 
-    const dataConsulta = await resConsulta.json();
-    const usuarioId = Array.isArray(dataConsulta)
-      ? dataConsulta[0]?.id
-      : dataConsulta?.id;
+    const checkData = await checkRes.json();
 
-    if (!usuarioId) throw new Error("No se pudo obtener el ID del usuario");
+    let idUsuario = null;
 
-    const resInscripcion = await fetch(ENDPOINT_INSCRIPCION, {
+    if (Array.isArray(checkData) && checkData.length > 0) {
+      idUsuario = checkData[0].id;
+      console.log("El usuario ya existe con ID:", idUsuario);
+    } else {
+      // Insertar nuevo usuario
+      console.log("Registrando nuevo usuario...");
+      const insertRes = await fetch(ENDPOINT_INSERTAR, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre,
+          correo,
+          telefono,
+          fecha_nacimiento,
+          tipo_contacto,
+          password: "godcode123",
+        }),
+      });
+
+      const insertData = await insertRes.json();
+      console.log("Respuesta del servidor (nuevo usuario):", insertData);
+
+      if (insertData?.mensaje === "Usuario registrado correctamente") {
+        const nuevoRes = await fetch(ENDPOINT_CONSULTA, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo, telefono }),
+        });
+
+        const nuevoUsuario = await nuevoRes.json();
+        idUsuario = nuevoUsuario[0]?.id;
+      } else {
+        throw new Error("No se pudo registrar el usuario.");
+      }
+    }
+
+    // Inscribir al curso
+    const inscRes = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         curso: idCursoGlobal,
-        usuario: usuarioId,
+        usuario: idUsuario,
         comentario: "",
       }),
     });
 
-    const dataInscripcion = await resInscripcion.json();
-    console.log("Respuesta de inscripción:", dataInscripcion);
-    mostrarMensaje("Inscripción completada exitosamente.", "exito");
-
-    setTimeout(cerrarModal, 3000);
-  } catch (error) {
-    console.error("Error en inscripción:", error);
-    alert("Ocurrió un error al registrar la inscripción.");
+    const inscData = await inscRes.json();
+    console.log("Resultado inscripción:", inscData);
+    mostrarMensaje(inscData?.mensaje || "Inscripción completada.", "exito");
+    formInscripcion.reset();
+  } catch (err) {
+    console.error("Error en inscripción:", err);
+    mostrarMensaje("Hubo un error al procesar tu inscripción.", "error");
   }
 });
 
-// ----------------------------- utilidades -----------------------------
-
-const calcularTipoContacto = () => {
-  const medios = Array.from(
+// Tipo de contacto: 1 = tel, 2 = correo, 3 = ambos
+const obtenerTipoContacto = () => {
+  const seleccionados = Array.from(
     document.querySelectorAll('input[name="medios-contacto"]:checked')
   ).map((cb) => cb.value);
 
-  if (medios.includes("telefono") && medios.includes("correo")) return 3;
-  if (medios.includes("telefono")) return 1;
-  if (medios.includes("correo")) return 2;
+  if (seleccionados.includes("telefono") && seleccionados.includes("correo"))
+    return 3;
+  if (seleccionados.includes("telefono")) return 1;
+  if (seleccionados.includes("correo")) return 2;
   return 0;
 };
 
-// ----------------------------- eventos -----------------------------
-
-abrirBtn?.addEventListener("click", abrirModal);
-cerrarBtn?.addEventListener("click", cerrarModal);
-
-modal?.addEventListener("click", (e) => {
+// Listeners
+abrirBtn.addEventListener("click", abrirModal);
+cerrarBtn.addEventListener("click", cerrarModal);
+modal.addEventListener("click", (e) => {
   if (e.target === modal) cerrarModal();
 });
-
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
-
-checkboxCuenta?.addEventListener("change", () => {
+checkboxCuenta.addEventListener("change", () => {
   toggleFormularios(checkboxCuenta.checked);
 });
-
-buscarBtn?.addEventListener("click", buscarCuentaExistente);
-
-volverRegistro?.addEventListener("click", (e) => {
+buscarBtn.addEventListener("click", buscarCuentaExistente);
+volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
   toggleFormularios(false);
 });
-
-inputTelefono?.addEventListener("input", validarDuplicados);
-inputCorreo?.addEventListener("input", validarDuplicados);
+document
+  .getElementById("telefono")
+  .addEventListener("input", validarDuplicados);
+document.getElementById("correo").addEventListener("input", validarDuplicados);

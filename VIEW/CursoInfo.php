@@ -348,7 +348,6 @@
             </div>
 
             <div class="form-contenedor">
-                <!-- LOGIN -->
                 <div class="campos-login">
                     <div class="form-group fila-buscar align-left-container">
                         <label for="login-identificador" class="label-align-left">Correo o Teléfono</label>
@@ -369,7 +368,6 @@
                     </p>
                 </div>
 
-                <!-- REGISTRO -->
                 <form id="form-inscripcion">
                     <div class="campos-registro">
                         <div class="registro-header">
@@ -381,15 +379,14 @@
                             <input type="text" id="nombre" />
                         </div>
 
-                        <div class="form-group grupo-contacto">
-                            <label class="label-contacto">Número de Teléfono o Email</label>
-                            <div class="inputs-contacto">
-                                <input type="text" id="telefono" placeholder="Teléfono" />
-                                <input type="email" id="correo" placeholder="Correo electrónico" />
-                            </div>
-                            <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
-                                Ya existe una cuenta con ese correo o teléfono.
-                            </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="text" id="telefono" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="correo">Correo</label>
+                            <input type="email" id="correo" />
                         </div>
 
                         <div class="form-group">
@@ -416,7 +413,12 @@
                             <input type="text" id="curso-nombre" readonly />
                         </div>
 
+                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido">
+                            Ya existe una cuenta con ese correo o teléfono.
+                        </div>
+
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
+
                         <p class="aviso">
                             Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
                             datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
@@ -427,6 +429,7 @@
             </div>
         </div>
     </div>
+
 
 
 
