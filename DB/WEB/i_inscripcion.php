@@ -26,7 +26,7 @@ if (!$con) {
 }
 
 // Verificar si ya existe la inscripción
-$check_query = "SELECT id FROM god_code.gc_inscripcion WHERE curso = $curso AND usuario = $usuario AND estatus = 1";
+$check_query = "SELECT id FROM god_code.gc_inscripcion WHERE curso = $curso AND usuario = $usuario";
 $check_result = mysqli_query($con, $check_query);
 
 if ($check_result && mysqli_num_rows($check_result) > 0) {
