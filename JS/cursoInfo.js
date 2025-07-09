@@ -344,7 +344,6 @@ const toggleFormularios = (mostrarLogin) => {
   camposLogin.classList.toggle("mostrar", mostrarLogin);
 };
 
-// mostrar mensajes reutilizando toast
 const mostrarMensaje = (mensaje, tipo = "error") => {
   errorCuenta.textContent = mensaje;
   errorCuenta.classList.add("mostrar");
@@ -356,11 +355,6 @@ const mostrarMensaje = (mensaje, tipo = "error") => {
   setTimeout(() => ocultarMensaje(), 5000);
 };
 
-const ocultarMensaje = () => {
-  errorCuenta.classList.remove("mostrar", "exito", "error");
-  errorCuenta.textContent = "";
-  volverRegistro.classList.remove("mostrar");
-};
 
 // buscar cuenta existente
 const buscarCuentaExistente = async () => {
