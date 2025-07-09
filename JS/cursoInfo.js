@@ -339,13 +339,12 @@ const toggleFormularios = (mostrarLogin) => {
   checkboxCuenta.checked = mostrarLogin;
   camposRegistro.classList.toggle("mostrar", !mostrarLogin);
   camposLogin.classList.toggle("mostrar", mostrarLogin);
+  cursoNombreInput.value = nombreCursoGlobal;
 };
 
 const mostrarMensaje = (mensaje, tipo = "error") => {
   volverRegistro.classList.toggle("mostrar", tipo === "error");
-
   mostrarToast(mensaje, tipo);
-  setTimeout(() => ocultarMensaje(), 5000);
 };
 
 // buscar cuenta existente
@@ -353,7 +352,8 @@ const buscarCuentaExistente = async () => {
   const identificador = loginInput.value.trim().toLowerCase();
   if (!identificador)
     return mostrarMensaje(
-      "Ingresa un correo o teléfono para buscar tu cuenta."
+      "Ingresa un correo o teléfono para buscar tu cuenta.",
+      "warning"
     );
 
   try {
