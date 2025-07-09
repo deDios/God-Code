@@ -184,27 +184,106 @@
                 </button>
 
                 <div class="ventajas-uxui__carousel" id="ventajas-uxui-carousel">
+
+
                     <div class="ventaja">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img1.png" alt="img" />
                         <div class="ventaja__texto">
-                            <h3>Investigación de Usuarios</h3>
+                            <h3>Investigación de Negocio</h3>
                             <p>Comprendemos las necesidades de los usuarios para crear soluciones efectivas.</p>
                         </div>
                     </div>
+
                     <div class="ventaja">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img1.png" alt="img" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img2.png" alt="img" />
                         <div class="ventaja__texto">
-                            <h3>Prototipos y Pruebas</h3>
-                            <p>Diseñamos prototipos interactivos que validan ideas antes del desarrollo.</p>
+                            <h3>Mejora la satisfacción del cliente</h3>
+                            <p>Diseños intuitivos y centrados en el usuario crean experiencias agradables que fortalecen
+                                la percepción de tu marca.</p>
                         </div>
                     </div>
+
                     <div class="ventaja">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img1.png" alt="img" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img3.png" alt="img" />
                         <div class="ventaja__texto">
-                            <h3>Interfaces Atractivas</h3>
-                            <p>Creamos interfaces intuitivas que mejoran la usabilidad y fidelizan a los usuarios.</p>
+                            <h3>Incrementa la conversión</h3>
+                            <p>Guía a los usuarios de forma clara hacia tus objetivos clave y aumenta tus tasas de
+                                conversión.</p>
                         </div>
                     </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img4.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Reduce los costos de soporte</h3>
+                            <p>Interfaces bien diseñadas evitan errores comunes y disminuyen la carga de atención
+                                técnica.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img5.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Aumenta la retención de usuarios</h3>
+                            <p>Una experiencia fluida y atractiva motiva a los usuarios a volver y seguir usando tu
+                                producto.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img6.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Diferencia frente a la competencia</h3>
+                            <p>Un diseño profesional destaca tu producto en mercados competitivos y saturados.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img7.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Optimiza el tiempo de desarrollo</h3>
+                            <p>Una estrategia UX/UI desde el inicio evita retrabajos y acelera el proceso de desarrollo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img8.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Impulsa la imagen de marca</h3>
+                            <p>Un diseño coherente transmite profesionalismo, confianza y calidad en cada interacción.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img9.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Favorece la escalabilidad</h3>
+                            <p>Diseños bien estructurados permiten crecer sin perder eficiencia ni coherencia visual.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img10.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Apoya decisiones basadas en datos</h3>
+                            <p>Las métricas y pruebas de usuario permiten mejorar el diseño con base en evidencia real.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img11.png" alt="img" />
+                        <div class="ventaja__texto">
+                            <h3>Conecta con las emociones del usuario</h3>
+                            <p>Una experiencia bien diseñada genera vínculos emocionales con tu marca.</p>
+                        </div>
+                    </div>
+
+
+
                 </div>
 
                 <button class="ventajas-uxui__btn next" aria-label="Siguiente">
@@ -277,7 +356,8 @@
                         diseñar con intención y aprender continuamente, este lugar es para ti.
                     </p>
                     <p>
-                        Que tus ideas cobren vida y marca la diferencia con nosotros. <a href="../VIEW/ContactoCV.php">Deja tus datos
+                        Que tus ideas cobren vida y marca la diferencia con nosotros. <a
+                            href="../VIEW/ContactoCV.php">Deja tus datos
                             y CV aquí </a>
                     </p>
                 </div>

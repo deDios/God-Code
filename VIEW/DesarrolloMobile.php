@@ -173,28 +173,28 @@
                             <div class="card-body">
                                 <h4>Desarrollo de App Mobile</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img1.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img1.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
                                 <h4>Diseño de App</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img2.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img2.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
                                 <h4>Compatibilidad y adaptabilidad</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img3.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img3.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
                                 <h4>Actualizaciones regulares</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img4.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img4.png" alt="img">
                         </div>
                     </div>
                 </div>
@@ -246,7 +246,7 @@
                         comprometer la calidad. Con una gestión clara y estructurada, tu app no solo llegará a tiempo,
                         sino que será más estable, intuitiva y lista para destacar en el mercado.</p>
                     <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Descripcion_Img1.png"
                             alt="Diseño de app móvil" />
                     </div>
                 </div>
@@ -266,7 +266,7 @@
                         solo reduces tiempos de desarrollo, sino que aseguras una entrega de mayor calidad, alineada a
                         las necesidades del mercado y preparada para crecer de forma sostenible.</p>
                     <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Descripcion_Img2.png"
                             alt="Datos de aplicación móvil" />
                     </div>
                 </div>

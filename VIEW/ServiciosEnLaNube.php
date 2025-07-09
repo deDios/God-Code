@@ -184,24 +184,67 @@
                     </div>
 
                     <div class="ventaja">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
-                            alt="Ventaja" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img2.png"
+                            alt="Reducción de costos" />
                         <div class="ventaja__texto">
-                            <h3>Escalabilidad inmediata</h3>
-                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
-                                demanda, sin necesidad de infraestructura física adicional.</p>
+                            <h3>Reducción de costos</h3>
+                            <p>El uso de servicios en la nube elimina gastos asociados a la compra, mantenimiento y
+                                actualización de servidores físicos, permitiendo una administración más eficiente del
+                                presupuesto.</p>
                         </div>
                     </div>
 
                     <div class="ventaja">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
-                            alt="Ventaja" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img3.png"
+                            alt="Alta disponibilidad" />
                         <div class="ventaja__texto">
-                            <h3>Escalabilidad inmediata</h3>
-                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
-                                demanda, sin necesidad de infraestructura física adicional.</p>
+                            <h3>Alta disponibilidad</h3>
+                            <p>Los servicios en la nube operan con arquitecturas redundantes que aseguran el acceso
+                                continuo a tus aplicaciones, incluso ante fallos técnicos o picos de tráfico.</p>
                         </div>
                     </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img4.png"
+                            alt="Seguridad avanzada" />
+                        <div class="ventaja__texto">
+                            <h3>Seguridad avanzada</h3>
+                            <p>Protege tus datos con cifrado, monitoreo 24/7, políticas de acceso y copias de seguridad
+                                automáticas, todo gestionado por proveedores especializados en ciberseguridad.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img5.png"
+                            alt="Integración sencilla" />
+                        <div class="ventaja__texto">
+                            <h3>Integración sencilla</h3>
+                            <p>La nube permite conectar tu sistema con plataformas de datos, inteligencia artificial,
+                                analítica, correo, CRM y más, optimizando los flujos de trabajo digitales.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img6.png"
+                            alt="Acceso global" />
+                        <div class="ventaja__texto">
+                            <h3>Acceso global</h3>
+                            <p>Administra y consulta tus aplicaciones desde cualquier dispositivo con conexión a
+                                internet, brindando movilidad y flexibilidad total a tu equipo de trabajo.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img7.png"
+                            alt="Agilidad en el despliegue" />
+                        <div class="ventaja__texto">
+                            <h3>Despliegue ágil</h3>
+                            <p>Lanza nuevas aplicaciones o actualizaciones en minutos, con herramienFtas que simplifican
+                                la configuración, mantenimiento y escalado continuo del sistema.</p>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 <button class="ventajas-nube__btn next" aria-label="Siguiente">
