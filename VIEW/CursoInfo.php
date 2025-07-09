@@ -334,7 +334,7 @@
         </div>
     </footer>
 
-    
+
     <!--- esto es la pestaña emergente para suscribirse al curso --->
     <div id="modal-inscripcion">
         <div class="modal-contenido">
@@ -357,8 +357,6 @@
                             <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
                         </div>
                     </div>
-
-                    <div id="error-cuenta" class="alerta-error"></div>
 
                     <p class="volver-a-registro">
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
@@ -423,8 +421,6 @@
             </div>
         </div>
     </div>
-
-
 
 
 

@@ -262,6 +262,7 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
+
 console.log("DOM cargado - Modal Inscripción Ready");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -379,17 +380,17 @@ const buscarCuentaExistente = async () => {
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       const usuario = data[0];
-      mostrarMensaje("Cuenta encontrada correctamente.", "exito");
+      mostrarToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(usuario);
     } else {
-      mostrarMensaje(
+      mostrarToast(
         "No encontramos tu cuenta. Puedes registrarte si es necesario.",
-        "error"
+        "warning"
       );
     }
   } catch (err) {
     console.error("Error al buscar cuenta:", err);
-    mostrarMensaje("Ocurrió un error al consultar tu cuenta.");
+    mostrarToast("Ocurrió un error al consultar tu cuenta.", "error");
   }
 };
 
@@ -557,4 +558,6 @@ volverRegistro.addEventListener("click", (e) => {
 document
   .getElementById("telefono")
   .addEventListener("input", validarDuplicados);
-document.getElementById("correo").addEventListener("input", validarDuplicados);
+document
+  .getElementById("correo")
+  .addEventListener("input", validarDuplicados);
