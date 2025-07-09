@@ -47,11 +47,6 @@ header {
     transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
-header.scrolled .top-bar {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-
 .subnav {
     position: fixed;
     top: 74px;
@@ -74,11 +69,24 @@ header.scrolled .top-bar {
     padding: 8px 12px;
 }
 
+/*----------------- css de la funcion scroller, todavia falta ver porque se mueven los iconos ---------------------------*/
+
+header.scrolled .top-bar {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
 header.scrolled .subnav {
     position: fixed;
     top: 0;
     width: 100%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+header.scrolled .social-bar-mobile {
+    top: 1px;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -301,7 +309,7 @@ footer small {
     justify-content: flex-end;
     gap: 15px;
     width: 100%;
-    padding-right: 10px;
+    padding-right: 30px;
 }
 
 
@@ -428,12 +436,7 @@ footer small {
         transition: top 0.4s ease-in-out, background-color 0.3s ease;
     }
 
-    header.scrolled .social-bar-mobile {
-        top: 1px;
-        /* ajusta según el nuevo top del subnav */
-        background-color: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+
 
     /*----------------css para los iconos de redes sociales MOBILE-----------------*/
     .social-bar-mobile .social-icons {

@@ -130,6 +130,20 @@
     margin-right: 0.7rem;
 }
 
+/*--------------------------- css para propiedades sticky para el aside ------------------------*/
+
+.curso-info {
+    position: sticky;
+    top: 2rem;
+    align-self: flex-start;
+    z-index: 10;
+}
+
+.curso-detalle {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
 
 /* ------------------------- seccion 2 ----------------------- */
 
@@ -891,3 +905,4 @@ input[type="checkbox"] {
     width: 100%;
     max-width: 450px;
 }
+
