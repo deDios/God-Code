@@ -264,6 +264,31 @@ function inicializarAcordeones() {
 
 console.log("DOM cargado - Modal Inscripción Ready");
 
+const crearToast = (mensaje, tipo = "exito") => {
+  const toast = document.createElement("div");
+  toast.className = `toast ${tipo}`;
+  toast.textContent = mensaje;
+
+  const contenedor =
+    document.querySelector(".toast-container") ||
+    (() => {
+      const nuevoContenedor = document.createElement("div");
+      nuevoContenedor.className = "toast-container";
+      document.body.appendChild(nuevoContenedor);
+      return nuevoContenedor;
+    })();
+
+  contenedor.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("mostrar");
+    setTimeout(() => {
+      toast.classList.remove("mostrar");
+      setTimeout(() => toast.remove(), 500);
+    }, 4000);
+  }, 100);
+};
+
 // Elementos principales
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
@@ -273,7 +298,6 @@ const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
 const errorCuenta = document.getElementById("error-cuenta");
-const alertaRepetido = document.getElementById("alerta-usuario-repetido");
 const buscarBtn = document.getElementById("buscar-cuenta");
 const volverRegistro = document.getElementById("volver-a-registro");
 const cursoNombreInput = document.getElementById("curso-nombre");
@@ -287,18 +311,6 @@ const ENDPOINT_INSERTAR =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
-
-// Toast personalizado
-const mostrarToast = (mensaje, tipo = "exito") => {
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${tipo}`;
-  toast.textContent = mensaje;
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add("visible"), 100);
-  setTimeout(() => toast.classList.remove("visible"), 4000);
-  setTimeout(() => toast.remove(), 5000);
-};
 
 // Mostrar modal
 const abrirModal = () => {
@@ -322,7 +334,6 @@ const limpiarFormulario = () => {
   ocultarMensaje();
   volverRegistro.classList.remove("mostrar");
   loginInput.value = "";
-  alertaRepetido.style.display = "none";
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked = false;
   });
@@ -336,17 +347,16 @@ const toggleFormularios = (mostrarLogin) => {
   camposLogin.classList.toggle("mostrar", mostrarLogin);
 };
 
-// Mensajes reutilizables (para el bloque de errores/éxitos en login/registro)
+// Mostrar/ocultar mensaje en el form (solo para login)
 const mostrarMensaje = (mensaje, tipo = "error") => {
   errorCuenta.textContent = mensaje;
-  errorCuenta.classList.add("mostrar", tipo);
-  errorCuenta.classList.remove(tipo === "error" ? "exito" : "error");
+  errorCuenta.className = `mostrar ${tipo}`;
   volverRegistro.classList.toggle("mostrar", tipo === "error");
-  setTimeout(() => ocultarMensaje(), 5000);
+  setTimeout(ocultarMensaje, 5000);
 };
 
 const ocultarMensaje = () => {
-  errorCuenta.classList.remove("mostrar", "exito", "error");
+  errorCuenta.className = "";
   errorCuenta.textContent = "";
   volverRegistro.classList.remove("mostrar");
 };
@@ -354,10 +364,10 @@ const ocultarMensaje = () => {
 // Buscar cuenta existente
 const buscarCuentaExistente = async () => {
   const identificador = loginInput.value.trim().toLowerCase();
-  if (!identificador)
-    return mostrarMensaje(
-      "Ingresa un correo o teléfono para buscar tu cuenta."
-    );
+  if (!identificador) {
+    return mostrarMensaje("Ingresa un correo o teléfono.", "error");
+  }
+
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
@@ -366,15 +376,18 @@ const buscarCuentaExistente = async () => {
     });
 
     const data = await res.json();
+
     if (Array.isArray(data) && data.length > 0) {
+      crearToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(data[0]);
-      mostrarMensaje("Cuenta encontrada correctamente.", "exito");
     } else {
-      mostrarMensaje("No se encontró la cuenta. Verifica los datos.", "error");
+      mostrarMensaje(
+        "No se encontró la cuenta. Verifica el correo o teléfono.",
+        "error"
+      );
     }
   } catch (err) {
-    mostrarMensaje("Error al buscar cuenta.", "error");
-    console.error(err);
+    mostrarMensaje("Ocurrió un error al buscar la cuenta.", "error");
   }
 };
 
@@ -396,24 +409,20 @@ const llenarFormulario = (cuenta) => {
   toggleFormularios(false);
 };
 
-// Validar medios de contacto seleccionados
+// Validar medios de contacto
 const validarMediosContacto = () => {
   return (
-    Array.from(
-      document.querySelectorAll('input[name="medios-contacto"]:checked')
-    ).length > 0
+    document.querySelectorAll('input[name="medios-contacto"]:checked').length >
+    0
   );
 };
 
-// Validar duplicados en tiempo real
+// Validar duplicados
 const validarDuplicados = async () => {
   const telefono = document.getElementById("telefono").value.trim();
   const correo = document.getElementById("correo").value.trim();
 
-  if (!telefono && !correo) {
-    alertaRepetido.style.display = "none";
-    return;
-  }
+  if (!telefono && !correo) return;
 
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
@@ -423,33 +432,33 @@ const validarDuplicados = async () => {
     });
 
     const data = await res.json();
-    alertaRepetido.style.display =
-      Array.isArray(data) && data.length > 0 ? "block" : "none";
+    if (Array.isArray(data) && data.length > 0) {
+      crearToast("Este correo o teléfono ya está registrado.", "advertencia");
+    }
   } catch (err) {
     console.warn("Error validando duplicados:", err);
   }
 };
 
-// Tipo de contacto: 1 = teléfono, 2 = correo, 3 = ambos
+// Tipo de contacto: 1 = tel, 2 = correo, 3 = ambos
 const obtenerTipoContacto = () => {
   const seleccionados = Array.from(
     document.querySelectorAll('input[name="medios-contacto"]:checked')
   ).map((cb) => cb.value);
-  return seleccionados.includes("telefono") && seleccionados.includes("correo")
-    ? 3
-    : seleccionados.includes("telefono")
-    ? 1
-    : seleccionados.includes("correo")
-    ? 2
-    : 0;
+
+  if (seleccionados.includes("telefono") && seleccionados.includes("correo"))
+    return 3;
+  if (seleccionados.includes("telefono")) return 1;
+  if (seleccionados.includes("correo")) return 2;
+  return 0;
 };
 
-// Enviar inscripción
+// Envío del formulario
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (!validarMediosContacto()) {
-    alert("Selecciona al menos un medio de contacto.");
+    crearToast("Selecciona al menos un medio de contacto.", "advertencia");
     return;
   }
 
@@ -460,17 +469,18 @@ formInscripcion.addEventListener("submit", async (e) => {
   const tipo_contacto = obtenerTipoContacto();
 
   if (!nombre || !telefono || !correo || !fecha_nacimiento) {
-    alert("Por favor completa todos los campos.");
+    crearToast("Por favor completa todos los campos.", "advertencia");
     return;
   }
 
   try {
-    // Validar duplicado
+    // Verificar si ya existe
     const checkRes = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correo, telefono }),
     });
+
     const checkData = await checkRes.json();
 
     let idUsuario = null;
@@ -478,7 +488,7 @@ formInscripcion.addEventListener("submit", async (e) => {
     if (Array.isArray(checkData) && checkData.length > 0) {
       idUsuario = checkData[0].id;
     } else {
-      // Insertar usuario
+      // Insertar nuevo usuario
       const insertRes = await fetch(ENDPOINT_INSERTAR, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -493,13 +503,13 @@ formInscripcion.addEventListener("submit", async (e) => {
       });
 
       const insertData = await insertRes.json();
-
       if (insertData?.mensaje === "Usuario registrado correctamente") {
         const nuevoRes = await fetch(ENDPOINT_CONSULTA, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ correo, telefono }),
         });
+
         const nuevoUsuario = await nuevoRes.json();
         idUsuario = nuevoUsuario[0]?.id;
       } else {
@@ -507,7 +517,7 @@ formInscripcion.addEventListener("submit", async (e) => {
       }
     }
 
-    // Inscripción
+    // Inscribir al curso
     const inscRes = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -519,14 +529,14 @@ formInscripcion.addEventListener("submit", async (e) => {
     });
 
     const inscData = await inscRes.json();
-    mostrarToast(
-      inscData?.mensaje || "Inscripción completada correctamente",
+    crearToast(
+      inscData?.mensaje || "Inscripción realizada correctamente.",
       "exito"
     );
     formInscripcion.reset();
   } catch (err) {
     console.error("Error en inscripción:", err);
-    mostrarToast("Hubo un error al procesar tu inscripción.", "error");
+    crearToast("Ocurrió un error al procesar tu inscripción.", "error");
   }
 });
 
@@ -539,9 +549,9 @@ modal.addEventListener("click", (e) => {
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
-checkboxCuenta.addEventListener("change", () =>
-  toggleFormularios(checkboxCuenta.checked)
-);
+checkboxCuenta.addEventListener("change", () => {
+  toggleFormularios(checkboxCuenta.checked);
+});
 buscarBtn.addEventListener("click", buscarCuentaExistente);
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();

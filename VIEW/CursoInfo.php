@@ -334,11 +334,11 @@
         </div>
     </footer>
 
+    
     <!--- esto es la pestaña emergente para suscribirse al curso --->
     <div id="modal-inscripcion">
         <div class="modal-contenido">
             <button class="cerrar-modal">&times;</button>
-
             <h2>Inscribirme al Curso</h2>
 
             <div class="form-group">
@@ -358,10 +358,7 @@
                         </div>
                     </div>
 
-                    <div id="error-cuenta" class="alerta-error">
-                        Lo sentimos, no pudimos encontrar tu cuenta. Verifica que el correo o número de teléfono estén
-                        escritos correctamente o regístrate para crear una nueva cuenta.
-                    </div>
+                    <div id="error-cuenta" class="alerta-error"></div>
 
                     <p class="volver-a-registro">
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
@@ -413,15 +410,12 @@
                             <input type="text" id="curso-nombre" readonly />
                         </div>
 
-                        <div id="alerta-usuario-repetido" class="alerta-usuario-repetido centrado">
-                            Ya existe una cuenta con ese correo o teléfono.
-                        </div>
-
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
 
                         <p class="aviso">
                             Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
-                            datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
+                            datos
+                            para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
                             confirmar tu registro.
                         </p>
                     </div>
@@ -434,7 +428,8 @@
 
 
 
-    <div id="notificacion-inscripcion" class="notificacion-toast"></div>
+
+    <div class="toast-container"></div>
     <script src="../JS/cursoInfo.js"></script>
     <script src="../JS/JSglobal.js"></script>
 </body>

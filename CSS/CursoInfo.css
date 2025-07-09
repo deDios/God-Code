@@ -906,26 +906,47 @@ input[type="checkbox"] {
     max-width: 450px;
 }
 
-.notificacion-toast {
+/*-------------------- notificaciones tipo toast --------------------*/
+.toast-container {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #0a61d0;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  transform: translateY(20px);
-  z-index: 2000;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.notificacion-toast.mostrar {
+.toast {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s ease;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  max-width: 300px;
+  word-break: break-word;
+  font-size: 0.95rem;
+}
+
+.toast.mostrar {
   opacity: 1;
   transform: translateY(0);
-  pointer-events: auto;
 }
 
+/* Tipos */
+.toast.exito {
+  background-color: #28a745;
+}
+
+.toast.error {
+  background-color: #dc3545;
+}
+
+.toast.advertencia {
+  background-color: #ffc107;
+  color: #222;
+}
