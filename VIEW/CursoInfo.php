@@ -434,7 +434,7 @@
 
 
 
-
+    <div id="notificacion-inscripcion" class="notificacion-toast"></div>
     <script src="../JS/cursoInfo.js"></script>
     <script src="../JS/JSglobal.js"></script>
 </body>

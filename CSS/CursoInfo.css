@@ -906,3 +906,26 @@ input[type="checkbox"] {
     max-width: 450px;
 }
 
+.notificacion-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #0a61d0;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(20px);
+  z-index: 2000;
+}
+
+.notificacion-toast.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
