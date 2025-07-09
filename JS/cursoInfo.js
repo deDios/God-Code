@@ -262,7 +262,6 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
-
 console.log("DOM cargado - Modal Inscripción Ready");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -272,7 +271,6 @@ const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
 const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
-const errorCuenta = document.getElementById("error-cuenta");
 const alertaRepetido = document.getElementById("alerta-usuario-repetido");
 const buscarBtn = document.getElementById("buscar-cuenta");
 const volverRegistro = document.getElementById("volver-a-registro");
@@ -328,7 +326,6 @@ const cerrarModal = () => {
 const limpiarFormulario = () => {
   if (formInscripcion) formInscripcion.reset();
   toggleFormularios(false);
-  ocultarMensaje();
   volverRegistro.classList.remove("mostrar");
   loginInput.value = "";
   document
@@ -345,16 +342,11 @@ const toggleFormularios = (mostrarLogin) => {
 };
 
 const mostrarMensaje = (mensaje, tipo = "error") => {
-  errorCuenta.textContent = mensaje;
-  errorCuenta.classList.add("mostrar");
-  errorCuenta.classList.remove("exito", "error");
-  errorCuenta.classList.add(tipo);
   volverRegistro.classList.toggle("mostrar", tipo === "error");
 
   mostrarToast(mensaje, tipo);
   setTimeout(() => ocultarMensaje(), 5000);
 };
-
 
 // buscar cuenta existente
 const buscarCuentaExistente = async () => {
@@ -552,6 +544,4 @@ volverRegistro.addEventListener("click", (e) => {
 document
   .getElementById("telefono")
   .addEventListener("input", validarDuplicados);
-document
-  .getElementById("correo")
-  .addEventListener("input", validarDuplicados);
+document.getElementById("correo").addEventListener("input", validarDuplicados);
