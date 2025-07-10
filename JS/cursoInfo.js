@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       curso.precio == 0
         ? "Gratuito"
         : `$${curso.precio.toLocaleString("es-MX", {
-          minimumFractionDigits: 2,
-        })}`;
+            minimumFractionDigits: 2,
+          })}`;
 
     elementos.horas.textContent = `${curso.horas} Horas totales`;
     elementos.actividades.textContent = actividades.nombre;
@@ -128,8 +128,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fechaFormateada = formatearFecha(curso.fecha_inicio);
     elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
 
-    elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"
-      }`;
+    elementos.certificado.textContent = `Certificado ${
+      curso.certificado ? "incluido" : "no incluido"
+    }`;
 
     if (tutor) {
       elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
@@ -167,18 +168,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           (curso) => `
       <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
         <div class="card-curso">
-            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
-            }">
+            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
+            curso.nombre
+          }">
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
                 <p class="info-curso">
-                ${curso.horas} hrs | ${curso.precio === 0
+                ${curso.horas} hrs | ${
+            curso.precio === 0
               ? "Gratuito"
               : `$${curso.precio.toLocaleString("es-MX", {
-                minimumFractionDigits: 2,
-              })}`
-            }
+                  minimumFractionDigits: 2,
+                })}`
+          }
                 </p>
             </div>
         </div>
@@ -258,7 +261,6 @@ function inicializarAcordeones() {
 }
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
-
 console.log("DOM cargado - Modal Inscripción Ready");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -268,17 +270,14 @@ const checkboxCuenta = document.getElementById("ya-tengo-cuenta");
 const titulo = document.querySelector(".titulo-modal");
 const camposRegistro = document.querySelector(".campos-registro");
 const camposLogin = document.querySelector(".campos-login");
-const alertaRepetido = document.getElementById("alerta-usuario-repetido");
 const buscarBtn = document.getElementById("buscar-cuenta");
 const volverRegistro = document.getElementById("volver-a-registro");
 const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
-
 const telefonoInput = document.getElementById("telefono");
 const correoInput = document.getElementById("correo");
-
-
+const btnSubmit = document.querySelector(".btn-inscribirme");
 
 // ENDPOINTS
 const ENDPOINT_CONSULTA =
@@ -288,8 +287,8 @@ const ENDPOINT_INSERTAR =
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// Mostrar notificacion tipo toast
-function mostrarToast(mensaje, tipo = "exito", duracion = 4000) {
+// mostrar notificacion tipo toast, creo que esto lo voy a terminar moviendo al js global para usarlo en las demas vistas
+function mostrarToast(mensaje, tipo = "exito", duracion = 8000) {
   const contenedor = document.querySelector(".toast-container");
   if (!contenedor) return;
 
@@ -336,6 +335,7 @@ const limpiarFormulario = () => {
 
   telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
   correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  btnSubmit.disabled = false;
 };
 
 // cambiar a login y registro
@@ -385,7 +385,7 @@ const buscarCuentaExistente = async () => {
   }
 };
 
-// llenar campos desde con cuenta encontrada
+// llenar campos desde el formulario de cuenta encontrada
 const llenarFormulario = (cuenta) => {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
@@ -401,6 +401,11 @@ const llenarFormulario = (cuenta) => {
   });
 
   toggleFormularios(false);
+
+  // Al llenar la cuenta, quitar alertas y habilita el boton
+  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  btnSubmit.disabled = false;
 };
 
 const validarMediosContacto = () => {
@@ -417,6 +422,7 @@ const validarDuplicados = async () => {
 
   telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
   correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  btnSubmit.disabled = false;
 
   if (!telefono && !correo) return;
 
@@ -434,18 +440,26 @@ const validarDuplicados = async () => {
         "warning"
       );
 
+      let hayAlerta = false;
+
       if (telefono && data.some((d) => d.telefono === telefono)) {
-        telefonoInput.closest(".input-alerta-container")?.classList.add("alerta");
+        telefonoInput
+          .closest(".input-alerta-container")
+          ?.classList.add("alerta");
+        hayAlerta = true;
       }
+
       if (correo && data.some((d) => d.correo === correo)) {
         correoInput.closest(".input-alerta-container")?.classList.add("alerta");
+        hayAlerta = true;
       }
+
+      btnSubmit.disabled = hayAlerta;
     }
   } catch (err) {
     console.warn("Error validando duplicados:", err);
   }
 };
-
 
 // enviar inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
@@ -456,9 +470,14 @@ formInscripcion.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (btnSubmit.disabled) {
+    mostrarToast("Corrige los campos marcados antes de continuar.", "warning");
+    return;
+  }
+
   const nombre = document.getElementById("nombre").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-  const correo = document.getElementById("correo").value.trim();
+  const telefono = telefonoInput.value.trim();
+  const correo = correoInput.value.trim();
   const fecha_nacimiento = document.getElementById("fecha-nacimiento").value;
   const tipo_contacto = obtenerTipoContacto();
 
@@ -557,7 +576,5 @@ volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
   toggleFormularios(false);
 });
-document
-  .getElementById("telefono")
-  .addEventListener("input", validarDuplicados);
-document.getElementById("correo").addEventListener("input", validarDuplicados);
+telefonoInput.addEventListener("input", validarDuplicados);
+correoInput.addEventListener("input", validarDuplicados);
