@@ -275,6 +275,8 @@ const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
 
+
+
 // ENDPOINTS
 const ENDPOINT_CONSULTA =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
@@ -328,6 +330,9 @@ const limpiarFormulario = () => {
   document
     .querySelectorAll('input[name="medios-contacto"]')
     .forEach((cb) => (cb.checked = false));
+
+  document.getElementById("telefono").parentElement.classList.remove("duplicado");
+  document.getElementById("correo").parentElement.classList.remove("duplicado");
 };
 
 // cambiar a login y registro
@@ -410,7 +415,6 @@ const validarDuplicados = async () => {
   const contenedorTelefono = document.getElementById("container-telefono");
   const contenedorCorreo = document.getElementById("container-correo");
 
-  // limpiar estado previo
   contenedorTelefono?.classList.remove("alerta");
   contenedorCorreo?.classList.remove("alerta");
 
@@ -425,16 +429,22 @@ const validarDuplicados = async () => {
 
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
-      mostrarToast(
-        "Ya existe una cuenta con ese correo o teléfono.",
-        "warning"
-      );
+      const usuario = data[0];
+      const telefonoDuplicado = usuario.telefono === telefono && telefono !== "";
+      const correoDuplicado = usuario.correo === correo && correo !== "";
 
-      if (data[0].telefono === telefono) {
+      if (telefonoDuplicado || correoDuplicado) {
+        mostrarToast(
+          "Ya existe una cuenta con ese correo o teléfono.",
+          "warning"
+        );
+      }
+
+      if (telefonoDuplicado) {
         contenedorTelefono?.classList.add("alerta");
       }
 
-      if (data[0].correo === correo) {
+      if (correoDuplicado) {
         contenedorCorreo?.classList.add("alerta");
       }
     }
@@ -442,6 +452,7 @@ const validarDuplicados = async () => {
     console.warn("Error validando duplicados:", err);
   }
 };
+
 
 // enviar inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
