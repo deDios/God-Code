@@ -376,14 +376,18 @@
 
                         <div class="form-group">
                             <label for="telefono">Teléfono</label>
-                            <input type="text" id="telefono" />
-                            <span class="input-alerta-container">⚠️</span>
+                            <div class="input-alerta-container" id="telefono-container">
+                                <input type="text" id="telefono" />
+                                <span class="icono-alerta">⚠️</span>
+                            </div>
                         </div>
 
                         <div class="form-group">
                             <label for="correo">Correo</label>
-                            <input type="email" id="correo" />
-                            <span class="input-alerta-container">⚠️</span>
+                            <div class="input-alerta-container" id="correo-container">
+                                <input type="email" id="correo" />
+                                <span class="icono-alerta">⚠️</span>
+                            </div>
                         </div>
 
                         <div class="form-group">
