@@ -275,6 +275,9 @@ const cursoNombreInput = document.getElementById("curso-nombre");
 const loginInput = document.getElementById("login-identificador");
 const formInscripcion = document.getElementById("form-inscripcion");
 
+const telefonoInput = document.getElementById("telefono");
+const correoInput = document.getElementById("correo");
+
 
 
 // ENDPOINTS
@@ -331,8 +334,8 @@ const limpiarFormulario = () => {
     .querySelectorAll('input[name="medios-contacto"]')
     .forEach((cb) => (cb.checked = false));
 
-  document.getElementById("telefono").parentElement.classList.remove("duplicado");
-  document.getElementById("correo").parentElement.classList.remove("duplicado");
+  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
 };
 
 // cambiar a login y registro
@@ -409,14 +412,11 @@ const validarMediosContacto = () => {
 
 // validar duplicados
 const validarDuplicados = async () => {
-  const telefono = document.getElementById("telefono").value.trim();
-  const correo = document.getElementById("correo").value.trim();
+  const telefono = telefonoInput.value.trim();
+  const correo = correoInput.value.trim();
 
-  const contenedorTelefono = document.getElementById("container-telefono");
-  const contenedorCorreo = document.getElementById("container-correo");
-
-  contenedorTelefono?.classList.remove("alerta");
-  contenedorCorreo?.classList.remove("alerta");
+  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
 
   if (!telefono && !correo) return;
 
@@ -429,23 +429,16 @@ const validarDuplicados = async () => {
 
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
-      const usuario = data[0];
-      const telefonoDuplicado = usuario.telefono === telefono && telefono !== "";
-      const correoDuplicado = usuario.correo === correo && correo !== "";
+      mostrarToast(
+        "Ya existe una cuenta con ese correo o teléfono.",
+        "warning"
+      );
 
-      if (telefonoDuplicado || correoDuplicado) {
-        mostrarToast(
-          "Ya existe una cuenta con ese correo o teléfono.",
-          "warning"
-        );
+      if (telefono && data.some((d) => d.telefono === telefono)) {
+        telefonoInput.closest(".input-alerta-container")?.classList.add("alerta");
       }
-
-      if (telefonoDuplicado) {
-        contenedorTelefono?.classList.add("alerta");
-      }
-
-      if (correoDuplicado) {
-        contenedorCorreo?.classList.add("alerta");
+      if (correo && data.some((d) => d.correo === correo)) {
+        correoInput.closest(".input-alerta-container")?.classList.add("alerta");
       }
     }
   } catch (err) {
