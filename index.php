@@ -133,7 +133,7 @@
         <section id="seccion-innovacion" class="innovacion-section">
             <!-- Columna izquierda -->
             <div class="columna texto">
-                <h1>Tecnología unificada.<br> Experiencias conectadas</h1>
+                <h1>Tecnología unificada. Experiencias conectadas</h1>
                 <p>
                     En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos los
                     canales y dispositivos de tu negocio.
@@ -143,8 +143,8 @@
                     360°.
                 </p>
                 <div class="botones">
-                    <a href="#" class="btn btn-primary">Descubre GodCode 360°</a>
-                    <a href="#" class="btn btn-outline">Explora el conjunto de soluciones</a>
+                    <a href="#" class="btn btn-primary">Ver más detalles</a>
+                    <a href="#" class="btn btn-outline">Servicios</a>
                 </div>
             </div>
 

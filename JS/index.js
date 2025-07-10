@@ -1,8 +1,3 @@
-// Solo carga si estamos en la vista ---------------------index---------------------
-if (window.location.pathname.includes("index.php")) {
- 
-}
-
 //solo carga si estamos en la vista ----------------------------------Nosotros----------------------------------------------
 if (window.location.pathname.includes("Nosotros.php")) {
   //seccion 2 Nosotros carrusel

@@ -1,73 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const noticias = [
-    {
-      id: 1,
-      titulo:
-        "IBM acelera la revolución de la IA Generativa empresarial con...",
-      url: "#",
-    },
-    {
-      id: 2,
-      titulo: "IBM z17: El primer Mainframe totalmente diseñado para la...",
-      url: "#",
-    },
-    {
-      id: 3,
-      titulo:
-        "IBM lanza soluciones de ciberseguridad para la nueva era digital",
-      url: "#",
-    },
-    {
-      id: 4,
-      titulo: "IBM Watsonx transforma el uso de datos en empresas medianas",
-      url: "#",
-    },
-    {
-      id: 5,
-      titulo: "Nuevos centros de datos verdes impulsados por IA de IBM",
-      url: "#",
-    },
-    {
-      id: 6,
-      titulo: "IBM y NASA colaboran en IA para predicción climática",
-      url: "#",
-    },
-  ];
+  const endpoint =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
 
-  const noticiasPorPagina = 2;
-  let paginaActual = 1;
-
-  const contenedorNoticias = document.getElementById("lista-noticias");
-  const contenidoNoticias = contenedorNoticias.querySelector(
-    ".contenido-noticias"
+  const h1 = document.querySelector("#seccion-innovacion .columna.texto h1");
+  const p = document.querySelector("#seccion-innovacion .columna.texto p");
+  const botonNoticia = document.querySelector(
+    "#seccion-innovacion .columna.texto .btn-primary"
   );
 
+  const contenedorNoticias = document.querySelector(
+    "#lista-noticias .contenido-noticias"
+  );
+  const paginacion = document.getElementById("paginacion");
+
+  const noticiasPorPagina = 5;
+  let paginaActual = 1;
+  let noticias = [];
+
+  // ENDPOINTNOTICIAS
+  fetch(endpoint)
+    .then((res) => res.json())
+    .then((data) => {
+      if (!Array.isArray(data) || data.length === 0) return;
+
+      // ordena por fecha de mas reciente a mas antigua
+      noticias = data.sort(
+        (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+      );
+
+      // mostrar la noticia mas reciente
+      const noticiaReciente = noticias[0];
+      h1.textContent = noticiaReciente.titulo;
+      p.textContent = noticiaReciente.desc_uno;
+      botonNoticia.textContent = "Ver más detalles";
+      botonNoticia.href = `VIEW/Noticia.php?id=${noticiaReciente.id}`;
+
+      // mostramos noticias apartir de la mas actual
+      noticias = noticias.slice(1);
+      mostrarNoticias(paginaActual);
+      crearPaginacion();
+    })
+    .catch((err) => {
+      console.error("Error al cargar noticias:", err);
+    });
+
   function mostrarNoticias(pagina) {
-    contenidoNoticias.classList.add("animar-salida");
+    contenedorNoticias.innerHTML = "";
 
-    setTimeout(() => {
-      contenidoNoticias.innerHTML = "";
+    const inicio = (pagina - 1) * noticiasPorPagina;
+    const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
 
-      const inicio = (pagina - 1) * noticiasPorPagina;
-      const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
+    noticiasPagina.forEach((noticia) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `VIEW/Noticia.php?id=${noticia.id}`;
+      a.textContent = noticia.titulo;
+      li.appendChild(a);
+      contenedorNoticias.appendChild(li);
+    });
+  }
 
-      noticiasPagina.forEach((noticia) => {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = noticia.url;
-        a.textContent = noticia.titulo;
-        li.appendChild(a);
-        contenidoNoticias.appendChild(li);
+  function crearPaginacion() {
+    const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
+    paginacion.innerHTML = "";
+
+    for (let i = 1; i <= totalPaginas; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.classList.add("paginacion-btn");
+      if (i === paginaActual) btn.classList.add("activo");
+
+      btn.addEventListener("click", () => {
+        paginaActual = i;
+        mostrarNoticias(paginaActual);
+        actualizarPaginacion();
       });
 
-      contenidoNoticias.classList.remove("animar-salida");
-      contenidoNoticias.classList.add("animar-entrada");
-
-      setTimeout(() => {
-        contenidoNoticias.classList.remove("animar-entrada");
-      }, 400);
-    }, 400);
+      paginacion.appendChild(btn);
+    }
   }
+
+  function actualizarPaginacion() {
+    const botones = paginacion.querySelectorAll("button");
+    botones.forEach((btn, index) => {
+      btn.classList.toggle("activo", index + 1 === paginaActual);
+    });
+  }
+  //----------------- aqui termina el js para noticias
 
   function crearPaginacion() {
     const paginacion = document.getElementById("paginacion");

@@ -288,7 +288,7 @@ const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
 // mostrar notificacion tipo toast, creo que esto lo voy a terminar moviendo al js global para usarlo en las demas vistas
-function mostrarToast(mensaje, tipo = "exito", duracion = 8000) {
+function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   const contenedor = document.querySelector(".toast-container");
   if (!contenedor) return;
 
