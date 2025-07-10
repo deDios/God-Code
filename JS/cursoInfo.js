@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       curso.precio == 0
         ? "Gratuito"
         : `$${curso.precio.toLocaleString("es-MX", {
-            minimumFractionDigits: 2,
-          })}`;
+          minimumFractionDigits: 2,
+        })}`;
 
     elementos.horas.textContent = `${curso.horas} Horas totales`;
     elementos.actividades.textContent = actividades.nombre;
@@ -128,9 +128,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fechaFormateada = formatearFecha(curso.fecha_inicio);
     elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
 
-    elementos.certificado.textContent = `Certificado ${
-      curso.certificado ? "incluido" : "no incluido"
-    }`;
+    elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"
+      }`;
 
     if (tutor) {
       elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
@@ -168,20 +167,18 @@ document.addEventListener("DOMContentLoaded", async () => {
           (curso) => `
       <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
         <div class="card-curso">
-            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
-            curso.nombre
-          }">
+            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
+            }">
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
                 <p class="info-curso">
-                ${curso.horas} hrs | ${
-            curso.precio === 0
+                ${curso.horas} hrs | ${curso.precio === 0
               ? "Gratuito"
               : `$${curso.precio.toLocaleString("es-MX", {
-                  minimumFractionDigits: 2,
-                })}`
-          }
+                minimumFractionDigits: 2,
+              })}`
+            }
                 </p>
             </div>
         </div>
@@ -380,7 +377,7 @@ const buscarCuentaExistente = async () => {
   }
 };
 
-// llenar campos desde cuenta encontrada
+// llenar campos desde con cuenta encontrada
 const llenarFormulario = (cuenta) => {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
@@ -410,6 +407,13 @@ const validarDuplicados = async () => {
   const telefono = document.getElementById("telefono").value.trim();
   const correo = document.getElementById("correo").value.trim();
 
+  const contenedorTelefono = document.getElementById("container-telefono");
+  const contenedorCorreo = document.getElementById("container-correo");
+
+  // limpiar estado previo
+  contenedorTelefono?.classList.remove("alerta");
+  contenedorCorreo?.classList.remove("alerta");
+
   if (!telefono && !correo) return;
 
   try {
@@ -425,6 +429,14 @@ const validarDuplicados = async () => {
         "Ya existe una cuenta con ese correo o teléfono.",
         "warning"
       );
+
+      if (data[0].telefono === telefono) {
+        contenedorTelefono?.classList.add("alerta");
+      }
+
+      if (data[0].correo === correo) {
+        contenedorCorreo?.classList.add("alerta");
+      }
     }
   } catch (err) {
     console.warn("Error validando duplicados:", err);
