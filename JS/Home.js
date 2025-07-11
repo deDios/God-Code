@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
-    elementos.boton.textContent = "Ver más detalles";
+    elementos.boton.textContent = "Descrubre GodCode 360°";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
     //elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
 

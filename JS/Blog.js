@@ -1,45 +1,40 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   //--------------------------- inicia el js para noticias
+  const endpoint =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const endpoint =
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
+  const contenedor = document.querySelector("#blog-godcode .grid-cards");
 
-    const contenedor = document.querySelector("#blog-godcode .grid-cards");
+  try {
+    //ENDPOINT NOTICIAS
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estatus: 1 }),
+    });
 
-    try {
-      //ENDPOINT NOTICIAS
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estatus: 1 }),
-      });
+    if (!res.ok) throw new Error("No se pudo obtener noticias");
+    const data = await res.json();
 
-      if (!res.ok) throw new Error("No se pudo obtener noticias");
-      const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn("No hay noticias activas disponibles");
+      return;
+    }
 
-      if (!Array.isArray(data) || data.length === 0) {
-        console.warn("No hay noticias activas disponibles");
-        return;
-      }
+    // toma las noticias con los 3 IDs más altos
+    const noticiasRecientes = data.sort((a, b) => b.id - a.id).slice(0, 3);
 
-      //toma las noticias con los 3 ids mas actuales
-      const noticiasRecientes = data.sort((a, b) => b.id - a.id).slice(0, 3);
+    // limpia las cards dummy
+    contenedor.innerHTML = "";
 
-      //limpia lo que estaba antes en el contenedor (las cards dummy)
-      contenedor.innerHTML = "";
+    // inserta las noticias
+    noticiasRecientes.forEach((noticia, index) => {
+      const card = document.createElement("div");
+      card.classList.add("card");
 
-      //aca inserta las noticias y arma la card
-      noticiasRecientes.forEach((noticia, index) => {
-        const card = document.createElement("div");
-        card.classList.add("card");
+      const rutaImagen = `../ASSETS/noticia/NoticiasImg/noticia_img1_${noticia.id}.png`;
 
-        // busca la imagen con el id concatenado
-        //const rutaImagen = `../ASSETS/Blog/blogNoticia_img${index + 1}.png`;
-        const rutaImagen = `../ASSETS/noticia/NoticiasImg/noticia_img1_${index + 1}.png`;
-        console.log("rutaImagen: ",rutaImagen);
-
-        card.innerHTML = `
+      card.innerHTML = `
         <img src="${rutaImagen}" alt="Imagen noticia ${noticia.id}">
         <div class="contenido">
           <p>${noticia.titulo}</p>
@@ -47,22 +42,23 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
 
-        contenedor.appendChild(card);
-        console.log("el id de la noticia es: ", noticia.id);
-      });
-    } catch (error) {
-      console.error("Error al cargar noticias para blog:", error);
-    }
-  });
+      contenedor.appendChild(card);
+      console.log("Insertada noticia ID:", noticia.id);
+    });
+  } catch (error) {
+    console.error("Error al cargar noticias para blog:", error);
+  }
 
-  //redireccionar con el id en la url
-  function abrirNoticia(event, btn) {
+  // redireccionar con el id en la url
+  window.abrirNoticia = function (event, btn) {
     const id = btn.getAttribute("data-id");
     if (!id) return;
     window.location.href = `../VIEW/Noticia.php?id=${id}`;
-  }
+  };
   //--------------------------- termina el js para noticias
+});
 
+document.addEventListener("DOMContentLoaded", () => {
   //----------------------- aca inicia el js para los cursos
   const cursosContainer = document.getElementById("cursos-container");
   const categoriaSelect = document.getElementById("categoria");
