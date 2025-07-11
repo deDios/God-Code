@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  console.log("🔵 DOMContentLoaded disparado");
+
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
 
@@ -7,24 +9,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     descripcion: document.querySelector("#seccion-innovacion .columna.texto p"),
     boton: document.querySelector("#seccion-innovacion .btn-primary"),
     imagen: document.querySelector("#seccion-innovacion .columna.imagen img"),
-    listaNoticias: document.querySelector(
-      "#lista-noticias .contenido-noticias"
-    ),
+    listaNoticias: document.querySelector("#lista-noticias .contenido-noticias"),
     paginacion: document.getElementById("paginacion"),
   };
+
+  console.log("🧩 Elementos encontrados:", elementos);
 
   const noticiasPorPagina = 5;
   let paginaActual = 1;
   let noticias = [];
 
-  // función para aplicar saltos de línea como <br>
   function formatearTexto(texto) {
     return (texto || "").toString().replace(/\n/g, "<br>");
   }
 
-  // obtener noticias activas
   async function fetchNoticias() {
-    console.log("1. Consultando noticias...");
+    console.log("📡 Consultando noticias...");
     const res = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -33,10 +33,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       body: JSON.stringify({ estatus: 1 }),
     });
 
-    if (!res.ok) throw new Error("No se pudo obtener noticias");
+    if (!res.ok) throw new Error("❌ No se pudo obtener noticias");
 
     const data = await res.json();
-    console.log("2. Noticias obtenidas:", data);
+    console.log("✅ Noticias recibidas:", data);
     return data;
   }
 
@@ -44,35 +44,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     noticias = await fetchNoticias();
 
     if (!Array.isArray(noticias) || noticias.length === 0) {
-      console.warn("No hay noticias disponibles.");
+      console.warn("⚠️ No hay noticias disponibles.");
       return;
     }
 
-    // ordenar de más reciente a más antigua
     noticias = noticias.sort(
       (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
     );
 
-    // cargar noticia más reciente en la columna izquierda
-    console.log("3. Cargando noticia principal...");
+    console.log("📋 Noticias ordenadas:", noticias);
+
     const principal = noticias[0];
+    console.log("⭐ Noticia principal:", principal);
+
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Ver más detalles";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
 
-    // (opcional) actualizar imagen si más adelante decides hacerla dinámica
     // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`;
     // elementos.imagen.alt = principal.titulo;
 
-    // eliminar la principal para que no se repita en la lista derecha
     noticias = noticias.slice(1);
 
-    // mostrar noticias secundarias
     mostrarNoticias(paginaActual);
     crearPaginacion();
 
-    // cambio automático cada 6 segundos
     setInterval(() => {
       paginaActual =
         (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
@@ -80,27 +77,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       actualizarPaginacion();
     }, 6000);
   } catch (error) {
-    console.error("Error cargando noticias:", error);
+    console.error("❌ Error en try principal:", error);
   }
 
   function mostrarNoticias(pagina) {
+    console.log("📄 Mostrando noticias página:", pagina);
     elementos.listaNoticias.innerHTML = "";
 
     const inicio = (pagina - 1) * noticiasPorPagina;
     const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
+    console.log("📰 Noticias en esta página:", noticiasPagina);
 
-    console.log("4. Noticias a mostrar:", noticiasPagina);
+    const ul = document.createElement("ul");
+    ul.classList.add("lista-noticias");
 
     noticiasPagina.forEach((noticia) => {
+      const li = document.createElement("li");
       const a = document.createElement("a");
       a.href = `VIEW/Noticia.php?id=${noticia.id}`;
       a.textContent = noticia.titulo;
-      a.classList.add("titulo-noticia");
-      elementos.listaNoticias.appendChild(a);
+      li.appendChild(a);
+      ul.appendChild(li);
     });
+
+    elementos.listaNoticias.appendChild(ul);
   }
 
   function crearPaginacion() {
+    console.log("🔢 Creando paginación");
     elementos.paginacion.innerHTML = "";
 
     const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
@@ -129,6 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+//--------------------------------------aca termina el section 1 
 
 document.addEventListener("DOMContentLoaded", () => {
   //seccion de preguntas frecuentes
