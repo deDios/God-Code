@@ -17,6 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let paginaActual = 1;
   let noticias = [];
 
+  // Función para dar formato al texto con saltos de línea
+  function formatearTexto(texto) {
+    return (texto || "").toString().replace(/\n/g, "<br>");
+  }
+
   // ENDPOINTNOTICIAS
   fetch(endpoint, {
     method: "POST",
@@ -34,25 +39,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // ordena por fecha de más reciente a más antigua
+      // Ordenar de más reciente a más antigua
       noticias = data.sort(
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
 
-      // mostrar la noticia más reciente (columna izquierda)
+      // Noticia más reciente → columna izquierda
       const noticiaReciente = noticias[0];
       console.log("Noticia más reciente:", noticiaReciente);
 
       h1.textContent = noticiaReciente.titulo;
-      p.textContent = noticiaReciente.desc_uno;
+      p.innerHTML = formatearTexto(noticiaReciente.desc_uno);
       botonNoticia.textContent = "Ver más detalles";
       botonNoticia.href = `VIEW/Noticia.php?id=${noticiaReciente.id}`;
 
-      // mostramos noticias a partir de la segunda (columna derecha)
+      // Resto de noticias → columna derecha
       noticias = noticias.slice(1);
       mostrarNoticias(paginaActual);
       crearPaginacion();
 
+      // Paginación automática cada 6s
       setInterval(() => {
         paginaActual =
           (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
@@ -64,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error al cargar noticias:", err);
     });
 
-  // Mostrar noticias de la página actual
+  // Mostrar noticias en columna derecha
   function mostrarNoticias(pagina) {
     contenedorNoticias.innerHTML = "";
 
@@ -77,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const a = document.createElement("a");
       a.href = `VIEW/Noticia.php?id=${noticia.id}`;
       a.textContent = noticia.titulo;
-      a.classList.add("titulo-noticia"); // por si necesitas estilizar
+      a.classList.add("titulo-noticia");
       contenedorNoticias.appendChild(a);
     });
   }
