@@ -21,34 +21,54 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch(endpoint)
     .then((res) => res.json())
     .then((data) => {
-      if (!Array.isArray(data) || data.length === 0) return;
+      console.log("Noticias cargadas:", data);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        console.warn("No hay noticias disponibles.");
+        return;
+      }
 
       // ordena por fecha de mas reciente a mas antigua
       noticias = data.sort(
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
 
+      console.log("Noticias ordenadas:", noticias);
+
       // mostrar la noticia mas reciente
       const noticiaReciente = noticias[0];
+      console.log("Noticia más reciente:", noticiaReciente);
+
       h1.textContent = noticiaReciente.titulo;
       p.textContent = noticiaReciente.desc_uno;
       botonNoticia.textContent = "Ver más detalles";
       botonNoticia.href = `VIEW/Noticia.php?id=${noticiaReciente.id}`;
 
-      // mostramos noticias apartir de la mas actual
+      // mostramos noticias a partir de la segunda
       noticias = noticias.slice(1);
       mostrarNoticias(paginaActual);
       crearPaginacion();
+
+      // auto-paginación cada 6s
+      setInterval(() => {
+        paginaActual =
+          (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
+        mostrarNoticias(paginaActual);
+        actualizarPaginacion();
+      }, 6000);
     })
     .catch((err) => {
       console.error("Error al cargar noticias:", err);
     });
 
+  // Mostrar noticias de una página
   function mostrarNoticias(pagina) {
     contenedorNoticias.innerHTML = "";
 
     const inicio = (pagina - 1) * noticiasPorPagina;
     const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
+
+    console.log("Noticias a mostrar:", noticiasPagina);
 
     noticiasPagina.forEach((noticia) => {
       const li = document.createElement("li");
@@ -60,36 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Paginación
   function crearPaginacion() {
-    const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
-    paginacion.innerHTML = "";
-
-    for (let i = 1; i <= totalPaginas; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      btn.classList.add("paginacion-btn");
-      if (i === paginaActual) btn.classList.add("activo");
-
-      btn.addEventListener("click", () => {
-        paginaActual = i;
-        mostrarNoticias(paginaActual);
-        actualizarPaginacion();
-      });
-
-      paginacion.appendChild(btn);
-    }
-  }
-
-  function actualizarPaginacion() {
-    const botones = paginacion.querySelectorAll("button");
-    botones.forEach((btn, index) => {
-      btn.classList.toggle("activo", index + 1 === paginaActual);
-    });
-  }
-  //----------------- aqui termina el js para noticias
-
-  function crearPaginacion() {
-    const paginacion = document.getElementById("paginacion");
     paginacion.innerHTML = "";
 
     const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
@@ -105,23 +97,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         paginaActual = i;
         mostrarNoticias(paginaActual);
-        crearPaginacion();
+        actualizarPaginacion();
       });
 
       paginacion.appendChild(enlace);
     }
   }
 
-  mostrarNoticias(paginaActual);
-  crearPaginacion();
+  function actualizarPaginacion() {
+    const enlaces = paginacion.querySelectorAll("a");
+    enlaces.forEach((btn, index) => {
+      btn.classList.toggle("activo", index + 1 === paginaActual);
+    });
+  }
 
-  setInterval(() => {
-    paginaActual =
-      (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
-    mostrarNoticias(paginaActual);
-    crearPaginacion();
-  }, 6000);
-});
+
+});//----------------- aqui termina el js para noticias
 
 document.addEventListener("DOMContentLoaded", () => {
   //seccion de preguntas frecuentes
