@@ -1,0 +1,67 @@
+#soluciones-negocio {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#soluciones-negocio .intro {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+#soluciones-negocio .intro h1 {
+    font-size: 2rem;
+    color: #0f62fe;
+    font-weight: bold;
+}
+
+#soluciones-negocio .bloque {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+#soluciones-negocio .bloque.invertida {
+    flex-direction: row-reverse;
+}
+
+#soluciones-negocio .texto {
+    flex: 1 1 400px;
+}
+
+#soluciones-negocio .texto h2 {
+    font-size: 1.4rem;
+    color: #222;
+    margin-bottom: 1rem;
+}
+
+#soluciones-negocio .texto p {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+}
+
+#soluciones-negocio .imagen {
+    flex: 1 1 300px;
+    text-align: center;
+}
+
+#soluciones-negocio .imagen img {
+    max-width: 100%;
+    padding: 1rem;
+}
+
+@media (max-width: 768px) {
+    #soluciones-negocio .bloque {
+        flex-direction: column !important;
+        text-align: center;
+    }
+
+    #soluciones-negocio .texto {
+        padding: 0 1rem;
+    }
+}
