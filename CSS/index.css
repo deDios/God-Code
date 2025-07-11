@@ -238,11 +238,16 @@ header.scrolled .subnav {
 }
 
 #seccion-innovacion #lista-noticias {
-    flex: 1;
+    position: relative;
+    width: 100%;
+    min-height: 100px;
+}
+
+#seccion-innovacion #lista-noticias .contenedor-animado {
     position: relative;
     overflow: hidden;
-    min-height: 100px;
     width: 100%;
+    height: 100%;
 }
 
 #seccion-innovacion .contenido-noticias {

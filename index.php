@@ -135,7 +135,8 @@
             <div class="columna texto">
                 <h1>Tecnología unificada. Experiencias conectadasV9</h1>
                 <p>
-                    V9En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos los
+                    V9En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos
+                    los
                     canales y dispositivos de tu negocio.
                     Desde aplicaciones móviles hasta plataformas web, sistemas de gestión y puntos de contacto físicos,
                     conectamos cada parte de tu negocio para brindar experiencias consistentes, fluidas y personalizadas
@@ -156,9 +157,13 @@
             <!-- Columna derecha -->
             <div class="columna noticias">
                 <h3>Noticias sobre tecnología</h3>
+
                 <div id="lista-noticias">
-                    <div class="contenido-noticias"></div>
+                    <div class="contenedor-animado">
+                        <div class="contenido-noticias"></div>
+                    </div>
                 </div>
+
                 <div id="paginacion" class="paginacion"></div>
             </div>
         </section>

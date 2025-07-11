@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("🔵 DOMContentLoaded disparado");
+  console.log("DOMContentLoaded disparado");
 
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let paginaActual = 1;
   let noticias = [];
 
+  let autoCambioActivo = true;
+  let intervaloRotacion;
+
   function formatearTexto(texto) {
     return (texto || "").toString().replace(/\n/g, "<br>");
   }
@@ -29,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estatus: 1 }),
     });
-    if (!res.ok) throw new Error("❌ No se pudo obtener noticias");
+    if (!res.ok) throw new Error("No se pudo obtener noticias");
     return await res.json();
   }
 
@@ -45,25 +48,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     const principal = noticias[0];
 
-    // Insertar noticia principal
+    
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Ver más detalles";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
-    // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`;
+    // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
 
-    noticias = noticias.slice(1); // quitar la principal
+    noticias = noticias.slice(1); 
 
     mostrarNoticias(paginaActual);
     crearPaginacion();
 
-    setInterval(() => {
+    intervaloRotacion = setInterval(() => {
+      if (!autoCambioActivo) return;
       const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
       paginaActual = (paginaActual % totalPaginas) + 1;
       cambiarPaginaAnimada(paginaActual);
     }, 6000);
   } catch (error) {
-    console.error("❌ Error en try principal:", error);
+    console.error(" Error en try principal:", error);
   }
 
   function mostrarNoticias(pagina) {
@@ -82,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ul.appendChild(li);
     });
 
-    elementos.listaNoticias.innerHTML = ""; // Limpia contenido anterior
+    elementos.listaNoticias.innerHTML = ""; 
     elementos.listaNoticias.appendChild(ul);
   }
 
@@ -99,6 +103,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       enlace.addEventListener("click", (e) => {
         e.preventDefault();
         if (paginaActual === i) return;
+
+        autoCambioActivo = false; 
         cambiarPaginaAnimada(i);
       });
 
@@ -114,7 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function cambiarPaginaAnimada(nuevaPagina) {
-    // animación de salida
+    
     elementos.listaNoticias.classList.remove("animar-entrada");
     elementos.listaNoticias.classList.add("animar-salida");
 
@@ -123,10 +129,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       mostrarNoticias(paginaActual);
       actualizarPaginacion();
 
-      // animación de entrada
+      
       elementos.listaNoticias.classList.remove("animar-salida");
       elementos.listaNoticias.classList.add("animar-entrada");
-    }, 400); // mismo tiempo que deslizarFuera
+    }, 800);
   }
 });
 
