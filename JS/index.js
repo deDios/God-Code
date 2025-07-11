@@ -129,32 +129,32 @@ if (
     {
       texto: "Servicios en la nube",
       icono: "../ASSETS/ProductosPopUp/ServiciosEnLaNube.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/ServiciosEnLaNube.php",
     },
     {
       texto: "Diseño UX/UI",
       icono: "../ASSETS/ProductosPopUp/DiseñoUXUI.png",
-      link: "../VIEW/DiseñoUXUI.php",
+      link: "../VIEW/DisenoUXUI.php",
     },
     {
       texto: "Sercivio educativo",
       icono: "../ASSETS/ProductosPopUp/ServicioEducativo.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/ServicioEducativo.php",
     },
     {
       texto: "Educación",
       icono: "../ASSETS/ProductosPopUp/Educacion.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/IndustriaEducacion.php",
     },
     {
       texto: "Finanzas",
       icono: "../ASSETS/ProductosPopUp/Finanzas.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/IndustriaFinanciera.php",
     },
     {
       texto: "Tecnología",
       icono: "../ASSETS/ProductosPopUp/Tecnologia.png",
-      link: "../VIEW/DesarrolloWeb.php",
+      link: "../VIEW/IndustriaTecnologia.php",
     },
   ];
 

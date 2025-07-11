@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("Noticia encontrada:", noticia);
 
-    elementos.img1.src = `../ASSETS/noticia/NoticiasImg/noticia_img1_${index + 1}.png`;
-    elementos.img2.src = `../ASSETS/noticia/NoticiasImg/noticia_img2_${index + 1}.png`;
+    elementos.img1.src = `../ASSETS/noticia/NoticiasImg/noticia_img1_${id}.png`;
+    elementos.img2.src = `../ASSETS/noticia/NoticiasImg/noticia_img2_${id}.png`;
     elementos.img1.alt = noticia.titulo;
     elementos.img2.alt = noticia.titulo;
 
