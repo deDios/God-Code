@@ -18,7 +18,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let noticias = [];
 
   // ENDPOINTNOTICIAS
-  fetch(endpoint)
+  fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ estatus: 1 }),
+  })
     .then((res) => res.json())
     .then((data) => {
       console.log("Noticias cargadas:", data);
@@ -110,9 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.classList.toggle("activo", index + 1 === paginaActual);
     });
   }
-
-
-});//----------------- aqui termina el js para noticias
+}); //----------------- aqui termina el js para noticias
 
 document.addEventListener("DOMContentLoaded", () => {
   //seccion de preguntas frecuentes
