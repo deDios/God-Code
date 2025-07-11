@@ -138,7 +138,10 @@
         <section id="noticia-detalle" class="noticia-detalle">
 
             <div class="imagen-noticia full">
+                <!---
                 <img src="../ASSETS/noticia/noticia_img1_1.png" alt="Imagen de noticia">
+                --->
+                <img src="..." alt="...">
                 <div class="overlay-titulo" id="titulo-noticia"></div>
             </div>
 

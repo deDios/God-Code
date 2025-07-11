@@ -378,7 +378,7 @@
                             <label for="telefono">Teléfono</label>
                             <div class="input-alerta-container" id="telefono-container">
                                 <input type="text" id="telefono" />
-                                <span class="icono-alerta">⚠️</span>
+                                <span class="icono-alerta"></span>
                             </div>
                         </div>
 
@@ -386,7 +386,7 @@
                             <label for="correo">Correo</label>
                             <div class="input-alerta-container" id="correo-container">
                                 <input type="email" id="correo" />
-                                <span class="icono-alerta">⚠️</span>
+                                <span class="icono-alerta"></span>
                             </div>
                         </div>
 
