@@ -252,7 +252,7 @@
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu app móvil con datos que realmente importan.</span></h2>
+                    <h2><span>Optimiza tu app mobile con datos que realmente importan.</span></h2>
                     <p> Gestiona tu proceso de desarrollo con información precisa, actualizada y accionable. Supervisa
                         el avance de cada etapa —desde el diseño de la interfaz y la experiencia del usuario, hasta la
                         programación de funcionalidades, pruebas internas y despliegue en tiendas— con total visibilidad

@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded disparado");
 
-
   const seccion = document.querySelector("#seccion-innovacion");
   if (!seccion) {
     console.warn("Esta vista no contiene la sección innovación.");
@@ -27,6 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let autoCambioActivo = true;
   let intervaloRotacion;
 
+  const idNoticiaPrincipal = 1; // esta variable esta por si acaso luego queremos cambiar la noticia principal
+
   function formatearTexto(texto) {
     return (texto || "").toString().replace(/\n/g, "<br>");
   }
@@ -48,19 +49,28 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    noticias = noticias.sort(
-      (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-    );
-    const principal = noticias[0];
+    // ordenar por fecha de mas reciente a mas antigua, lo dejo por si luego se usa
+    //    noticias = noticias.sort(
+    //      (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+    //    );
 
     //noticia principal
+    const principal = noticias.find((n) => n.id === idNoticiaPrincipal);
+    if (!principal) {
+      console.warn(`No se encontró la noticia con ID ${idNoticiaPrincipal}`);
+      return;
+    }
+
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Ver más detalles";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
     //elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
 
-    noticias = noticias.slice(1);
+    //eliminar la noticia principal para no repetirla en el listado derecho
+    noticias = noticias.filter((n) => n.id !== idNoticiaPrincipal);
+
+    noticias = noticias.sort((a, b) => b.id - a.id); //se ordenan las noticias segun su id y con orden decendente (mayor id a menor id)
 
     mostrarNoticias(paginaActual);
     crearPaginacion();

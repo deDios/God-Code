@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
+    <link rel="stylesheet" href="../CSS/Servicios.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
-    <link rel="stylesheet" href="../CSS/Blog.css">
 </head>
 
 <body>
@@ -57,7 +57,7 @@
         <div id="mobile-menu" class="subnav">
             <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#">Productos</a>
+                <a href="#" class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -112,11 +112,11 @@
             </div>
 
             <div class="nav-item mobile-only">
-                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
             </div>
 
             <a href="../VIEW/Nosotros.php">Nosotros</a>
-            <a href="../VIEW/Blog.php" class="active">Blog</a>
+            <a href="../VIEW/Blog.php">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">
@@ -132,107 +132,101 @@
         </div>
     </header>
 
+
     <main>
         <!-- seccion 1 -->
-        <section id="blog-godcode" class="animado">
+        <section id="seccion-productos">
             <div class="limite">
-                <h2>Blog GodCode</h2>
-                <h3>Lo Nuevo</h3>
-                <p class="descripcion">
-                    Explora el futuro hoy<br>
-                    Descubre las últimas noticias en tecnología, innovación y avances que están transformando el
-                    mundo.<br>
-                    Mantente al día con lo más relevante, todo en un solo lugar.
-                </p>
+                <h2 class="titulo-principal">Productos</h2>
+                <h3 class="subtitulo">Lo que hacemos</h3>
                 <div class="grid-cards">
-                    <div class="card" data-id="meta">
-                        <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
-                        <div class="contenido">
-                            <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
-                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                        </div>
-                    </div>
+                    <div class="card">
 
-                    <div class="card" data-id="apple">
-                        <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
-                        <div class="contenido">
-                            <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
-                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                        </div>
+                        <img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Desarrollo Web" />
+                        <h4>Desarrollo Web</h4>
+                        <p>Diseñamos y desarrollamos sitios web que encantan, funcionan y se convierten.</p>
+                        <p>Impulsa tu presencia digital con soluciones a medida enfocadas en resultados reales.</p>
+                        <a href="../VIEW/DesarrolloWeb.php" class="btn-azul">Saber más...</a>
                     </div>
+                    <div class="card">
 
-                    <div class="card" data-id="nato">
-                        <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
-                        <div class="contenido">
-                            <p>NATO lanza nueva estrategia para investigación científica...</p>
-                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
-                        </div>
+                        <img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Desarrollo Mobile" />
+                        <h4>Desarrollo Mobile</h4>
+                        <p>Creamos apps móviles intuitivas, rápidas y efectivas.</p>
+                        <p>Lleva tu idea al siguiente nivel con soluciones que conectan y generan resultados.</p>
+                        <a href="../VIEW/DesarrolloMobile.php" class="btn-azul">Saber más...</a>
                     </div>
+                </div>
+
+                <h3 class="subtitulo">Servicios</h3>
+                <div class="grid-cards">
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Servicios en la Nube" />
+                        <h4>Servicios en la Nube</h4>
+                        <p>Escala tu negocio con servicios en la nube seguros, flexibles y de alto rendimiento.</p>
+                        <p>Optimiza tus sistemas, automatiza procesos y mantén todo disponible en cualquier momento y
+                            lugar.</p>
+                        <a href="../VIEW/ServiciosEnLaNube.php" class="btn-azul">Saber más...</a>
+                    </div>
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="Diseño UX/UI" />
+                        <h4>Diseño UX/UI</h4>
+                        <p>Diseñamos experiencias digitales intuitivas, atractivas y centradas en el usuario.</p>
+                        <p>Conecta con tu audiencia desde el primer clic y convierte diseño en resultados.</p>
+                        <a href="../VIEW/DisenoUXUI.php" class="btn-azul">Saber más...</a>
+                    </div>
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/ServicioEducativo.png" alt="Servicio educativo" />
+                        <h4>Servicio educativo</h4>
+                        <p>Transforma el aprendizaje con experiencias educativas dinámicas, accesibles y personalizadas.
+                        </p>
+                        <p>Ofrecemos soluciones que inspiran, forman y potencian el crecimiento real.</p>
+                        <a href="../VIEW/ServicioEducativo.php" class="btn-azul">Saber más...</a>
+                    </div>
+                </div>
+
+                <h3 class="subtitulo">Industrias</h3>
+                <div class="grid-cards">
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación" />
+                        <h4>Educación</h4>
+                        <p>Impulsa el conocimiento con propuestas educativas innovadoras, inclusivas y de calidad.</p>
+                        <p>Formamos mentes preparadas para enfrentar los retos del presente y del futuro.</p>
+                        <a href="../VIEW/IndustriaEducacion.php" class="btn-azul">Saber más...</a>
+                    </div>
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología" />
+                        <h4>Tecnología</h4>
+                        <p>Impulsa tu negocio con soluciones tecnológicas innovadoras, seguras y escalables.</p>
+                        <p>Conecta procesos, personas y datos para avanzar hacia un futuro digital más inteligente.</p>
+                        <a href="../VIEW/IndustriaTecnologia.php" class="btn-azul">Saber más...</a>
+                    </div>
+                    <div class="card">
+
+                        <img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas" />
+                        <h4>Finanzas</h4>
+                        <p>Optimiza la gestión financiera con soluciones precisas, seguras y adaptadas a tus
+                            necesidades.</p>
+                        <p>Toma decisiones inteligentes y alcanza la eficiencia y estabilidad de tu negocio.</p>
+                        <a href="../VIEW/" class="btn-azul">Saber más...</a>
+                    </div>
+                </div>
+
+                <div class="contacto-productos">
+                    <p>¿Tienes dudas sobre alguno de nuestros productos?<br>
+                        Contáctanos para recibir asesoría personalizada o consulta nuestras políticas. Estamos aquí para
+                        ayudarte a tomar la mejor decisión.</p>
+                    <a href="../VIEW/Contacto.php" class="btn-azul claro">Contáctanos</a>
                 </div>
             </div>
         </section>
 
-        <!-- seccion 2 -->
-        <section id="filtros-cursos">
-            <div class="limite">
-                <div class="filtros-cursos__contenido">
-                    <h2>Cursos destacados</h2>
-                    <h3>Explora nuestras mejores opciones</h3>
-                    <p class="descripcion">
-                        Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
-                        actualizado y práctico.
-                    </p>
-                </div>
 
-                <div class="contenedor-filtros">
-
-                    <div class="filtro">
-                        <label for="categoria">Categoría</label>
-                        <select id="categoria" name="categoria">
-                            <option value="">Selecciona una categoría</option>
-                            <!-- Se llenara con JS -->
-                        </select>
-                    </div>
-
-                    <div class="filtro">
-                        <label for="explorar">Explorar</label>
-                        <select id="explorar" name="explorar">
-                            <option value="">Selecciona una opción</option>
-                        </select>
-                    </div>
-
-                    <div class="filtro limpiar">
-                        <label>&nbsp;</label>
-                        <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- seccion 3 -->
-        <section id="cursos-destacados">
-            <h3>Cursos disponibles</h3>
-
-            <div class="carousel-container" id="carousel-container">
-                <button class="carousel-btn prev" aria-label="Anterior">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-                    </svg>
-                </button>
-
-                <div class="carousel-track-container">
-                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
-                        <!-- Las cards se insertan desde JS -->
-                    </div>
-                </div>
-
-                <button class="carousel-btn next" aria-label="Siguiente">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
-                    </svg>
-                </button>
-            </div>
-        </section>
 
     </main>
 
@@ -250,8 +244,7 @@
         </div>
     </footer>
 
-    <script src="../JS/JSglobal.js"></script>
-    <script src="../JS/Blog.js"></script>
+    <script src="../JS/index.js"></script>
 </body>
 
 </html>

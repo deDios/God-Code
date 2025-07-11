@@ -136,37 +136,14 @@
     <main>
         <!--------- seccion 1 ----------->
         <section id="noticia-detalle" class="noticia-detalle">
+            <div class="imagen-noticia full">
+                <img src="../ASSETS/noticia/noticia_img1_1.png" alt="Imagen de noticia">
+                <div class="overlay-titulo" id="titulo-noticia"></div>
+            </div>
             <div class="limite">
-                <div class="imagen-noticia">
-                    <img src="../ASSETS/noticia/noticia_img1_1.png" alt="Imagen de noticia">
-                </div>
                 <div class="contenido-noticia">
                     <p>
-                        Meta, la empresa matriz de Facebook e Instagram, se vio obligada a frenar sus planes de
-                        construir un centro de datos para inteligencia artificial en Estados Unidos, impulsado por
-                        energía nuclear. El motivo detrás de la suspensión fue la presencia de una rara especie de
-                        abeja en peligro de extinción en el terreno donde se planeaba levantar el proyecto, según
-                        informó el Financial Times.
-                        La energía nuclear es vista como una opción atractiva para alimentar centros de datos
-                        dedicados a la inteligencia artificial, especialmente por su capacidad de proporcionar
-                        energía constante, libre de emisiones de carbono y disponible las 24 horas del día. Gigantes
-                        tecnológicos como Amazon, Google y Microsoft ya han establecido acuerdos con operadores de
-                        plantas nucleares para abastecer sus centros de datos, ya que las consultas de IA pueden
-                        consumir hasta diez veces más energía que una búsqueda estándar en Google.
-                        Meta también planeaba firmar un acuerdo con una planta nuclear, pero el CEO Mark Zuckerberg
-                        se vio afectado por un obstáculo imprevisto. El terreno donde Meta quería construir el
-                        centro de datos alberga una especie de abeja rara y en peligro, lo que requirió una
-                        evaluación detallada sobre el impacto ambiental en su hábitat. Este proceso puede llevar a
-                        estrictas regulaciones de conservación que dificultan proyectos que interfieren con
-                        ecosistemas protegidos.
-                        Mientras Meta enfrenta este desafío, otras compañías tecnológicas continúan avanzando con
-                        sus propios proyectos nucleares. En septiembre, Microsoft anunció la reactivación de una
-                        planta nuclear en Three Mile Island, Pensilvania, para abastecer sus centros de datos.
-                        Amazon, por su parte, destinó 650 millones de dólares en marzo para construir un centro de
-                        datos cerca de la planta nuclear Susquehanna Steam Electric, también en Pensilvania. Google
-                        firmó un acuerdo con la startup Kairos Power para adquirir pequeños reactores nucleares
-                        modulares, convirtiéndose en la primera empresa tecnológica en operar instalaciones
-                        nucleares en EE.UU.
+                        <!-- ya se inserta desde el js -->
                     </p>
                 </div>
             </div>
@@ -261,9 +238,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
 
 
                     </div>

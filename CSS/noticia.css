@@ -27,14 +27,14 @@
     color: #1a1a1a;
     margin-bottom: 1.5rem;
     line-height: 1.4;
-    text-align: center;
+    text-align: justify;
 }
 
 #noticia-detalle .contenido-noticia p {
     font-size: 1.1rem;
     color: #333;
     line-height: 1.8;
-    text-align: center;
+    text-align: justify;
     margin-bottom: 1rem;
 }
 
@@ -53,12 +53,13 @@
 /*----------- css para las 2 imagenes -------------*/
 #noticia-detalle .imagen-noticia,
 #noticia-bloque2 .imagen-noticia {
+    position: relative;
     width: 100%;
-    max-width: 1000px;
-    margin: 0 auto 2rem auto;
-    border-radius: 12px;
+    margin: 0 0 2rem 0;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 100%;
+    box-shadow: none;
 }
 
 #noticia-detalle .imagen-noticia img,
@@ -66,9 +67,50 @@
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 12px;
     object-fit: cover;
-    padding-top: 1rem;
+    border-radius: 0;
+    padding: 0;
+    max-height: 480px;
+}
+
+#noticia-detalle .overlay-titulo,
+#noticia-bloque2 .overlay-titulo {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    max-width: 90%;
+    text-align: justify;
+    backdrop-filter: blur(4px);
+}
+
+#noticia-detalle .overlay-titulo {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    color: white;
+    text-align: justify;
+    box-sizing: border-box;
+}
+
+#noticia-detalle .overlay-titulo h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+#noticia-detalle .imagen-noticia {
+    position: relative;
 }
 
 
@@ -103,7 +145,6 @@
     padding-bottom: 1rem;
 }
 
-/*------------------------------- NUEVO COMENTARIO -------------------------------*/
 
 #noticia-comentarios .comentarios-box {
     background: #f9f9f9;
@@ -114,7 +155,6 @@
     max-height: 420px;
     overflow-y: auto;
     overflow-x: hidden;
-    /* ✅ evita scroll horizontal */
 }
 
 #noticia-comentarios .nuevo-comentario {
@@ -152,7 +192,6 @@
     box-sizing: border-box;
 }
 
-/*------------------------------- LISTA DE COMENTARIOS -------------------------------*/
 
 #noticia-comentarios .lista-comentarios {
     display: flex;
@@ -160,7 +199,6 @@
     gap: 1.5rem;
 }
 
-/*------------------------------- COMENTARIO INDIVIDUAL -------------------------------*/
 
 #noticia-comentarios .comentario {
     display: flex;
@@ -206,7 +244,6 @@
     word-wrap: break-word;
 }
 
-/*------------------------------- INTERACCIONES -------------------------------*/
 
 #noticia-comentarios .comentario-interacciones {
     display: flex;
@@ -245,7 +282,6 @@
     text-decoration: underline;
 }
 
-/*------------------------------- VER RESPUESTAS (estilo YouTube) -------------------------------*/
 
 #noticia-comentarios .comentario-respuestas {
     margin-top: 0.6rem;
@@ -271,12 +307,10 @@
     transition: transform 0.3s ease;
 }
 
-/* Flecha girada (cuando despliegue respuestas) */
 #noticia-comentarios .ver-respuestas.abierto .flecha {
     transform: rotate(180deg);
 }
 
-/*------------------------------- NAVEGACIÓN ENTRE NOTICIAS -------------------------------*/
 
 #noticia-comentarios .navegacion-noticias {
     display: flex;

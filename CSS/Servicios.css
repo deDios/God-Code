@@ -1,0 +1,95 @@
+#seccion-productos {
+    padding: 4rem 1rem;
+    background-color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+#seccion-productos .limite {
+    max-width: 1280px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#seccion-productos .titulo-principal {
+    font-size: 2rem;
+    color: #0f62fe;
+    margin-bottom: 0.5rem;
+}
+
+#seccion-productos .subtitulo {
+    font-size: 1.5rem;
+    margin: 2rem 0 1.5rem;
+    color: #333;
+}
+
+#seccion-productos .grid-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+#seccion-productos .card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 2rem;
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+}
+
+#seccion-productos .card img {
+    width: 60px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+#seccion-productos .card h4 {
+    font-size: 1.1rem;
+    color: #0f62fe;
+    margin-bottom: 0.6rem;
+}
+
+#seccion-productos .card p {
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 0.5rem;
+}
+
+#seccion-productos .btn-azul {
+    display: inline-block;
+    background-color: #0f62fe;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    margin-top: 0.8rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+#seccion-productos .btn-azul:hover {
+    background-color: #0b4cc2;
+}
+
+#seccion-productos .btn-azul.claro {
+    background-color: #e8f0fe;
+    color: #0f62fe;
+    font-weight: 500;
+}
+
+#seccion-productos .btn-azul.claro:hover {
+    background-color: #d0e4ff;
+}
+
+#seccion-productos .contacto-productos {
+    margin-top: 3rem;
+}
+
+#seccion-productos .contacto-productos p {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 1rem;
+}

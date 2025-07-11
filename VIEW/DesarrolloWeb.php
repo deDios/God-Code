@@ -250,7 +250,7 @@
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu app móvil con datos que importan</span></h2>
+                    <h2><span>Optimiza tu sitio web con datos que importan</span></h2>
                     <p>Toma decisiones inteligentes en cada fase del desarrollo apoyándote en información precisa,
                         medible y en tiempo real. Supervisa el avance de tu proyecto desde el diseño inicial hasta las
                         pruebas finales, incluyendo la planificación de contenido, la implementación de funcionalidades

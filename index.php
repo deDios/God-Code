@@ -131,6 +131,7 @@
     <main>
         <!-------------------------- Seccion 1  --------------------------->
         <section id="seccion-innovacion" class="innovacion-section">
+            
             <!-- Columna izquierda -->
             <div class="columna texto">
                 <h1>Tecnología unificada. Experiencias conectadasV9</h1>
@@ -145,7 +146,7 @@
                 </p>
                 <div class="botones">
                     <a href="#" class="btn btn-primary">Ver más detalles</a>
-                    <a href="#" class="btn btn-outline">Servicios</a>
+                    <a href="VIEW/Servicios.php" class="btn btn-outline">Servicios</a>
                 </div>
             </div>
 
@@ -166,6 +167,7 @@
 
                 <div id="paginacion" class="paginacion"></div>
             </div>
+
         </section>
 
 
