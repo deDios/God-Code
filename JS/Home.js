@@ -27,21 +27,21 @@ document.addEventListener("DOMContentLoaded", () => {
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log("Noticias cargadas:", data);
+      console.log("Noticias activas:", data);
 
       if (!Array.isArray(data) || data.length === 0) {
-        console.warn("No hay noticias disponibles.");
+        console.warn("No hay noticias activas disponibles.");
         return;
       }
 
-      // ordena por fecha de mas reciente a mas antigua
+      // ordena por fecha de más reciente a más antigua
       noticias = data.sort(
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
 
       console.log("Noticias ordenadas:", noticias);
 
-      // mostrar la noticia mas reciente
+      // mostrar la noticia más reciente (columna izquierda)
       const noticiaReciente = noticias[0];
       console.log("Noticia más reciente:", noticiaReciente);
 
@@ -50,12 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
       botonNoticia.textContent = "Ver más detalles";
       botonNoticia.href = `VIEW/Noticia.php?id=${noticiaReciente.id}`;
 
-      // mostramos noticias a partir de la segunda
+      // mostramos noticias a partir de la segunda (columna derecha)
       noticias = noticias.slice(1);
       mostrarNoticias(paginaActual);
       crearPaginacion();
 
-      // auto-paginación cada 6s
+      // paginación automática cada 6s
       setInterval(() => {
         paginaActual =
           (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error al cargar noticias:", err);
     });
 
-  // Mostrar noticias de una página
+  // Mostrar noticias de la página actual
   function mostrarNoticias(pagina) {
     contenedorNoticias.innerHTML = "";
 
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Paginación
+  // Crear paginación dinámica
   function crearPaginacion() {
     paginacion.innerHTML = "";
 
@@ -110,13 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Actualizar estado visual de paginación
   function actualizarPaginacion() {
     const enlaces = paginacion.querySelectorAll("a");
     enlaces.forEach((btn, index) => {
       btn.classList.toggle("activo", index + 1 === paginaActual);
     });
   }
-}); //----------------- aqui termina el js para noticias
+
+  //----------------- aqui termina el js para noticias
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   //seccion de preguntas frecuentes
