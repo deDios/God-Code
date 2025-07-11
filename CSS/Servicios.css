@@ -93,3 +93,55 @@
     color: #333;
     margin-bottom: 1rem;
 }
+
+@media screen and (max-width: 768px) {
+    #seccion-productos {
+        padding: 2.5rem 1rem;
+    }
+
+    #seccion-productos .titulo-principal {
+        font-size: 1.5rem;
+    }
+
+    #seccion-productos .subtitulo {
+        font-size: 1.2rem;
+        margin: 1.5rem 0 1.2rem;
+    }
+
+    #seccion-productos .grid-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #seccion-productos .card {
+        max-width: 100%;
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    #seccion-productos .card img {
+        width: 50px;
+        margin-bottom: 0.8rem;
+    }
+
+    #seccion-productos .card h4 {
+        font-size: 1rem;
+    }
+
+    #seccion-productos .card p {
+        font-size: 0.9rem;
+    }
+
+    #seccion-productos .btn-azul {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.9rem;
+    }
+
+    #seccion-productos .contacto-productos {
+        margin-top: 2rem;
+    }
+
+    #seccion-productos .contacto-productos p {
+        font-size: 0.85rem;
+    }
+}
