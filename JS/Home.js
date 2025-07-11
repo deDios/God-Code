@@ -1,18 +1,23 @@
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded disparado");
 
+
+  const seccion = document.querySelector("#seccion-innovacion");
+  if (!seccion) {
+    console.warn("Esta vista no contiene la sección innovación.");
+    return;
+  }
+
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
 
   const elementos = {
-    titulo: document.querySelector("#seccion-innovacion .columna.texto h1"),
-    descripcion: document.querySelector("#seccion-innovacion .columna.texto p"),
-    boton: document.querySelector("#seccion-innovacion .btn-primary"),
-    imagen: document.querySelector("#seccion-innovacion .columna.imagen img"),
-    listaNoticias: document.querySelector(
-      "#lista-noticias .contenido-noticias"
-    ),
-    paginacion: document.getElementById("paginacion"),
+    titulo: seccion.querySelector(".columna.texto h1"),
+    descripcion: seccion.querySelector(".columna.texto p"),
+    boton: seccion.querySelector(".btn-primary"),
+    imagen: seccion.querySelector(".columna.imagen img"),
+    listaNoticias: seccion.querySelector(".contenido-noticias"),
+    paginacion: seccion.querySelector("#paginacion"),
   };
 
   const noticiasPorPagina = 5;
@@ -48,14 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     const principal = noticias[0];
 
-    
+    //noticia principal
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Ver más detalles";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
-    // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
+    //elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
 
-    noticias = noticias.slice(1); 
+    noticias = noticias.slice(1);
 
     mostrarNoticias(paginaActual);
     crearPaginacion();
@@ -67,7 +72,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       cambiarPaginaAnimada(paginaActual);
     }, 6000);
   } catch (error) {
-    console.error(" Error en try principal:", error);
+    console.error("Error en carga de noticias:", error);
   }
 
   function mostrarNoticias(pagina) {
@@ -86,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ul.appendChild(li);
     });
 
-    elementos.listaNoticias.innerHTML = ""; 
+    elementos.listaNoticias.innerHTML = "";
     elementos.listaNoticias.appendChild(ul);
   }
 
@@ -103,8 +108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       enlace.addEventListener("click", (e) => {
         e.preventDefault();
         if (paginaActual === i) return;
-
-        autoCambioActivo = false; 
+        autoCambioActivo = false;
         cambiarPaginaAnimada(i);
       });
 
@@ -120,7 +124,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function cambiarPaginaAnimada(nuevaPagina) {
-    
     elementos.listaNoticias.classList.remove("animar-entrada");
     elementos.listaNoticias.classList.add("animar-salida");
 
@@ -129,10 +132,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       mostrarNoticias(paginaActual);
       actualizarPaginacion();
 
-      
       elementos.listaNoticias.classList.remove("animar-salida");
       elementos.listaNoticias.classList.add("animar-entrada");
-    }, 800);
+    }, 400);
   }
 });
 
