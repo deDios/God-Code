@@ -131,7 +131,7 @@
     <main>
         <!-------------------------- Seccion 1  --------------------------->
         <section id="seccion-innovacion" class="innovacion-section">
-            
+
             <!-- Columna izquierda -->
             <div class="columna texto">
                 <h1>Tecnología unificada. Experiencias conectadasV9</h1>
@@ -145,8 +145,9 @@
                     360°.
                 </p>
                 <div class="botones">
-                    <a href="#" class="btn btn-primary">Ver más detalles</a>
-                    <a href="VIEW/Servicios.php" class="btn btn-outline">Servicios</a>
+                    <a href="#" class="btn btn-primary">Descrubre GodCode 360°</a>
+                    <a href="VIEW/Servicios.php" class="btn btn-outline">Explore el conjunto
+                        de soluciones</a>
                 </div>
             </div>
 
