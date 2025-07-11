@@ -145,6 +145,10 @@ header.scrolled .subnav {
     text-decoration: none;
 }
 
+
+/*----------------- seccion 1 ------------------------*/
+
+
 #seccion-innovacion {
     display: flex;
     justify-content: space-between;
@@ -212,7 +216,6 @@ header.scrolled .subnav {
 #seccion-innovacion .noticias {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     height: 100%;
 }
 
@@ -222,39 +225,24 @@ header.scrolled .subnav {
     margin-bottom: 1rem;
 }
 
-#seccion-innovacion .noticias ul {
-    list-style: none;
-    padding: 0;
-}
-
-#seccion-innovacion .noticias li {
-    margin-bottom: 1rem;
-}
-
-#seccion-innovacion .noticias a {
-    color: #0f62fe;
-    text-decoration: none;
-    font-size: 0.95rem;
-}
-
 #seccion-innovacion #lista-noticias {
     position: relative;
     width: 100%;
-    min-height: 100px;
+    min-height: 200px;
 }
 
 #seccion-innovacion #lista-noticias .contenedor-animado {
     position: relative;
-    overflow: hidden;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 #seccion-innovacion .contenido-noticias {
-    position: absolute;
+    position: relative;
     width: 100%;
-    top: 0;
-    left: 0;
+    min-height: 100px;
+    transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
 #seccion-innovacion .contenido-noticias.animar-salida {
@@ -263,6 +251,14 @@ header.scrolled .subnav {
 
 #seccion-innovacion .contenido-noticias.animar-entrada {
     animation: deslizarDentro 0.4s ease forwards;
+}
+
+#seccion-innovacion .lista-noticias {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 #seccion-innovacion .lista-noticias li {
@@ -288,7 +284,7 @@ header.scrolled .subnav {
 #seccion-innovacion .paginacion {
     margin-top: auto;
     padding-top: 1rem;
-    margin-top: 300px;
+    text-align: left;
 }
 
 #seccion-innovacion .paginacion a {
@@ -301,14 +297,6 @@ header.scrolled .subnav {
 #seccion-innovacion .paginacion a.activo {
     font-weight: bold;
     text-decoration: underline;
-}
-
-#seccion-innovacion #lista-noticias.animar-salida {
-    animation: deslizarFuera 0.4s forwards;
-}
-
-#seccion-innovacion #lista-noticias.animar-entrada {
-    animation: deslizarDentro 0.4s forwards;
 }
 
 @keyframes deslizarFuera {
