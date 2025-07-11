@@ -39,8 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
 
-      console.log("Noticias ordenadas:", noticias);
-
       // mostrar la noticia más reciente (columna izquierda)
       const noticiaReciente = noticias[0];
       console.log("Noticia más reciente:", noticiaReciente);
@@ -55,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarNoticias(paginaActual);
       crearPaginacion();
 
-      // paginación automática cada 6s
       setInterval(() => {
         paginaActual =
           (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
@@ -77,16 +74,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Noticias a mostrar:", noticiasPagina);
 
     noticiasPagina.forEach((noticia) => {
-      const li = document.createElement("li");
       const a = document.createElement("a");
       a.href = `VIEW/Noticia.php?id=${noticia.id}`;
       a.textContent = noticia.titulo;
-      li.appendChild(a);
-      contenedorNoticias.appendChild(li);
+      a.classList.add("titulo-noticia"); // por si necesitas estilizar
+      contenedorNoticias.appendChild(a);
     });
   }
 
-  // Crear paginación dinámica
+  // Crear paginación
   function crearPaginacion() {
     paginacion.innerHTML = "";
 
@@ -110,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Actualizar estado visual de paginación
   function actualizarPaginacion() {
     const enlaces = paginacion.querySelectorAll("a");
     enlaces.forEach((btn, index) => {
