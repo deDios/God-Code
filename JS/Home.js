@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     descripcion: document.querySelector("#seccion-innovacion .columna.texto p"),
     boton: document.querySelector("#seccion-innovacion .btn-primary"),
     imagen: document.querySelector("#seccion-innovacion .columna.imagen img"),
-    listaNoticias: document.querySelector("#lista-noticias .contenido-noticias"),
+    listaNoticias: document.querySelector(
+      "#lista-noticias .contenido-noticias"
+    ),
     paginacion: document.getElementById("paginacion"),
   };
-
-  console.log("🧩 Elementos encontrados:", elementos);
 
   const noticiasPorPagina = 5;
   let paginaActual = 1;
@@ -24,69 +24,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function fetchNoticias() {
-    console.log("📡 Consultando noticias...");
     const res = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estatus: 1 }),
     });
-
     if (!res.ok) throw new Error("❌ No se pudo obtener noticias");
-
-    const data = await res.json();
-    console.log("✅ Noticias recibidas:", data);
-    return data;
+    return await res.json();
   }
 
   try {
     noticias = await fetchNoticias();
-
     if (!Array.isArray(noticias) || noticias.length === 0) {
-      console.warn("⚠️ No hay noticias disponibles.");
+      elementos.listaNoticias.innerHTML = "<p>No hay noticias disponibles.</p>";
       return;
     }
 
     noticias = noticias.sort(
       (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
     );
-
-    console.log("📋 Noticias ordenadas:", noticias);
-
     const principal = noticias[0];
-    console.log("⭐ Noticia principal:", principal);
 
+    // Insertar noticia principal
     elementos.titulo.textContent = principal.titulo;
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Ver más detalles";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
-
     // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`;
-    // elementos.imagen.alt = principal.titulo;
 
-    noticias = noticias.slice(1);
+    noticias = noticias.slice(1); // quitar la principal
 
     mostrarNoticias(paginaActual);
     crearPaginacion();
 
     setInterval(() => {
-      paginaActual =
-        (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
-      mostrarNoticias(paginaActual);
-      actualizarPaginacion();
+      const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
+      paginaActual = (paginaActual % totalPaginas) + 1;
+      cambiarPaginaAnimada(paginaActual);
     }, 6000);
   } catch (error) {
     console.error("❌ Error en try principal:", error);
   }
 
   function mostrarNoticias(pagina) {
-    console.log("📄 Mostrando noticias página:", pagina);
-    elementos.listaNoticias.innerHTML = "";
-
     const inicio = (pagina - 1) * noticiasPorPagina;
     const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
-    console.log("📰 Noticias en esta página:", noticiasPagina);
 
     const ul = document.createElement("ul");
     ul.classList.add("lista-noticias");
@@ -100,14 +82,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       ul.appendChild(li);
     });
 
+    elementos.listaNoticias.innerHTML = ""; // Limpia contenido anterior
     elementos.listaNoticias.appendChild(ul);
   }
 
   function crearPaginacion() {
-    console.log("🔢 Creando paginación");
+    const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
     elementos.paginacion.innerHTML = "";
 
-    const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
     for (let i = 1; i <= totalPaginas; i++) {
       const enlace = document.createElement("a");
       enlace.textContent = i;
@@ -117,9 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       enlace.addEventListener("click", (e) => {
         e.preventDefault();
         if (paginaActual === i) return;
-        paginaActual = i;
-        mostrarNoticias(paginaActual);
-        actualizarPaginacion();
+        cambiarPaginaAnimada(i);
       });
 
       elementos.paginacion.appendChild(enlace);
@@ -132,8 +112,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       btn.classList.toggle("activo", index + 1 === paginaActual);
     });
   }
+
+  function cambiarPaginaAnimada(nuevaPagina) {
+    // animación de salida
+    elementos.listaNoticias.classList.remove("animar-entrada");
+    elementos.listaNoticias.classList.add("animar-salida");
+
+    setTimeout(() => {
+      paginaActual = nuevaPagina;
+      mostrarNoticias(paginaActual);
+      actualizarPaginacion();
+
+      // animación de entrada
+      elementos.listaNoticias.classList.remove("animar-salida");
+      elementos.listaNoticias.classList.add("animar-entrada");
+    }, 400); // mismo tiempo que deslizarFuera
+  }
 });
-//--------------------------------------aca termina el section 1 
+
+//--------------------------------------aca termina el section 1
 
 document.addEventListener("DOMContentLoaded", () => {
   //seccion de preguntas frecuentes
