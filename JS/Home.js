@@ -1,96 +1,107 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
 
-  const h1 = document.querySelector("#seccion-innovacion .columna.texto h1");
-  const p = document.querySelector("#seccion-innovacion .columna.texto p");
-  const botonNoticia = document.querySelector(
-    "#seccion-innovacion .columna.texto .btn-primary"
-  );
-
-  const contenedorNoticias = document.querySelector(
-    "#lista-noticias .contenido-noticias"
-  );
-  const paginacion = document.getElementById("paginacion");
+  const elementos = {
+    titulo: document.querySelector("#seccion-innovacion .columna.texto h1"),
+    descripcion: document.querySelector("#seccion-innovacion .columna.texto p"),
+    boton: document.querySelector("#seccion-innovacion .btn-primary"),
+    imagen: document.querySelector("#seccion-innovacion .columna.imagen img"),
+    listaNoticias: document.querySelector(
+      "#lista-noticias .contenido-noticias"
+    ),
+    paginacion: document.getElementById("paginacion"),
+  };
 
   const noticiasPorPagina = 5;
   let paginaActual = 1;
   let noticias = [];
 
-  // Función para dar formato al texto con saltos de línea
+  // función para aplicar saltos de línea como <br>
   function formatearTexto(texto) {
     return (texto || "").toString().replace(/\n/g, "<br>");
   }
 
-  // ENDPOINTNOTICIAS
-  fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ estatus: 1 }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Noticias activas:", data);
-
-      if (!Array.isArray(data) || data.length === 0) {
-        console.warn("No hay noticias activas disponibles.");
-        return;
-      }
-
-      // Ordenar de más reciente a más antigua
-      noticias = data.sort(
-        (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-      );
-
-      // Noticia más reciente → columna izquierda
-      const noticiaReciente = noticias[0];
-      console.log("Noticia más reciente:", noticiaReciente);
-
-      h1.textContent = noticiaReciente.titulo;
-      p.innerHTML = formatearTexto(noticiaReciente.desc_uno);
-      botonNoticia.textContent = "Ver más detalles";
-      botonNoticia.href = `VIEW/Noticia.php?id=${noticiaReciente.id}`;
-
-      // Resto de noticias → columna derecha
-      noticias = noticias.slice(1);
-      mostrarNoticias(paginaActual);
-      crearPaginacion();
-
-      // Paginación automática cada 6s
-      setInterval(() => {
-        paginaActual =
-          (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
-        mostrarNoticias(paginaActual);
-        actualizarPaginacion();
-      }, 6000);
-    })
-    .catch((err) => {
-      console.error("Error al cargar noticias:", err);
+  // obtener noticias activas
+  async function fetchNoticias() {
+    console.log("1. Consultando noticias...");
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ estatus: 1 }),
     });
 
-  // Mostrar noticias en columna derecha
+    if (!res.ok) throw new Error("No se pudo obtener noticias");
+
+    const data = await res.json();
+    console.log("2. Noticias obtenidas:", data);
+    return data;
+  }
+
+  try {
+    noticias = await fetchNoticias();
+
+    if (!Array.isArray(noticias) || noticias.length === 0) {
+      console.warn("No hay noticias disponibles.");
+      return;
+    }
+
+    // ordenar de más reciente a más antigua
+    noticias = noticias.sort(
+      (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+    );
+
+    // cargar noticia más reciente en la columna izquierda
+    console.log("3. Cargando noticia principal...");
+    const principal = noticias[0];
+    elementos.titulo.textContent = principal.titulo;
+    elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
+    elementos.boton.textContent = "Ver más detalles";
+    elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
+
+    // (opcional) actualizar imagen si más adelante decides hacerla dinámica
+    // elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`;
+    // elementos.imagen.alt = principal.titulo;
+
+    // eliminar la principal para que no se repita en la lista derecha
+    noticias = noticias.slice(1);
+
+    // mostrar noticias secundarias
+    mostrarNoticias(paginaActual);
+    crearPaginacion();
+
+    // cambio automático cada 6 segundos
+    setInterval(() => {
+      paginaActual =
+        (paginaActual % Math.ceil(noticias.length / noticiasPorPagina)) + 1;
+      mostrarNoticias(paginaActual);
+      actualizarPaginacion();
+    }, 6000);
+  } catch (error) {
+    console.error("Error cargando noticias:", error);
+  }
+
   function mostrarNoticias(pagina) {
-    contenedorNoticias.innerHTML = "";
+    elementos.listaNoticias.innerHTML = "";
 
     const inicio = (pagina - 1) * noticiasPorPagina;
     const noticiasPagina = noticias.slice(inicio, inicio + noticiasPorPagina);
 
-    console.log("Noticias a mostrar:", noticiasPagina);
+    console.log("4. Noticias a mostrar:", noticiasPagina);
 
     noticiasPagina.forEach((noticia) => {
       const a = document.createElement("a");
       a.href = `VIEW/Noticia.php?id=${noticia.id}`;
       a.textContent = noticia.titulo;
       a.classList.add("titulo-noticia");
-      contenedorNoticias.appendChild(a);
+      elementos.listaNoticias.appendChild(a);
     });
   }
 
-  // Crear paginación
   function crearPaginacion() {
-    paginacion.innerHTML = "";
+    elementos.paginacion.innerHTML = "";
 
     const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
     for (let i = 1; i <= totalPaginas; i++) {
@@ -102,24 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
       enlace.addEventListener("click", (e) => {
         e.preventDefault();
         if (paginaActual === i) return;
-
         paginaActual = i;
         mostrarNoticias(paginaActual);
         actualizarPaginacion();
       });
 
-      paginacion.appendChild(enlace);
+      elementos.paginacion.appendChild(enlace);
     }
   }
 
   function actualizarPaginacion() {
-    const enlaces = paginacion.querySelectorAll("a");
+    const enlaces = elementos.paginacion.querySelectorAll("a");
     enlaces.forEach((btn, index) => {
       btn.classList.toggle("activo", index + 1 === paginaActual);
     });
   }
-
-  //----------------- aqui termina el js para noticias
 });
 
 document.addEventListener("DOMContentLoaded", () => {
