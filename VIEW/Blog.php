@@ -148,7 +148,7 @@
                     <div class="card" data-id="meta">
                         <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
                         <div class="contenido">
-                            <p>Meta recluta una “superinteligencia”: Zuckerberg al frente...</p>
+                            <p>Meta recluta </p>
                             <button onclick="abrirNoticia(event, this)">Leer más...</button>
                         </div>
                     </div>
@@ -156,7 +156,7 @@
                     <div class="card" data-id="apple">
                         <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
                         <div class="contenido">
-                            <p>Apple presenta “Liquid Glass” y rediseña todos sus sistemas...</p>
+                            <p>Apple pr</p>
                             <button onclick="abrirNoticia(event, this)">Leer más...</button>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                     <div class="card" data-id="nato">
                         <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
                         <div class="contenido">
-                            <p>NATO lanza nueva estrategia para investigación científica...</p>
+                            <p>NATO lanza n</p>
                             <button onclick="abrirNoticia(event, this)">Leer más...</button>
                         </div>
                     </div>

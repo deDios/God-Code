@@ -55,7 +55,6 @@
     color: inherit;
     padding: 0;
     transition: transform 0.3s ease;
-    cursor: pointer;
 }
 
 #blog-godcode .card:hover {
@@ -97,6 +96,7 @@
     font-weight: 500;
     font-size: 0.9rem;
     transition: background 0.3s ease;
+    cursor: pointer;
 }
 
 #blog-godcode button:hover {
