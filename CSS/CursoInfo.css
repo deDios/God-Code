@@ -966,7 +966,6 @@ input[type="checkbox"] {
     right: 0.5rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #e6b400;
     font-size: 1.2rem;
     pointer-events: none;
     display: none;
@@ -974,30 +973,10 @@ input[type="checkbox"] {
 
 .input-alerta-container.alerta .icono-alerta {
     display: inline;
-}
-
-.input-alerta-container {
-    position: relative;
-    width: 100%;
-}
-
-.input-alerta-container input {
-    width: 100%;
-    padding-right: 2rem;
-    box-sizing: border-box;
-}
-
-.input-alerta-container .icono-alerta {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
     color: #e6b400;
-    font-size: 1.2rem;
-    pointer-events: none;
-    display: none;
 }
 
-.input-alerta-container.alerta .icono-alerta {
+.input-alerta-container.valido .icono-alerta {
     display: inline;
+    color: #2ecc71;
 }

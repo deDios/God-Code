@@ -261,7 +261,7 @@ function inicializarAcordeones() {
 }
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
-console.log("DOM cargado - Modal Inscripción Ready");
+console.log("DOM cargado - modal listo");
 
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
@@ -279,7 +279,6 @@ const telefonoInput = document.getElementById("telefono");
 const correoInput = document.getElementById("correo");
 const btnSubmit = document.querySelector(".btn-inscribirme");
 
-// ENDPOINTS
 const ENDPOINT_CONSULTA =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 const ENDPOINT_INSERTAR =
@@ -287,7 +286,7 @@ const ENDPOINT_INSERTAR =
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// mostrar notificacion tipo toast, creo que esto lo voy a terminar moviendo al js global para usarlo en las demas vistas
+// mostrar notificacion tipo toast
 function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   const contenedor = document.querySelector(".toast-container");
   if (!contenedor) return;
@@ -297,9 +296,7 @@ function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   toast.textContent = mensaje;
 
   contenedor.appendChild(toast);
-
   setTimeout(() => toast.classList.add("mostrar"), 10);
-
   setTimeout(() => {
     toast.classList.remove("mostrar");
     setTimeout(() => contenedor.removeChild(toast), 400);
@@ -308,7 +305,6 @@ function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
 
 // mostrar modal
 const abrirModal = () => {
-  console.log("Abriendo modal...");
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
@@ -317,7 +313,6 @@ const abrirModal = () => {
 
 // cerrar modal
 const cerrarModal = () => {
-  console.log("Cerrando modal...");
   modal.classList.remove("mostrar");
   document.body.classList.remove("modal-abierto");
   limpiarFormulario();
@@ -333,12 +328,12 @@ const limpiarFormulario = () => {
     .querySelectorAll('input[name="medios-contacto"]')
     .forEach((cb) => (cb.checked = false));
 
-  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
-  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  actualizarIcono("telefono", ""); // limpiar iconos
+  actualizarIcono("correo", "");
   btnSubmit.disabled = false;
 };
 
-// cambiar a login y registro
+// alternar entre login y registro
 const toggleFormularios = (mostrarLogin) => {
   titulo.style.display = mostrarLogin ? "none" : "flex";
   checkboxCuenta.checked = mostrarLogin;
@@ -401,10 +396,8 @@ const llenarFormulario = (cuenta) => {
   });
 
   toggleFormularios(false);
-
-  // Al llenar la cuenta, quitar alertas y habilita el boton
-  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
-  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  actualizarIcono("telefono", "valido");
+  actualizarIcono("correo", "valido");
   btnSubmit.disabled = false;
 };
 
@@ -415,13 +408,12 @@ const validarMediosContacto = () => {
   );
 };
 
-// validar duplicados
 const validarDuplicados = async () => {
   const telefono = telefonoInput.value.trim();
   const correo = correoInput.value.trim();
 
-  telefonoInput.closest(".input-alerta-container")?.classList.remove("alerta");
-  correoInput.closest(".input-alerta-container")?.classList.remove("alerta");
+  actualizarIcono("telefono", "");
+  actualizarIcono("correo", "");
   btnSubmit.disabled = false;
 
   if (!telefono && !correo) return;
@@ -443,14 +435,12 @@ const validarDuplicados = async () => {
       let hayAlerta = false;
 
       if (telefono && data.some((d) => d.telefono === telefono)) {
-        telefonoInput
-          .closest(".input-alerta-container")
-          ?.classList.add("alerta");
+        actualizarIcono("telefono", "warning");
         hayAlerta = true;
       }
 
       if (correo && data.some((d) => d.correo === correo)) {
-        correoInput.closest(".input-alerta-container")?.classList.add("alerta");
+        actualizarIcono("correo", "warning");
         hayAlerta = true;
       }
 
@@ -460,6 +450,53 @@ const validarDuplicados = async () => {
     console.warn("Error validando duplicados:", err);
   }
 };
+
+const validarCampoValido = async (campo) => {
+  const valor =
+    campo === "telefono"
+      ? telefonoInput.value.trim()
+      : correoInput.value.trim();
+  if (!valor) {
+    actualizarIcono(campo, "");
+    return;
+  }
+
+  try {
+    const res = await fetch(ENDPOINT_CONSULTA, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo: valor, telefono: valor }),
+    });
+
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      actualizarIcono(campo, "valido");
+    }
+  } catch (err) {
+    console.warn("Error validando campo:", err);
+  }
+};
+
+// función para actualizar ícono
+function actualizarIcono(campo, estado) {
+  const contenedor = document.getElementById(`${campo}-container`);
+  const icono = contenedor?.querySelector(".icono-alerta");
+
+  contenedor?.classList.remove("alerta");
+
+  if (icono) {
+    if (estado === "warning") {
+      icono.textContent = "⚠️";
+      contenedor.classList.add("alerta");
+    } else if (estado === "valido") {
+      icono.textContent = "✅";
+      icono.style.display = "inline";
+    } else {
+      icono.textContent = "";
+      icono.style.display = "none";
+    }
+  }
+}
 
 // enviar inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
@@ -546,7 +583,7 @@ formInscripcion.addEventListener("submit", async (e) => {
   }
 });
 
-// tipo de contacto: 1 = tel, 2 = correo, 3 = ambos
+// tipo de contacto
 const obtenerTipoContacto = () => {
   const seleccionados = Array.from(
     document.querySelectorAll('input[name="medios-contacto"]:checked')
@@ -578,3 +615,5 @@ volverRegistro.addEventListener("click", (e) => {
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
+telefonoInput.addEventListener("blur", () => validarCampoValido("telefono"));
+correoInput.addEventListener("blur", () => validarCampoValido("correo"));
