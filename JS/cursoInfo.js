@@ -471,12 +471,19 @@ function validarCampoValido(input) {
   const contenedor = input.closest(".input-alerta-container");
   const icono = contenedor.querySelector(".icono-alerta");
   const valor = input.value.trim();
+  const esCorreo = input.id === "correo";
+  const esTelefono = input.id === "telefono";
 
-  if (valor && !contenedor.classList.contains("alerta")) {
+  // Si hay warning activo, no mostrar ícono válido
+  if (contenedor.classList.contains("alerta")) {
+    icono.textContent = "⚠️";
+    icono.classList.remove("valido");
+  } else if (valor) {
     icono.textContent = "✅";
     icono.classList.add("valido");
+
     mostrarToast(
-      input.id === "correo" ? "Correo disponible." : "Teléfono disponible.",
+      esCorreo ? "Correo disponible." : "Teléfono disponible.",
       "exito"
     );
   } else {
@@ -484,9 +491,10 @@ function validarCampoValido(input) {
     icono.classList.remove("valido");
   }
 
-  // Validar botón
+  // Evaluar si hay errores para desactivar botones
   const hayWarning =
     document.querySelectorAll(".input-alerta-container.alerta").length > 0;
+
   buscarBtn.classList.toggle("disabled", hayWarning);
   btnSubmit.disabled = hayWarning;
 }
