@@ -1,151 +1,177 @@
 body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f9f9f9;
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
 }
 
 #registro {
-  max-width: 600px;
-  margin: auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-h1 {
-  color: #0f62fe;
-  margin-bottom: 1rem;
+.registro-container h1 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 2rem;
 }
 
 form label {
-  display: block;
-  margin-bottom: 1rem;
-  font-weight: 500;
-  color: #333;
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-input[type="date"] {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
+form input[type="text"],
+form input[type="email"],
+form input[type="tel"],
+form input[type="password"],
+form input[type="date"] {
+    width: 100%;
+    padding: 0.65rem;
+    margin-top: 0.3rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f6f6f6;
+    font-size: 1rem;
+    transition: border 0.2s ease;
+}
+
+form input:focus {
+    outline: none;
+    border-color: #0f62fe;
+    background-color: #fff;
 }
 
 .fila-doble {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .fila-doble label {
-  flex: 1;
+    flex: 1;
 }
 
 .btn-registrarse {
-  width: 100%;
-  background: #0f62fe;
-  color: white;
-  border: none;
-  padding: 0.8rem;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
+    width: 100%;
+    background: #0f62fe;
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-registrarse:hover {
+    background: #004fc1;
 }
 
 .btn-registrarse:disabled {
-  background-color: #ccc;
-  color: #888;
-  cursor: not-allowed;
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
 }
 
 .mensaje-politica {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #555;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: #666;
+    text-align: center;
 }
 
 .registro-copy {
-  margin-top: 2rem;
-  font-size: 0.8rem;
-  text-align: center;
-  color: #999;
+    margin-top: 2rem;
+    font-size: 0.75rem;
+    text-align: center;
+    color: #999;
 }
 
 .toast-container {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 9999;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
 }
 
 .toast {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  margin-bottom: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 5px;
-  color: white;
-  font-weight: bold;
-  min-width: 200px;
-}
-
-.toast.exito {
-  background-color: #4caf50;
-}
-
-.toast.warning {
-  background-color: #ff9800;
-}
-
-.toast.error {
-  background-color: #f44336;
+    min-width: 250px;
+    max-width: 320px;
+    background-color: #fff;
+    padding: 1rem 1.2rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    pointer-events: auto;
+    border-left: 5px solid transparent;
 }
 
 .toast.mostrar {
-  opacity: 1;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.exito {
+    border-left-color: #28a745;
+}
+
+.toast.error {
+    border-left-color: #dc3545;
+}
+
+.toast.warning {
+    border-left-color: #ffc107;
 }
 
 .input-alerta-container {
-  position: relative;
-  width: 100%;
+    position: relative;
+    width: 100%;
 }
 
 .input-alerta-container input {
-  width: 100%;
-  padding-right: 2rem;
-  box-sizing: border-box;
+    padding-right: 2rem;
 }
 
 .icono-alerta {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  pointer-events: none;
-  display: none;
+    position: absolute;
+    right: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    pointer-events: none;
+    display: none;
 }
 
 .input-alerta-container .icono-alerta.valido {
-  color: green;
-  display: inline;
+    color: green;
+    display: inline;
 }
 
 .input-alerta-container.alerta .icono-alerta {
-  display: inline;
-  color: #e53935;
+    display: inline;
+    color: #e53935;
 }
 
 .input-alerta-container.alerta input {
-  border-color: #e53935;
+    border-color: #e53935;
+    background-color: #fff1f1;
 }
