@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   function insertarOverlayTitulo(titulo) {
+    console.log("Título insertado en overlay:", JSON.stringify(titulo));
+
     const overlay = document.createElement("div");
     overlay.classList.add("overlay-titulo");
     overlay.innerHTML = `<h1>${titulo}</h1>`;

@@ -141,7 +141,7 @@
                 <!---
                 <img src="../ASSETS/noticia/noticia_img1_1.png" alt="Imagen de noticia">
                 --->
-                <img src="..." alt="...">
+                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="iamgen1">
                 <div class="overlay-titulo" id="titulo-noticia"></div>
             </div>
 
@@ -158,7 +158,7 @@
         <section id="noticia-bloque2" class="noticia-bloque">
             <div class="limite">
                 <div class="imagen-noticia">
-                    <img src="../ASSETS/noticia/noticia_img1_2.png" alt="Imagen noticia2">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Imagen2">
                 </div>
                 <div class="contenido-noticia">
                     <p>
