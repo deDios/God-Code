@@ -134,6 +134,7 @@
 
 
     <main>
+        
         <section id="registro">
             <div class="registro-container">
                 <h1>Nuevo Registro</h1>
@@ -146,7 +147,10 @@
 
                     <label>
                         Correo electrónico
-                        <input type="email" name="correo" required />
+                        <div class="input-alerta-container">
+                            <input type="email" name="correo" required />
+                            <span class="icono-alerta"></span>
+                        </div>
                     </label>
 
                     <div class="fila-doble">
@@ -163,10 +167,13 @@
                     <div class="fila-doble">
                         <label>
                             Teléfono
-                            <input type="tel" name="telefono" required />
+                            <div class="input-alerta-container">
+                                <input type="tel" name="telefono" required />
+                                <span class="icono-alerta"></span>
+                            </div>
                         </label>
                         <label>
-                            <strong>Fecha de nacimiento</strong>
+                            Fecha de nacimiento
                             <input type="date" name="fecha_nacimiento" required />
                         </label>
                     </div>
@@ -176,15 +183,13 @@
 
                 <p class="mensaje-politica">
                     Tus datos están seguros con nosotros. Al completar tu registro, aceptas nuestras políticas de
-                    privacidad y condiciones de uso. Si tienes dudas, contáctanos.
+                    privacidad y condiciones de uso.
                 </p>
 
                 <div class="registro-copy">
                     <p>&copy; 2025 GoDCode. Todos los derechos reservados.</p>
-                    <p>
-                        Queda prohibida la reproducción total o parcial de este contenido sin autorización previa por
-                        escrito.
-                    </p>
+                    <p>Queda prohibida la reproducción total o parcial de este contenido sin autorización previa por
+                        escrito.</p>
                 </div>
             </div>
         </section>
@@ -204,6 +209,8 @@
             <small>De 9:00AM a 8:00PM</small>
         </div>
     </footer>
+
+    <div class="toast-container"></div>
 
     <script src="../JS/Inscripcion.js"></script>
     <script src="../JS/JSglobal.js"></script>
