@@ -6,9 +6,9 @@ body {
 }
 
 #registro {
-    max-width: 1000px;
-    margin: 2rem auto;
-    padding: 2.5rem;
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 3rem 2rem;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -17,15 +17,24 @@ body {
 .registro-container h1 {
     text-align: center;
     color: #222;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 form label {
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     font-weight: 600;
     color: #333;
     font-size: 0.95rem;
+}
+
+form label>input,
+form label>.input-alerta-container {
+    margin-top: 0.4rem;
+}
+
+form label:not(:last-child) {
+    margin-bottom: 1.4rem;
 }
 
 form input[type="text"],
@@ -35,12 +44,12 @@ form input[type="password"],
 form input[type="date"] {
     width: 100%;
     padding: 0.65rem;
-    margin-top: 0.3rem;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #f6f6f6;
     font-size: 1rem;
     transition: border 0.2s ease;
+    box-sizing: border-box;
 }
 
 form input:focus {
@@ -52,7 +61,7 @@ form input:focus {
 .fila-doble {
     display: flex;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .fila-doble label {
@@ -70,7 +79,7 @@ form input:focus {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s;
-    margin-top: 1rem;
+    margin-top: 2rem;
 }
 
 .btn-registrarse:hover {
@@ -84,7 +93,7 @@ form input:focus {
 }
 
 .mensaje-politica {
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     font-size: 0.85rem;
     color: #666;
     text-align: center;
