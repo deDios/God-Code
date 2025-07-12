@@ -115,8 +115,8 @@
                 <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
             </div>
 
-            <a href="../VIEW/Nosotros.php" class="active">Nosotros</a>
-            <a href="../VIEW/Blog.php">Blog</a>
+            <a href="../VIEW/Nosotros.php">Nosotros</a>
+            <a href="../VIEW/Blog.php" class="active">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">

@@ -957,11 +957,18 @@ input[type="checkbox"] {
 }
 
 /*----------------------- alerta para email o telefonos incorreectos --------------------------*/
-.input-alerta-container input {
-    padding-right: 2rem;
+.input-alerta-container {
+    position: relative;
+    width: 100%;
 }
 
-.input-alerta-container .icono-alerta {
+.input-alerta-container input {
+    width: 100%;
+    padding-right: 2rem;
+    box-sizing: border-box;
+}
+
+.icono-alerta {
     position: absolute;
     right: 0.5rem;
     top: 50%;
@@ -974,9 +981,10 @@ input[type="checkbox"] {
 .input-alerta-container.alerta .icono-alerta {
     display: inline;
     color: #e6b400;
+    content: "⚠️";
 }
 
-.input-alerta-container.valido .icono-alerta {
+.input-alerta-container .icono-alerta.valido {
     display: inline;
-    color: #2ecc71;
+    color: #28a745;
 }
