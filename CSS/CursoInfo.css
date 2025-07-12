@@ -674,34 +674,6 @@ input[type="checkbox"] {
     transform: translateY(0);
 }
 
-.alerta-error {
-    display: block;
-    background-color: #e74c3c;
-    color: #fff;
-    padding: 1rem;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: opacity 0.3s ease, max-height 0.3s ease;
-}
-
-.alerta-error.mostrar {
-    opacity: 1;
-    max-height: 200px;
-}
-
-.alerta-error.exito {
-    background-color: #2ecc71;
-}
-
-.alerta-error.error {
-    background-color: #e74c3c;
-}
-
 .volver-a-registro {
     display: block;
     opacity: 0;
@@ -889,24 +861,6 @@ input[type="checkbox"] {
     }
 }
 
-.alerta-usuario-repetido {
-    display: none;
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.85rem;
-    border: 1px solid #fcd34d;
-    border-radius: 4px;
-    margin-top: 0.5rem;
-}
-
-.alerta-usuario-repetido.centrado {
-    text-align: center;
-    margin: 1rem auto;
-    width: 100%;
-    max-width: 450px;
-}
-
 /*-------------------- notificaciones tipo toast --------------------*/
 .toast-container {
     position: fixed;
@@ -956,6 +910,13 @@ input[type="checkbox"] {
     position: relative;
 }
 
+.btn-buscar-cuenta.disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /*----------------------- alerta para email o telefonos incorreectos --------------------------*/
 .input-alerta-container {
     position: relative;
@@ -981,10 +942,9 @@ input[type="checkbox"] {
 .input-alerta-container.alerta .icono-alerta {
     display: inline;
     color: #e6b400;
-    content: "⚠️";
 }
 
-.input-alerta-container .icono-alerta.valido {
+.icono-alerta.valido {
     display: inline;
     color: #28a745;
 }
