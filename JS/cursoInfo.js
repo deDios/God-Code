@@ -286,7 +286,7 @@ const ENDPOINT_INSERTAR =
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// mostrar notificación tipo toast
+// mostrar notificacion tipo toast
 function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   const contenedor = document.querySelector(".toast-container");
   if (!contenedor) return;
@@ -398,7 +398,7 @@ const llenarFormulario = (cuenta) => {
   btnSubmit.disabled = false;
 };
 
-// validar al menos un medio de contacto
+//validar al menos un medio de contacto
 const validarMediosContacto = () => {
   return (
     document.querySelectorAll('input[name="medios-contacto"]:checked').length >
@@ -406,7 +406,7 @@ const validarMediosContacto = () => {
   );
 };
 
-// validar duplicados y mostrar íconos y toasts
+// validar duplicados y mostrar alertas
 const validarDuplicados = async () => {
   const telefono = telefonoInput.value.trim();
   const correo = correoInput.value.trim();
@@ -463,7 +463,6 @@ const validarDuplicados = async () => {
   btnSubmit.disabled = warning;
 };
 
-// validar campo al salir de foco y mostrar ícono ✅
 telefonoInput.addEventListener("blur", () => validarCampoValido(telefonoInput));
 correoInput.addEventListener("blur", () => validarCampoValido(correoInput));
 
@@ -471,11 +470,10 @@ function validarCampoValido(input) {
   const contenedor = input.closest(".input-alerta-container");
   const icono = contenedor.querySelector(".icono-alerta");
   const valor = input.value.trim();
-  const esCorreo = input.id === "correo";
-  const esTelefono = input.id === "telefono";
 
-  // Si hay warning activo, no mostrar ícono válido
-  if (contenedor.classList.contains("alerta")) {
+  const hayWarning = contenedor.classList.contains("alerta");
+
+  if (hayWarning) {
     icono.textContent = "⚠️";
     icono.classList.remove("valido");
   } else if (valor) {
@@ -483,7 +481,7 @@ function validarCampoValido(input) {
     icono.classList.add("valido");
 
     mostrarToast(
-      esCorreo ? "Correo disponible." : "Teléfono disponible.",
+      input.id === "correo" ? "Correo disponible." : "Teléfono disponible.",
       "exito"
     );
   } else {
@@ -491,12 +489,11 @@ function validarCampoValido(input) {
     icono.classList.remove("valido");
   }
 
-  // Evaluar si hay errores para desactivar botones
-  const hayWarning =
+  const algunWarning =
     document.querySelectorAll(".input-alerta-container.alerta").length > 0;
 
-  buscarBtn.classList.toggle("disabled", hayWarning);
-  btnSubmit.disabled = hayWarning;
+  buscarBtn.classList.toggle("disabled", algunWarning);
+  btnSubmit.disabled = algunWarning;
 }
 
 // tipo de contacto: 1 = tel, 2 = correo, 3 = ambos
@@ -511,7 +508,7 @@ const obtenerTipoContacto = () => {
   return 0;
 };
 
-// envío final del formulario
+// envio final del formulario
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validarMediosContacto()) {
