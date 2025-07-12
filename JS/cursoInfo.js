@@ -467,31 +467,31 @@ telefonoInput.addEventListener("blur", () => validarCampoValido(telefonoInput));
 correoInput.addEventListener("blur", () => validarCampoValido(correoInput));
 
 function validarCampoValido(input) {
-  const contenedor = input.closest(".input-alerta-container");
-  const icono = contenedor.querySelector(".icono-alerta");
-  const valor = input.value.trim();
+  const campos = [
+    { input: telefonoInput, id: "telefono" },
+    { input: correoInput, id: "correo" },
+  ];
 
-  const hayWarning = contenedor.classList.contains("alerta");
+  campos.forEach(({ input: campo, id }) => {
+    const contenedor = campo.closest(".input-alerta-container");
+    const icono = contenedor.querySelector(".icono-alerta");
+    const valor = campo.value.trim();
+    const tieneWarning = contenedor.classList.contains("alerta");
 
-  if (hayWarning) {
-    icono.textContent = "⚠️";
-    icono.classList.remove("valido");
-  } else if (valor) {
-    icono.textContent = "✅";
-    icono.classList.add("valido");
-
-    mostrarToast(
-      input.id === "correo" ? "Correo disponible." : "Teléfono disponible.",
-      "exito"
-    );
-  } else {
-    icono.textContent = "";
-    icono.classList.remove("valido");
-  }
+    if (tieneWarning) {
+      icono.textContent = "⚠️";
+      icono.classList.remove("valido");
+    } else if (valor) {
+      icono.textContent = "✅";
+      icono.classList.add("valido");
+    } else {
+      icono.textContent = "";
+      icono.classList.remove("valido");
+    }
+  });
 
   const algunWarning =
     document.querySelectorAll(".input-alerta-container.alerta").length > 0;
-
   buscarBtn.classList.toggle("disabled", algunWarning);
   btnSubmit.disabled = algunWarning;
 }

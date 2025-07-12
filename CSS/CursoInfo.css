@@ -910,7 +910,7 @@ input[type="checkbox"] {
     position: relative;
 }
 
-.btn-buscar-cuenta.disabled {
+.btn-buscar-cuenta.disabled { /*de momento no funcion pero despues lo hecho a andar*/
   background-color: #ccc;
   color: #888;
   cursor: not-allowed;
