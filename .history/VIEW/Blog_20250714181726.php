@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
+    <link rel="stylesheet" href="../CSS/Blog.css">
 </head>
 
 <body>
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -55,7 +55,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -112,11 +112,11 @@
             </div>
 
             <div class="nav-item mobile-only">
-                <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
             </div>
 
             <a href="../VIEW/Nosotros.php">Nosotros</a>
-            <a href="../VIEW/Blog.php">Blog</a>
+            <a href="../VIEW/Blog.php" class="active">Blog</a>
 
             <div class="social-icons">
                 <div class="circle-icon">
@@ -132,77 +132,107 @@
         </div>
     </header>
 
-
     <main>
-        <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
-
-            <div class="contacto-contenedor">
-                <div class="formulario-contacto">
-                    <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
-                    </p>
-
-                    <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
+        <!-- seccion 1 -->
+        <section id="blog-godcode" class="animado">
+            <div class="limite">
+                <h2>Blog GodCode</h2>
+                <h3>Lo Nuevo</h3>
+                <p class="descripcion">
+                    Explora el futuro hoy<br>
+                    Descubre las últimas noticias en tecnología, innovación y avances que están transformando el
+                    mundo.<br>
+                    Mantente al día con lo más relevante, todo en un solo lugar.
+                </p>
+                <div class="grid-cards">
+                    <div class="card" data-id="meta">
+                        <img src="../ASSETS/Blog/blog_img1.png" alt="Meta AI">
+                        <div class="contenido">
+                            <p>Meta recluta </p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
                         </div>
-
-                        <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
-                        </div>
-
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
-
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
-
-                        <button type="submit">Enviar</button>
-                    </form>
-                </div>
-
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
                     </div>
 
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
+                    <div class="card" data-id="apple">
+                        <img src="../ASSETS/Blog/blog_img2.png" alt="Apple Liquid Glass">
+                        <div class="contenido">
+                            <p>Apple pr</p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                        </div>
+                    </div>
+
+                    <div class="card" data-id="nato">
+                        <img src="../ASSETS/Blog/blog_img3.png" alt="NATO ciencia">
+                        <div class="contenido">
+                            <p>NATO lanza n</p>
+                            <button onclick="abrirNoticia(event, this)">Leer más...</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- seccion 2 -->
+        <section id="filtros-cursos">
+            <div class="limite">
+                <div class="filtros-cursos__contenido">
+                    <h2>Cursos destacados</h2>
+                    <h3>Explora nuestras mejores opciones</h3>
+                    <p class="descripcion">
+                        Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo, con contenido
+                        actualizado y práctico.
+                    </p>
+                </div>
+
+                <div class="contenedor-filtros">
+
+                    <div class="filtro">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria" name="categoria">
+                            <option value="">Selecciona una categoría</option>
+                            <!-- Se llenara con JS -->
+                        </select>
+                    </div>
+
+                    <div class="filtro">
+                        <label for="explorar">Explorar</label>
+                        <select id="explorar" name="explorar">
+                            <option value="">Selecciona una opción</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro limpiar">
+                        <label>&nbsp;</label>
+                        <button id="limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- seccion 3 -->
+        <section id="cursos-destacados">
+            <h3>Cursos disponibles</h3>
+
+            <div class="carousel-container" id="carousel-container">
+                <button class="carousel-btn prev" aria-label="Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+
+                <div class="carousel-track-container">
+                    <div class="carousel-track grid-cards-cursos" id="cursos-container">
+                        <!-- Las cards se insertan desde JS -->
+                    </div>
+                </div>
+
+                <button class="carousel-btn next" aria-label="Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
+                </button>
+            </div>
+        </section>
 
     </main>
 
@@ -220,7 +250,8 @@
         </div>
     </footer>
 
-    <script src="../JS/index.js"></script>
+    <script src="../JS/JSglobal.js"></script>
+    <script src="../JS/Blog.js"></script>
 </body>
 
 </html>

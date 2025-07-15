@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/IndustriaEducacion.css" />
+    <link rel="stylesheet" href="../CSS/ServicioEducativo.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -135,90 +135,136 @@
 
     <main>
         <!-- Seccion 1 -->
-        <section id="industria-educacion">
-            <h2>Educación</h2>
-
-            <div class="industria-educacion__contenido">
-                <div class="industria-educacion__texto">
+        <section id="servicio-educativo">
+            <div class="educativo-contenido">
+                <div class="educativo-texto">
+                    <h3>Servicio educativo</h3>
                     <p>
-                        Nuestros programas de formación están cuidadosamente diseñados para adaptarse a las demandas
-                        reales de múltiples industrias, ofreciendo contenidos actualizados, metodologías efectivas y
-                        herramientas prácticas que fortalecen el desempeño profesional de cada participante.
+                        Las grandes oportunidades profesionales comienzan con una formación integral en tecnología,
+                        administración y lenguas extranjeras.
+                        En un mundo cada vez más globalizado y digital, estudiar en estas áreas te brinda las
+                        herramientas necesarias para destacar en el mercado laboral y adaptarte a los constantes cambios
+                        del entorno profesional.
                     </p>
                     <p>
-                        Creemos que la educación debe ser un motor de transformación y crecimiento, por eso enfocamos
-                        cada programa en el desarrollo de competencias clave que aporten valor directo al entorno
-                        laboral, fomenten la innovación y aumenten la competitividad en cada sector.
+                        Adquiere habilidades tecnológicas que te permitirán dominar el uso de software, análisis de
+                        datos, desarrollo de sistemas y herramientas digitales esenciales en cualquier industria.
                     </p>
                     <p>
-                        Desde el ámbito tecnológico hasta el administrativo, pasando por áreas lingüísticas, educativas
-                        y de desarrollo personal, nuestras soluciones formativas están alineadas con los retos actuales
-                        del mercado y preparadas para responder a las necesidades específicas de cada organización,
-                        equipo o individuo.
+                        Complementa tu perfil con conocimientos administrativos sólidos en gestión, liderazgo,
+                        planificación estratégica y optimización de procesos organizacionales.
                     </p>
                     <p>
-                        Impulsa el crecimiento de tu talento humano con una formación relevante, dinámica y aplicada. <a
-                         class="link-godcode">GodCode</a>
+                        Y potencia aún más tu desarrollo aprendiendo lenguas extranjeras, clave para comunicarte con el
+                        mundo, acceder a mejores oportunidades y participar activamente en entornos multiculturales.
+                        Estudiar estas disciplinas no solo fortalece tu perfil profesional, sino que te convierte en un
+                        talento versátil, preparado para afrontar los desafíos del presente y construir el futuro con
+                        visión global. <a class="link-godcode">GodCode</a>
                     </p>
                 </div>
-
-                <div class="industria-educacion__imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaEducacion_seccion1_img1.png"
-                        alt="Educación industria" />
+                <div class="educativo-imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion1_img1.png"
+                        alt="Servicio educativo">
                 </div>
             </div>
         </section>
 
-        <!-- Seccion 2 -->
-        <section class="seccion-educacion">
-            <div class="educacion-contenido">
-                <div class="educacion-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaEducacion_seccion2_img1.png"
-                        alt="Educación digital">
+        <!-- Seccion 2 cursos disponibles -->
+        <section id="cursos-servicio-educativo">
+            <h3>Esta es la variedad de estudios que manejamos en las instalaciones.</h3>
+
+            <div class="carousel-container-servicio">
+                <button class="carousel-btn-servicio prev" aria-label="Anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+
+                <div class="carousel-track-container-servicio">
+                    <div class="carousel-track-servicio" id="cursos-servicio-container">
+                        <!-- Las cards se insertan desde JS -->
+                    </div>
                 </div>
-                <div class="educacion-texto">
-                    <p>
-                        Ofrecemos una propuesta educativa integral con cursos especializados en Programación,
-                        Administración y Lenguas,
-                        diseñados para fortalecer habilidades clave en entornos académicos y profesionales.
-                    </p>
-                    <p>
-                        Nuestros programas combinan teoría actualizada, práctica guiada y recursos digitales para que
-                        cada estudiante pueda
-                        aplicar lo aprendido de forma efectiva y alcanzar sus objetivos.
-                    </p>
-                    <p>
-                        Ya sea que busques desarrollar competencias técnicas, mejorar tu gestión organizacional o
-                        perfeccionar tus habilidades
-                        comunicativas, encontrarás en nuestros cursos una formación de calidad, flexible y orientada a
-                        resultados.
-                    </p>
-                </div>
+
+                <button class="carousel-btn-servicio next" aria-label="Siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
+                </button>
             </div>
         </section>
 
         <!-- Seccion 3 -->
-        <section class="seccion-educacion-cta">
-            <div class="educacion-cta-contenido">
-                <h3>¿Estás listo para dar el siguiente paso en tu desarrollo profesional o impulsar las habilidades de
-                    tu equipo?</h3>
-                <p>
-                    Descubre nuestros programas de formación en Programación, Administración y Lenguas, diseñados para
-                    adaptarse a diferentes
-                    niveles de experiencia y necesidades del mercado actual. Ya sea que busques adquirir nuevas
-                    competencias, actualizar tus
-                    conocimientos o capacitar a tu organización, contamos con opciones flexibles, prácticas y orientadas
-                    a resultados.
-                </p>
-                <p>
-                    Solicita más información, descarga nuestro catálogo completo de cursos o agenda una asesoría
-                    personalizada con nuestro
-                    equipo académico. Estamos aquí para ayudarte a construir un camino de aprendizaje efectivo,
-                    accesible y alineado con tus metas.
-                </p>
-                <a href="../VIEW/Blog.php" class="educacion-cta-boton">
-                    Haz clic aquí y comienza a transformar tu formación con GodCode.
-                </a>
+        <section id="educacion-digital">
+            <div class="educacion-bloque">
+                <div class="educacion-texto">
+                    <p>
+                        No te pierdas la oportunidad de transformar tu oferta educativa con soluciones innovadoras y
+                        centradas en el aprendizaje. Mejora la experiencia de estudiantes y docentes, fortalece tu
+                        propuesta académica y amplía tu alcance con herramientas diseñadas para educar de forma
+                        efectiva, dinámica y accesible.
+                    </p>
+                    <p>
+                        Al aplicar metodologías pedagógicas modernas y recursos digitales estratégicos, tu servicio
+                        educativo se adapta a las nuevas demandas del entorno digital y potencia el aprendizaje real.
+                    </p>
+                    <p>
+                        Desde la planificación de contenidos hasta la evaluación del progreso, trabajamos cada etapa
+                        para que tu plataforma o programa no solo transmita conocimiento, sino que también motive,
+                        conecte y forme con propósito.
+                    </p>
+                    <p>
+                        Evita barreras de acceso, mejora la participación y transforma cada sesión en una experiencia de
+                        valor.
+                    </p>
+                    <p>
+                        Nuestro equipo de expertos en educación digital te acompaña en todo el proceso: diseño
+                        instruccional, creación de materiales, implementación tecnológica y mejoras continuas.
+                    </p>
+                    <p>
+                        Desarrollamos soluciones adaptables a distintos niveles educativos, dispositivos y contextos,
+                        pensadas para lograr un aprendizaje significativo y medible.
+                    </p>
+                    <p>
+                        Haz que tu proyecto educativo evolucione con herramientas que inspiran, transforman y dejan
+                        huella en cada estudiante.
+                    </p>
+                </div>
+                <div class="educacion-imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion3_img1.png"
+                        alt="Educación digital">
+                </div>
+            </div>
+
+            <div class="educacion-bloque reverse">
+                <div class="educacion-texto">
+                    <h3>Únete a alguno de nuestros cursos</h3>
+                    <p>
+                        ¿Apasionado por aprender y desarrollar nuevas habilidades?<br>
+                        En nuestra comunidad educativa te ofrecemos formación integral en Administración, Programación y
+                        Lengua, tres áreas clave para crecer personal y profesionalmente en un mundo cada vez más
+                        conectado y competitivo.
+                    </p>
+                    <p>
+                        Aquí no solo adquieres las competencias prácticas y aplicables a la vida real. Nuestros
+                        programas están diseñados para que participes activamente en tu proceso de aprendizaje desde la
+                        comprensión de conceptos fundamentales hasta el dominio de herramientas y técnicas actualizadas.
+                    </p>
+                    <p>
+                        Aprender con el apoyo de docentes comprometidos, materiales dinámicos y entornos colaborativos
+                        donde podrás resolver problemas, proponer ideas y crecer junto a otros estudiantes.
+                    </p>
+                    <p>
+                        Ya sea que busques avanzar en tu carrera, iniciar un nuevo camino profesional o simplemente
+                        reforzar tus conocimientos, este espacio es para ti.<br>
+                        Haz que tu futuro comience hoy. Capacítate con nosotros y transforma tu potencial en
+                        oportunidades reales.
+                    </p>
+                </div>
+                <div class="educacion-imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion4_img1.png"
+                        alt="Cursos GodCode">
+                </div>
             </div>
         </section>
 

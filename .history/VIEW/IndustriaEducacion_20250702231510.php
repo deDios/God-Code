@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
+    <link rel="stylesheet" href="../CSS/IndustriaEducacion.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -55,9 +55,9 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#">Productos</a>
+                <a href="#" class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -135,74 +135,98 @@
 
     <main>
         <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
+        <section id="industria-educacion">
+            <h2>Educación</h2>
 
-            <div class="contacto-contenedor">
-                <div class="formulario-contacto">
+            <div class="industria-educacion__contenido">
+                <div class="industria-educacion__texto">
                     <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
+                        Nuestros programas de formación están cuidadosamente diseñados para adaptarse a las demandas
+                        reales de múltiples industrias, ofreciendo contenidos actualizados, metodologías efectivas y
+                        herramientas prácticas que fortalecen el desempeño profesional de cada participante.
                     </p>
-
-                    <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
-                        </div>
-
-                        <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
-                        </div>
-
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
-
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
-
-                        <button type="submit">Enviar</button>
-                    </form>
+                    <p>
+                        Creemos que la educación debe ser un motor de transformación y crecimiento, por eso enfocamos
+                        cada programa en el desarrollo de competencias clave que aporten valor directo al entorno
+                        laboral, fomenten la innovación y aumenten la competitividad en cada sector.
+                    </p>
+                    <p>
+                        Desde el ámbito tecnológico hasta el administrativo, pasando por áreas lingüísticas, educativas
+                        y de desarrollo personal, nuestras soluciones formativas están alineadas con los retos actuales
+                        del mercado y preparadas para responder a las necesidades específicas de cada organización,
+                        equipo o individuo.
+                    </p>
+                    <p>
+                        Impulsa el crecimiento de tu talento humano con una formación relevante, dinámica y aplicada. <a
+                         class="link-godcode">GodCode</a>
+                    </p>
                 </div>
 
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
-                    </div>
-
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
-                    </div>
+                <div class="industria-educacion__imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaEducacion_seccion1_img1.png"
+                        alt="Educación industria" />
                 </div>
             </div>
         </section>
 
+        <!-- Seccion 2 -->
+        <section class="seccion-educacion">
+            <div class="educacion-contenido">
+                <div class="educacion-imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaEducacion_seccion2_img1.png"
+                        alt="Educación digital">
+                </div>
+                <div class="educacion-texto">
+                    <p>
+                        Ofrecemos una propuesta educativa integral con cursos especializados en Programación,
+                        Administración y Lenguas,
+                        diseñados para fortalecer habilidades clave en entornos académicos y profesionales.
+                    </p>
+                    <p>
+                        Nuestros programas combinan teoría actualizada, práctica guiada y recursos digitales para que
+                        cada estudiante pueda
+                        aplicar lo aprendido de forma efectiva y alcanzar sus objetivos.
+                    </p>
+                    <p>
+                        Ya sea que busques desarrollar competencias técnicas, mejorar tu gestión organizacional o
+                        perfeccionar tus habilidades
+                        comunicativas, encontrarás en nuestros cursos una formación de calidad, flexible y orientada a
+                        resultados.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seccion 3 -->
+        <section class="seccion-educacion-cta">
+            <div class="educacion-cta-contenido">
+                <h3>¿Estás listo para dar el siguiente paso en tu desarrollo profesional o impulsar las habilidades de
+                    tu equipo?</h3>
+                <p>
+                    Descubre nuestros programas de formación en Programación, Administración y Lenguas, diseñados para
+                    adaptarse a diferentes
+                    niveles de experiencia y necesidades del mercado actual. Ya sea que busques adquirir nuevas
+                    competencias, actualizar tus
+                    conocimientos o capacitar a tu organización, contamos con opciones flexibles, prácticas y orientadas
+                    a resultados.
+                </p>
+                <p>
+                    Solicita más información, descarga nuestro catálogo completo de cursos o agenda una asesoría
+                    personalizada con nuestro
+                    equipo académico. Estamos aquí para ayudarte a construir un camino de aprendizaje efectivo,
+                    accesible y alineado con tus metas.
+                </p>
+                <a href="../VIEW/Blog.php" class="educacion-cta-boton">
+                    Haz clic aquí y comienza a transformar tu formación con GodCode.
+                </a>
+            </div>
+        </section>
+
+        <!-- Seccion 4  -->
+        <section id="otros-productos">
+            <h2>Otros Productos</h2>
+            <div class="productos-random"></div>
+        </section>
 
     </main>
 

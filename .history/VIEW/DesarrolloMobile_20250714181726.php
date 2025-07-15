@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -57,7 +57,7 @@
         <div id="mobile-menu" class="subnav">
             <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#" class="active">Productos</a>
+                <a href="#">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -140,18 +140,20 @@
             <!-- Texto informativo y llamado a la acción -->
             <div class="info-section">
                 <div class="info-text">
-                    <h2>Desarrollo Web</h2>
+                    <h2>Desarrollo Mobile</h2>
                     <p>
-                        Los grandes sitios web comienzan con una
-                        buena estrategia de desarrollo. Desde la
-                        planificación hasta el diseño y la programación,
-                        cada paso cuenta para construir experiencias
-                        digitales que realmente conectan con tus
-                        usuarios y logran resultados medibles. <a>GodCode</a>
+                        Las grandes apps comienzan con una buena
+                        estrategia de desarrollo. Desde la conceptualización
+                        hasta el diseño y la programación, cada etapa
+                        es clave para crear experiencias mobiles intuitivas,
+                        funcionales y alineadas con las necesidades reales
+                        de tus usuarios. Desarrolla aplicaciones que no
+                        solo se ven bien, sino que generan impacto,
+                        engagement y resultados medibles. <a>GodCode</a>
                     </p>
                 </div>
                 <div class="cta-box">
-                    <h3>Crea tu sitio web</h3>
+                    <h3>Crea tu App Mobile</h3>
                     <button onclick="location.href='#'">Contáctanos</button>
                 </div>
             </div>
@@ -169,31 +171,30 @@
                         <!-- Cards-->
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Planificacion</h4>
+                                <h4>Desarrollo de App Mobile</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img1.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img1.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Diseño</h4>
+                                <h4>Diseño de App</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img2.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img2.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Desarrollo de sitio Web </h4>
+                                <h4>Compatibilidad y adaptabilidad</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img3.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img3.png" alt="img">
                         </div>
 
                         <div class="simple-card">
                             <div class="card-body">
-                                <h4>Pruebas y control de</h4>
-                                <h4>calidad</h4>
+                                <h4>Actualizaciones regulares</h4>
                             </div>
-                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Img4.png" alt="img">
+                            <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Img4.png" alt="img">
                         </div>
                     </div>
                 </div>
@@ -210,63 +211,63 @@
         <section id="descripcion-pagina-Productos" class="animado">
             <div class="descripcion-pagina-Productos__wrapper">
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza sitios web impactantes</span></h2>
+                    <h2><span>Diseña, construye y lanza aplicaciones móviles que marcan la diferencia</span></h2>
                     <p>
-                        Desde sitios informativos hasta plataformas personalizadas y complejas, planifica cada etapa del
-                        desarrollo con claridad, estrategia y propósito. Define objetivos claros desde el inicio,
-                        identifica las necesidades de tus usuarios y construye una estructura sólida que te permita
-                        escalar a futuro.Organiza el contenido de forma coherente, establece la jerarquía visual y
-                        funcional, y colabora estrechamente con diseñadores, desarrolladores, redactores y otros
-                        perfiles clave para asegurar una ejecución impecable.
-                        Adapta cada parte del proceso a tu flujo de trabajo: asigna tareas, establece prioridades,
-                        visualiza avances en tiempo real y mantén un control preciso sobre cada componente del proyecto.
-                        Integra herramientas modernas de diseño, programación, análisis y gestión para maximizar la
-                        eficiencia y reducir errores.Asegúrate de que cada detalle esté alineado con la experiencia del
-                        usuario, desde la navegación hasta la velocidad de carga, la accesibilidad y la adaptabilidad
-                        móvil. Lanza sitios web que no solo se ven bien, sino que realmente funcionan, conectan con tu
-                        audiencia, generan resultados medibles y fortalecen tu presencia digital.
+                        Desde ideas simples hasta soluciones móviles robustas y escalables, planifica cada etapa del
+                        desarrollo con visión estratégica y atención al detalle. Define funcionalidades clave que
+                        respondan a las verdaderas necesidades de tus usuarios, diseña interfaces intuitivas que
+                        ofrezcan una experiencia fluida, y establece objetivos claros que orienten cada decisión del
+                        proyecto. Colabora de forma integrada con diseñadores UI/UX, desarrolladores front y back-end,
+                        testers y gestores de producto en un flujo de trabajo bien estructurado, que favorezca la
+                        comunicación, la agilidad y la eficiencia. Asigna tareas según prioridades, gestiona los tiempos
+                        de entrega, realiza pruebas en tiempo real y ajusta cada componente para lograr una aplicación
+                        estable, rápida y centrada en la experiencia del usuario. Aprovecha herramientas modernas de
+                        desarrollo, análisis, control de calidad y despliegue continuo para acelerar el proceso sin
+                        comprometer la calidad. Lanza aplicaciones móviles que no solo funcionan correctamente, sino que
+                        conectan emocionalmente con los usuarios, generan fidelización, fortalecen tu marca y entregan
+                        resultados medibles. Transforma tus ideas en soluciones móviles funcionales, atractivas y
+                        preparadas para competir en un mercado digital cada vez más exigente.
                     </p>
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu sitio web con datos que importan</span></h2>
-                    <p> Toma decisiones inteligentes en cada fase del desarrollo apoyándote en información precisa,
-                        medible y en tiempo real. Supervisa el avance de tu proyecto desde el diseño inicial hasta las
-                        pruebas finales, incluyendo la planificación de contenido, la implementación de funcionalidades
-                        y la validación de cada componente técnico y visual. Detecta cuellos de botella antes de que se
-                        conviertan en problemas mayores, identifica errores o inconsistencias de forma anticipada y
-                        mantén una visión clara del desempeño general de tu equipo.Utiliza métricas clave para evaluar
-                        tiempos de entrega, cumplimiento de tareas, eficiencia en los flujos de trabajo y calidad del
-                        código, asegurando un proceso de desarrollo más predecible y transparente. Además, analiza el
-                        comportamiento de los usuarios en tu sitio para ajustar funcionalidades, mejorar la experiencia
-                        de navegación y aumentar la conversión. Con una gestión basada en datos, puedes anticipar
-                        riesgos, responder rápidamente a los cambios del entorno y optimizar cada recurso invertido en
-                        tu proyecto. Logra sitios web más rápidos, seguros, funcionales y alineados con tus objetivos,
-                        reduciendo tiempos de entrega y elevando la calidad final del producto.</p>
+                    <h2><span>Lleva el control total del desarrollo de tu app móvil</span></h2>
+                    <p> Gestiona cada etapa de tu proyecto de forma organizada, visual y eficiente con tableros, listas,
+                        cronogramas y flujos de trabajo adaptados a tus procesos. Desde la concepción de la idea hasta
+                        el despliegue en las tiendas de aplicaciones, mantén todo bajo control con una metodología
+                        estructurada y colaborativa. Diseña flujos personalizados para cada fase: conceptualización,
+                        prototipado, diseño de interfaz, desarrollo de funcionalidades, pruebas de calidad, optimización
+                        de rendimiento y publicación final. Asigna tareas con claridad, define prioridades, establece
+                        fechas clave y asegúrate de que cada integrante del equipo conozca su rol y objetivos en tiempo
+                        real .Integra tus herramientas preferidas como entornos de desarrollo (IDE), sistemas de control
+                        de versiones como Git, gestores de tareas, plataformas de analítica y testing en un solo entorno
+                        centralizado que facilite la comunicación y evite errores.
+                        Optimiza el trabajo en equipo, reduce retrabajos y acelera los tiempos de entrega sin
+                        comprometer la calidad. Con una gestión clara y estructurada, tu app no solo llegará a tiempo,
+                        sino que será más estable, intuitiva y lista para destacar en el mercado.</p>
                     <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
-                            alt="img" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Descripcion_Img1.png"
+                            alt="Diseño de app móvil" />
                     </div>
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu sitio web con datos que importan</span></h2>
-                    <p>Toma decisiones inteligentes en cada fase del desarrollo apoyándote en información precisa,
-                        medible y en tiempo real. Supervisa el avance de tu proyecto desde el diseño inicial hasta las
-                        pruebas finales, incluyendo la planificación de contenido, la implementación de funcionalidades
-                        y la validación de cada componente técnico y visual. Detecta cuellos de botella antes de que se
-                        conviertan en problemas mayores, identifica errores o inconsistencias de forma anticipada y
-                        mantén una visión clara del desempeño general de tu equipo.Utiliza métricas clave para evaluar
-                        tiempos de entrega, cumplimiento de tareas, eficiencia en los flujos de trabajo y calidad del
-                        código, asegurando un proceso de desarrollo más predecible y transparente. Además, analiza el
-                        comportamiento de los usuarios en tu sitio para ajustar funcionalidades, mejorar la experiencia
-                        de navegación y aumentar la conversión. Con una gestión basada en datos, puedes anticipar
-                        riesgos, responder rápidamente a los cambios del entorno y optimizar cada recurso invertido en
-                        tu proyecto. Logra sitios web más rápidos, seguros, funcionales y alineados con tus objetivos,
-                        reduciendo tiempos de entrega y elevando la calidad final del producto.</p>
+                    <h2><span>Optimiza tu app mobile con datos que realmente importan.</span></h2>
+                    <p> Gestiona tu proceso de desarrollo con información precisa, actualizada y accionable. Supervisa
+                        el avance de cada etapa —desde el diseño de la interfaz y la experiencia del usuario, hasta la
+                        programación de funcionalidades, pruebas internas y despliegue en tiendas— con total visibilidad
+                        en tiempo real. Identifica cuellos de botella en los flujos de trabajo, detecta errores antes de
+                        que impacten al usuario final y toma decisiones respaldadas por datos reales, no suposiciones.
+                        Evalúa el rendimiento individual y colectivo de tu equipo, mide la eficiencia de cada fase del
+                        proyecto y ajusta las estrategias según métricas claras y objetivos definidos. Además, analiza
+                        el comportamiento de los usuarios dentro de tu app una vez publicada: tasa de retención, caídas,
+                        errores, interacciones y conversiones. Esta retroalimentación continua te permitirá iterar,
+                        mejorar y escalar tu aplicación de forma más ágil y precisa. Con un enfoque basado en datos, no
+                        solo reduces tiempos de desarrollo, sino que aseguras una entrega de mayor calidad, alineada a
+                        las necesidades del mercado y preparada para crecer de forma sostenible.</p>
                     <div class="descripcion-pagina-Productos__imagen">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img2.png"
-                            alt="img" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloMobile_Descripcion_Img2.png"
+                            alt="Datos de aplicación móvil" />
                     </div>
                 </div>
             </div>
@@ -280,19 +281,6 @@
 
     </main>
 
-    <!-- Pie de pagina -->
-    <footer>
-        <div>
-            <strong>Contacto</strong>
-            <small>Teléfono: 33 3333 3333</small>
-            <small>Ubicación: Ixtlahuacán de los membrillos</small>
-        </div>
-        <div>
-            <strong>Horarios de servicio</strong>
-            <small>Lunes a Viernes</small>
-            <small>De 9:00AM a 8:00PM</small>
-        </div>
-    </footer>
     <script src="../JS/index.js"></script>
 </body>
 

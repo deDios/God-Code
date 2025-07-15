@@ -5,12 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
-    <link rel="stylesheet" href="../CSS/plantilla.css" />
+    <link rel="stylesheet" href="../CSS/index.css" />
 </head>
 
-<body>
-    <!-- Tope de pagina -->
+<body> 
+     <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
@@ -44,7 +43,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -55,7 +54,7 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
                 <a href="#">Productos</a>
                 <div class="megamenu">
@@ -112,7 +111,7 @@
             </div>
 
             <div class="nav-item mobile-only">
-                <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
             </div>
 
             <a href="../VIEW/Nosotros.php">Nosotros</a>
@@ -132,93 +131,42 @@
         </div>
     </header>
 
-
-    <main>
-        <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
-
-            <div class="contacto-contenedor">
-                <div class="formulario-contacto">
-                    <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
-                    </p>
-
-                    <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
-                        </div>
-
-                        <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
-                        </div>
-
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
-
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
-
-                        <button type="submit">Enviar</button>
-                    </form>
+    
+    <main class="animado">
+        <div class="login-wrapper">
+            <section class="login-container">
+                <div class="login-visual">
+                    <img src="../ASSETS/Login/imagen_login.png" alt="Collage de tecnología">
                 </div>
+                <div class="login-form">
+                    <h1>GodCode</h1>
+                    <input type="text" placeholder="Teléfono, Usuario o correo electrónico">
+                    <input type="password" placeholder="Contraseña">
+                    <button>Iniciar sesión</button>
 
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
-                    </div>
+                    <div class="divider">o</div>
 
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
+                    <a href="#">¿Olvidaste tu contraseña?</a>
+                    <div class="footer-links">
+                        ¿No tienes una cuenta? <a href="#">Regístrate</a>
                     </div>
+                </div>
+            </section>
+        </div>
+        <section class="footer2">
+            <div class="footer2-content">
+                <div class="footer2-links">
+                    <a href="#">Ubicación</a>
+                    <a href="#">Galería</a>
+                    <a href="#">Productos</a>
+                    <a href="#">Información</a>
+                </div>
+                <div class="footer2-copyright">
+                    <p>©2025 God Code</p>
                 </div>
             </div>
         </section>
-
-
     </main>
-
-    <!-- Pie de pagina -->
-    <footer>
-        <div>
-            <strong>Contacto</strong>
-            <small>Teléfono: 33 3333 3333</small>
-            <small>Ubicación: Ixtlahuacán de los membrillos</small>
-        </div>
-        <div>
-            <strong>Horarios de servicio</strong>
-            <small>Lunes a Viernes</small>
-            <small>De 9:00AM a 8:00PM</small>
-        </div>
-    </footer>
 
     <script src="../JS/index.js"></script>
 </body>

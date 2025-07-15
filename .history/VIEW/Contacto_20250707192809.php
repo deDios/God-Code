@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
+    <link rel="stylesheet" href="../CSS/Contacto.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -135,70 +135,57 @@
 
     <main>
         <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
+         
+        <section id="contacto">
+            <h2 class="titulo">Contacto</h2>
 
             <div class="contacto-contenedor">
+
+                <div class="info-contacto">
+                    <h3>Información de Contacto</h3>
+                    <div class="bloque-info">
+                        <p><strong>Teléfono:</strong> +52 3333333333</p>
+                        <p><strong>Correo:</strong> godcode@gmail.com</p>
+                        <p><strong>Horario de atención:</strong><br>Lunes a viernes, de 9:00 a.m. a 6:00 p.m.</p>
+                    </div>
+
+                    <h3>Nuestras oficinas</h3>
+                    <div class="bloque-info">
+                        <p><strong>Dirección:</strong><br>
+                            Calle: Madero N°1 C. Ixtlahuacán de los Membrillos, Jalisco, México</p>
+                        <p><strong>Colonia:</strong> Centro</p>
+                        <p><strong>C.P:</strong> 45850</p>
+                    </div>
+                </div>
+
                 <div class="formulario-contacto">
+                    <h3>¿Requieres más información?</h3>
                     <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
+                        Nuestro equipo está disponible para resolver cualquier duda que tengas respecto a nuestros
+                        servicios,
+                        programas o procesos. No dudes en escribirnos; será un placer atenderte.
                     </p>
 
+                    <h4>Solicita más información</h4>
                     <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
-                        </div>
+                        <input type="text" placeholder="Nombre" required>
 
                         <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
+                            <input type="text" placeholder="Teléfono" required>
+                            <input type="email" placeholder="Correo electrónico" required>
                         </div>
 
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
-
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
+                        <textarea placeholder="Hola, me gustaría saber..." rows="4" required></textarea>
 
                         <button type="submit">Enviar</button>
                     </form>
                 </div>
 
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
-                    </div>
-
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
-                    </div>
+                <div class="contacto-pie">
+                    <p>© 2025 GodCode. Todos los derechos reservados.<br>
+                        Queda prohibida la reproducción total o parcial de este contenido sin autorización previa por
+                        escrito.
+                    </p>
                 </div>
             </div>
         </section>

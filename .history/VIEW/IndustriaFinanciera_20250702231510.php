@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
+    <link rel="stylesheet" href="../CSS/IndustriaFinanciera.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -55,9 +55,9 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
+            <a href="../index.php" >Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#">Productos</a>
+                <a href="#" class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -134,75 +134,115 @@
 
 
     <main>
-        <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
-
-            <div class="contacto-contenedor">
-                <div class="formulario-contacto">
+        <!-- seccion 1 -->
+        <section id="industria-financiera" class="industria-financiera seccion">
+            <div class="contenedor-industria">
+                <div class="texto">
+                    <h2>Finanzas</h2>
                     <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
+                        Nuestros programas de formación están diseñados para responder a los desafíos reales tanto de
+                        las industrias tecnológicas como del sector financiero, ofreciendo contenidos actualizados,
+                        metodologías ágiles y herramientas prácticas que impulsan el desarrollo de habilidades técnicas,
+                        analíticas y estratégicas.
                     </p>
-
-                    <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
-                        </div>
-
-                        <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
-                        </div>
-
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
-
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
-
-                        <button type="submit">Enviar</button>
-                    </form>
+                    <p>
+                        Formamos profesionales capaces de enfrentar entornos complejos, altamente digitalizados y en
+                        constante evolución, preparados para innovar, adaptarse y liderar en sectores cada vez más
+                        competitivos y regulados.
+                    </p>
+                    <p>
+                        Desde el desarrollo de software, la gestión de datos y la inteligencia artificial, hasta la
+                        administración financiera, el análisis de riesgos y la planificación estratégica, nuestros
+                        programas están alineados con las demandas actuales del mercado.
+                    </p>
+                    <p>
+                        Diseñamos nuestras formaciones para aportar valor real a empresas, instituciones financieras,
+                        startups y equipos multidisciplinarios que buscan mejorar su eficiencia operativa y su capacidad
+                        de respuesta.
+                    </p>
+                    <p>
+                        Creemos que la educación especializada no solo transforma carreras individuales, sino que
+                        acelera el crecimiento y la transformación digital de las organizaciones.
+                    </p>
+                    <p>
+                        Haz crecer tu capital humano con formación de calidad, actualizada y adaptada a las tendencias
+                        que están redefiniendo el futuro de la industria. <a>GodCode</a>
+                    </p>
                 </div>
 
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
-                    </div>
-
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
-                    </div>
+                <div class="imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaFinanciera_seccion1_img1.png" alt="Finanzas y tecnología">
                 </div>
             </div>
         </section>
 
+        <!-- seccion 2 -->
+        <section class="industria-financiera-2">
+            <div class="contenedor-industria">
+                <div class="imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/IndustriaFinanciera_seccion2_img1.png"
+                        alt="Soluciones tecnológicas financieras">
+                </div>
+
+                <div class="texto">
+                    <p>
+                        Ofrecemos una propuesta integral orientada a las industrias tecnológica y financiera, en la que
+                        utilizamos diversas tecnologías para desarrollar soluciones innovadoras, eficientes y alineadas
+                        a las necesidades del entorno digital y económico actual.
+                    </p>
+                    <p>
+                        Aplicamos herramientas modernas, entornos de desarrollo actualizados y metodologías ágiles que
+                        nos permiten crear productos y servicios de alto valor, adaptados a distintos contextos,
+                        sectores y desafíos del mercado.
+                    </p>
+                    <p>
+                        Desde programación avanzada, gestión de datos, automatización y seguridad informática, hasta
+                        sistemas de análisis financiero, plataformas de gestión contable y soluciones para fintech,
+                        trabajamos con tecnologías versátiles que garantizan resultados sólidos, escalables y
+                        sostenibles.
+                    </p>
+                    <p>
+                        Ya sea que se trate de crear, optimizar o transformar procesos digitales y financieros, nuestras
+                        soluciones están diseñadas para ofrecer calidad, flexibilidad e impacto real en cada proyecto.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- seccion 3 -->
+        <section id="industria-financiera">
+            <div class="industria-financiera__contenido">
+                <p>
+                    En GodCode, utilizamos una amplia gama de tecnologías para desarrollar soluciones modernas,
+                    escalables y adaptadas a las exigencias de las industrias tecnológica y financiera.<br><br>
+
+                    Ya sea que necesites construir una plataforma digital desde cero, implementar sistemas de análisis
+                    financiero, optimizar procesos administrativos o integrar herramientas inteligentes en tus
+                    operaciones, contamos con la experiencia y los recursos para hacerlo realidad.<br><br>
+
+                    Aplicamos metodologías ágiles, frameworks actualizados, infraestructura en la nube y tecnologías de
+                    vanguardia que nos permiten crear productos eficientes, seguros y orientados a resultados concretos,
+                    tanto en el ámbito digital como en la gestión financiera.<br><br>
+
+                    Solicita más información sobre nuestros servicios tecnológicos y financieros, agenda una asesoría
+                    con nuestro equipo o descubre cómo podemos ayudarte a impulsar la transformación digital de tu
+                    empresa.
+                </p>
+            </div>
+
+            <div class="contenedor-boton">
+                <button class="btn-contacto" onclick="location.href='../VIEW/Contacto.php'">
+                    <span>Contáctanos!</span>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Seccion otros productos  -->
+        <section id="otros-productos">
+            <h2>Otros Productos</h2>
+            <div class="productos-random"></div>
+        </section>
 
     </main>
 

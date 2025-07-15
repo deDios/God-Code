@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ContactoCV.css" />
+    <link rel="stylesheet" href="../CSS/ProductosMobile.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -55,9 +55,9 @@
 
         <!-- Barra de navegación pequeña -->
         <div id="mobile-menu" class="subnav">
-            <a href="../index.php" class="active">Inicio</a>
+            <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#">Productos</a>
+                <a href="#" class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
@@ -134,76 +134,89 @@
 
 
     <main>
-        <!-- Seccion 1 -->
-        <section id="trabaja-con-nosotros">
-            <h2 class="titulo">Trabaja con nosotros</h2>
-            <p class="intro">
-                En GodCode creemos en el poder del talento, la innovación y el trabajo en equipo.
-                Si te apasiona crear soluciones digitales que generen impacto, este es tu lugar.
-            </p>
+        <section class="productos-mobile">
+            <h1 style="color: #1a73e8;">Productos</h1>
+            <h2>Lo que hacemos</h2>
 
-            <div class="contacto-contenedor">
-                <div class="formulario-contacto">
-                    <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
-                    </p>
+            <!-- Productos -->
+            <div class="card-producto">
+                <a href="../VIEW/DesarrolloWeb.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DesarrolloWeb.png" alt="Desarrollo Web">
+                    <h3>Desarrollo Web</h3>
+                    <p>Diseñamos y desarrollamos sitios web que atraen, funcionan y convierten. Impulsa tu presencia
+                        digital con soluciones a medida enfocadas en resultados reales.</p>
+                </a>
+            </div>
 
-                    <form>
-                        <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
-                            <input type="email" placeholder="Correo electrónico" required />
-                        </div>
+            <div class="card-producto">
+                <a href="../VIEW/DesarrolloMobile.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DesarrolloMobile.png" alt="Desarrollo Mobile">
+                    <h3>Desarrollo Mobile</h3>
+                    <p>Creamos apps móviles intuitivas, rápidas y efectivas. Lleva tu idea al siguiente nivel con
+                        soluciones que conectan y generan resultados.</p>
+                </a>
+            </div>
 
-                        <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
-                            </select>
-                        </div>
+            <h2>Servicios</h2>
 
-                        <textarea placeholder="Háblanos sobre ti"></textarea>
+            <!-- Servicios -->
+            <div class="card-producto">
+                <a href="../VIEW/ServiciosEnLaNube.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/ServiciosEnLaNube.png" alt="Servicios en la Nube">
+                    <h3>Servicios en la Nube</h3>
+                    <p>Escala tu negocio con servicios en la nube seguros, flexibles y de alto rendimiento. Optimiza tus
+                        sistemas, automatiza procesos y mantén todo disponible en cualquier momento y lugar.</p>
+                </a>
+            </div>
 
-                        <div class="bloque-info file-upload">
-                            <strong>Adjunta tu CV:</strong><br />
-                            <label for="cv-file">Arrastra y suelta tu archivo o haz clic para seleccionarlo.</label>
-                            <input type="file" id="cv-file" />
-                        </div>
+            <div class="card-producto">
+                <a href="../VIEW/DisenoUXUI.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/DiseñoUXUI.png" alt="Diseño UX/UI">
+                    <h3>Diseño UX/UI</h3>
+                    <p>Diseñamos experiencias digitales intuitivas, atractivas y centradas en el usuario. Conecta con tu
+                        audiencia desde el primer clic y convierte diseño en resultados.</p>
+                </a>
+            </div>
 
-                        <button type="submit">Enviar</button>
-                    </form>
-                </div>
+            <div class="card-producto">
+                <a href="../VIEW/ServicioEducativo.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/ServicioEducativo.png" alt="Servicio educativo">
+                    <h3>Servicio educativo</h3>
+                    <p>Transforma el aprendizaje con experiencias educativas dinámicas, accesibles y personalizadas.
+                        Ofrecemos soluciones que inspiran, forman y potencian el crecimiento real.</p>
+                </a>
+            </div>
 
-                <div class="info-contacto">
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué buscamos?</p>
-                        <p>Contamos con diversas áreas de trabajo desde Diseñador UX/UI hasta Desarrollador Full Stack.
-                        </p>
-                        <p>Buscamos personas que...</p>
-                        <ul>
-                            <li>Sean proactivas, creativas y con pensamiento crítico</li>
-                            <li>Disfruten del trabajo colaborativo</li>
-                            <li>Tengan pasión por el aprendizaje y la tecnología</li>
-                        </ul>
-                    </div>
+            <h2>Industrias</h2>
 
-                    <div class="bloque-infoNoFondo">
-                        <p>¿Qué ofrecemos?</p>
-                        <ul>
-                            <li>Trabajo remoto o híbrido</li>
-                            <li>Horarios flexibles</li>
-                            <li>Proyectos innovadores y con impacto real</li>
-                            <li>Oportunidades de desarrollo profesional</li>
-                            <li>Un ambiente de trabajo respetuoso, dinámico y en crecimiento</li>
-                        </ul>
-                        <p>Gracias por tu interés. Un miembro de nuestro equipo te contactará próximamente.</p>
-                    </div>
-                </div>
+            <!-- Industrias -->
+            <div class="card-producto">
+                <a href="../VIEW/ServicioEducativo.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">
+                    <h3>Educación</h3>
+                    <p>Impulsa el conocimiento con propuestas educativas innovadoras, inclusivas y de calidad. Formamos
+                        mentes preparadas para enfrentar los retos del presente y del futuro.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/IndustriaTecnologia.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Tecnologia.png" alt="Tecnología">
+                    <h3>Tecnología</h3>
+                    <p>Impulsa tu negocio con soluciones tecnológicas innovadoras, seguras y escalables. Conecta
+                        procesos, personas y datos para avanzar hacia un futuro digital más inteligente.</p>
+                </a>
+            </div>
+
+            <div class="card-producto">
+                <a href="../VIEW/IndustriaFinanciera.php" class="card-body-producto">
+                    <img src="../ASSETS/ProductosPopUp/Finanzas.png" alt="Finanzas">
+                    <h3>Finanzas</h3>
+                    <p>Optimiza la gestión financiera con soluciones precisas, seguras y adaptadas a tus necesidades.
+                        Toma decisiones informadas que impulsen el crecimiento y la estabilidad de tu negocio.</p>
+                </a>
             </div>
         </section>
-
-
     </main>
 
     <!-- Pie de pagina -->

@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/ServicioEducativo.css" />
+    <link rel="stylesheet" href="../CSS/ServiciosEnLaNube.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
@@ -44,7 +44,7 @@
 
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
-                <button class="btn btn-primary" onclick="location.href='../VIEW/Inscripcion.php'">Registrarse</button>
+                <button class="btn btn-primary" onclick="location.href='#'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
                     <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
@@ -134,59 +134,120 @@
 
 
     <main>
-        <!-- Seccion 1 -->
-        <section id="servicio-educativo">
-            <div class="educativo-contenido">
-                <div class="educativo-texto">
-                    <h3>Servicio educativo</h3>
+        <!-- Seccion 1  -->
+        <section id="servicios-nube">
+            <div class="servicios-nube__contenedor">
+                <div class="servicios-nube__texto">
+                    <h2>Servicios en la Nube</h2>
                     <p>
-                        Las grandes oportunidades profesionales comienzan con una formación integral en tecnología,
-                        administración y lenguas extranjeras.
-                        En un mundo cada vez más globalizado y digital, estudiar en estas áreas te brinda las
-                        herramientas necesarias para destacar en el mercado laboral y adaptarte a los constantes cambios
-                        del entorno profesional.
-                    </p>
-                    <p>
-                        Adquiere habilidades tecnológicas que te permitirán dominar el uso de software, análisis de
-                        datos, desarrollo de sistemas y herramientas digitales esenciales en cualquier industria.
-                    </p>
-                    <p>
-                        Complementa tu perfil con conocimientos administrativos sólidos en gestión, liderazgo,
-                        planificación estratégica y optimización de procesos organizacionales.
-                    </p>
-                    <p>
-                        Y potencia aún más tu desarrollo aprendiendo lenguas extranjeras, clave para comunicarte con el
-                        mundo, acceder a mejores oportunidades y participar activamente en entornos multiculturales.
-                        Estudiar estas disciplinas no solo fortalece tu perfil profesional, sino que te convierte en un
-                        talento versátil, preparado para afrontar los desafíos del presente y construir el futuro con
-                        visión global. <a class="link-godcode">GodCode</a>
+                        Las grandes soluciones digitales comienzan con una estrategia sólida en la nube. Desde la
+                        planificación de la infraestructura hasta la implementación y escalabilidad, cada etapa es clave
+                        para construir entornos seguros, flexibles y eficientes. Aprovecha el poder del cómputo en la
+                        nube para alojar tus aplicaciones, gestionar datos, automatizar procesos y optimizar el
+                        rendimiento de tus sistemas. Desarrolla soluciones que no solo funcionan bien, sino que
+                        evolucionan contigo, impulsan la innovación y logran resultados reales.
+                        <a href="#" class="link-godcode">GodCode</a>
                     </p>
                 </div>
-                <div class="educativo-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion1_img1.png"
-                        alt="Servicio educativo">
+
+                <div class="servicios-nube__imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion1_img1.png"
+                        alt="Servicios en la nube" />
                 </div>
             </div>
         </section>
 
-        <!-- Seccion 2 cursos disponibles -->
-        <section id="cursos-servicio-educativo">
-            <h3>Esta es la variedad de estudios que manejamos en las instalaciones.</h3>
+        <!-- Seccion 2  -->
+        <section id="ventajas-nube">
+            <p class="ventajas-nube__intro">
+                Estas son las ventajas estratégicas que su producto puede alcanzar mediante la adopción<br>
+                de soluciones basadas en la nube.
+            </p>
 
-            <div class="carousel-container-servicio">
-                <button class="carousel-btn-servicio prev" aria-label="Anterior">
+            <div class="ventajas-nube__contenedor">
+                <button class="ventajas-nube__btn prev" aria-label="Anterior">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                     </svg>
                 </button>
 
-                <div class="carousel-track-container-servicio">
-                    <div class="carousel-track-servicio" id="cursos-servicio-container">
-                        <!-- Las cards se insertan desde JS -->
+                <div class="ventajas-nube__carousel" id="ventajas-carousel">
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img1.png"
+                            alt="Ventaja" />
+                        <div class="ventaja__texto">
+                            <h3>Escalabilidad inmediata</h3>
+                            <p>Puedes aumentar o reducir recursos (almacenamiento, procesamiento, usuarios) según la
+                                demanda, sin necesidad de infraestructura física adicional.</p>
+                        </div>
                     </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img2.png"
+                            alt="Reducción de costos" />
+                        <div class="ventaja__texto">
+                            <h3>Reducción de costos</h3>
+                            <p>El uso de servicios en la nube elimina gastos asociados a la compra, mantenimiento y
+                                actualización de servidores físicos, permitiendo una administración más eficiente del
+                                presupuesto.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img3.png"
+                            alt="Alta disponibilidad" />
+                        <div class="ventaja__texto">
+                            <h3>Alta disponibilidad</h3>
+                            <p>Los servicios en la nube operan con arquitecturas redundantes que aseguran el acceso
+                                continuo a tus aplicaciones, incluso ante fallos técnicos o picos de tráfico.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img4.png"
+                            alt="Seguridad avanzada" />
+                        <div class="ventaja__texto">
+                            <h3>Seguridad avanzada</h3>
+                            <p>Protege tus datos con cifrado, monitoreo 24/7, políticas de acceso y copias de seguridad
+                                automáticas, todo gestionado por proveedores especializados en ciberseguridad.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img5.png"
+                            alt="Integración sencilla" />
+                        <div class="ventaja__texto">
+                            <h3>Integración sencilla</h3>
+                            <p>La nube permite conectar tu sistema con plataformas de datos, inteligencia artificial,
+                                analítica, correo, CRM y más, optimizando los flujos de trabajo digitales.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img6.png"
+                            alt="Acceso global" />
+                        <div class="ventaja__texto">
+                            <h3>Acceso global</h3>
+                            <p>Administra y consulta tus aplicaciones desde cualquier dispositivo con conexión a
+                                internet, brindando movilidad y flexibilidad total a tu equipo de trabajo.</p>
+                        </div>
+                    </div>
+
+                    <div class="ventaja">
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion2_img7.png"
+                            alt="Agilidad en el despliegue" />
+                        <div class="ventaja__texto">
+                            <h3>Despliegue ágil</h3>
+                            <p>Lanza nuevas aplicaciones o actualizaciones en minutos, con herramienFtas que simplifican
+                                la configuración, mantenimiento y escalado continuo del sistema.</p>
+                        </div>
+                    </div>
+
+
                 </div>
 
-                <button class="carousel-btn-servicio next" aria-label="Siguiente">
+                <button class="ventajas-nube__btn next" aria-label="Siguiente">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
                     </svg>
@@ -194,76 +255,25 @@
             </div>
         </section>
 
-        <!-- Seccion 3 -->
-        <section id="educacion-digital">
-            <div class="educacion-bloque">
-                <div class="educacion-texto">
-                    <p>
-                        No te pierdas la oportunidad de transformar tu oferta educativa con soluciones innovadoras y
-                        centradas en el aprendizaje. Mejora la experiencia de estudiantes y docentes, fortalece tu
-                        propuesta académica y amplía tu alcance con herramientas diseñadas para educar de forma
-                        efectiva, dinámica y accesible.
-                    </p>
-                    <p>
-                        Al aplicar metodologías pedagógicas modernas y recursos digitales estratégicos, tu servicio
-                        educativo se adapta a las nuevas demandas del entorno digital y potencia el aprendizaje real.
-                    </p>
-                    <p>
-                        Desde la planificación de contenidos hasta la evaluación del progreso, trabajamos cada etapa
-                        para que tu plataforma o programa no solo transmita conocimiento, sino que también motive,
-                        conecte y forme con propósito.
-                    </p>
-                    <p>
-                        Evita barreras de acceso, mejora la participación y transforma cada sesión en una experiencia de
-                        valor.
-                    </p>
-                    <p>
-                        Nuestro equipo de expertos en educación digital te acompaña en todo el proceso: diseño
-                        instruccional, creación de materiales, implementación tecnológica y mejoras continuas.
-                    </p>
-                    <p>
-                        Desarrollamos soluciones adaptables a distintos niveles educativos, dispositivos y contextos,
-                        pensadas para lograr un aprendizaje significativo y medible.
-                    </p>
-                    <p>
-                        Haz que tu proyecto educativo evolucione con herramientas que inspiran, transforman y dejan
-                        huella en cada estudiante.
-                    </p>
-                </div>
-                <div class="educacion-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion3_img1.png"
-                        alt="Educación digital">
-                </div>
-            </div>
-
-            <div class="educacion-bloque reverse">
-                <div class="educacion-texto">
-                    <h3>Únete a alguno de nuestros cursos</h3>
-                    <p>
-                        ¿Apasionado por aprender y desarrollar nuevas habilidades?<br>
-                        En nuestra comunidad educativa te ofrecemos formación integral en Administración, Programación y
-                        Lengua, tres áreas clave para crecer personal y profesionalmente en un mundo cada vez más
-                        conectado y competitivo.
-                    </p>
-                    <p>
-                        Aquí no solo adquieres las competencias prácticas y aplicables a la vida real. Nuestros
-                        programas están diseñados para que participes activamente en tu proceso de aprendizaje desde la
-                        comprensión de conceptos fundamentales hasta el dominio de herramientas y técnicas actualizadas.
-                    </p>
-                    <p>
-                        Aprender con el apoyo de docentes comprometidos, materiales dinámicos y entornos colaborativos
-                        donde podrás resolver problemas, proponer ideas y crecer junto a otros estudiantes.
-                    </p>
-                    <p>
-                        Ya sea que busques avanzar en tu carrera, iniciar un nuevo camino profesional o simplemente
-                        reforzar tus conocimientos, este espacio es para ti.<br>
-                        Haz que tu futuro comience hoy. Capacítate con nosotros y transforma tu potencial en
-                        oportunidades reales.
-                    </p>
-                </div>
-                <div class="educacion-imagen">
-                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServicioEducativo_seccion4_img1.png"
-                        alt="Cursos GodCode">
+        <!-- Seccion 3  -->
+        <section id="nube-final">
+            <div class="nube-final__contenido">
+                <p>
+                    No te pierdas la oportunidad de tener tus páginas y apps alojadas en nuestro servicio en la nube.
+                    Optimiza el rendimiento, la seguridad y la escalabilidad de tus soluciones digitales con una
+                    infraestructura moderna, confiable y diseñada para acompañar el crecimiento de tu negocio. Al migrar
+                    tus aplicaciones y sitios web a nuestra nube, disfrutarás de disponibilidad continua, tiempos de
+                    carga rápidos, respaldo automático de datos y protección avanzada contra amenazas.
+                    <br><br>
+                    Además, podrás realizar despliegues más ágiles, mantener el control total sobre tus recursos y
+                    reducir significativamente los costos operativos. Nuestro equipo técnico te acompaña en cada etapa:
+                    desde la configuración inicial hasta el monitoreo y mantenimiento, garantizando un entorno estable y
+                    adaptado a tus necesidades. Haz que tu proyecto digital evolucione con la flexibilidad y potencia
+                    que solo la nube puede ofrecer.
+                </p>
+                <div class="nube-final__imagen">
+                    <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/ServiciosEnLaNubeSeccion3_img1.png"
+                        alt="Servicios en la nube">
                 </div>
             </div>
         </section>
@@ -273,9 +283,7 @@
             <h2>Otros Productos</h2>
             <div class="productos-random"></div>
         </section>
-
     </main>
-
     <!-- Pie de pagina -->
     <footer>
         <div>
@@ -289,7 +297,6 @@
             <small>De 9:00AM a 8:00PM</small>
         </div>
     </footer>
-
     <script src="../JS/index.js"></script>
 </body>
 
