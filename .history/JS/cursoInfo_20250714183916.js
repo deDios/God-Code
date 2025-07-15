@@ -583,7 +583,7 @@ formInscripcion.addEventListener("submit", async (e) => {
     });
 
     const inscData = await inscRes.json();
-    mostrarToast(inscData?.mensaje || "Inscripción completada.", "exito", 7000);
+    mostrarToast(inscData?.mensaje || "Inscripción completada.", "exito", 6000);
     formInscripcion.reset();
     cerrarModal();
   } catch (err) {
