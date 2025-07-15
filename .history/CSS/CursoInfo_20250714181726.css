@@ -910,10 +910,11 @@ input[type="checkbox"] {
     position: relative;
 }
 
-.btn-inscribirme.disabled {
-    background-color: #ccc;
-    color: #888;
-    cursor: not-allowed;
+.btn-buscar-cuenta.disabled { /*de momento no funcion pero despues lo hecho a andar*/
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /*----------------------- alerta para email o telefonos incorreectos --------------------------*/
