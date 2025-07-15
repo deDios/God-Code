@@ -163,7 +163,7 @@
                     destacar en un entorno digital competitivo.</p>
             </div>
             <div class="imagen">
-                <img src="../ASSETS/MasInformacion/img1.png" alt="Ventas con tecnología" />
+                <img src="../ASSETS/MasInformacion/img1.png" alt="Ventas con tecnología">
             </div>
         </section>
 
@@ -172,7 +172,10 @@
                 <h2>Impulsa tu negocio</h2>
                 <p>Desarrollamos soluciones a la medida para escalar tu empresa. En GodCode, entendemos que cada
                     organización tiene retos, procesos y objetivos únicos. Por eso, creamos soluciones digitales
-                    personalizadas que se adaptan exactamente a tus necesidades operativas, técnicas y estratégicas.
+                    personalizadas que se adaptan exactamente a tus necesidades operativas, técnicas y estratégicas. Ya
+                    sea que requieras optimizar tus sistemas internos, automatizar flujos de trabajo o lanzar una
+                    plataforma completa orientada a tus clientes, nuestro equipo está preparado para acompañarte en cada
+                    etapa del desarrollo.
 
                     Desde herramientas internas de gestión hasta sistemas robustos y escalables, nuestras soluciones
                     están diseñadas para ayudarte a operar con mayor agilidad, seguridad y eficiencia. Utilizamos
@@ -185,7 +188,7 @@
                     operación al siguiente nivel.</p>
             </div>
             <div class="imagen">
-                <img src="../ASSETS/MasInformacion/img2.png" alt="Impulsa tu negocio" />
+                <img src="../ASSETS/MasInformacion/img2.png" alt="Impulsa tu negocio">
             </div>
         </section>
 
@@ -193,7 +196,9 @@
             <div class="texto">
                 <h2>Muestra tu marca</h2>
                 <p>Haz que tu marca hable por ti. En GodCode, diseñamos sitios web y experiencias digitales visualmente
-                    poderosas que elevan el valor de tu marca y comunican con claridad lo que te hace único.
+                    poderosas que elevan el valor de tu marca y comunican con claridad lo que te hace único. Sabemos que
+                    tu presencia digital es muchas veces el primer punto de contacto con tu audiencia, y por eso
+                    cuidamos cada detalle para que transmita confianza, profesionalismo y coherencia con tu identidad.
 
                     Creamos interfaces atractivas, funcionales y adaptadas a distintos dispositivos, con una estructura
                     estratégica que guía al usuario de forma natural hacia la acción. Nuestro enfoque combina diseño
@@ -207,7 +212,7 @@
                     herramienta activa para lograr resultados.</p>
             </div>
             <div class="imagen">
-                <img src="../ASSETS/MasInformacion/img3.png" alt="Muestra tu marca" />
+                <img src="../ASSETS/MasInformacion/img3.png" alt="Muestra tu marca">
             </div>
         </section>
 
@@ -216,7 +221,9 @@
                 <h2>De un móvil, a tus clientes</h2>
                 <p>Tus clientes viven en su celular, y tu negocio también debe estar ahí. En GodCode, desarrollamos
                     aplicaciones móviles modernas, rápidas y seguras que llevan tu marca, productos o servicios
-                    directamente al dispositivo de tus usuarios.
+                    directamente al dispositivo de tus usuarios. Sabemos que hoy la mayoría de las interacciones,
+                    compras y decisiones ocurren desde un smartphone, por eso diseñamos soluciones móviles que te
+                    permiten estar presente donde más importa: en la palma de la mano.
 
                     Nuestras apps están pensadas para ofrecer una experiencia fluida, intuitiva y atractiva, adaptada a
                     las necesidades de tu negocio y a los hábitos digitales de tus clientes. Desde aplicaciones nativas
@@ -227,10 +234,12 @@
                     gestionar reservas o brindar servicios personalizados, nuestras soluciones móviles están creadas
                     para generar valor real. Además, integramos funcionalidades como notificaciones push,
                     geolocalización, pagos seguros, autenticación social y análisis de comportamiento, para que tu app
-                    no solo esté presente, sino que también impulse resultados.</p>
+                    no solo esté presente, sino que también impulse resultados.
+                    Haz que tu negocio evolucione al ritmo de tu audiencia y mantente conectado con ellos en todo
+                    momento, con una app que represente lo mejor de tu marca.</p>
             </div>
             <div class="imagen">
-                <img src="../ASSETS/MasInformacion/img4.png" alt="Soluciones móviles" />
+                <img src="../ASSETS/MasInformacion/img4.png" alt="Soluciones móviles">
             </div>
         </section>
 
@@ -240,11 +249,14 @@
                 <p>Utilizamos tecnología para atraer, segmentar y convertir leads en clientes reales. En GodCode,
                     desarrollamos soluciones digitales estratégicas que te ayudan a conectar con las personas correctas,
                     en el momento adecuado, a través de herramientas tecnológicas que optimizan cada paso del proceso
-                    comercial.
+                    comercial. Desde la captación hasta la conversión, diseñamos experiencias digitales centradas en
+                    resultados, enfocadas en aumentar tu base de clientes de forma sostenible y medible.
 
                     Combinamos desarrollo web, automatización de marketing, análisis de datos y UX/UI enfocado en
                     conversión para ofrecerte plataformas y sistemas que no solo generan tráfico, sino que lo
-                    transforman en oportunidades reales de negocio.
+                    transforman en oportunidades reales de negocio. Implementamos formularios inteligentes, segmentación
+                    dinámica, integraciones con CRM, seguimiento de comportamiento de usuarios y contenido personalizado
+                    para lograr interacciones relevantes y efectivas.
 
                     Ya sea que estés construyendo tu presencia digital desde cero o buscando escalar tu estrategia de
                     captación actual, nuestras soluciones están diseñadas para impulsar tu crecimiento con base en datos
@@ -254,12 +266,11 @@
                     mejor, segmenta con precisión y convierte más.</p>
             </div>
             <div class="imagen">
-                <img src="../ASSETS/MasInformacion/img5.png" alt="Maximiza tus clientes" />
+                <img src="../ASSETS/MasInformacion/img5.png" alt="Maximiza tus clientes">
             </div>
         </section>
     </main>
-
-
+    
     <!-- Pie de pagina -->
     <footer>
         <div>

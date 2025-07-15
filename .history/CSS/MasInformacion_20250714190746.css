@@ -1,7 +1,7 @@
 #soluciones-negocio {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 5rem 1rem;
+    padding: 5rem 1rem; /* Espaciado vertical amplio */
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -12,8 +12,8 @@
 
 #soluciones-negocio .intro h1 {
     font-size: 2rem;
+    color: #0f62fe;
     font-weight: bold;
-    padding-top: 3rem;
 }
 
 #soluciones-negocio .bloque {
@@ -37,15 +37,14 @@
 
 #soluciones-negocio .texto h2 {
     font-size: 1.4rem;
+    color: #0f62fe;
     margin-bottom: 1rem;
-    text-align: center;
 }
 
 #soluciones-negocio .texto p {
     font-size: 1rem;
     color: #333;
     line-height: 1.6;
-    text-align: center;
 }
 
 #soluciones-negocio .imagen {
