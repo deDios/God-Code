@@ -420,7 +420,7 @@ footer small {
 }
 
 /*--------------------------------Resuluciones pequeñas-----------------------------------*/
-@media (max-width: 700px) {
+@media (max-width: 768px) {
 
     /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
     .social-bar-mobile {
@@ -542,4 +542,69 @@ footer small {
     .columna.noticias {
         display: none;
     }
+}
+
+/*--------------------- para notificaciones tipo toast ------------------------- */
+.gc-toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.gc-toast {
+  min-width: 250px;
+  max-width: 320px;
+  background-color: #fff;
+  padding: 1rem 1.2rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  pointer-events: auto;
+}
+
+.gc-toast.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gc-toast.exito {
+  border-left: 5px solid #28a745;
+}
+
+.gc-toast.error {
+  border-left: 5px solid #dc3545;
+}
+
+.gc-toast.warning {
+  border-left: 5px solid #ffc107;
+}
+
+/*-------------------- pequeño css para mostrar el correo junto al icono de perfil --------------*/
+.user-session {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f4f4f4;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-session .user-icon img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
 }

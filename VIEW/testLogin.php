@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
-<body> 
-     <!-- Tope de pagina -->
+<body>
+    <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
@@ -132,45 +132,44 @@
         </div>
     </header>
 
-    
-    <main class="animado">
-        <div class="login-wrapper">
-            <section class="login-container">
-                <div class="login-visual">
-                    <img src="../ASSETS/Login/imagen_login.png" alt="Collage de tecnología">
-                </div>
-                <div class="login-form">
-                    <h1>GodCode</h1>
-                    <input type="text" placeholder="Teléfono, Usuario o correo electrónico">
-                    <input type="password" placeholder="Contraseña">
-                    <button>Iniciar sesión</button>
 
-                    <div class="divider">o</div>
+    <main>
 
-                    <a href="#">¿Olvidaste tu contraseña?</a>
-                    <div class="footer-links">
-                        ¿No tienes una cuenta? <a href="#">Regístrate</a>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <section class="footer2">
-            <div class="footer2-content">
-                <div class="footer2-links">
-                    <a href="#">Ubicación</a>
-                    <a href="#">Galería</a>
-                    <a href="#">Productos</a>
-                    <a href="#">Información</a>
-                </div>
-                <div class="footer2-copyright">
-                    <p>©2025 God Code</p>
-                </div>
-            </div>
-        </section>
     </main>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const main = document.querySelector("main");
+        const usuarioCookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("usuario="));
+
+        if (usuarioCookie && main) {
+            try {
+                const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+
+                const contenido = `
+        <h2>Datos del usuario:</h2>
+        <ul>
+          <li><strong>ID:</strong> ${datos.id}</li>
+          <li><strong>Nombre:</strong> ${datos.nombre}</li>
+          <li><strong>Correo:</strong> ${datos.correo}</li>
+          <li><strong>Teléfono:</strong> ${datos.telefono}</li>
+          <li><strong>Tipo de contacto:</strong> ${datos.tipo_contacto}</li>
+        </ul>
+      `;
+                main.innerHTML += contenido;
+            } catch (error) {
+                console.error("Error al leer cookie de usuario:", error);
+                main.innerHTML += "<p>Error al cargar los datos del usuario.</p>";
+            }
+        } else {
+            main.innerHTML += "<p>No hay usuario autenticado.</p>";
+        }
+    });
+    </script>
+
     <script src="../JS/JSglobal.js"></script>
-    <script src="../JS/Login.js"></script>
 </body>
 
 </html>

@@ -45,9 +45,12 @@
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='VIEW/Inscripcion.php'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
-                <div class="user-icon" onclick="window.location.href='VIEW/Login.php'">
-                    <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                        alt="Usuario" href="VIEW/Login.php" />
+                <div class="user-session" id="user-session">
+                    <span class="user-email" id="user-email"></span>
+                    <div class="user-icon">
+                        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                            alt="Usuario" />
+                    </div>
                 </div>
             </div>
         </div>
