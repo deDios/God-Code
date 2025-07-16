@@ -94,7 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })();
 
-document.addEventListener("DOMContentLoaded", () => { //------------- js para cambiar los botones de registro
+document.addEventListener("DOMContentLoaded", () => {
+  //------------- js para cambiar los botones de registro
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -115,18 +116,23 @@ document.addEventListener("DOMContentLoaded", () => { //------------- js para ca
       // Actualizar icono desktop
       if (iconDesktop) {
         iconDesktop.innerHTML = `
-          <span class="user-email">${email}</span>
-          <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-               onerror="this.src='../ASSETS/usuario/usuarioImg/img_user_noEncontrado.png'" />
-        `;
+    <span class="user-email">${email}</span>
+    <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
+         onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
+  `;
+
         iconDesktop.addEventListener("click", () => {
-          //desktop
-          window.location.href = "../VIEW/testLogin.php"; //------------- redirecion
+          window.location.href = "../VIEW/testLogin.php";
         });
       }
 
       // mobile
       if (iconMobile) {
+        iconMobile.innerHTML = `
+    <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
+         onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
+  `;
+
         iconMobile.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
         });
@@ -148,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => { //------------- js para ca
       });
     }
   }
+  console.log("se ejecuto por completo el bloque para cambiar los botones");
 });
 
 //---------------------------------------------- MANEJO DE SESIONES
