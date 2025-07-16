@@ -94,19 +94,20 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })();
 
-document.addEventListener("DOMContentLoaded", () => {//------------- js para cambiar los botones de registro
-
+document.addEventListener("DOMContentLoaded", () => { // -------- js para cambiar el topbar
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
 
-  const btnDesktop = document.querySelector(".btn-registrarse-desktop");
   const iconMobile = document.querySelector(".user-icon-mobile");
-  const iconDesktop = document.querySelector(".user-icon");
+  const socialIconsContainer = document.querySelector(".social-icons");
+
+  const actionsDesktop = document.querySelector(".actions");
+  const userIconDesktop = document.querySelector(".user-icon");
+  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary"); // botón registrarse
+  const btnCotizar = actionsDesktop?.querySelector(".btn-outline");
 
   if (usuarioCookie) {
-    if (btnDesktop) btnDesktop.style.display = "none";
-
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       const email = datos?.correo || "Usuario";
@@ -114,60 +115,50 @@ document.addEventListener("DOMContentLoaded", () => {//------------- js para cam
       const rutaImg = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
-        mostrarToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
+        gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
       }
 
-      if (iconDesktop) {
-        iconDesktop.innerHTML = `
-          <span class="user-email">${email}</span>
-          <div class="user-icon">
-            <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-                 onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
-          </div>
+      if (actionsDesktop) {
+        if (btnRegistrarse) btnRegistrarse.remove();
+
+        if (userIconDesktop) userIconDesktop.remove();
+
+        const nuevoIcon = document.createElement("div");
+        nuevoIcon.className = "user-icon";
+        nuevoIcon.innerHTML = `
+          <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
+            onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
         `;
-        iconDesktop.addEventListener("click", () => {
+        nuevoIcon.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
         });
+
+        actionsDesktop.appendChild(nuevoIcon);
       }
 
-      if (iconMobile) {
-        iconMobile.innerHTML = `
-          <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-               onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
+      if (socialIconsContainer && iconMobile) {
+        iconMobile.remove();
+
+        const nuevoIconMobile = document.createElement("div");
+        nuevoIconMobile.className = "user-icon-mobile";
+        nuevoIconMobile.innerHTML = `
+          <img src="${rutaImg}" alt="Perfil"
+            title="Ir a perfil"
+            onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
         `;
-        iconMobile.addEventListener("click", () => {
+        nuevoIconMobile.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
         });
+
+        socialIconsContainer.appendChild(nuevoIconMobile);
       }
     } catch (e) {
       console.warn("Cookie malformada:", e);
     }
-  } else {
-    if (btnDesktop) btnDesktop.style.display = "inline-block";
-
-    // colocar icono default / sin login
-    if (iconDesktop) {
-      iconDesktop.innerHTML = `
-        <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
-          <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-               alt="Usuario" />
-        </div>
-      `;
-    }
-
-    // colcoar icono default
-    if (iconMobile) {
-      iconMobile.innerHTML = `
-        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-             alt="Usuario" title="Login" />
-      `;
-      iconMobile.addEventListener("click", () => {
-        window.location.href = "../VIEW/Login.php";
-      });
-    }
   }
 
-  console.log("se ejecuto por completo el bloque para cambiar los botones");
+  console.log("Bloque de botones dinámicos ejecutado");
 });
+
 //---------------------------------------------- MANEJO DE SESIONES
