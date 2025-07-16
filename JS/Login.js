@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // redirigir
         setTimeout(() => {
-          window.location.href = ""; //--------------------------------------------- redireccion
+          window.location.href = "../VIEW/testLogin.php"; //--------------------------------------------- redireccion
         }, 1500);
       } else if (data.error) {
         // mensaje de error
