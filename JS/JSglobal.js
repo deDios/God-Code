@@ -94,17 +94,16 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })();
 
-document.addEventListener("DOMContentLoaded", () => { //-------- aquí inicia el js para cambiar los botones del login
+document.addEventListener("DOMContentLoaded", () => { //------------- js para cambiar los botones de registro
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
 
   const btnDesktop = document.querySelector(".btn-registrarse-desktop");
   const iconMobile = document.querySelector(".user-icon-mobile");
-  const perfilContenedor = document.getElementById("perfil-usuario-desktop");
+  const iconDesktop = document.querySelector(".user-icon");
 
   if (usuarioCookie) {
-    // oculta el boton de registro si esta logeado
     if (btnDesktop) btnDesktop.style.display = "none";
 
     try {
@@ -113,18 +112,20 @@ document.addEventListener("DOMContentLoaded", () => { //-------- aquí inicia el
       const id = datos?.id || "default";
       const rutaImg = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      if (perfilContenedor) {
-        perfilContenedor.innerHTML = `
-          <span>${email}</span>
+      // Actualizar icono desktop
+      if (iconDesktop) {
+        iconDesktop.innerHTML = `
+          <span class="user-email">${email}</span>
           <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
                onerror="this.src='../ASSETS/usuario/usuarioImg/img_user_noEncontrado.png'" />
         `;
-
-        perfilContenedor.addEventListener("click", () => {
-          window.location.href = "../VIEW/testLogin.php"; //------------ redireccion
+        iconDesktop.addEventListener("click", () => {
+          //desktop
+          window.location.href = "../VIEW/testLogin.php"; //------------- redirecion
         });
       }
 
+      // mobile
       if (iconMobile) {
         iconMobile.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
@@ -134,13 +135,9 @@ document.addEventListener("DOMContentLoaded", () => { //-------- aquí inicia el
       console.warn("Cookie malformada:", e);
     }
   } else {
-    // si no esta logeado mandamos al login
-    if (perfilContenedor) {
-      perfilContenedor.innerHTML = `
-        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-             alt="Login" title="Iniciar sesión" />
-      `;
-      perfilContenedor.addEventListener("click", () => {
+    // si no esta logeado redireciona al login
+    if (iconDesktop) {
+      iconDesktop.addEventListener("click", () => {
         window.location.href = "../VIEW/Login.php";
       });
     }
