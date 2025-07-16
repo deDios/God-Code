@@ -134,21 +134,23 @@
 
 
     <main>
-
+        <h2>Datos del usuario:</h2>
+        <div id="datos-usuario"></div>
+        <button id="cerrar-sesion" class="btn-cerrar-sesion">Cerrar sesión</button>
     </main>
 
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const main = document.querySelector("main");
-        const usuarioCookie = document.cookie
-            .split("; ")
-            .find(row => row.startsWith("usuario="));
+        document.addEventListener("DOMContentLoaded", () => {
+            const main = document.querySelector("main");
+            const usuarioCookie = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("usuario="));
 
-        if (usuarioCookie && main) {
-            try {
-                const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+            if (usuarioCookie && main) {
+                try {
+                    const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
 
-                const contenido = `
+                    const contenido = `
         <h2>Datos del usuario:</h2>
         <ul>
           <li><strong>ID:</strong> ${datos.id}</li>
@@ -158,15 +160,51 @@
           <li><strong>Tipo de contacto:</strong> ${datos.tipo_contacto}</li>
         </ul>
       `;
-                main.innerHTML += contenido;
-            } catch (error) {
-                console.error("Error al leer cookie de usuario:", error);
-                main.innerHTML += "<p>Error al cargar los datos del usuario.</p>";
+                    main.innerHTML += contenido;
+                } catch (error) {
+                    console.error("Error al leer cookie de usuario:", error);
+                    main.innerHTML += "<p>Error al cargar los datos del usuario.</p>";
+                }
+            } else {
+                main.innerHTML += "<p>No hay usuario autenticado.</p>";
             }
-        } else {
-            main.innerHTML += "<p>No hay usuario autenticado.</p>";
-        }
-    });
+        });
+
+
+        //boton para cerrar la seccion
+        document.addEventListener("DOMContentLoaded", () => {
+            const main = document.querySelector("#datos-usuario");
+            const cerrarBtn = document.getElementById("cerrar-sesion");
+
+            const cookie = document.cookie.split("; ").find(row => row.startsWith("usuario="));
+            if (cookie) {
+                try {
+                    const datos = JSON.parse(decodeURIComponent(cookie.split("=")[1]));
+                    main.innerHTML = `
+        <ul>
+          <li><strong>ID:</strong> ${datos.id}</li>
+          <li><strong>Nombre:</strong> ${datos.nombre}</li>
+          <li><strong>Correo:</strong> ${datos.correo}</li>
+          <li><strong>Teléfono:</strong> ${datos.telefono}</li>
+          <li><strong>Tipo de contacto:</strong> ${datos.tipo_contacto}</li>
+        </ul>
+      `;
+                } catch (error) {
+                    main.innerHTML = "<p>Error al leer la cookie del usuario.</p>";
+                }
+            } else {
+                main.innerHTML = "<p>No hay sesión activa.</p>";
+                cerrarBtn.style.display = "none";
+            }
+
+            cerrarBtn.addEventListener("click", () => {
+                // eliminar cookie de sesion
+                document.cookie = "usuario=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                // redireccionar al login
+                window.location.href = "../VIEW/Login.php";
+            });
+        });
     </script>
 
     <script src="../JS/JSglobal.js"></script>

@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
+  if (usuarioCookie) {
+    try {
+      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+      if (datos?.id) {
+        window.location.href = "../VIEW/testLogin.php"; //---redirecciona si hay una cookie de algun usuario logeado
+        return; 
+      }
+    } catch (err) {
+      console.warn("Cookie malformada o inválida:", err);
+    }
+  }
+
   const btnLogin = document.querySelector(".login-form button");
   const inputUsuario = document.querySelector(".login-form input[type='text']");
   const inputPassword = document.querySelector(
@@ -16,22 +32,33 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(`[${tipo.toUpperCase()}] ${msg}`);
     };
 
+  // se eliminan cookies antiguas individuales (si existen)
+  function limpiarCookiesAntiguas() {
+    const cookiesAntiguas = [
+      "usuario_id",
+      "nombre",
+      "correo",
+      "telefono",
+      "tipo_contacto",
+      "estatus",
+    ];
+    cookiesAntiguas.forEach((clave) => {
+      document.cookie = `${clave}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    });
+  }
+
   // se guardan las cookies
   function guardarEnCookies(usuario) {
+    limpiarCookiesAntiguas(); // primero borramos las antiguas
+
     const dias = 1;
     const fechaExp = new Date();
     fechaExp.setTime(fechaExp.getTime() + dias * 24 * 60 * 60 * 1000);
     const expira = "expires=" + fechaExp.toUTCString();
 
-    // se guardan los datos y aparte expiracion la cual deberia ser 1 dia
-    document.cookie = `usuario_id=${usuario.id}; ${expira}; path=/`;
-    document.cookie = `nombre=${encodeURIComponent(
-      usuario.nombre
-    )}; ${expira}; path=/`;
-    document.cookie = `correo=${usuario.correo}; ${expira}; path=/`;
-    document.cookie = `telefono=${usuario.telefono}; ${expira}; path=/`;
-    document.cookie = `tipo_contacto=${usuario.tipo_contacto}; ${expira}; path=/`;
-    document.cookie = `estatus=${usuario.estatus}; ${expira}; path=/`;
+    // se guardan los datos en una sola cookie con JSON codificado
+    const datosJSON = encodeURIComponent(JSON.stringify(usuario));
+    document.cookie = `usuario=${datosJSON}; ${expira}; path=/`;
   }
 
   // login al click
@@ -82,5 +109,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // reactivar boton
     btnLogin.disabled = false;
     btnLogin.textContent = "Iniciar sesión";
+  });
+
+
+  [inputUsuario, inputPassword].forEach((input) => {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        btnLogin.click();
+      }
+    });
   });
 });
