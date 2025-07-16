@@ -556,3 +556,20 @@ footer small {
     border: 1px solid #ccc;
     object-fit: cover;
 }
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    z-index: 1001;
+    white-space: nowrap;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
