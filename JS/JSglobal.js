@@ -94,71 +94,78 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })();
 
-document.addEventListener("DOMContentLoaded", () => { // -------- js para cambiar el topbar
+document.addEventListener("DOMContentLoaded", () => { //--------------- js para topbar actualizado
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
 
-  const iconMobile = document.querySelector(".user-icon-mobile");
-  const socialIconsContainer = document.querySelector(".social-icons");
-
   const actionsDesktop = document.querySelector(".actions");
-  const userIconDesktop = document.querySelector(".user-icon");
-  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary"); // botón registrarse
-  const btnCotizar = actionsDesktop?.querySelector(".btn-outline");
+  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
+  const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
+
+  const socialIconsContainer = document.querySelector(".social-icons");
+  const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
+
+  // Función para checar si la imagen existe
+  function verificarImagen(src, callback) {
+    const img = new Image();
+    img.onload = () => callback(src);
+    img.onerror = () => callback("../ASSETS/usuario/usuarioImg/img_user1.png");
+    img.src = src;
+  }
 
   if (usuarioCookie) {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
-      const email = datos?.correo || "Usuario";
-      const id = datos?.id || "default";
-      const rutaImg = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
+      const email = datos.correo || "Usuario";
+      const id = datos.id || "1";
+      const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
       }
 
-      if (actionsDesktop) {
-        if (btnRegistrarse) btnRegistrarse.remove();
+      verificarImagen(ruta, (rutaFinal) => {
+        if (actionsDesktop) {
+          btnRegistrarse?.remove();
+          userIconDesktop?.remove();
 
-        if (userIconDesktop) userIconDesktop.remove();
+          const nuevo = document.createElement("div");
+          nuevo.className = "user-icon";
+          nuevo.innerHTML = `
+            <span class="user-email">${email}</span>
+            <img src="${rutaFinal}"
+                 alt="Perfil"
+                 title="Ir a perfil" />
+          `;
+          nuevo.addEventListener("click", () => {
+            window.location.href = "../VIEW/testLogin.php";
+          });
 
-        const nuevoIcon = document.createElement("div");
-        nuevoIcon.className = "user-icon";
-        nuevoIcon.innerHTML = `
-          <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-            onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
-        `;
-        nuevoIcon.addEventListener("click", () => {
-          window.location.href = "../VIEW/testLogin.php";
-        });
+          actionsDesktop.appendChild(nuevo);
+        }
 
-        actionsDesktop.appendChild(nuevoIcon);
-      }
+        if (socialIconsContainer && iconMobile) {
+          iconMobile.remove();
 
-      if (socialIconsContainer && iconMobile) {
-        iconMobile.remove();
+          const nuevoMob = document.createElement("div");
+          nuevoMob.className = "user-icon-mobile";
+          nuevoMob.innerHTML = `
+            <img src="${rutaFinal}"
+                 alt="Perfil"
+                 title="Ir a perfil" />
+          `;
+          nuevoMob.addEventListener("click", () => {
+            window.location.href = "../VIEW/testLogin.php";
+          });
 
-        const nuevoIconMobile = document.createElement("div");
-        nuevoIconMobile.className = "user-icon-mobile";
-        nuevoIconMobile.innerHTML = `
-          <img src="${rutaImg}" alt="Perfil"
-            title="Ir a perfil"
-            onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
-        `;
-        nuevoIconMobile.addEventListener("click", () => {
-          window.location.href = "../VIEW/testLogin.php";
-        });
-
-        socialIconsContainer.appendChild(nuevoIconMobile);
-      }
+          socialIconsContainer.appendChild(nuevoMob);
+        }
+      });
     } catch (e) {
       console.warn("Cookie malformada:", e);
     }
   }
-
-  console.log("Bloque de botones dinámicos ejecutado");
 });
-
 //---------------------------------------------- MANEJO DE SESIONES
