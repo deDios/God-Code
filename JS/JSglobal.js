@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })();
 
-document.addEventListener("DOMContentLoaded", () => {
-  //------------- js para cambiar los botones de registro
+document.addEventListener("DOMContentLoaded", () => {//------------- js para cambiar los botones de registro
+
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -113,26 +113,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = datos?.id || "default";
       const rutaImg = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      // Actualizar icono desktop
+      if (!sessionStorage.getItem("bienvenidaMostrada")) {
+        mostrarToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
+        sessionStorage.setItem("bienvenidaMostrada", "true");
+      }
+
       if (iconDesktop) {
         iconDesktop.innerHTML = `
-    <span class="user-email">${email}</span>
-    <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-         onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
-  `;
-
+          <span class="user-email">${email}</span>
+          <div class="user-icon">
+            <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
+                 onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
+          </div>
+        `;
         iconDesktop.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
         });
       }
 
-      // mobile
       if (iconMobile) {
         iconMobile.innerHTML = `
-    <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
-         onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
-  `;
-
+          <img src="${rutaImg}" alt="Perfil" title="Ir a perfil"
+               onerror="this.onerror=null; this.src='../ASSETS/usuario/usuarioImg/img_user1.png'" />
+        `;
         iconMobile.addEventListener("click", () => {
           window.location.href = "../VIEW/testLogin.php";
         });
@@ -141,20 +144,30 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("Cookie malformada:", e);
     }
   } else {
-    // si no esta logeado redireciona al login
+    if (btnDesktop) btnDesktop.style.display = "inline-block";
+
+    // colocar icono default / sin login
     if (iconDesktop) {
-      iconDesktop.addEventListener("click", () => {
-        window.location.href = "../VIEW/Login.php";
-      });
+      iconDesktop.innerHTML = `
+        <div class="user-icon" onclick="window.location.href='../VIEW/Login.php'">
+          <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+               alt="Usuario" />
+        </div>
+      `;
     }
 
+    // colcoar icono default
     if (iconMobile) {
+      iconMobile.innerHTML = `
+        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+             alt="Usuario" title="Login" />
+      `;
       iconMobile.addEventListener("click", () => {
         window.location.href = "../VIEW/Login.php";
       });
     }
   }
+
   console.log("se ejecuto por completo el bloque para cambiar los botones");
 });
-
 //---------------------------------------------- MANEJO DE SESIONES
