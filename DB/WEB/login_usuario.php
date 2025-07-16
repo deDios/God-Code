@@ -39,8 +39,8 @@ $result = $stmt->get_result();
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
 
-    //if ($row['password'] === $password) { // Sin hashing
-    if (password_verify($password, $row['password'])) { // con el hashing
+    if ($row['password'] === $password) { // Sin hashing
+    //if (password_verify($password, $row['password'])) { // con el hashing
         unset($row['password']); // No regresamos la contraseña
         echo json_encode(["mensaje" => "Acceso correcto", "usuario" => $row]);
     } else {
