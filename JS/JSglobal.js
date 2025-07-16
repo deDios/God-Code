@@ -127,8 +127,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // notificacion de saludo
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
+        console.log("se va disparar el saludo de bienvenida");
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
+        console.log("se disparo el saludo de bienvenida");
       }
 
       // Comprobamos si la imagen existe y seguimos con lo demás
@@ -175,6 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
       console.warn("Cookie malformada:", e); // mensaje de error
     }
+    console.log("se completo el js para el topbar");
   }
 });
 
