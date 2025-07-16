@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => contenedor.removeChild(toast), 400);
     }, duracion);
   };
-})();
+})(); //------------------ aca termina el js para las notificaciones.
 
 document.addEventListener("DOMContentLoaded", () => { //--------------- js para topbar actualizado
   const usuarioCookie = document.cookie
