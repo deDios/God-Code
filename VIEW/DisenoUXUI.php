@@ -275,7 +275,7 @@
                     </div>
 
                     <div class="ventaja">
-                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img11" alt="img" />
+                        <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DiseñoUX-UI_seccion2_img11.png" alt="img" />
                         <div class="ventaja__texto">
                             <h3>Conecta con las emociones del usuario</h3>
                             <p>Una experiencia bien diseñada genera vínculos emocionales con tu marca.</p>
@@ -388,6 +388,7 @@
     </footer>
 
     <script src="../JS/index.js"></script>
+    <script src="../JS/JSglobal.js"></script>
 </body>
 
 </html>

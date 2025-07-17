@@ -229,20 +229,22 @@
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Optimiza tu sitio web con datos que importan</span></h2>
-                    <p> Toma decisiones inteligentes en cada fase del desarrollo apoyándote en información precisa,
-                        medible y en tiempo real. Supervisa el avance de tu proyecto desde el diseño inicial hasta las
-                        pruebas finales, incluyendo la planificación de contenido, la implementación de funcionalidades
-                        y la validación de cada componente técnico y visual. Detecta cuellos de botella antes de que se
-                        conviertan en problemas mayores, identifica errores o inconsistencias de forma anticipada y
-                        mantén una visión clara del desempeño general de tu equipo.Utiliza métricas clave para evaluar
-                        tiempos de entrega, cumplimiento de tareas, eficiencia en los flujos de trabajo y calidad del
-                        código, asegurando un proceso de desarrollo más predecible y transparente. Además, analiza el
-                        comportamiento de los usuarios en tu sitio para ajustar funcionalidades, mejorar la experiencia
-                        de navegación y aumentar la conversión. Con una gestión basada en datos, puedes anticipar
-                        riesgos, responder rápidamente a los cambios del entorno y optimizar cada recurso invertido en
-                        tu proyecto. Logra sitios web más rápidos, seguros, funcionales y alineados con tus objetivos,
-                        reduciendo tiempos de entrega y elevando la calidad final del producto.</p>
+                    <h2><span>Lleva el control total del desarrollo de tu sitio web</span></h2>
+                    <p>Supervisa y gestiona cada etapa del proyecto con precisión y eficiencia, utilizando tableros
+                        visuales, listas personalizadas, cronogramas interactivos y herramientas adaptadas a tus
+                        procesos internos. Desde la planificación de la arquitectura inicial hasta la publicación final,
+                        cada fase del desarrollo puede ser organizada, optimizada y monitoreada en un entorno claro y
+                        estructurado.
+                        Crea flujos de trabajo completamente personalizados que se ajusten a las necesidades de tu
+                        equipo y proyecto: desde el diseño visual y la creación de contenido hasta la programación, las
+                        pruebas de calidad y la revisión final. Asignar tareas, establecer dependencias, definir
+                        prioridades y coordinar entregables nunca ha sido tan simple. Integra tus herramientas favoritas
+                        —como editores de código, plataformas de diseño, gestores de contenido (CMS), sistemas de
+                        control de versiones y herramientas de análisis— en un solo entorno colaborativo. Centraliza la
+                        comunicación, automatiza procesos repetitivos y obtén visibilidad en tiempo real sobre el avance
+                        del proyecto para que tu equipo trabaje alineado, sin desvíos y con enfoque total en los
+                        objetivos. Asegura un desarrollo web ágil, ordenado y de alta calidad, con todo bajo control,
+                        desde el primer boceto hasta el clic de publicación.</p>
                     <div class="descripcion-pagina-Productos__imagen">
                         <img src="../ASSETS/ProductosPopUp/AssetsParaVistas/DesarrolloWeb_Descripcion_Img1.png"
                             alt="img" />
@@ -294,6 +296,7 @@
         </div>
     </footer>
     <script src="../JS/index.js"></script>
+    <script src="../JS/JSglobal.js"></script>
 </body>
 
 </html>

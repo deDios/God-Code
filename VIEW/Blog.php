@@ -250,8 +250,8 @@
         </div>
     </footer>
 
-    <script src="../JS/JSglobal.js"></script>
     <script src="../JS/Blog.js"></script>
+    <script src="../JS/JSglobal.js"></script>
 </body>
 
 </html>

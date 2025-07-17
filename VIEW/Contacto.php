@@ -208,6 +208,7 @@
     </footer>
 
     <script src="../JS/index.js"></script>
+    <script src="../JS/JSglobal.js"></script>
 </body>
 
 </html>
