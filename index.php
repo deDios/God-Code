@@ -47,11 +47,6 @@
                 <button class="btn btn-primary" onclick="location.href='VIEW/Inscripcion.php'">Registrarse</button>
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-session" id="user-session">
-                    <span class="user-email" id="user-email"></span>
-
-                    <div class="user-icon" id="user-icon">
-                        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg" alt="Usuario" />
-                    </div>
 
                 </div>
             </div>
