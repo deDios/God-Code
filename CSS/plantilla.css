@@ -727,8 +727,10 @@ footer small {
     width: 20px;
     height: 20px;
     object-fit: contain;
+    border: none;
     border-radius: 0;
-    box-shadow: none;
     background: none;
+    box-shadow: none;
     display: block;
+    padding: 0;
 }
