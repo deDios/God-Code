@@ -143,10 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <div class="dropdown-menu" id="user-dropdown">
             <ul>
-              <li onclick="window.location.href='index.php'">
+              <li onclick="window.location.href='../VIEW/testLogin.php'">
                 <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
               </li>
-              <li id="logout-btn">
+              <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
                 <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
               </li>
             </ul>
@@ -180,7 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.cookie =
               "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
-            window.location.reload();
           });
         }
 
