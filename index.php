@@ -45,10 +45,7 @@
             <div class="actions">
                 <button class="btn btn-outline" onclick="location.href='#'">Cotizar</button>
                 <button class="btn btn-primary" onclick="location.href='VIEW/Inscripcion.php'">Registrarse</button>
-                <!-- icono de usuario para despues hacer el login -->
-                <div class="user-session" id="user-session">
-
-                </div>
+                <!-- icono de usuario para despues hacer el login (ahora se inserta desde el js) -->
             </div>
         </div>
 
