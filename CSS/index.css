@@ -87,11 +87,6 @@ header.scrolled .subnav {
     vertical-align: middle;
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-}
-
 .user-icon img {
     width: 38px;
     height: 38px;
@@ -99,26 +94,6 @@ header.scrolled .subnav {
     cursor: pointer;
     align-items: center;
     gap: 10px;
-}
-
-.btn {
-    padding: 5px 12px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    white-space: normal;
-    word-break: break-word;
-    text-align: center;
-    max-width: 200px;
-}
-
-.btn-outline {
-    border: 1px solid #0a61d0;
-    color: #0a61d0;
-    background-color: white;
-    text-decoration: none;
 }
 
 .btn-primary {
