@@ -666,9 +666,14 @@ footer small {
 }
 
 /*----------------------- css para el submenu de perfil ------------------*/
-
-.user-icon {
+.user-session {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #f4f4f4;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
     cursor: pointer;
 }
 
@@ -680,24 +685,35 @@ footer small {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 180px;
     padding: 0.5rem 0;
-    width: 160px;
-    display: none;
     z-index: 1000;
+
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.dropdown-menu.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .dropdown-menu ul {
     list-style: none;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 .dropdown-menu li {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    color: #333;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -707,6 +723,7 @@ footer small {
 }
 
 .dropdown-menu img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
 }

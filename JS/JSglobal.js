@@ -94,6 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })(); //------------------ aca termina el js para las notificaciones.
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
   //--------------- js para topbar
 
@@ -116,14 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = src;
   }
 
-  if (usuarioCookie) { //------------------------ js para el topbar 
+  if (usuarioCookie) {
+    //------------------------ js para el topbar
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       const email = datos.correo || "Usuario";
       const id = datos.id || "1";
       const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      // mensaje de bienvenida que solo se activa una vez, el cual de momento no se esta mostrando
+      // mensaje de bienvenida que solo se activa una vez
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
@@ -139,45 +142,50 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevo.className = "user-icon";
           nuevo.innerHTML = `
             <span class="user-email">${email}</span>
-            <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" id="user-icon-img" />
 
-            <div class="user-menu" id="user-menu">
+            <div class="dropdown-menu" id="user-dropdown">
               <ul>
                 <li onclick="window.location.href='index.php'">
-                  <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" /> Ir a Home
+                  <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
                 </li>
-                <li id="btn-logout">
+                <li id="logout-btn">
                   <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
                 </li>
               </ul>
             </div>
           `;
 
-          // muestra o oculta el submenu
-          nuevo.addEventListener("click", (e) => {
+          actionsDesktop.appendChild(nuevo);
+          actionsDesktop.classList.add("mostrar");
+
+          // === SUBMENÚ emergente animado ===
+          const userIconImg = nuevo.querySelector("#user-icon-img");
+          const userDropdown = nuevo.querySelector("#user-dropdown");
+
+          userIconImg?.addEventListener("click", (e) => {
             e.stopPropagation();
-            const menu = nuevo.querySelector("#user-menu");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
+            userDropdown.classList.toggle("active");
           });
 
-          // en dado caso de que se de un click afuera del menu este se va a cerrar
           document.addEventListener("click", () => {
-            const menu = document.querySelector("#user-menu");
-            if (menu) menu.style.display = "none";
+            userDropdown.classList.remove("active");
+          });
+
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              userDropdown.classList.remove("active");
+            }
           });
 
           // boton de logout
-          setTimeout(() => {
-            const btnLogout = document.getElementById("btn-logout");
-            btnLogout?.addEventListener("click", () => {
-              document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-              sessionStorage.removeItem("bienvenidaMostrada");
-              window.location.reload();
-            });
-          }, 100);
-
-          actionsDesktop.appendChild(nuevo);
-          actionsDesktop.classList.add("mostrar");
+          const btnLogout = nuevo.querySelector("#logout-btn");
+          btnLogout?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+            window.location.reload();
+          });
         }
 
         // MOBILE
@@ -197,17 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevoMob.classList.add("mostrar");
         }
       });
-
     } catch (e) {
       console.warn("Cookie malformada:", e);
     }
   } else {
-    //cuando no este logeado el usuario estara el icono de perfil que redirecciona a la view de login
+    // cuando no está logeado el usuario: ícono normal
     actionsDesktop?.classList.add("mostrar");
     iconMobile?.classList.add("mostrar");
   }
 
   console.log("Se ejecutó todo el bloque para el topbar");
-}); //------------------------- aca termina el js para el topbar
+});
 
-//--------------- aca estara el js para el manejo de seciones 
+//--------------- aca estara el js para el manejo de seciones
