@@ -94,8 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 })(); //------------------ aca termina el js para las notificaciones.
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
   //--------------- js para topbar
 
@@ -160,10 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
           actionsDesktop.classList.add("mostrar");
 
           // === SUBMENÚ emergente animado ===
-          const userIconImg = nuevo.querySelector("#user-icon-img");
           const userDropdown = nuevo.querySelector("#user-dropdown");
 
-          userIconImg?.addEventListener("click", (e) => {
+          nuevo.addEventListener("click", (e) => {
             e.stopPropagation();
             userDropdown.classList.toggle("active");
           });

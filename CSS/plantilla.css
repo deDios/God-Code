@@ -680,7 +680,7 @@ footer small {
 .dropdown-menu {
     position: absolute;
     top: 110%;
-    right: 0;
+    right: 8;
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 8px;
