@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevo.className = "user-icon";
           nuevo.innerHTML = `
             <span class="user-email">${email}</span>
-            <img src="${rutaFinal}" alt="Perfil" title="Perfil" id="user-icon-img" />
+            <<img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
 
             <div class="dropdown-menu" id="user-dropdown">
               <ul>

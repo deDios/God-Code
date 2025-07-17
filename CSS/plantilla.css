@@ -606,12 +606,12 @@ footer small {
     text-overflow: ellipsis;
 }
 
-.actions .user-icon img {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid #ccc;
-    object-fit: cover;
+.img-perfil {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  object-fit: cover;
 }
 
 .social-icons .user-icon-mobile {
