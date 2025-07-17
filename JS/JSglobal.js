@@ -144,10 +144,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="user-menu" id="user-menu">
               <ul>
                 <li onclick="window.location.href='index.php'">
-                  <img src="ASSETS/icons/home.svg" alt="home" /> Ir a Home
+                  <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" /> Ir a Home
                 </li>
                 <li id="btn-logout">
-                  <img src="ASSETS/icons/logout.svg" alt="logout" /> Logout
+                  <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
                 </li>
               </ul>
             </div>
