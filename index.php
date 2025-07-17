@@ -48,9 +48,23 @@
                 <!-- icono de usuario para despues hacer el login -->
                 <div class="user-session" id="user-session">
                     <span class="user-email" id="user-email"></span>
-                    <div class="user-icon">
-                        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-                            alt="Usuario" />
+
+                    <div class="user-icon" id="user-icon">
+                        <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg" alt="Usuario" />
+                    </div>
+
+                    <!-- este es el submenu para cuando este logeado el usuario -->
+                    <div class="user-dropdown" id="user-dropdown">
+                        <ul>
+                            <li onclick="location.href='index.php'">
+                                <img src="ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="Home" />
+                                Ir a Home
+                            </li>
+                            <li id="logout-btn">
+                                <img src="ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="Logout" />
+                                Logout
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

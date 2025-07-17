@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const socialIconsContainer = document.querySelector(".social-icons");
   const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
 
-  // funcion para verificar si la imagen del usuario existe
+  // función para verificar si la imagen del usuario existe
   function verificarImagen(src, callback) {
     const img = new Image();
     img.onload = () => callback(src);
@@ -116,21 +116,21 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = src;
   }
 
-  if (usuarioCookie) {
+  if (usuarioCookie) { //------------------------ js para el topbar 
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       const email = datos.correo || "Usuario";
       const id = datos.id || "1";
       const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      // mostrar toast de bienvenida solo una vez
+      // mensaje de bienvenida que solo se activa una vez, el cual de momento no se esta mostrando
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
       }
 
       verificarImagen(ruta, (rutaFinal) => {
-        // === version desktop ===
+        // DESKTOP
         if (actionsDesktop) {
           btnRegistrarse?.remove();
           userIconDesktop?.remove();
@@ -139,28 +139,55 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevo.className = "user-icon";
           nuevo.innerHTML = `
             <span class="user-email">${email}</span>
-            <img src="${rutaFinal}"
-                 alt="Perfil"
-                 title="Ir a perfil" />
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+
+            <div class="user-menu" id="user-menu">
+              <ul>
+                <li onclick="window.location.href='index.php'">
+                  <img src="ASSETS/icons/home.svg" alt="home" /> Ir a Home
+                </li>
+                <li id="btn-logout">
+                  <img src="ASSETS/icons/logout.svg" alt="logout" /> Logout
+                </li>
+              </ul>
+            </div>
           `;
-          nuevo.addEventListener("click", () => {
-            window.location.href = "../VIEW/testLogin.php";
+
+          // muestra o oculta el submenu
+          nuevo.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const menu = nuevo.querySelector("#user-menu");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
           });
+
+          // en dado caso de que se de un click afuera del menu este se va a cerrar
+          document.addEventListener("click", () => {
+            const menu = document.querySelector("#user-menu");
+            if (menu) menu.style.display = "none";
+          });
+
+          // boton de logout
+          setTimeout(() => {
+            const btnLogout = document.getElementById("btn-logout");
+            btnLogout?.addEventListener("click", () => {
+              document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+              sessionStorage.removeItem("bienvenidaMostrada");
+              window.location.reload();
+            });
+          }, 100);
 
           actionsDesktop.appendChild(nuevo);
           actionsDesktop.classList.add("mostrar");
         }
 
-        // === mobile ===
+        // MOBILE
         if (socialIconsContainer && iconMobile) {
           iconMobile.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
           nuevoMob.innerHTML = `
-            <img src="${rutaFinal}"
-                 alt="Perfil"
-                 title="Ir a perfil" />
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
           `;
           nuevoMob.addEventListener("click", () => {
             window.location.href = "../VIEW/testLogin.php";
@@ -170,13 +197,17 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevoMob.classList.add("mostrar");
         }
       });
+
     } catch (e) {
       console.warn("Cookie malformada:", e);
     }
   } else {
+    //cuando no este logeado el usuario estara el icono de perfil que redirecciona a la view de login
     actionsDesktop?.classList.add("mostrar");
     iconMobile?.classList.add("mostrar");
   }
-});
 
-//---------------------------------------------- MANEJO DE SESIONES
+  console.log("Se ejecutó todo el bloque para el topbar");
+}); //------------------------- aca termina el js para el topbar
+
+//--------------- aca estara el js para el manejo de seciones 
