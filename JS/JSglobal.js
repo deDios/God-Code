@@ -95,9 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
 })(); //------------------ aca termina el js para las notificaciones.
 
 document.addEventListener("DOMContentLoaded", () => {
-  //--------------- js para topbar actualizado
+  //--------------- js para topbar
 
-  // verificar si existe la cookie de usuario
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -109,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const socialIconsContainer = document.querySelector(".social-icons");
   const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
 
-  // verificar si el usuario tiene imagen si no manda la default
+  // funcion para verificar si la imagen del usuario existe
   function verificarImagen(src, callback) {
     const img = new Image();
     img.onload = () => callback(src);
@@ -117,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = src;
   }
 
-  // verifica si hay una cookie de usuario activa
   if (usuarioCookie) {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
@@ -125,22 +123,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = datos.id || "1";
       const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      // notificacion de saludo
+      // mostrar toast de bienvenida solo una vez
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
-        console.log("se va disparar el saludo de bienvenida");
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
-        console.log("se disparo el saludo de bienvenida");
       }
 
-      // Comprobamos si la imagen existe y seguimos con lo demás
       verificarImagen(ruta, (rutaFinal) => {
-        // ===== desktop =====
+        // === version desktop ===
         if (actionsDesktop) {
-          btnRegistrarse?.remove(); // quitar el boton de registrarse
-          userIconDesktop?.remove(); // quitar el icono de perfil default
+          btnRegistrarse?.remove();
+          userIconDesktop?.remove();
 
-          // se arma un nuevo contenedor con los datos del usuario
           const nuevo = document.createElement("div");
           nuevo.className = "user-icon";
           nuevo.innerHTML = `
@@ -154,11 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           actionsDesktop.appendChild(nuevo);
+          actionsDesktop.classList.add("mostrar");
         }
 
-        // ===== mobile =====
+        // === mobile ===
         if (socialIconsContainer && iconMobile) {
-          iconMobile.remove(); 
+          iconMobile.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
@@ -172,12 +167,15 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           socialIconsContainer.appendChild(nuevoMob);
+          nuevoMob.classList.add("mostrar");
         }
       });
     } catch (e) {
-      console.warn("Cookie malformada:", e); // mensaje de error
+      console.warn("Cookie malformada:", e);
     }
-    console.log("se completo el js para el topbar");
+  } else {
+    actionsDesktop?.classList.add("mostrar");
+    iconMobile?.classList.add("mostrar");
   }
 });
 
