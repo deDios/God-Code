@@ -92,7 +92,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error al cargar la noticia:", error);
   }
 
-  await cargarComentarios(noticiaId);
 });
 
 //----------------------- JS para los comentarios
