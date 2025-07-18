@@ -138,53 +138,21 @@ function crearComentarioHTML(data) {
         </div>
         <a href="#" class="accion">Responder</a>
       </div>
-      ${
-        data.respuestas?.length > 0
-          ? `<div class="comentario-respuestas">
-              <a href="#" class="ver-respuestas">
-                <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
-                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-                </svg>
-                Ver ${data.respuestas.length} respuesta(s)
-              </a>
-            </div>`
-          : ""
-      }
     </div>
   `;
 
   if (data.respuestas?.length > 0) {
     const contenedor = document.createElement("div");
-    contenedor.className = "subrespuestas";
+    contenedor.className = "subrespuestas mostrar";
     data.respuestas.forEach((r) => {
       const respuestaHTML = crearComentarioHTML(r);
       contenedor.appendChild(respuestaHTML);
     });
-    if (!data.respuesta_a) contenedor.style.display = "none";
     div.appendChild(contenedor);
   }
 
   return div;
 }
-
-document.addEventListener("click", (e) => {
-  if (e.target.closest(".ver-respuestas")) {
-    e.preventDefault();
-    const enlace = e.target.closest(".ver-respuestas");
-    const comentario = enlace.closest(".comentario");
-    const subrespuestas = comentario.querySelector(".subrespuestas");
-
-    if (!subrespuestas) return;
-
-    const abierto = enlace.classList.toggle("abierto");
-    subrespuestas.style.display = abierto ? "flex" : "none";
-    enlace.querySelector(".flecha")?.classList.toggle("girar", abierto);
-
-    enlace.lastChild.textContent = abierto
-      ? ` Ocultar ${subrespuestas.childElementCount} respuesta(s)`
-      : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
-  }
-});
 
 async function cargarComentarios(noticiaId) {
   const lista = document.getElementById("lista-comentarios");
@@ -246,6 +214,12 @@ async function cargarComentarios(noticiaId) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const noticiaId = parseInt(params.get("id"));
+  if (!noticiaId) return;
+
+  await cargarComentarios(noticiaId);
+
   const textarea = document.querySelector(".nuevo-comentario textarea");
   const contador = document.getElementById("contador-caracteres");
   const btnCancelar = document.getElementById("cancelar-respuesta");
@@ -253,9 +227,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const wrapper = document.querySelector(".nuevo-comentario-wrapper");
   const endpointInsertar =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_comentario_noticia.php";
-
-  const params = new URLSearchParams(window.location.search);
-  const noticiaId = parseInt(params.get("id"));
 
   let usuarioId = null;
   let respuestaA = null;
@@ -380,7 +351,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  console.log("se ejecutó todo el bloque de comentarios de noticias");
-
-  await cargarComentarios(noticiaId);
+  console.log("se ejecutó todo el bloque de comentarios");
 });
