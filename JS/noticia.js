@@ -99,7 +99,6 @@ function tiempoRelativo(fechaStr) {
   const fecha = new Date(fechaStr);
   const ahora = new Date();
   const diff = (ahora - fecha) / 1000;
-
   if (diff < 60) return "Hace unos segundos";
   if (diff < 3600) return `Hace ${Math.floor(diff / 60)} minuto(s)`;
   if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} hora(s)`;
@@ -109,12 +108,6 @@ function tiempoRelativo(fechaStr) {
 }
 
 function crearComentarioHTML(data) {
-  console.log(
-    "Renderizando comentario ID:",
-    data.id,
-    "| texto:",
-    data.comentario
-  );
   const div = document.createElement("div");
   div.className = "comentario";
   if (data.respuesta_a) div.classList.add("subcomentario");
@@ -145,7 +138,7 @@ function crearComentarioHTML(data) {
         <a href="#" class="accion">Responder</a>
       </div>
       ${
-        data.respuestas?.length > 0
+        data.respuestas?.length
           ? `
         <div class="comentario-respuestas">
           <a href="#" class="ver-respuestas">
@@ -160,20 +153,43 @@ function crearComentarioHTML(data) {
     </div>
   `;
 
+  // Agregar subrespuestas si existen
   if (data.respuestas?.length > 0) {
-    console.log("→ Este comentario tiene respuestas:", data.respuestas.length);
+    console.log(
+      `Renderizando ${data.respuestas.length} respuesta(s) para ID ${data.id}`
+    );
     const contenedor = document.createElement("div");
     contenedor.className = "subrespuestas";
-    data.respuestas.forEach((r) => {
-      const respuestaHTML = crearComentarioHTML(r);
+    contenedor.style.display = "none";
+
+    data.respuestas.forEach((respuesta) => {
+      const respuestaHTML = crearComentarioHTML(respuesta);
       contenedor.appendChild(respuestaHTML);
     });
-    contenedor.style.display = "none";
+
     div.appendChild(contenedor);
   }
 
   return div;
 }
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".ver-respuestas")) {
+    e.preventDefault();
+    const enlace = e.target.closest(".ver-respuestas");
+    const comentario = enlace.closest(".comentario");
+    const subrespuestas = comentario.querySelector(".subrespuestas");
+    if (!subrespuestas) return;
+
+    const abierto = enlace.classList.toggle("abierto");
+    subrespuestas.style.display = abierto ? "flex" : "none";
+    enlace.querySelector(".flecha")?.classList.toggle("girar", abierto);
+
+    enlace.lastChild.textContent = abierto
+      ? ` Ocultar ${subrespuestas.childElementCount} respuesta(s)`
+      : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
+  }
+});
 
 async function cargarComentarios(noticiaId) {
   const lista = document.getElementById("lista-comentarios");
@@ -182,50 +198,18 @@ async function cargarComentarios(noticiaId) {
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
 
-  let usuarioId = null;
-  const usuarioCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("usuario="));
-  if (usuarioCookie) {
-    try {
-      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
-      usuarioId = datos?.id || null;
-    } catch (e) {
-      console.warn("Cookie malformada:", e);
-    }
-  }
-
   try {
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        noticia_id: noticiaId,
-        estatus: 1,
-        ...(usuarioId ? { usuario_id: usuarioId } : {}),
-      }),
+      body: JSON.stringify({ noticia_id: noticiaId, estatus: 1 }),
     });
 
     const data = await res.json();
     if (!Array.isArray(data)) return;
-    console.log("Comentarios recibidos:", data);
+    console.log("Comentarios cargados desde API:", data);
 
-    const mapa = new Map();
     data.forEach((comentario) => {
-      mapa.set(comentario.id, { ...comentario, respuestas: [] });
-    });
-
-    const raiz = [];
-    mapa.forEach((comentario) => {
-      if (comentario.respuesta_a) {
-        const padre = mapa.get(comentario.respuesta_a);
-        if (padre) padre.respuestas.push(comentario);
-      } else {
-        raiz.push(comentario);
-      }
-    });
-
-    raiz.forEach((comentario) => {
       const nodo = crearComentarioHTML(comentario);
       lista.appendChild(nodo);
     });
