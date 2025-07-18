@@ -176,6 +176,29 @@
     box-sizing: border-box;
 }
 
+#noticia-comentarios .acciones-comentario {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 0.5rem 0.2rem 0 3.2rem;
+}
+
+#noticia-comentarios .acciones-comentario button {
+    background-color: #0a5efb;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#noticia-comentarios .acciones-comentario button:hover {
+    background-color: #084ed0;
+}
+
 #noticia-comentarios .lista-comentarios {
     display: flex;
     flex-direction: column;
@@ -291,6 +314,20 @@
     transform: rotate(180deg);
 }
 
+#noticia-comentarios .subrespuestas {
+    margin-top: 0.6rem;
+    margin-left: 3.2rem;
+    display: none;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+#noticia-comentarios .subrespuestas.mostrar {
+    display: flex;
+}
+
+
+/* ------------------------ css para botones de navegacion entre noticias ------------------------------ */
 #noticia-comentarios .navegacion-noticias {
     display: flex;
     justify-content: space-between;
