@@ -195,6 +195,10 @@
                             <span id="contador-caracteres">0/500</span>
                             <button id="cancelar-respuesta" style="display: none;">Cancelar respuesta</button>
                         </div>
+
+                        <button id="btn-enviar-comentario" class="btn btn-primary" style="margin-top: 0.5rem;">
+                            Enviar comentario
+                        </button>
                     </div>
 
                     <div class="lista-comentarios" id="lista-comentarios">
