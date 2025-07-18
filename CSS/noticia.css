@@ -208,28 +208,21 @@
     gap: 1.5rem;
 }
 
-/* Comentario principal */
 #noticia-comentarios .comentario {
-    display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1.2rem;
-    background: #fff;
     border-radius: 8px;
     position: relative;
     margin-bottom: 0.3rem;
 }
 
-/* Subcomentarios (respuestas) */
 #noticia-comentarios .comentario.subcomentario {
-    background-color: #f7fafd;
     padding: 1rem 1rem 0.8rem 2.5rem;
     border-radius: 8px;
     margin-left: 2.8rem;
     margin-top: 0.25rem;
     font-size: 0.98em;
-    border-left: 2.5px solid #d3e3fd;
-    box-shadow: 0 1px 4px #0001;
 }
 
 #noticia-comentarios .comentario-usuario img {
