@@ -109,49 +109,66 @@ function tiempoRelativo(fechaStr) {
 }
 
 function crearComentarioHTML(data) {
+  console.log(
+    "Renderizando comentario ID:",
+    data.id,
+    "| Texto:",
+    data.comentario
+  );
+  if (data.respuestas?.length > 0) {
+    console.log(
+      `Comentario ID ${data.id} tiene ${data.respuestas.length} respuesta(s)`
+    );
+  }
+
   const div = document.createElement("div");
   div.className = "comentario";
 
   div.innerHTML = `
-    <div class="comentario-usuario">
-      <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">
+  <div class="comentario-usuario">
+    <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">
+  </div>
+  <div class="comentario-contenido">
+    <div class="comentario-meta">
+      <strong>${data.usuario_nombre}</strong>
+      <span>${tiempoRelativo(data.fecha_creacion)}</span>
     </div>
-    <div class="comentario-contenido">
-      <div class="comentario-meta">
-        <strong>${data.usuario_nombre}</strong>
-        <span>${tiempoRelativo(data.fecha_creacion)}</span>
+    <p class="comentario-texto">${data.comentario}</p>
+    <div class="comentario-interacciones">
+      <div class="reaccion" data-id="${data.id}" data-tipo="like">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#1a73e8">
+          <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32
+            c0-.41-.17-.79-.44-1.06L14.17 2 
+            7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 
+            1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72v-1.09l-.01-.01L23 10z"/>
+        </svg>
+        <span class="cantidad">${data.likes}</span>
       </div>
-      <p class="comentario-texto">${data.comentario}</p>
-      <div class="comentario-interacciones">
-        <div class="reaccion" data-id="${data.id}" data-tipo="like">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="#1a73e8">
-            <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l..." />
-          </svg>
-          <span class="cantidad">${data.likes}</span>
-        </div>
-        <div class="reaccion" data-id="${data.id}" data-tipo="dislike">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
-            <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2..." />
-          </svg>
-          <span class="cantidad">${data.dislikes}</span>
-        </div>
-        <a href="#" class="accion">Responder</a>
+      <div class="reaccion" data-id="${data.id}" data-tipo="dislike">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
+          <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09l.01.01c0
+            1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 
+            .41.17.79.44 1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>
+        </svg>
+        <span class="cantidad">${data.dislikes}</span>
       </div>
-      ${
-        data.respuestas?.length > 0
-          ? `
-        <div class="comentario-respuestas">
-          <a href="#" class="ver-respuestas">
-            <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
-              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-            </svg>
-            Ver ${data.respuestas.length} respuesta(s)
-          </a>
-        </div>`
-          : ""
-      }
+      <a href="#" class="accion">Responder</a>
     </div>
-  `;
+    ${
+      data.respuestas?.length > 0
+        ? `
+      <div class="comentario-respuestas">
+        <a href="#" class="ver-respuestas">
+          <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+          </svg>
+          Ver ${data.respuestas.length} respuesta(s)
+        </a>
+      </div>`
+        : ""
+    }
+  </div>
+`;
 
   if (data.respuestas?.length > 0) {
     const contenedor = document.createElement("div");
@@ -199,11 +216,18 @@ async function cargarComentarios(noticiaId) {
 
     const data = await res.json();
     if (!Array.isArray(data)) return;
+    console.log("Comentarios recibidos desde API:", data);
 
-    data.forEach((comentario) => {
+    data.forEach((comentario, i) => {
+      console.log(
+        `Comentario #${i + 1} ID=${comentario.id} | Usuario=${
+          comentario.usuario_nombre
+        }`
+      );
       const nodo = crearComentarioHTML(comentario);
       lista.appendChild(nodo);
     });
+    
   } catch (err) {
     console.error("Error al cargar comentarios:", err);
   }
