@@ -408,3 +408,20 @@
         padding: 0.8rem 1rem;
     }
 }
+
+/*------- apartado estra para comentarios -----*/
+.acciones-comentario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+}
+
+#cancelar-respuesta {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    cursor: pointer;
+    font-weight: bold;
+}

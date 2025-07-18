@@ -189,6 +189,11 @@
                             <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Tu avatar">
                             <textarea placeholder="Añade un comentario..."></textarea>
                         </div>
+
+                        <div class="acciones-comentario">
+                            <span id="contador-caracteres">0/500</span>
+                            <button id="cancelar-respuesta" style="display: none;">Cancelar respuesta</button>
+                        </div>
                     </div>
 
                     <div class="lista-comentarios" id="lista-comentarios">
