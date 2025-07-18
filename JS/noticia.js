@@ -91,9 +91,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("Error al cargar la noticia:", error);
   }
+
+  await cargarComentarios(noticiaId);
 });
 
 //----------------------- JS para los comentarios
+
 function tiempoRelativo(fechaStr) {
   const fecha = new Date(fechaStr);
   const ahora = new Date();
@@ -219,9 +222,27 @@ async function cargarComentarios(noticiaId) {
 
     const data = await res.json();
     if (!Array.isArray(data)) return;
-    console.log("Comentarios recibidos desde API:", data);
+    console.log("Comentarios recibidos:", data);
 
+    const mapa = new Map();
     data.forEach((comentario) => {
+      mapa.set(comentario.id, { ...comentario, respuestas: [] });
+    });
+
+    // Asociar respuestas a sus padres
+    const raiz = [];
+    mapa.forEach((comentario) => {
+      if (comentario.respuesta_a) {
+        const padre = mapa.get(comentario.respuesta_a);
+        if (padre) {
+          padre.respuestas.push(comentario);
+        }
+      } else {
+        raiz.push(comentario);
+      }
+    });
+
+    raiz.forEach((comentario) => {
       const nodo = crearComentarioHTML(comentario);
       lista.appendChild(nodo);
     });
