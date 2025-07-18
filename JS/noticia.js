@@ -91,7 +91,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error("Error al cargar la noticia:", error);
   }
-
 });
 
 //----------------------- JS para los comentarios
@@ -141,15 +140,14 @@ function crearComentarioHTML(data) {
       </div>
       ${
         data.respuestas?.length > 0
-          ? `
-        <div class="comentario-respuestas">
-          <a href="#" class="ver-respuestas">
-            <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
-              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-            </svg>
-            Ver ${data.respuestas.length} respuesta(s)
-          </a>
-        </div>`
+          ? `<div class="comentario-respuestas">
+              <a href="#" class="ver-respuestas">
+                <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
+                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+                </svg>
+                Ver ${data.respuestas.length} respuesta(s)
+              </a>
+            </div>`
           : ""
       }
     </div>
@@ -162,7 +160,7 @@ function crearComentarioHTML(data) {
       const respuestaHTML = crearComentarioHTML(r);
       contenedor.appendChild(respuestaHTML);
     });
-    contenedor.style.display = "none";
+    if (!data.respuesta_a) contenedor.style.display = "none";
     div.appendChild(contenedor);
   }
 
@@ -228,14 +226,11 @@ async function cargarComentarios(noticiaId) {
       mapa.set(comentario.id, { ...comentario, respuestas: [] });
     });
 
-    // Asociar respuestas a sus padres
     const raiz = [];
     mapa.forEach((comentario) => {
       if (comentario.respuesta_a) {
         const padre = mapa.get(comentario.respuesta_a);
-        if (padre) {
-          padre.respuestas.push(comentario);
-        }
+        if (padre) padre.respuestas.push(comentario);
       } else {
         raiz.push(comentario);
       }
@@ -250,7 +245,7 @@ async function cargarComentarios(noticiaId) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const textarea = document.querySelector(".nuevo-comentario textarea");
   const contador = document.getElementById("contador-caracteres");
   const btnCancelar = document.getElementById("cancelar-respuesta");
@@ -385,5 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  console.log("se ejecuto todo el bloque de comentarios de noticias");
+  console.log("se ejecutó todo el bloque de comentarios de noticias");
+
+  await cargarComentarios(noticiaId);
 });

@@ -114,7 +114,7 @@
 /*--------------------------------------- seccion 3 ------------------*/
 
 
-/*------------- seccion 3 ------------------*/
+
 
 #noticia-comentarios {
     background-color: #fff;
@@ -329,6 +329,38 @@
     display: flex;
 }
 
+/*------- apartado estra para comentarios -----*/
+.acciones-comentario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+}
+
+#cancelar-respuesta {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#noticia-comentarios .comentario.subcomentario {
+    background-color: #f1f1f1;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-left: 3.2rem;
+}
+
+#noticia-comentarios .subrespuestas .comentario.subcomentario {
+    margin-left: 0;
+    background-color: #eeeeee;
+}
+
+
+
+
 
 
 /* ------------------------ css para botones de navegacion entre noticias ------------------------------ */
@@ -450,19 +482,3 @@
     }
 }
 
-/*------- apartado estra para comentarios -----*/
-.acciones-comentario {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.3rem;
-    font-size: 0.85rem;
-}
-
-#cancelar-respuesta {
-    background: none;
-    border: none;
-    color: #1a73e8;
-    cursor: pointer;
-    font-weight: bold;
-}
