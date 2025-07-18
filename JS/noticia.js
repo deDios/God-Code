@@ -107,10 +107,22 @@ function tiempoRelativo(fechaStr) {
   return `Hace ${Math.floor(diff / 31536000)} año(s)`;
 }
 
-function crearComentarioHTML(data) {
+function crearComentarioHTML(data, usuariosEnEsteHilo = {}) {
+  if (data.respuestas) {
+    data.respuestas.forEach((res) => {
+      usuariosEnEsteHilo[res.id] = res.usuario_nombre;
+    });
+  }
+
+  let prefijo = "";
+  if (data.respuesta_a && usuariosEnEsteHilo[data.respuesta_a]) {
+    prefijo = `<span class="mencion-usuario">@${
+      usuariosEnEsteHilo[data.respuesta_a]
+    }</span> `;
+  }
+
   const div = document.createElement("div");
-  div.className = "comentario";
-  if (data.respuesta_a) div.classList.add("subcomentario");
+  div.className = "comentario" + (data.respuesta_a ? " subcomentario" : "");
 
   div.innerHTML = `
     <div class="comentario-usuario">
@@ -121,7 +133,7 @@ function crearComentarioHTML(data) {
         <strong>${data.usuario_nombre}</strong>
         <span>${tiempoRelativo(data.fecha_creacion)}</span>
       </div>
-      <p class="comentario-texto">${data.comentario}</p>
+      <p class="comentario-texto">${prefijo}${data.comentario}</p>
       <div class="comentario-interacciones">
         <div class="reaccion" data-id="${data.id}" data-tipo="like">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="#1a73e8">
@@ -153,20 +165,14 @@ function crearComentarioHTML(data) {
     </div>
   `;
 
-  // Agregar subrespuestas si existen
   if (data.respuestas?.length > 0) {
-    console.log(
-      `Renderizando ${data.respuestas.length} respuesta(s) para ID ${data.id}`
-    );
     const contenedor = document.createElement("div");
     contenedor.className = "subrespuestas";
     contenedor.style.display = "none";
-
     data.respuestas.forEach((respuesta) => {
-      const respuestaHTML = crearComentarioHTML(respuesta);
+      const respuestaHTML = crearComentarioHTML(respuesta, usuariosEnEsteHilo);
       contenedor.appendChild(respuestaHTML);
     });
-
     div.appendChild(contenedor);
   }
 

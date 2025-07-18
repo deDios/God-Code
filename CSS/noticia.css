@@ -208,20 +208,43 @@
     gap: 1.5rem;
 }
 
+/* Comentario principal */
 #noticia-comentarios .comentario {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1.2rem;
+    background: #fff;
+    border-radius: 8px;
+    position: relative;
+    margin-bottom: 0.3rem;
+}
+
+/* Subcomentarios (respuestas) */
+#noticia-comentarios .comentario.subcomentario {
+    background-color: #f7fafd;
+    padding: 1rem 1rem 0.8rem 2.5rem;
+    border-radius: 8px;
+    margin-left: 2.8rem;
+    margin-top: 0.25rem;
+    font-size: 0.98em;
+    border-left: 2.5px solid #d3e3fd;
+    box-shadow: 0 1px 4px #0001;
 }
 
 #noticia-comentarios .comentario-usuario img {
-    width: 45px;
-    height: 45px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
 }
 
+#noticia-comentarios .comentario.subcomentario .comentario-usuario img {
+    width: 32px;
+    height: 32px;
+}
+
+/* Contenido del comentario */
 #noticia-comentarios .comentario-contenido {
     flex: 1;
 }
@@ -230,7 +253,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
 }
 
 #noticia-comentarios .comentario-meta strong {
@@ -240,16 +263,35 @@
 
 #noticia-comentarios .comentario-meta span {
     color: #777;
-    font-size: 0.85rem;
+    font-size: 0.86rem;
 }
 
 #noticia-comentarios .comentario-texto {
-    font-size: 1rem;
+    font-size: 1.05rem;
     color: #333;
     line-height: 1.6;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.55rem;
     text-align: justify;
     word-wrap: break-word;
+}
+
+#noticia-comentarios .comentario.subcomentario .comentario-meta strong {
+    font-size: 0.96em;
+}
+
+#noticia-comentarios .comentario.subcomentario .comentario-texto {
+    font-size: 1em;
+    margin-bottom: 0.3rem;
+    margin-top: 0.12rem;
+}
+
+/* Mención de usuario tipo @nombre */
+.mencion-usuario {
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 0.98em;
+    margin-right: 4px;
+    word-break: break-all;
 }
 
 #noticia-comentarios .comentario-interacciones {
@@ -263,7 +305,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.9rem;
+    font-size: 0.91rem;
     color: #555;
 }
 
@@ -277,7 +319,7 @@
 }
 
 #noticia-comentarios .comentario-interacciones .accion {
-    font-size: 0.9rem;
+    font-size: 0.93rem;
     color: #1a73e8;
     text-decoration: none;
     font-weight: 500;
@@ -290,14 +332,14 @@
 }
 
 #noticia-comentarios .comentario-respuestas {
-    margin-top: 0.6rem;
+    margin-top: 0.5rem;
 }
 
 #noticia-comentarios .ver-respuestas {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.9rem;
+    font-size: 0.93rem;
     color: #1a73e8;
     text-decoration: none;
     font-weight: 500;
@@ -318,24 +360,25 @@
 }
 
 #noticia-comentarios .subrespuestas {
-    margin-top: 0.6rem;
-    margin-left: 3.2rem;
+    margin-top: 0.35rem;
+    margin-left: 0;
     display: none;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1.1rem;
+    border-left: none;
+    padding-left: 0;
 }
 
 #noticia-comentarios .subrespuestas.mostrar {
     display: flex;
 }
 
-/*------- apartado estra para comentarios -----*/
 .acciones-comentario {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 0.3rem;
-    font-size: 0.85rem;
+    margin-top: 0.2rem;
+    font-size: 0.87rem;
 }
 
 #cancelar-respuesta {
@@ -346,17 +389,36 @@
     font-weight: bold;
 }
 
-#noticia-comentarios .comentario.subcomentario {
-    background-color: #f1f1f1;
-    padding: 1rem;
-    border-radius: 6px;
-    margin-left: 3.2rem;
+@media (max-width: 600px) {
+    #noticia-comentarios {
+        padding: 24px 5px;
+    }
+
+    #noticia-comentarios .comentarios-box {
+        padding: 0.7rem;
+        max-height: 310px;
+    }
+
+    #noticia-comentarios .comentario {
+        padding: 0.7rem;
+    }
+
+    #noticia-comentarios .comentario.subcomentario {
+        padding: 0.5rem 0.7rem 0.5rem 1.2rem;
+        margin-left: 1rem;
+    }
+
+    #noticia-comentarios .comentario-usuario img {
+        width: 32px;
+        height: 32px;
+    }
+
+    #noticia-comentarios .comentario.subcomentario .comentario-usuario img {
+        width: 24px;
+        height: 24px;
+    }
 }
 
-#noticia-comentarios .subrespuestas .comentario.subcomentario {
-    margin-left: 0;
-    background-color: #eeeeee;
-}
 
 
 
@@ -481,4 +543,3 @@
         padding: 0.8rem 1rem;
     }
 }
-
