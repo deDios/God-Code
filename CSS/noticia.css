@@ -111,6 +111,9 @@
     margin-bottom: 1rem;
 }
 
+/*--------------------------------------- seccion 3 ------------------*/
+
+
 /*------------- seccion 3 ------------------*/
 
 #noticia-comentarios {
@@ -325,6 +328,7 @@
 #noticia-comentarios .subrespuestas.mostrar {
     display: flex;
 }
+
 
 
 /* ------------------------ css para botones de navegacion entre noticias ------------------------------ */
