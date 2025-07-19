@@ -98,7 +98,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // --- Variables y endpoints ---
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -114,12 +113,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_reaccion_comentario.php";
 
   let usuarioId = null;
-  let respuestaA = null; // ID del comentario principal
+  let respuestaA = null; 
   let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
-  // --- Usuario logeado desde cookie ---
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -169,12 +167,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
-  // --- Publicar comentario/respuesta ---
+  // --- enviar comentario/respuesta ---
   btnEnviar.addEventListener("click", async () => {
     let texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
 
-    // Si es respuesta, forzar que empiece con @nombre
+    // si es respuesta que empiece con @nombre
     if (respuestaA && respuestaA_nombre) {
       const atText = `@${respuestaA_nombre} `;
       if (!texto.startsWith(atText)) {
@@ -240,7 +238,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       let data = await res.json();
       if (!Array.isArray(data)) return;
-      // Ordena del más reciente al más antiguo (estilo YouTube)
       data.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
       data.forEach((comentario) => {
         const nodo = crearComentarioHTML(comentario);
@@ -252,7 +249,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function crearComentarioHTML(data) {
-    // Mapa id de respuesta => usuario_nombre para las menciones
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
       idToNombre[res.id] = res.usuario_nombre;
@@ -306,7 +302,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const contenedor = document.createElement("div");
       contenedor.className = "subcomentarios subrespuestas";
       contenedor.style.display = "none";
-      // Ordenar por fecha ascendente para que queden como en YouTube
       data.respuestas.sort((a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion));
       data.respuestas.forEach((respuesta) => {
         contenedor.appendChild(
@@ -319,14 +314,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function crearRespuestaHTML(res, idToNombre, idComentarioPrincipal) {
-    // Si respuesta_a corresponde a otra respuesta, menciona al usuario con @
     let prefijo = "";
     if (
       res.respuesta_a &&
       res.respuesta_a !== idComentarioPrincipal &&
       idToNombre[res.respuesta_a]
     ) {
-      // Solo poner el prefijo si el comentario no lo tiene ya
       if (!res.comentario.trim().startsWith(`@${idToNombre[res.respuesta_a]}`)) {
         prefijo = `<span class="mencion-usuario">@${idToNombre[res.respuesta_a]}</span> `;
       }
@@ -364,7 +357,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   document.addEventListener("click", (e) => {
-    // Responder a cualquier comentario o respuesta
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -373,7 +365,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       const comentario = e.target.closest(".comentario");
       const autor = comentario.querySelector(".comentario-meta strong")?.textContent || "";
-      // Buscar el comentario principal para respuesta_a:
       let principal = comentario;
       while (principal && principal.classList.contains("subcomentario")) {
         principal = principal.parentElement.closest(".comentario:not(.subcomentario)");
@@ -393,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       contador.textContent = `${textarea.value.length}/500`;
     }
 
-    // Mostrar/ocultar subrespuestas
+    // muestra y oculta las respuestas
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
       const enlace = e.target.closest(".ver-respuestas");
@@ -408,7 +399,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
 
-    // Likes/dislikes
+    // likes/dislikes
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
       if (!usuarioId) {
