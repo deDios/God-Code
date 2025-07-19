@@ -286,7 +286,6 @@
 }
 
 #noticia-comentarios .comentario {
-    display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem 4rem;
@@ -527,6 +526,90 @@
     resize: none;
     max-height: 110px;
 }
+
+.nuevo-comentario-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+}
+
+.nuevo-comentario-wrapper img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.input-contenedor {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.pill-mencion {
+    display: none;
+    background: #222;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 16px;
+    padding: 4px 14px;
+    margin-bottom: 8px;
+    margin-top: 3px;
+    font-size: 1rem;
+    pointer-events: none;
+    align-self: flex-start;
+    z-index: 1;
+    line-height: 1.3;
+    max-width: 95%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.input-contenedor textarea {
+    width: 100%;
+    min-height: 48px;
+    max-height: 110px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    resize: none;
+    overflow-y: auto;
+    border-radius: 8px;
+    border: 1.5px solid #1565c0;
+    margin: 0;
+    box-sizing: border-box;
+    background: #fff;
+    line-height: 1.5;
+    font-family: inherit;
+}
+
+.input-contenedor textarea:disabled {
+    background: #f1f1f1;
+    color: #bbb;
+}
+
+@media (max-width: 600px) {
+    .nuevo-comentario-wrapper img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .input-contenedor textarea {
+        min-height: 38px;
+        font-size: 0.97rem;
+    }
+
+    .pill-mencion {
+        font-size: 0.98rem;
+        padding: 4px 10px;
+    }
+}
+
+
+
+
 
 /* ------------------------ css para botones de navegacion entre noticias ------------------------------ */
 #noticia-comentarios .navegacion-noticias {
