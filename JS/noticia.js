@@ -165,8 +165,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     respuestaA_nombre = "";
     textarea.placeholder = "Añade un comentario...";
     btnCancelar.style.display = "none";
-    const etiquetaAutor = document.getElementById("etiqueta-autor");
+    // Elimina el indicador visual y clase de respuesta
+    let etiquetaAutor = document.getElementById("etiqueta-autor");
     if (etiquetaAutor) etiquetaAutor.remove();
+    wrapper.classList.remove("respondiendo");
     textarea.value = "";
     contador.textContent = "0/500";
   });
@@ -207,8 +209,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         respuestaA_nombre = "";
         textarea.placeholder = "Añade un comentario...";
         btnCancelar.style.display = "none";
-        const etiquetaAutor = document.getElementById("etiqueta-autor");
+        // Elimina el indicador visual y clase de respuesta
+        let etiquetaAutor = document.getElementById("etiqueta-autor");
         if (etiquetaAutor) etiquetaAutor.remove();
+        wrapper.classList.remove("respondiendo");
         gcToast("Comentario publicado", "exito");
         await cargarComentarios(noticiaId);
         scrollToUltimoComentario();
@@ -360,7 +364,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           <div class="reaccion" data-id="${res.id}" data-tipo="dislike">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
-              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79-.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
             </svg>
             <span class="cantidad">${res.dislikes}</span>
           </div>
@@ -396,16 +400,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         respuestaA_nombre = autor;
         textarea.placeholder = `@${autor} `;
         btnCancelar.style.display = "inline";
+        // Indicador visual: inserta como hijo de .nuevo-comentario-wrapper
         let etiquetaAutor = document.getElementById("etiqueta-autor");
         if (!etiquetaAutor) {
           etiquetaAutor = document.createElement("div");
           etiquetaAutor.id = "etiqueta-autor";
-          etiquetaAutor.style.margin = "4px 0 4px 3.2rem";
-          etiquetaAutor.style.fontSize = "0.85rem";
-          etiquetaAutor.style.color = "#1a73e8";
-          wrapper.parentNode.insertBefore(etiquetaAutor, wrapper.nextSibling);
+          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
+          wrapper.insertBefore(etiquetaAutor, wrapper.children[1]);
+        } else {
+          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
         }
-        etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
+        wrapper.classList.add("respondiendo");
       } else {
         // Si es principal, igual que siempre
         id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
@@ -420,12 +425,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!etiquetaAutor) {
           etiquetaAutor = document.createElement("div");
           etiquetaAutor.id = "etiqueta-autor";
-          etiquetaAutor.style.margin = "4px 0 4px 3.2rem";
-          etiquetaAutor.style.fontSize = "0.85rem";
-          etiquetaAutor.style.color = "#1a73e8";
-          wrapper.parentNode.insertBefore(etiquetaAutor, wrapper.nextSibling);
+          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
+          wrapper.insertBefore(etiquetaAutor, wrapper.children[1]);
+        } else {
+          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
         }
-        etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
+        wrapper.classList.add("respondiendo");
       }
       textarea.focus();
     }

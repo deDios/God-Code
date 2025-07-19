@@ -418,6 +418,46 @@
     margin-right: 2px;
 }
 
+/* Estilos generales para el bloque de nuevo comentario */
+.nuevo-comentario-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+}
+
+#etiqueta-autor {
+    display: inline-block;
+    margin: 0.25rem 0 0.2rem 56px;
+    padding: 2px 12px;
+    background: #eaf1fb;
+    color: #1565c0;
+    border-radius: 999px;
+    font-size: 0.98rem;
+    font-weight: 500;
+    line-height: 1.6;
+    position: absolute;
+    top: 0;
+    left: 56px;
+    z-index: 2;
+    pointer-events: none;
+    letter-spacing: .01em;
+}
+
+@media (max-width: 600px) {
+    #etiqueta-autor {
+        position: static;
+        margin: 0.35rem 0 0.2rem 0.5rem;
+        display: block;
+        width: max-content;
+    }
+}
+
+.nuevo-comentario-wrapper.respondiendo textarea {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 1.5px #1565c055;
+}
+
 
 
 
