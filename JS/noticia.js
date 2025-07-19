@@ -96,7 +96,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 //----------------------- JS para los comentarios
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // ---- Variables y endpoints ----
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -104,7 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const contador = document.getElementById("contador-caracteres");
   const btnCancelar = document.getElementById("cancelar-respuesta");
   const btnEnviar = document.getElementById("btn-enviar-comentario");
-  const wrapper = document.querySelector(".nuevo-comentario-wrapper");
   const endpointComentarios =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
   const endpointInsertar =
@@ -118,7 +116,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let enviando = false;
   let ultimoComentario = "";
 
-  // ---- Usuario logeado desde cookie ----
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -135,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ---- Habilitar/deshabilitar textarea y botón según login ----
+  // --- habilitar o inhabiltar si esta logeado o no la seccion de comentarios
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -151,7 +148,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   actualizarEstadoInput();
 
-  // ---- Contador de caracteres y activación del botón ----
   textarea.addEventListener("input", () => {
     contador.textContent = `${textarea.value.length}/500`;
     btnEnviar.disabled =
@@ -162,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // ---- Cancelar respuesta ----
+  // --- cancelar respuesta
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
     respuestaA_nombre = "";
@@ -172,12 +168,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
-  // ---- Publicar comentario/respuesta ----
   btnEnviar.addEventListener("click", async () => {
     let texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
 
-    // Si es respuesta, forzar que empiece con @nombre
     if (respuestaA && respuestaA_nombre) {
       const atText = `@${respuestaA_nombre} `;
       if (!texto.startsWith(atText)) {
@@ -231,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // ---- Render y carga de comentarios ----
+  // --- arma y carga los comentarios
   async function cargarComentarios(noticiaId) {
     lista.innerHTML = "";
     try {
@@ -242,7 +236,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       let data = await res.json();
       if (!Array.isArray(data)) return;
-      // Ordena del más reciente al más antiguo (YouTube style)
       data.sort(
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
@@ -255,9 +248,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ---- Render de comentario principal y respuestas ----
   function crearComentarioHTML(data) {
-    // Mapa id de respuesta => usuario_nombre para las menciones
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
       idToNombre[res.id] = res.usuario_nombre;
@@ -285,7 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           <div class="reaccion" data-id="${data.id}" data-tipo="dislike">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
-              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17.79.44 1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
             </svg>
             <span class="cantidad">${data.dislikes}</span>
           </div>
@@ -307,12 +298,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    // Subrespuestas (todas bajo el comentario principal)
     if (data.respuestas?.length > 0) {
       const contenedor = document.createElement("div");
       contenedor.className = "subcomentarios subrespuestas";
       contenedor.style.display = "none";
-      // Ordenar por fecha ascendente para que queden como en YouTube
       data.respuestas.sort(
         (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
       );
@@ -326,18 +315,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // ---- Render de cada respuesta ----
   function crearRespuestaHTML(res, idToNombre, idComentarioPrincipal) {
-    // Si respuesta_a corresponde a otra respuesta, menciona al usuario con @
     let prefijo = "";
     if (
       res.respuesta_a &&
       res.respuesta_a !== idComentarioPrincipal &&
       idToNombre[res.respuesta_a]
     ) {
-      prefijo = `<span class="mencion-usuario">@${
-        idToNombre[res.respuesta_a]
-      }</span> `;
+      if (
+        !res.comentario.trim().startsWith(`@${idToNombre[res.respuesta_a]}`)
+      ) {
+        prefijo = `<span class="mencion-usuario">@${
+          idToNombre[res.respuesta_a]
+        }</span> `;
+      }
     }
     const div = document.createElement("div");
     div.className = "comentario subcomentario";
@@ -371,9 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // ---- Click handler para responder y reacciones ----
   document.addEventListener("click", (e) => {
-    // Responder (en cualquier comentario o respuesta)
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -385,7 +374,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         comentario.querySelector(".comentario-meta strong")?.textContent || "";
       respuestaA = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
       respuestaA_nombre = autor;
-      // Inserta el @nombre al inicio (si no está)
+      // coloca el nombre del usuario al que respondes con un @
       const atText = `@${respuestaA_nombre} `;
       if (!textarea.value.startsWith(atText)) {
         textarea.value = atText;
@@ -395,7 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnCancelar.style.display = "inline";
       contador.textContent = `${textarea.value.length}/500`;
     }
-    // Mostrar/ocultar subrespuestas
+    // Mostrar/ocultar respuestas
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
       const enlace = e.target.closest(".ver-respuestas");
@@ -409,7 +398,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? ` Ocultar ${subrespuestas.childElementCount} respuesta(s)`
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
-    // Likes/dislikes
+    // likes/dislikes
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -467,7 +456,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ---- Inicializar ----
   if (noticiaId) {
     await cargarComentarios(noticiaId);
   }
