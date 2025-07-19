@@ -189,17 +189,18 @@
                         <div class="nuevo-comentario-wrapper">
                             <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Tu avatar">
                             <div class="input-contenedor">
-                                <div id="pill-mencion" class="pill-mencion" style="display:none;"></div>
                                 <textarea placeholder="Añade un comentario..." maxlength="500"></textarea>
                             </div>
                         </div>
                         <div class="acciones-comentario">
                             <span id="contador-caracteres">0/500</span>
-                            <button id="cancelar-respuesta" style="display: none;">Cancelar respuesta</button>
+                            <div class="acciones-botones">
+                                <button id="cancelar-respuesta" style="display: none;">Cancelar respuesta</button>
+                                <button id="btn-enviar-comentario" class="btn btn-primary">
+                                    Enviar comentario
+                                </button>
+                            </div>
                         </div>
-                        <button id="btn-enviar-comentario" class="btn btn-primary" style="margin-top: 0.5rem;">
-                            Enviar comentario
-                        </button>
                     </div>
 
                     <div class="lista-comentarios" id="lista-comentarios">
