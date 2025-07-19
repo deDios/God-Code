@@ -95,7 +95,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 //----------------------- JS para los comentarios
 
+
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // --- Variables y endpoints ---
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -111,11 +114,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_reaccion_comentario.php";
 
   let usuarioId = null;
-  let respuestaA = null;
+  let respuestaA = null; // ID del comentario principal
   let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
+  // --- Usuario logeado desde cookie ---
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -124,15 +128,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       usuarioId = datos?.id || null;
       if (datos?.avatar) {
-        document.querySelector(".nuevo-comentario-wrapper img").src =
-          datos.avatar;
+        document.querySelector(".nuevo-comentario-wrapper img").src = datos.avatar;
       }
     } catch (e) {
       usuarioId = null;
     }
   }
 
-  // --- habilitar o inhabiltar si esta logeado o no la seccion de comentarios
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -158,7 +160,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // --- cancelar respuesta
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
     respuestaA_nombre = "";
@@ -168,10 +169,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
+  // --- Publicar comentario/respuesta ---
   btnEnviar.addEventListener("click", async () => {
     let texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
 
+    // Si es respuesta, forzar que empiece con @nombre
     if (respuestaA && respuestaA_nombre) {
       const atText = `@${respuestaA_nombre} `;
       if (!texto.startsWith(atText)) {
@@ -184,6 +187,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    const body = {
+      noticia_id: noticiaId,
+      usuario_id: usuarioId,
+      comentario: texto,
+      estatus: 1,
+      ...(respuestaA ? { respuesta_a: respuestaA } : {}),
+    };
+
     enviando = true;
     btnEnviar.disabled = true;
 
@@ -191,13 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const res = await fetch(endpointInsertar, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          noticia_id: noticiaId,
-          usuario_id: usuarioId,
-          comentario: texto,
-          estatus: 1,
-          ...(respuestaA ? { respuesta_a: respuestaA } : {}),
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -225,7 +230,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // --- arma y carga los comentarios
   async function cargarComentarios(noticiaId) {
     lista.innerHTML = "";
     try {
@@ -236,9 +240,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       let data = await res.json();
       if (!Array.isArray(data)) return;
-      data.sort(
-        (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-      );
+      // Ordena del más reciente al más antiguo (estilo YouTube)
+      data.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
       data.forEach((comentario) => {
         const nodo = crearComentarioHTML(comentario);
         lista.appendChild(nodo);
@@ -249,6 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function crearComentarioHTML(data) {
+    // Mapa id de respuesta => usuario_nombre para las menciones
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
       idToNombre[res.id] = res.usuario_nombre;
@@ -302,9 +306,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const contenedor = document.createElement("div");
       contenedor.className = "subcomentarios subrespuestas";
       contenedor.style.display = "none";
-      data.respuestas.sort(
-        (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
-      );
+      // Ordenar por fecha ascendente para que queden como en YouTube
+      data.respuestas.sort((a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion));
       data.respuestas.forEach((respuesta) => {
         contenedor.appendChild(
           crearRespuestaHTML(respuesta, idToNombre, data.id)
@@ -316,18 +319,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function crearRespuestaHTML(res, idToNombre, idComentarioPrincipal) {
+    // Si respuesta_a corresponde a otra respuesta, menciona al usuario con @
     let prefijo = "";
     if (
       res.respuesta_a &&
       res.respuesta_a !== idComentarioPrincipal &&
       idToNombre[res.respuesta_a]
     ) {
-      if (
-        !res.comentario.trim().startsWith(`@${idToNombre[res.respuesta_a]}`)
-      ) {
-        prefijo = `<span class="mencion-usuario">@${
-          idToNombre[res.respuesta_a]
-        }</span> `;
+      // Solo poner el prefijo si el comentario no lo tiene ya
+      if (!res.comentario.trim().startsWith(`@${idToNombre[res.respuesta_a]}`)) {
+        prefijo = `<span class="mencion-usuario">@${idToNombre[res.respuesta_a]}</span> `;
       }
     }
     const div = document.createElement("div");
@@ -363,6 +364,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   document.addEventListener("click", (e) => {
+    // Responder a cualquier comentario o respuesta
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -370,11 +372,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       const comentario = e.target.closest(".comentario");
-      const autor =
-        comentario.querySelector(".comentario-meta strong")?.textContent || "";
-      respuestaA = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+      const autor = comentario.querySelector(".comentario-meta strong")?.textContent || "";
+      // Buscar el comentario principal para respuesta_a:
+      let principal = comentario;
+      while (principal && principal.classList.contains("subcomentario")) {
+        principal = principal.parentElement.closest(".comentario:not(.subcomentario)");
+      }
+      respuestaA = principal
+        ? parseInt(principal.querySelector(".reaccion")?.dataset.id)
+        : parseInt(comentario.querySelector(".reaccion")?.dataset.id);
       respuestaA_nombre = autor;
-      // coloca el nombre del usuario al que respondes con un @
+
       const atText = `@${respuestaA_nombre} `;
       if (!textarea.value.startsWith(atText)) {
         textarea.value = atText;
@@ -384,7 +392,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       btnCancelar.style.display = "inline";
       contador.textContent = `${textarea.value.length}/500`;
     }
-    // Mostrar/ocultar respuestas
+
+    // Mostrar/ocultar subrespuestas
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
       const enlace = e.target.closest(".ver-respuestas");
@@ -398,7 +407,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? ` Ocultar ${subrespuestas.childElementCount} respuesta(s)`
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
-    // likes/dislikes
+
+    // Likes/dislikes
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
       if (!usuarioId) {
