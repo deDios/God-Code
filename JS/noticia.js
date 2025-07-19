@@ -114,7 +114,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let usuarioId = null;
   let respuestaA = null;
-  let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
@@ -162,15 +161,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // --- Cancelar respuesta ---
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
-    respuestaA_nombre = "";
+    textarea.value = "";
     textarea.placeholder = "Añade un comentario...";
     btnCancelar.style.display = "none";
-    // Elimina el indicador visual y clase de respuesta
-    let etiquetaAutor = document.getElementById("etiqueta-autor");
-    if (etiquetaAutor) etiquetaAutor.remove();
-    wrapper.classList.remove("respondiendo");
-    textarea.value = "";
-    contador.textContent = "0/500";
   });
 
   // --- Publicar comentario/respuesta ---
@@ -206,13 +199,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         textarea.value = "";
         contador.textContent = "0/500";
         respuestaA = null;
-        respuestaA_nombre = "";
         textarea.placeholder = "Añade un comentario...";
         btnCancelar.style.display = "none";
-        // Elimina el indicador visual y clase de respuesta
-        let etiquetaAutor = document.getElementById("etiqueta-autor");
-        if (etiquetaAutor) etiquetaAutor.remove();
-        wrapper.classList.remove("respondiendo");
         gcToast("Comentario publicado", "exito");
         await cargarComentarios(noticiaId);
         scrollToUltimoComentario();
@@ -364,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           <div class="reaccion" data-id="${res.id}" data-tipo="dislike">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
-              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79-.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
             </svg>
             <span class="cantidad">${res.dislikes}</span>
           </div>
@@ -385,54 +373,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       const comentario = e.target.closest(".comentario");
-      const esRespuesta = comentario.classList.contains("subcomentario");
-      let id, autor;
-      if (esRespuesta) {
-        // Busca el padre principal
+      let autor =
+        comentario.querySelector(".comentario-meta strong")?.textContent || "";
+
+      // Busca el id del comentario principal si es respuesta
+      let id;
+      if (comentario.classList.contains("subcomentario")) {
         let padre = comentario.parentElement.closest(
           ".comentario:not(.subcomentario)"
         );
         id = parseInt(padre.querySelector(".reaccion")?.dataset.id);
-        autor =
-          comentario.querySelector(".comentario-meta strong")?.textContent ||
-          "";
-        respuestaA = id; // SIEMPRE id del principal
-        respuestaA_nombre = autor;
-        textarea.placeholder = `@${autor} `;
-        btnCancelar.style.display = "inline";
-        // Indicador visual: inserta como hijo de .nuevo-comentario-wrapper
-        let etiquetaAutor = document.getElementById("etiqueta-autor");
-        if (!etiquetaAutor) {
-          etiquetaAutor = document.createElement("div");
-          etiquetaAutor.id = "etiqueta-autor";
-          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
-          wrapper.insertBefore(etiquetaAutor, wrapper.children[1]);
-        } else {
-          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
-        }
-        wrapper.classList.add("respondiendo");
       } else {
-        // Si es principal, igual que siempre
         id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
-        autor =
-          comentario.querySelector(".comentario-meta strong")?.textContent ||
-          "";
-        respuestaA = id;
-        respuestaA_nombre = autor;
-        textarea.placeholder = `@${autor} `;
-        btnCancelar.style.display = "inline";
-        let etiquetaAutor = document.getElementById("etiqueta-autor");
-        if (!etiquetaAutor) {
-          etiquetaAutor = document.createElement("div");
-          etiquetaAutor.id = "etiqueta-autor";
-          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
-          wrapper.insertBefore(etiquetaAutor, wrapper.children[1]);
-        } else {
-          etiquetaAutor.textContent = `Respondiendo a: @${autor}`;
-        }
-        wrapper.classList.add("respondiendo");
       }
+
+      respuestaA = id;
+
+      textarea.value = `@${autor} `;
       textarea.focus();
+      // Coloca el cursor al final del textarea
+      setTimeout(() => {
+        textarea.setSelectionRange(
+          textarea.value.length,
+          textarea.value.length
+        );
+      }, 10);
+
+      btnCancelar.style.display = "inline";
     }
     // Mostrar/ocultar subrespuestas
     if (e.target.closest(".ver-respuestas")) {
