@@ -481,5 +481,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         .catch(() => gcToast("Error de red al reaccionar", "error"));
     }
   });
-  
+
+  // --- Helper tiempo relativo ---
+  function tiempoRelativo(fechaStr) {
+    const fecha = new Date(fechaStr);
+    const ahora = new Date();
+    const diff = (ahora - fecha) / 1000;
+    if (diff < 60) return "Hace unos segundos";
+    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} minuto(s)`;
+    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} hora(s)`;
+    if (diff < 2592000) return `Hace ${Math.floor(diff / 86400)} día(s)`;
+    if (diff < 31536000) return `Hace ${Math.floor(diff / 2592000)} mes(es)`;
+    return `Hace ${Math.floor(diff / 31536000)} año(s)`;
+  }
+
+  // --- Inicializar ---
+  if (noticiaId) {
+    await cargarComentarios(noticiaId);
+  }
+  actualizarEstadoInput();
 });
