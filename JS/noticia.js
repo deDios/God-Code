@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 //----------------------- JS para los comentarios
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // ---------------- Variables globales y endpoints -----------------
+  // --- Variables y endpoints ---
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -114,10 +114,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let usuarioId = null;
   let respuestaA = null;
+  let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
-  // ----------- Obtener usuario logueado desde cookie -----------
+  // --- Usuario logeado desde cookie ---
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -125,7 +126,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       usuarioId = datos?.id || null;
-      // Si tienes foto, cámbiala en el avatar superior
       if (datos?.avatar) {
         document.querySelector(".nuevo-comentario-wrapper img").src =
           datos.avatar;
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ----------- Habilitar/deshabilitar textarea y botón según login ----------
+  // --- Habilitar/deshabilitar textarea y botón según login ---
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -151,18 +151,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   actualizarEstadoInput();
 
-  // ----------- Contador de caracteres (y bloquea si vacío) -------------
+  // --- Contador de caracteres ---
   textarea.addEventListener("input", () => {
     contador.textContent = `${textarea.value.length}/500`;
-    // Botón solo se activa si hay texto, user logeado, y no está enviando
     btnEnviar.disabled =
       !usuarioId || enviando || textarea.value.trim().length === 0;
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // ----------- Cancelar respuesta (mueve textarea a estado normal) -----------
+  // --- Cancelar respuesta ---
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
+    respuestaA_nombre = "";
     textarea.placeholder = "Añade un comentario...";
     btnCancelar.style.display = "none";
     const etiquetaAutor = document.getElementById("etiqueta-autor");
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
-  // ----------- Publicar comentario/respuesta -----------
+  // --- Publicar comentario/respuesta ---
   btnEnviar.addEventListener("click", async () => {
     const texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
@@ -204,6 +204,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         textarea.value = "";
         contador.textContent = "0/500";
         respuestaA = null;
+        respuestaA_nombre = "";
         textarea.placeholder = "Añade un comentario...";
         btnCancelar.style.display = "none";
         const etiquetaAutor = document.getElementById("etiqueta-autor");
@@ -231,20 +232,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ---------------- Render y carga de comentarios ---------------------
+  // --- Render y carga de comentarios y respuestas (estilo YouTube) ---
   async function cargarComentarios(noticiaId) {
     lista.innerHTML = "";
-
     try {
       const res = await fetch(endpointComentarios, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ noticia_id: noticiaId, estatus: 1 }),
       });
-
       let data = await res.json();
       if (!Array.isArray(data)) return;
-      // Ordena del más reciente al más antiguo (estilo "nuevo primero" como en YouTube)
       data.sort(
         (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
       );
@@ -257,23 +255,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // ------------ Render de cada comentario/respuesta ----------------
-  function crearComentarioHTML(data, usuariosEnEsteHilo = {}) {
-    // Mapa de id a nombre para las respuestas a este comentario principal
-    if (data.respuestas) {
-      data.respuestas.forEach((res) => {
-        usuariosEnEsteHilo[res.id] = res.usuario_nombre;
-      });
-    }
-    // Si es respuesta a otra respuesta, agrega @nombre
-    let prefijo = "";
-    if (data.respuesta_a && usuariosEnEsteHilo[data.respuesta_a]) {
-      prefijo = `<span class="mencion-usuario">@${
-        usuariosEnEsteHilo[data.respuesta_a]
-      }</span> `;
-    }
+  // --- Render de comentario principal y todas sus respuestas ---
+  function crearComentarioHTML(data) {
+    // Mapa id de respuesta => usuario_nombre para las menciones
+    const idToNombre = {};
+    (data.respuestas || []).forEach((res) => {
+      idToNombre[res.id] = res.usuario_nombre;
+    });
+
     const div = document.createElement("div");
-    div.className = "comentario" + (data.respuesta_a ? " subcomentario" : "");
+    div.className = "comentario";
 
     div.innerHTML = `
       <div class="comentario-usuario">
@@ -284,7 +275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <strong>${data.usuario_nombre}</strong>
           <span>${tiempoRelativo(data.fecha_creacion)}</span>
         </div>
-        <p class="comentario-texto">${prefijo}${data.comentario}</p>
+        <p class="comentario-texto">${data.comentario}</p>
         <div class="comentario-interacciones">
           <div class="reaccion" data-id="${data.id}" data-tipo="like">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#1a73e8">
@@ -315,29 +306,74 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       </div>
     `;
-    // Subrespuestas
+
+    // Subrespuestas (todas bajo el comentario principal)
     if (data.respuestas?.length > 0) {
       const contenedor = document.createElement("div");
       contenedor.className = "subrespuestas";
       contenedor.style.display = "none";
-      // Ordena las respuestas por fecha (nuevo primero)
+      // Ordenar por fecha ascendente para que queden como en YouTube (más viejo arriba)
       data.respuestas.sort(
-        (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
+        (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
       );
       data.respuestas.forEach((respuesta) => {
-        const respuestaHTML = crearComentarioHTML(
-          respuesta,
-          usuariosEnEsteHilo
+        contenedor.appendChild(
+          crearRespuestaHTML(respuesta, idToNombre, data.id)
         );
-        contenedor.appendChild(respuestaHTML);
       });
       div.appendChild(contenedor);
     }
     return div;
   }
 
-  // ----------- Responder a comentario o respuesta --------------
+  // --- Render de cada respuesta (estilo YouTube) ---
+  function crearRespuestaHTML(res, idToNombre, idComentarioPrincipal) {
+    // Si respuesta_a corresponde a otra respuesta, menciona al usuario con @
+    let prefijo = "";
+    if (
+      res.respuesta_a &&
+      res.respuesta_a !== idComentarioPrincipal &&
+      idToNombre[res.respuesta_a]
+    ) {
+      prefijo = `<span class="mencion-usuario">@${
+        idToNombre[res.respuesta_a]
+      }</span> `;
+    }
+    const div = document.createElement("div");
+    div.className = "comentario subcomentario";
+    div.innerHTML = `
+      <div class="comentario-usuario">
+        <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">
+      </div>
+      <div class="comentario-contenido">
+        <div class="comentario-meta">
+          <strong>${res.usuario_nombre}</strong>
+          <span>${tiempoRelativo(res.fecha_creacion)}</span>
+        </div>
+        <p class="comentario-texto">${prefijo}${res.comentario}</p>
+        <div class="comentario-interacciones">
+          <div class="reaccion" data-id="${res.id}" data-tipo="like">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#1a73e8">
+              <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z" />
+            </svg>
+            <span class="cantidad">${res.likes}</span>
+          </div>
+          <div class="reaccion" data-id="${res.id}" data-tipo="dislike">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+            </svg>
+            <span class="cantidad">${res.dislikes}</span>
+          </div>
+          <a href="#" class="accion">Responder</a>
+        </div>
+      </div>
+    `;
+    return div;
+  }
+
+  // --- Click handler para responder y reacciones ---
   document.addEventListener("click", (e) => {
+    // Responder (en cualquier comentario o respuesta)
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -345,17 +381,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       const comentario = e.target.closest(".comentario");
-      if (comentario) {
-        respuestaA = parseInt(
-          comentario.querySelector(".reaccion")?.dataset.id
-        );
-        const autor =
+      const esRespuesta = comentario.classList.contains("subcomentario");
+      let id, autor;
+      if (esRespuesta) {
+        id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+        autor =
           comentario.querySelector(".comentario-meta strong")?.textContent ||
-          "usuario";
-        textarea.focus();
+          "";
+        // Busca el padre principal
+        let padre = comentario.parentElement.closest(
+          ".comentario:not(.subcomentario)"
+        );
+        if (padre) {
+          respuestaA = id;
+          respuestaA_nombre = autor;
+          textarea.placeholder = `@${autor} `;
+          btnCancelar.style.display = "inline";
+          let etiquetaAutor = document.getElementById("etiqueta-autor");
+          if (!etiquetaAutor) {
+            etiquetaAutor = document.createElement("div");
+            etiquetaAutor.id = "etiqueta-autor";
+            etiquetaAutor.style.margin = "4px 0 4px 3.2rem";
+            etiquetaAutor.style.fontSize = "0.85rem";
+            etiquetaAutor.style.color = "#1a73e8";
+            wrapper.parentNode.insertBefore(etiquetaAutor, wrapper.nextSibling);
+          }
+          etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
+        }
+      } else {
+        id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+        autor =
+          comentario.querySelector(".comentario-meta strong")?.textContent ||
+          "";
+        respuestaA = id;
+        respuestaA_nombre = autor;
         textarea.placeholder = `@${autor} `;
         btnCancelar.style.display = "inline";
-
         let etiquetaAutor = document.getElementById("etiqueta-autor");
         if (!etiquetaAutor) {
           etiquetaAutor = document.createElement("div");
@@ -367,6 +428,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
       }
+      textarea.focus();
     }
     // Mostrar/ocultar subrespuestas
     if (e.target.closest(".ver-respuestas")) {
@@ -391,7 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       const btn = e.target.closest(".reaccion");
       const comentarioId = btn.dataset.id;
-      const tipo = btn.dataset.tipo; // "like" o "dislike"
+      const tipo = btn.dataset.tipo;
       fetch(endpointReaccion, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -411,7 +473,6 @@ document.addEventListener("DOMContentLoaded", async () => {
               `¡Gracias por tu ${tipo === "like" ? "like" : "dislike"}!`,
               "exito"
             );
-            // Actualiza recuento visualmente
             cargarComentarios(noticiaId);
           } else {
             gcToast("No se pudo registrar la reacción", "error");
@@ -420,23 +481,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         .catch(() => gcToast("Error de red al reaccionar", "error"));
     }
   });
-
-  // ----------- Helpers --------
-  function tiempoRelativo(fechaStr) {
-    const fecha = new Date(fechaStr);
-    const ahora = new Date();
-    const diff = (ahora - fecha) / 1000;
-    if (diff < 60) return "Hace unos segundos";
-    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} minuto(s)`;
-    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} hora(s)`;
-    if (diff < 2592000) return `Hace ${Math.floor(diff / 86400)} día(s)`;
-    if (diff < 31536000) return `Hace ${Math.floor(diff / 2592000)} mes(es)`;
-    return `Hace ${Math.floor(diff / 31536000)} año(s)`;
-  }
-
-  // ----------- Inicializar ---------
-  if (noticiaId) {
-    await cargarComentarios(noticiaId);
-  }
-  actualizarEstadoInput();
+  
 });

@@ -211,7 +211,7 @@
 #noticia-comentarios .comentario {
     align-items: flex-start;
     gap: 1rem;
-    padding: 1.2rem;
+    padding: 1rem 4rem;
     border-radius: 8px;
     position: relative;
     margin-bottom: 0.3rem;
