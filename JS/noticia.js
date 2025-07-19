@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           <div class="reaccion" data-id="${data.id}" data-tipo="dislike">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="#e53935">
-              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17.79.44 1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z" />
             </svg>
             <span class="cantidad">${data.dislikes}</span>
           </div>
@@ -312,7 +312,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const contenedor = document.createElement("div");
       contenedor.className = "subrespuestas";
       contenedor.style.display = "none";
-      // Ordenar por fecha ascendente para que queden como en YouTube (más viejo arriba)
+      // Ordenar por fecha ascendente (más viejo arriba)
       data.respuestas.sort(
         (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
       );
@@ -384,31 +384,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       const esRespuesta = comentario.classList.contains("subcomentario");
       let id, autor;
       if (esRespuesta) {
-        id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
-        autor =
-          comentario.querySelector(".comentario-meta strong")?.textContent ||
-          "";
         // Busca el padre principal
         let padre = comentario.parentElement.closest(
           ".comentario:not(.subcomentario)"
         );
-        if (padre) {
-          respuestaA = id;
-          respuestaA_nombre = autor;
-          textarea.placeholder = `@${autor} `;
-          btnCancelar.style.display = "inline";
-          let etiquetaAutor = document.getElementById("etiqueta-autor");
-          if (!etiquetaAutor) {
-            etiquetaAutor = document.createElement("div");
-            etiquetaAutor.id = "etiqueta-autor";
-            etiquetaAutor.style.margin = "4px 0 4px 3.2rem";
-            etiquetaAutor.style.fontSize = "0.85rem";
-            etiquetaAutor.style.color = "#1a73e8";
-            wrapper.parentNode.insertBefore(etiquetaAutor, wrapper.nextSibling);
-          }
-          etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
+        id = parseInt(padre.querySelector(".reaccion")?.dataset.id);
+        autor =
+          comentario.querySelector(".comentario-meta strong")?.textContent ||
+          "";
+        respuestaA = id; // SIEMPRE id del principal
+        respuestaA_nombre = autor;
+        textarea.placeholder = `@${autor} `;
+        btnCancelar.style.display = "inline";
+        let etiquetaAutor = document.getElementById("etiqueta-autor");
+        if (!etiquetaAutor) {
+          etiquetaAutor = document.createElement("div");
+          etiquetaAutor.id = "etiqueta-autor";
+          etiquetaAutor.style.margin = "4px 0 4px 3.2rem";
+          etiquetaAutor.style.fontSize = "0.85rem";
+          etiquetaAutor.style.color = "#1a73e8";
+          wrapper.parentNode.insertBefore(etiquetaAutor, wrapper.nextSibling);
         }
+        etiquetaAutor.textContent = `Respondiendo a: ${autor}`;
       } else {
+        // Si es principal, igual que siempre
         id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
         autor =
           comentario.querySelector(".comentario-meta strong")?.textContent ||
