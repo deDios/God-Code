@@ -116,6 +116,8 @@
 
 
 
+
+
 #noticia-comentarios {
     background-color: #fff;
     padding: 60px 30px;
@@ -148,58 +150,133 @@
     margin-bottom: 1.5rem;
 }
 
-#noticia-comentarios .nuevo-comentario-wrapper {
+.nuevo-comentario-wrapper {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
+    position: relative;
 }
 
-#noticia-comentarios .nuevo-comentario-wrapper img {
-    width: 45px;
-    height: 45px;
+.nuevo-comentario-wrapper img {
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
+    background: #eee;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
-#noticia-comentarios .nuevo-comentario-wrapper textarea {
+.input-contenedor {
+    position: relative;
+    flex: 1;
     width: 100%;
-    min-height: 60px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 0.75rem;
-    font-size: 1rem;
-    font-family: inherit;
-    resize: vertical;
-    line-height: 1.5;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-    background-color: #fff;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-#noticia-comentarios .acciones-comentario {
+.input-contenedor textarea {
+    width: 100%;
+    min-height: 44px;
+    max-height: 120px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    background: transparent;
+    color: #222;
+    font-size: 1.12rem;
+    font-family: inherit;
+    resize: none;
+    padding: 10px 0 8px 0;
+    box-sizing: border-box;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color .2s;
+    overflow-y: auto;
+}
+
+.input-contenedor textarea:focus {
+    border-bottom: 2.5px solid #1565c0;
+    background: transparent;
+}
+
+.pill-mencion {
+    position: absolute;
+    top: 13px;
+    left: 0;
+    z-index: 3;
+    padding: 3px 14px;
+    background: #222;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0.93;
+    font-family: inherit;
+    letter-spacing: .01em;
+    box-shadow: 0 2px 7px 0 #0001;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.input-contenedor textarea:not(:placeholder-shown)~.pill-mencion,
+.input-contenedor textarea:focus~.pill-mencion {
+    opacity: 0.7;
+}
+
+.input-contenedor textarea:focus~.pill-mencion {
+    opacity: 0.18;
+}
+
+.acciones-comentario {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    justify-content: space-between;
-    padding: 0.5rem 0.2rem 0 3.2rem;
+    justify-content: flex-end;
+    gap: 1.2rem;
+    margin: 0.7rem 0 0 62px;
+    background: transparent;
 }
 
-#noticia-comentarios .acciones-comentario button {
-    background-color: #0a5efb;
+#contador-caracteres {
+    color: #666;
+    font-size: 0.96rem;
+    margin-right: auto;
+}
+
+#cancelar-respuesta {
+    background: none;
+    border: none;
+    color: #1565c0;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 999px;
+    font-size: 1rem;
+    padding: 5px 12px;
+    transition: background .16s;
+}
+
+#cancelar-respuesta:hover {
+    background: #eaf1fb;
+}
+
+.btn.btn-primary {
+    background: #1565c0;
     color: #fff;
     font-weight: 600;
     border: none;
     border-radius: 999px;
-    padding: 0.5rem 1.2rem;
+    padding: 8px 28px;
+    font-size: 1.02rem;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.22s;
 }
 
-#noticia-comentarios .acciones-comentario button:hover {
-    background-color: #084ed0;
+.btn.btn-primary.disabled,
+.btn.btn-primary:disabled {
+    background: #b2becd;
+    color: #eee;
+    cursor: not-allowed;
+    opacity: .89;
 }
 
 #noticia-comentarios .lista-comentarios {
@@ -209,12 +286,14 @@
 }
 
 #noticia-comentarios .comentario {
+    display: flex;
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem 4rem;
     border-radius: 8px;
     position: relative;
     margin-bottom: 0.3rem;
+    background: none;
 }
 
 #noticia-comentarios .comentario.subcomentario {
@@ -223,8 +302,10 @@
     margin-left: 2.8rem;
     margin-top: 0.25rem;
     font-size: 0.98em;
+    background: none;
 }
 
+/* Avatar para subcomentario */
 #noticia-comentarios .comentario-usuario img {
     width: 42px;
     height: 42px;
@@ -278,13 +359,22 @@
     margin-top: 0.12rem;
 }
 
-/* Mención de usuario tipo @nombre */
 .mencion-usuario {
-    color: #1a73e8;
-    font-weight: 500;
-    font-size: 0.98em;
+    color: #1565c0;
+    font-weight: 600;
+    cursor: pointer;
+    background: #eaf1fb;
+    border-radius: 7px;
+    padding: 1px 6px;
     margin-right: 4px;
-    word-break: break-all;
+    display: inline-block;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.mencion-usuario:hover {
+    background: #dbeafe;
+    text-decoration: underline;
 }
 
 #noticia-comentarios .comentario-interacciones {
@@ -366,22 +456,6 @@
     display: flex;
 }
 
-.acciones-comentario {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.2rem;
-    font-size: 0.87rem;
-}
-
-#cancelar-respuesta {
-    background: none;
-    border: none;
-    color: #1a73e8;
-    cursor: pointer;
-    font-weight: bold;
-}
-
 @media (max-width: 600px) {
     #noticia-comentarios {
         padding: 24px 5px;
@@ -410,32 +484,49 @@
         width: 24px;
         height: 24px;
     }
+
+    .nuevo-comentario-wrapper img {
+        width: 36px;
+        height: 36px;
+    }
+
+    .acciones-comentario {
+        margin-left: 0.5rem;
+    }
+
+    .input-contenedor textarea {
+        font-size: 1rem;
+    }
+
+    .pill-mencion {
+        font-size: 0.97rem;
+        padding: 2px 8px;
+    }
 }
 
-.mencion-usuario {
-    color: #1a73e8;
-    font-weight: 500;
-    margin-right: 2px;
+.nuevo-comentario-wrapper textarea {
+    border: none;
+    border-bottom: 2px solid #ccc;
+    background: transparent;
+    color: #222;
+    font-size: 1.12rem;
+    font-family: inherit;
+    resize: none;
+    padding: 10px 0 8px 0;
+    box-sizing: border-box;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color .2s;
+    overflow-y: auto;
+    min-height: 44px;
+    max-height: 120px;
 }
 
-/* Estilos generales para el bloque de nuevo comentario */
-.nuevo-comentario-wrapper {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    position: relative;
+#noticia-comentarios .nuevo-comentario-wrapper textarea {
+    overflow-y: auto;
+    resize: none;
+    max-height: 110px;
 }
-
-.nuevo-comentario-wrapper.respondiendo textarea {
-    border-color: #1565c0;
-    box-shadow: 0 0 0 1.5px #1565c055;
-}
-
-
-
-
-
-
 
 /* ------------------------ css para botones de navegacion entre noticias ------------------------------ */
 #noticia-comentarios .navegacion-noticias {

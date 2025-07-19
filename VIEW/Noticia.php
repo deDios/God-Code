@@ -188,21 +188,20 @@
                     <div class="nuevo-comentario">
                         <div class="nuevo-comentario-wrapper">
                             <img src="../ASSETS/noticia/usuario_icon_1.png" alt="Tu avatar">
-                            <textarea placeholder="Añade un comentario..." maxlength="500"></textarea>
+                            <div class="input-contenedor">
+                                <div id="pill-mencion" class="pill-mencion" style="display: none;"></div>
+                                <textarea placeholder="Añade un comentario..." maxlength="500" rows="2"></textarea>
+                            </div>
                         </div>
-
                         <div class="acciones-comentario">
                             <span id="contador-caracteres">0/500</span>
-                            <button id="cancelar-respuesta" style="display: none;">Cancelar respuesta</button>
+                            <button id="cancelar-respuesta" style="display:none;">Cancelar</button>
+                            <button id="btn-enviar-comentario" class="btn btn-primary">Comentar</button>
                         </div>
-
-                        <button id="btn-enviar-comentario" class="btn btn-primary" style="margin-top: 0.5rem;">
-                            Enviar comentario
-                        </button>
                     </div>
 
                     <div class="lista-comentarios" id="lista-comentarios">
-                        <!-- Comentarios se insertan dinámicamente aquí -->
+                        <!-- se arman los comentarios desde el JS -->
                     </div>
                 </div>
 
@@ -211,7 +210,6 @@
                         <strong>Anterior</strong>
                         <span id="titulo-anterior">Título de noticia anterior</span>
                     </button>
-
                     <button id="btn-siguiente" class="btn-navegacion">
                         <strong>Siguiente</strong>
                         <span id="titulo-siguiente">Título de noticia que sigue</span>
@@ -219,6 +217,7 @@
                 </div>
             </div>
         </section>
+
 
 
 

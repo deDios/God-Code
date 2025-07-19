@@ -95,16 +95,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 //----------------------- JS para los comentarios
 
+
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // --- Variables y endpoints ---
+  // Variables y endpoints
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
-  const textarea = document.querySelector(".nuevo-comentario textarea");
+  const textarea = document.querySelector(".input-contenedor textarea");
+  const pillMencion = document.getElementById("pill-mencion");
   const contador = document.getElementById("contador-caracteres");
   const btnCancelar = document.getElementById("cancelar-respuesta");
   const btnEnviar = document.getElementById("btn-enviar-comentario");
-  const wrapper = document.querySelector(".nuevo-comentario-wrapper");
   const endpointComentarios =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
   const endpointInsertar =
@@ -114,10 +116,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let usuarioId = null;
   let respuestaA = null;
+  let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
-  // --- Usuario logeado desde cookie ---
+  // --- Login cookie
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -134,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // --- Habilitar/deshabilitar textarea y botón según login ---
+  // --- Activar/desactivar input según login
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -144,29 +147,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       textarea.disabled = false;
       textarea.placeholder = "Añade un comentario...";
-      btnEnviar.disabled = false;
+      btnEnviar.disabled = true; // inicia desactivado hasta que escriba
       btnEnviar.classList.remove("disabled");
     }
   }
   actualizarEstadoInput();
 
-  // --- Contador de caracteres ---
+  // --- Contador de caracteres y bloqueo botón
   textarea.addEventListener("input", () => {
     contador.textContent = `${textarea.value.length}/500`;
     btnEnviar.disabled =
       !usuarioId || enviando || textarea.value.trim().length === 0;
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
+
+    // Oculta la pill si empieza a escribir (pero NO si la mención aún está)
+    if (pillMencion.style.display === "inline-block") {
+      if (
+        !textarea.value.startsWith("@" + respuestaA_nombre) &&
+        respuestaA_nombre
+      ) {
+        pillMencion.style.display = "none";
+        respuestaA = null;
+        respuestaA_nombre = "";
+        btnCancelar.style.display = "none";
+      }
+    }
   });
 
-  // --- Cancelar respuesta ---
+  // --- Cancelar respuesta
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
+    respuestaA_nombre = "";
+    pillMencion.style.display = "none";
     textarea.value = "";
     textarea.placeholder = "Añade un comentario...";
     btnCancelar.style.display = "none";
+    contador.textContent = "0/500";
   });
 
-  // --- Publicar comentario/respuesta ---
+  // --- Publicar comentario/respuesta
   btnEnviar.addEventListener("click", async () => {
     const texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
@@ -199,6 +218,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         textarea.value = "";
         contador.textContent = "0/500";
         respuestaA = null;
+        respuestaA_nombre = "";
+        pillMencion.style.display = "none";
         textarea.placeholder = "Añade un comentario...";
         btnCancelar.style.display = "none";
         gcToast("Comentario publicado", "exito");
@@ -218,13 +239,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function scrollToUltimoComentario() {
     const lista = document.getElementById("lista-comentarios");
-    const ultimo = lista?.firstElementChild;
-    if (ultimo) {
-      ultimo.scrollIntoView({ behavior: "smooth", block: "start" });
+    const primero = lista?.firstElementChild;
+    if (primero) {
+      primero.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
-  // --- Render y carga de comentarios y respuestas (estilo YouTube) ---
+  // --- Cargar comentarios
   async function cargarComentarios(noticiaId) {
     lista.innerHTML = "";
     try {
@@ -247,9 +268,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // --- Render de comentario principal y todas sus respuestas ---
+  // --- Render de comentario principal y respuestas
   function crearComentarioHTML(data) {
-    // Mapa id de respuesta => usuario_nombre para las menciones
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
       idToNombre[res.id] = res.usuario_nombre;
@@ -299,12 +319,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    // Subrespuestas (todas bajo el comentario principal)
     if (data.respuestas?.length > 0) {
       const contenedor = document.createElement("div");
       contenedor.className = "subrespuestas";
       contenedor.style.display = "none";
-      // Ordenar por fecha ascendente (más viejo arriba)
       data.respuestas.sort(
         (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
       );
@@ -318,18 +336,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --- Render de cada respuesta (estilo YouTube) ---
+  // --- Render de cada respuesta (incluye pill tipo @usuario si aplica)
   function crearRespuestaHTML(res, idToNombre, idComentarioPrincipal) {
-    // Si respuesta_a corresponde a otra respuesta, menciona al usuario con @
     let prefijo = "";
     if (
       res.respuesta_a &&
       res.respuesta_a !== idComentarioPrincipal &&
       idToNombre[res.respuesta_a]
     ) {
-      prefijo = `<span class="mencion-usuario">@${
-        idToNombre[res.respuesta_a]
-      }</span> `;
+      prefijo = `<span class="mencion-usuario">@${idToNombre[res.respuesta_a]}</span> `;
     }
     const div = document.createElement("div");
     div.className = "comentario subcomentario";
@@ -363,7 +378,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --- Click handler para responder y reacciones ---
+  // --- Click handler para responder y reacciones
   document.addEventListener("click", (e) => {
     // Responder (en cualquier comentario o respuesta)
     if (e.target.classList.contains("accion")) {
@@ -373,34 +388,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
       const comentario = e.target.closest(".comentario");
-      let autor =
-        comentario.querySelector(".comentario-meta strong")?.textContent || "";
-
-      // Busca el id del comentario principal si es respuesta
-      let id;
-      if (comentario.classList.contains("subcomentario")) {
-        let padre = comentario.parentElement.closest(
-          ".comentario:not(.subcomentario)"
-        );
-        id = parseInt(padre.querySelector(".reaccion")?.dataset.id);
+      const esRespuesta = comentario.classList.contains("subcomentario");
+      let id, autor;
+      if (esRespuesta) {
+        id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+        autor =
+          comentario.querySelector(".comentario-meta strong")?.textContent ||
+          "";
       } else {
         id = parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+        autor =
+          comentario.querySelector(".comentario-meta strong")?.textContent ||
+          "";
       }
-
       respuestaA = id;
-
+      respuestaA_nombre = autor;
+      pillMencion.textContent = `@${autor}`;
+      pillMencion.style.display = "inline-block";
       textarea.value = `@${autor} `;
       textarea.focus();
-      // Coloca el cursor al final del textarea
-      setTimeout(() => {
-        textarea.setSelectionRange(
-          textarea.value.length,
-          textarea.value.length
-        );
-      }, 10);
-
       btnCancelar.style.display = "inline";
+      // Mueve el cursor al final:
+      setTimeout(() => {
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      }, 20);
     }
+
     // Mostrar/ocultar subrespuestas
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
@@ -415,6 +428,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? ` Ocultar ${subrespuestas.childElementCount} respuesta(s)`
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
+
     // Likes/dislikes
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
@@ -453,7 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // --- Helper tiempo relativo ---
+  // --- Helper tiempo relativo
   function tiempoRelativo(fechaStr) {
     const fecha = new Date(fechaStr);
     const ahora = new Date();
@@ -466,7 +480,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `Hace ${Math.floor(diff / 31536000)} año(s)`;
   }
 
-  // --- Inicializar ---
+  // --- Inicializar
   if (noticiaId) {
     await cargarComentarios(noticiaId);
   }
