@@ -154,7 +154,7 @@
                 </div>
                 <div class="cta-box">
                     <h3>Crea tu App Mobile</h3>
-                    <button onclick="location.href='#'">Contáctanos</button>
+                    <button onclick="location.href='../VIEW/Contacto.php'">Contáctanos</button>
                 </div>
             </div>
 

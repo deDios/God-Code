@@ -307,6 +307,11 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
       cursos.forEach((curso) => {
         const card = document.createElement("div");
         card.classList.add("card");
+        card.style.cursor = "pointer";
+
+        card.addEventListener("click", () => {
+          window.location.href = `../VIEW/cursoInfo.php?id=${curso.id}`;
+        });
 
         const img = document.createElement("img");
         img.src = `../ASSETS/cursos/img${curso.id}.png`;
@@ -400,4 +405,3 @@ if (window.location.pathname.includes("ServicioEducativo.php")) {
     }
   });
 }
-

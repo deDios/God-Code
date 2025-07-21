@@ -260,13 +260,13 @@
                         optimiza la gestión operativa de la empresa.</p>
                 </div>
                 <div class="imagenNosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img1.png" alt="Mobility Solutions">
+                    <img src="../ASSETS/Nosotros/seccion3_img1.png" alt="Mobility Solutions">
                 </div>
             </div>
 
             <div class="proyecto animado">
                 <div class="imagenNosotros">
-                    <img src="../ASSETS/Nosotros/seccion1_img2.png" alt="Luna Café">
+                    <img src="../ASSETS/Nosotros/seccion3_img2.png" alt="Luna Café">
                 </div>
                 <div class="texto">
                     <h3>Luna Café – Punto de venta inteligente</h3>
