@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 //----------------------- JS para los comentarios
 document.addEventListener("DOMContentLoaded", async () => {
+  // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -483,12 +484,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         gcToast("Inicia sesión para responder", "advertencia");
         return;
       }
-      const comentario = e.target.closest(".comentario, .subcomentario");
+      const comentario = e.target.closest(".comentario");
       const autor =
         comentario.querySelector(".comentario-meta strong")?.textContent || "";
-
-      respuestaA = parseInt(comentario.dataset.comentarioId, 10); // ← Cambia aquí
-
+      let principal = comentario;
+      while (principal && principal.classList.contains("subcomentario")) {
+        principal = principal.parentElement.closest(
+          ".comentario:not(.subcomentario)"
+        );
+      }
+      respuestaA = principal
+        ? parseInt(principal.querySelector(".reaccion")?.dataset.id)
+        : parseInt(comentario.querySelector(".reaccion")?.dataset.id);
       respuestaA_nombre = autor;
 
       const atText = `@${respuestaA_nombre} `;
