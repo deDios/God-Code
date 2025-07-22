@@ -155,7 +155,7 @@
 
             <!-- Columna derecha -->
             <div class="columna noticias">
-                <h3>Noticias sobre tecnología</h3>
+                <h3>Noticias</h3>
 
                 <div id="lista-noticias">
                     <div class="contenedor-animado">

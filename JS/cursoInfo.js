@@ -118,8 +118,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       curso.precio == 0
         ? "Gratuito"
         : `$${curso.precio.toLocaleString("es-MX", {
-          minimumFractionDigits: 2,
-        })}`;
+            minimumFractionDigits: 2,
+          })}`;
 
     elementos.horas.textContent = `${curso.horas} Horas totales`;
     elementos.actividades.textContent = actividades.nombre;
@@ -128,8 +128,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fechaFormateada = formatearFecha(curso.fecha_inicio);
     elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
 
-    elementos.certificado.textContent = `Certificado ${curso.certificado ? "incluido" : "no incluido"
-      }`;
+    elementos.certificado.textContent = `Certificado ${
+      curso.certificado ? "incluido" : "no incluido"
+    }`;
 
     if (tutor) {
       elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
@@ -167,18 +168,20 @@ document.addEventListener("DOMContentLoaded", async () => {
           (curso) => `
       <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
         <div class="card-curso">
-            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${curso.nombre
-            }">
+            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
+            curso.nombre
+          }">
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
                 <p class="info-curso">
-                ${curso.horas} hrs | ${curso.precio === 0
+                ${curso.horas} hrs | ${
+            curso.precio === 0
               ? "Gratuito"
               : `$${curso.precio.toLocaleString("es-MX", {
-                minimumFractionDigits: 2,
-              })}`
-            }
+                  minimumFractionDigits: 2,
+                })}`
+          }
                 </p>
             </div>
         </div>
@@ -260,6 +263,7 @@ function inicializarAcordeones() {
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 console.log("DOM cargado modal listo");
 
+// Variables DOM
 const modal = document.getElementById("modal-inscripcion");
 const abrirBtn = document.getElementById("abrir-modal-inscripcion");
 const cerrarBtn = document.querySelector(".cerrar-modal");
@@ -276,6 +280,7 @@ const telefonoInput = document.getElementById("telefono");
 const correoInput = document.getElementById("correo");
 const btnSubmit = document.querySelector(".btn-inscribirme");
 
+// Endpoints
 const ENDPOINT_CONSULTA =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 const ENDPOINT_INSERTAR =
@@ -283,7 +288,7 @@ const ENDPOINT_INSERTAR =
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// mostrar notificación tipo toast
+// Toast visual
 function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   const contenedor = document.querySelector(".toast-container");
   if (!contenedor) return;
@@ -300,12 +305,26 @@ function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
   }, duracion);
 }
 
-// mostrar/ocultar modal
+// Mostrar/ocultar modal
 const abrirModal = () => {
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
   cursoNombreInput.value = nombreCursoGlobal;
+
+  // Si el usuario está logeado, autocompleta y bloquea campos
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
+  if (usuarioCookie) {
+    try {
+      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+      if (datos?.id) {
+        // Rellena y bloquea
+        llenarFormulario(datos, true);
+      }
+    } catch (e) {}
+  }
 };
 
 const cerrarModal = () => {
@@ -314,7 +333,7 @@ const cerrarModal = () => {
   limpiarFormulario();
 };
 
-// limpiar formulario y estados visuales
+// Limpia campos y estados
 const limpiarFormulario = () => {
   formInscripcion.reset();
   toggleFormularios(false);
@@ -322,6 +341,7 @@ const limpiarFormulario = () => {
   loginInput.value = "";
   btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
+  desbloquearCampos();
 
   document.querySelectorAll(".icono-alerta").forEach((el) => {
     el.textContent = "";
@@ -339,22 +359,23 @@ const limpiarFormulario = () => {
   buscarBtn.classList.remove("disabled");
 };
 
-// alternar entre login y registro
+// Alternar login/registro
 const toggleFormularios = (mostrarLogin) => {
   titulo.style.display = mostrarLogin ? "none" : "flex";
   checkboxCuenta.checked = mostrarLogin;
   camposRegistro.classList.toggle("mostrar", !mostrarLogin);
   camposLogin.classList.toggle("mostrar", mostrarLogin);
   cursoNombreInput.value = nombreCursoGlobal;
+  desbloquearCampos();
 };
 
-// mensaje de error o alerta visual
+// mostrar mensaje toast y controla link de volver
 const mostrarMensaje = (mensaje, tipo = "error") => {
   volverRegistro.classList.toggle("mostrar", tipo === "error");
   mostrarToast(mensaje, tipo);
 };
 
-// buscar cuenta existente
+// buscar cuenta existente (correo/telefono)
 const buscarCuentaExistente = async () => {
   const identificador = loginInput.value.trim().toLowerCase();
   if (!identificador)
@@ -370,17 +391,19 @@ const buscarCuentaExistente = async () => {
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       mostrarToast("Cuenta encontrada correctamente.", "exito");
-      llenarFormulario(data[0]);
+      llenarFormulario(data[0], true); // bloquea campos si encuentra
     } else {
       mostrarToast("No encontramos tu cuenta.", "warning");
+      limpiarFormulario();
+      desbloquearCampos();
     }
   } catch (err) {
     mostrarToast("Error al consultar la cuenta.", "error");
   }
 };
 
-// llenar campos con datos de cuenta encontrada
-const llenarFormulario = (cuenta) => {
+// rellena y bloquea campos
+function llenarFormulario(cuenta, bloquear = false) {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
@@ -394,14 +417,35 @@ const llenarFormulario = (cuenta) => {
   });
 
   toggleFormularios(false);
-  document.querySelectorAll(".input-alerta-container").forEach((c) =>
-    c.classList.remove("alerta")
-  );
+  document
+    .querySelectorAll(".input-alerta-container")
+    .forEach((c) => c.classList.remove("alerta"));
   btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
-};
 
-//validar al menos un medio de contacto
+  // bloquea todos los campos si se necesita
+  if (bloquear) {
+    document.getElementById("nombre").readOnly = true;
+    document.getElementById("telefono").readOnly = true;
+    document.getElementById("correo").readOnly = true;
+    document.getElementById("fecha-nacimiento").readOnly = true;
+    document
+      .querySelectorAll('input[name="medios-contacto"]')
+      .forEach((cb) => (cb.disabled = true));
+  }
+}
+
+function desbloquearCampos() {
+  document.getElementById("nombre").readOnly = false;
+  document.getElementById("telefono").readOnly = false;
+  document.getElementById("correo").readOnly = false;
+  document.getElementById("fecha-nacimiento").readOnly = false;
+  document
+    .querySelectorAll('input[name="medios-contacto"]')
+    .forEach((cb) => (cb.disabled = false));
+}
+
+// validacion de los medios de contacto mas abajo esta lo que necesitan
 const validarMediosContacto = () => {
   return (
     document.querySelectorAll('input[name="medios-contacto"]:checked').length >
@@ -409,7 +453,7 @@ const validarMediosContacto = () => {
   );
 };
 
-// validar duplicados y mostrar alertas
+// validar duplicados
 const validarDuplicados = async () => {
   const telefono = telefonoInput.value.trim();
   const correo = correoInput.value.trim();
@@ -439,7 +483,6 @@ const validarDuplicados = async () => {
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       let mensaje = "Ya existe una cuenta con ese ";
-
       if (telefono && data.some((d) => d.telefono === telefono)) {
         telefonoInput
           .closest(".input-alerta-container")
@@ -448,25 +491,23 @@ const validarDuplicados = async () => {
         mensaje += "teléfono ";
         warning = true;
       }
-
       if (correo && data.some((d) => d.correo === correo)) {
         correoInput.closest(".input-alerta-container").classList.add("alerta");
         correoIcono.textContent = "⚠️";
         mensaje += telefono ? "y correo" : "correo";
         warning = true;
       }
-
       mostrarToast(mensaje.trim(), "warning");
     }
   } catch (err) {
     console.warn("Error validando duplicados:", err);
   }
-
   buscarBtn.classList.toggle("disabled", warning);
   btnSubmit.disabled = warning;
   btnSubmit.classList.toggle("disabled", warning);
 };
 
+// iconos de validacion campos
 telefonoInput.addEventListener("blur", () => validarCampoValido(telefonoInput));
 correoInput.addEventListener("blur", () => validarCampoValido(correoInput));
 
@@ -476,7 +517,7 @@ function validarCampoValido(input) {
     { input: correoInput, id: "correo" },
   ];
 
-  campos.forEach(({ input: campo, id }) => {
+  campos.forEach(({ input: campo }) => {
     const contenedor = campo.closest(".input-alerta-container");
     const icono = contenedor.querySelector(".icono-alerta");
     const valor = campo.value.trim();
@@ -501,7 +542,7 @@ function validarCampoValido(input) {
   btnSubmit.classList.toggle("disabled", algunWarning);
 }
 
-// tipo de contacto: 1 = tel, 2 = correo, 3 = ambos
+// tipo_contacto: 1 = tel, 2 = correo, 3 = ambos
 const obtenerTipoContacto = () => {
   const seleccionados = Array.from(
     document.querySelectorAll('input[name="medios-contacto"]:checked')
@@ -513,19 +554,17 @@ const obtenerTipoContacto = () => {
   return 0;
 };
 
-// envío final del formulario
+// envio final del formulario
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!validarMediosContacto()) {
     mostrarToast("Selecciona al menos un medio de contacto.", "warning");
     return;
   }
-
   if (btnSubmit.disabled) {
     mostrarToast("Corrige los campos marcados antes de continuar.", "warning");
     return;
   }
-
   const nombre = document.getElementById("nombre").value.trim();
   const telefono = telefonoInput.value.trim();
   const correo = correoInput.value.trim();
@@ -543,10 +582,8 @@ formInscripcion.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correo, telefono }),
     });
-
     const checkData = await checkRes.json();
     let idUsuario = null;
-
     if (Array.isArray(checkData) && checkData.length > 0) {
       idUsuario = checkData[0].id;
     } else {
@@ -559,10 +596,9 @@ formInscripcion.addEventListener("submit", async (e) => {
           telefono,
           fecha_nacimiento,
           tipo_contacto,
-          password: "godcode123",
+          password: "godcode123", //contraseña por defecto
         }),
       });
-
       const insertData = await insertRes.json();
       if (insertData?.mensaje === "Usuario registrado correctamente") {
         const nuevoRes = await fetch(ENDPOINT_CONSULTA, {
@@ -576,7 +612,6 @@ formInscripcion.addEventListener("submit", async (e) => {
         throw new Error("No se pudo registrar el usuario.");
       }
     }
-
     const inscRes = await fetch(ENDPOINT_INSCRIPCION, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -586,10 +621,9 @@ formInscripcion.addEventListener("submit", async (e) => {
         comentario: "",
       }),
     });
-
     const inscData = await inscRes.json();
     mostrarToast(inscData?.mensaje || "Inscripción completada.", "exito", 6000);
-    cerrarModal(); // ✅ Limpia y cierra
+    cerrarModal(); // limpia y cierra el modal
   } catch (err) {
     console.error("Error en inscripción:", err);
     mostrarToast("Hubo un error al procesar tu inscripción.", "error");
@@ -612,6 +646,7 @@ buscarBtn.addEventListener("click", buscarCuentaExistente);
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
   toggleFormularios(false);
+  desbloquearCampos();
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
