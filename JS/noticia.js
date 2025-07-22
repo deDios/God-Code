@@ -254,22 +254,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (data?.mensaje === "Comentario registrado correctamente") {
         ultimoComentario = texto;
 
-        const nodo = await crearNodoComentarioInstantaneo(
-          {
-            id: data?.id ?? Date.now(),
-            usuario_id: usuarioId,
-            usuario_nombre: usuarioNombre,
-            comentario: texto,
-            fecha_creacion: new Date().toISOString(),
-            likes: 0,
-            dislikes: 0,
-            mi_reaccion: null,
-            respuestas: [],
-          },
-          respuestaA
-        );
-        lista.insertBefore(nodo, lista.firstChild);
-        hacerStickyAnim(nodo);
+        if (respuestaA) {
+          // Es una respuesta: recarga SOLO el comentario padre (donde debe aparecer la respuesta)
+          await recargarUnComentario(
+            respuestaA,
+            document.querySelector(`[data-comentario-id="${respuestaA}"]`)
+          );
+        } else {
+          // Es comentario principal: agrégalo optimistamente al inicio (o recarga toda la lista si prefieres)
+          const nodo = await crearNodoComentarioInstantaneo(
+            {
+              id: data?.id ?? Date.now(),
+              usuario_id: usuarioId,
+              usuario_nombre: usuarioNombre,
+              comentario: texto,
+              fecha_creacion: new Date().toISOString(),
+              likes: 0,
+              dislikes: 0,
+              mi_reaccion: null,
+              respuestas: [],
+            },
+            respuestaA
+          );
+          lista.insertBefore(nodo, lista.firstChild);
+          hacerStickyAnim(nodo);
+        }
 
         textarea.value = "";
         contador.textContent = "0/500";
