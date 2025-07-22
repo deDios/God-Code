@@ -1,0 +1,462 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  background: #fafafa;
+}
+
+#home-main {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ----------- SIDEBAR IZQUIERDO ----------- */
+.sidebar {
+  width: 340px;
+  background: #fff;
+  padding: 0 24px;
+  border-right: 1px solid #e3e3e3;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 12px;
+}
+
+.avatar-circle {
+  width: 112px;
+  height: 112px;
+  background: #f2f2f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.avatar-circle img {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  text-align: center;
+  margin-bottom: 5px;
+}
+.user-info #user-name {
+  font-weight: 500;
+  font-size: 1.08rem;
+  margin-bottom: 2px;
+}
+.edit-profile {
+  font-size: 0.86rem;
+  color: #1565c0;
+  text-decoration: none;
+  transition: color 0.17s;
+}
+.edit-profile:hover {
+  color: #0a4596;
+  text-decoration: underline;
+}
+
+.aprender-hoy {
+  margin-top: 18px;
+  margin-bottom: 14px;
+}
+.aprender-hoy h2 {
+  font-size: 1.18rem;
+  font-weight: 400;
+  margin: 0 0 8px 0;
+}
+.input-search {
+  position: relative;
+}
+.input-search input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  padding: 8px 32px 8px 12px;
+  font-size: 1rem;
+  background: #f8f8f8;
+  transition: border 0.2s;
+}
+.input-search input:focus {
+  border-color: #1565c0;
+  background: #fff;
+  outline: none;
+}
+
+.icon-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/icons/search.svg') no-repeat center/contain;
+  opacity: 0.6;
+}
+
+.bloque-objetivos {
+  background: #f7f7fb;
+  border-radius: 8px;
+  margin-top: 14px;
+  margin-bottom: 24px;
+  padding: 12px 12px 12px 12px;
+  border: 1px solid #dedede;
+}
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.tabs .tab {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  color: #3b3b3b;
+  padding: 7px 15px;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  font-size: 1rem;
+}
+.tabs .tab.active {
+  background: #e8eefd;
+  color: #0a57c6;
+}
+.tabs .arrow {
+  font-size: 0.92em;
+  margin-left: 3px;
+}
+.objetivos-content {
+  margin-top: 12px;
+}
+.objetivo {
+  font-size: 0.98rem;
+  color: #343434;
+  margin-bottom: 9px;
+}
+.objetivo-label {
+  font-weight: 600;
+  display: block;
+  color: #1a73e8;
+  margin-bottom: 1px;
+}
+.objetivo-num {
+  font-weight: 400;
+  font-size: 0.97em;
+}
+.cursos-completados {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+.circular-chart {
+  width: 44px;
+  height: 44px;
+  position: relative;
+}
+.circular-chart svg {
+  width: 44px;
+  height: 44px;
+}
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3.5;
+}
+.circle {
+  fill: none;
+  stroke: #1565c0;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s;
+}
+.circle-text {
+  position: absolute;
+  left: 0; top: 0;
+  width: 44px; height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.16rem;
+  font-weight: 600;
+  color: #1565c0;
+}
+.cursos-label {
+  font-size: 0.89em;
+  color: #222;
+  font-weight: 500;
+}
+.titulo-recibido {
+  font-size: 0.93em;
+  color: #666;
+  margin-top: 4px;
+  margin-bottom: 3px;
+}
+
+/* ---- Mis Cursos ---- */
+.mis-cursos {
+  margin-top: 18px;
+}
+.mis-cursos h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.cursos-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.cursos-list {
+  margin-bottom: 6px;
+}
+.cursos-subtitulo {
+  font-size: 0.96em;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #222;
+}
+#cursos-activos, #cursos-pendientes, #cursos-terminados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.curso-card {
+  background: #f7f7fb;
+  border: 1px solid #dadada;
+  border-radius: 6px;
+  font-size: 0.98em;
+  padding: 7px 11px;
+  margin-bottom: 2px;
+  min-width: 138px;
+  max-width: 180px;
+  box-sizing: border-box;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.curso-card:hover {
+  background: #e3f0ff;
+  box-shadow: 0 2px 6px #bcd6f3a8;
+}
+
+/* ----------- MAIN CONTENT (DERECHO) ----------- */
+.main-content {
+  flex: 1;
+  background: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-navbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 34px 0 26px 0;
+  border-bottom: 1px solid #e3e3e3;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.nav-btn {
+  background: #fff;
+  border: none;
+  font-size: 1.04rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px #e6e6e6;
+  padding: 13px 18px;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.15s;
+  outline: none;
+}
+.nav-btn.active, .nav-btn:hover {
+  background: #f1f7fe;
+  box-shadow: 0 4px 10px #e0e9fa;
+}
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 1.25rem;
+  margin-right: 2px;
+}
+.nav-icon img {
+  width: 22px;
+  height: 22px;
+}
+
+.recursos-box {
+  padding: 32px 38px 0 38px;
+}
+.recursos-box h2 {
+  font-size: 1.38rem;
+  font-weight: 600;
+  margin-bottom: 17px;
+}
+.recursos-table {
+  width: 100%;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  box-sizing: border-box;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.table-header, .table-body {
+  display: flex;
+  flex-direction: column;
+}
+.table-header {
+  flex-direction: row;
+  background: #f4f7fb;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #242424;
+  border-bottom: 1px solid #e2e2e2;
+}
+.table-header > div {
+  padding: 12px 0 12px 13px;
+}
+.col-nombre {
+  flex: 2 1 240px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.col-tipo {
+  flex: 1 1 120px;
+}
+.col-fecha {
+  flex: 1.3 1 150px;
+}
+.flecha {
+  font-size: 1.05em;
+  color: #1565c0;
+  margin-left: 2px;
+}
+
+.table-body {
+  width: 100%;
+}
+.table-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 1.03rem;
+  background: #fff;
+  transition: background 0.17s;
+  cursor: pointer;
+}
+.table-row:last-child {
+  border-bottom: none;
+}
+.table-row:hover {
+  background: #f2f9ff;
+}
+.table-row > div {
+  padding: 11px 0 11px 13px;
+}
+.table-row .col-nombre {
+  flex: 2 1 240px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #222;
+}
+.table-row .col-tipo {
+  flex: 1 1 120px;
+  color: #666;
+  font-size: 0.97em;
+}
+.table-row .col-fecha {
+  flex: 1.3 1 150px;
+  color: #888;
+  font-size: 0.96em;
+}
+.table-row .icon-recurso {
+  margin-right: 7px;
+  width: 18px;
+  height: 18px;
+}
+
+.table-row .link {
+  color: #145bc7;
+  text-decoration: underline;
+  font-size: 1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.18s;
+  padding: 0;
+}
+.table-row .link:hover {
+  color: #103d75;
+  text-decoration: underline;
+}
+
+/* --------- Responsive --------- */
+@media (max-width: 950px) {
+  #home-main {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e3e3e3;
+    min-height: unset;
+    padding: 14px 7vw 18px 7vw;
+  }
+  .main-content {
+    padding: 0 7vw;
+  }
+  .recursos-box {
+    padding: 32px 4vw 0 4vw;
+  }
+}
+
+@media (max-width: 700px) {
+  .main-navbar {
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 22px 0 16px 0;
+  }
+  .sidebar {
+    padding: 7px 2vw;
+  }
+  .recursos-box {
+    padding: 16px 2vw 0 2vw;
+  }
+  .recursos-table {
+    font-size: 0.93em;
+  }
+}
+
+@media (max-width: 520px) {
+  .main-navbar {
+    padding: 12px 0 10px 0;
+    gap: 2px;
+  }
+  .recursos-box {
+    padding: 4px 2vw 0 2vw;
+  }
+}
