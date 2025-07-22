@@ -247,7 +247,7 @@
 
             <div class="proyecto fila invertida2 animado">
                 <div class="texto">
-                    <h3>Mobility Solutions – Plataforma web empresarial</h3>
+                    <h3>Mobility Solutions Plataforma web empresarial</h3>
                     <p>Diseñamos y desarrollamos una plataforma web completa para la empresa Mobility Solutions, con un
                         enfoque integral:</p>
                     <ul class="lista-puntos">
@@ -269,7 +269,7 @@
                     <img src="../ASSETS/Nosotros/seccion3_img2.png" alt="Luna Café">
                 </div>
                 <div class="texto">
-                    <h3>Luna Café – Punto de venta inteligente</h3>
+                    <h3>Luna Café Punto de venta inteligente</h3>
                     <p>Creamos un sistema POS personalizado, diseñado para facilitar y automatizar la operación diaria
                         del negocio:</p>
                     <ul class="lista-puntos">
