@@ -753,6 +753,11 @@
     }
 }
 
+#lista-comentarios .comentario {
+    transition: opacity 0.25s;
+}
+
+
 
 
 

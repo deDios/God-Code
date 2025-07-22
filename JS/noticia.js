@@ -94,9 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 //----------------------- JS para los comentarios
-
 document.addEventListener("DOMContentLoaded", async () => {
-  // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
   const lista = document.getElementById("lista-comentarios");
@@ -114,29 +112,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/d_reaccion_comentario.php";
 
   let usuarioId = null;
+  let usuarioNombre = "Tú";
   let respuestaA = null;
   let respuestaA_nombre = "";
   let enviando = false;
   let ultimoComentario = "";
 
-  // -------- Recuperar usuario logeado de cookie --------
-  const usuarioCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("usuario="));
-  if (usuarioCookie) {
-    try {
-      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
-      usuarioId = datos?.id || null;
-      if (datos?.avatar) {
-        document.querySelector(".nuevo-comentario-wrapper img").src =
-          datos.avatar;
+  function getUsuarioDeCookie() {
+    const usuarioCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("usuario="));
+    if (usuarioCookie) {
+      try {
+        const datos = JSON.parse(
+          decodeURIComponent(usuarioCookie.split("=")[1])
+        );
+        return datos;
+      } catch (e) {
+        return null;
       }
-    } catch (e) {
-      usuarioId = null;
+    }
+    return null;
+  }
+
+  // -------- recuperar usuario logeado de cookie --------
+  const usuario = getUsuarioDeCookie();
+  if (usuario) {
+    usuarioId = usuario?.id || null;
+    usuarioNombre = usuario?.nombre || "Tú";
+    if (usuario?.avatar) {
+      document.querySelector(".nuevo-comentario-wrapper img").src =
+        usuario.avatar;
     }
   }
 
-  // --------- Estado input/btn ----------
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -152,7 +161,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   actualizarEstadoInput();
 
-  // -------- Contador y validador de textarea --------
   textarea.addEventListener("input", () => {
     contador.textContent = `${textarea.value.length}/500`;
     btnEnviar.disabled =
@@ -163,7 +171,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // -------- Cancelar respuesta --------
+  textarea.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey && !btnEnviar.disabled) {
+      e.preventDefault();
+      btnEnviar.click();
+    }
+  });
+
+  // -------- cancelar respuesta --------
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
     respuestaA_nombre = "";
@@ -173,7 +188,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
-  // -------- Sticky animate (nuevo comentario) --------
   function hacerStickyAnim(nodo) {
     if (!nodo) return;
     nodo.classList.add("sticky-anim");
@@ -183,13 +197,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     nodo.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  // -------- Enviar comentario/respuesta --------
+  function esComentarioDuplicado(texto) {
+    const clean = (str) =>
+      (str || "")
+        .replace(/\s+/g, " ")
+        .replace(/^\s+|\s+$/g, "")
+        .toLowerCase();
+    return clean(texto) === clean(ultimoComentario);
+  }
+
+  // -------- enviar comentario/respuesta --------
   btnEnviar.addEventListener("click", async () => {
     let texto = textarea.value.trim();
-    if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
+    if (!texto || enviando || esComentarioDuplicado(texto) || !usuarioId)
+      return;
     if (enviando) return;
 
-    // Si es respuesta, anteponer @nombre
+    // si es respuesta, anteponer @nombre
     if (respuestaA && respuestaA_nombre) {
       const atText = `@${respuestaA_nombre} `;
       if (!texto.startsWith(atText)) {
@@ -201,7 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       gcToast("Comentario demasiado largo", "warning");
       return;
     }
-    if (texto === ultimoComentario) {
+    if (esComentarioDuplicado(texto)) {
       gcToast("No publiques el mismo texto dos veces.", "warning");
       return;
     }
@@ -229,15 +253,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (data?.mensaje === "Comentario registrado correctamente") {
         ultimoComentario = texto;
 
-        // Armar el nuevo comentario y meterlo arriba del DOM
         const nodo = await crearNodoComentarioInstantaneo(
           {
             id: data?.id ?? Date.now(),
             usuario_id: usuarioId,
-            usuario_nombre: usuarioCookie
-              ? JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]))
-                  .nombre
-              : "Tú",
+            usuario_nombre: usuarioNombre,
             comentario: texto,
             fecha_creacion: new Date().toISOString(),
             likes: 0,
@@ -271,14 +291,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   async function crearNodoComentarioInstantaneo(data, respuestaAId) {
-    // Solo principal, no respuestas anidadas instantáneas (para respuestas, puedes recargar solo el comentario padre)
     return crearComentarioHTML({
       ...data,
       respuestas: [],
     });
   }
 
-  // --------- Cargar comentarios ---------
+  // --------- cargar comentarios ---------
   async function cargarComentarios(noticiaId) {
     try {
       const res = await fetch(endpointComentarios, {
@@ -315,7 +334,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       cargarComentarios(noticiaId);
   }
 
-  // --------- Render comentario principal y respuestas ---------
+  // --------- render comentario principal y respuestas ---------
   function crearComentarioHTML(data) {
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
@@ -326,7 +345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     div.className = "comentario";
     div.dataset.comentarioId = data.id;
 
-    // like/dislike icon state
+    // like/dislike icon
     const likeActivo = data.mi_reaccion === "like";
     const dislikeActivo = data.mi_reaccion === "dislike";
 
@@ -375,7 +394,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
-    // Subrespuestas
+    // subrespuestas
     if (data.respuestas?.length > 0) {
       const contenedor = document.createElement("div");
       contenedor.className = "subcomentarios subrespuestas";
@@ -393,7 +412,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --------- Render respuesta ---------
+  // --------- armar respuesta ---------
   function crearRespuestaHTML(
     res,
     idToNombre,
@@ -415,7 +434,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // Like/dislike state
+    // like/dislike ahora con estados
     const likeActivo = res.mi_reaccion === "like";
     const dislikeActivo = res.mi_reaccion === "dislike";
 
@@ -456,9 +475,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --------- Eventos de click globales ---------
   document.addEventListener("click", async (e) => {
-    // ---- Responder a comentario/resp ----
+    // ---- responder a comentario ----
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -489,7 +507,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       contador.textContent = `${textarea.value.length}/500`;
     }
 
-    // ---- Mostrar/Ocultar respuestas ----
+    // ---- mostrar/ocultar respuestas ----
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
       const enlace = e.target.closest(".ver-respuestas");
@@ -504,7 +522,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
 
-    // ---- Like/dislike con MUTUAL EXCLUSION real y logs ----
+    // ---- like/dislike ----
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -520,108 +538,125 @@ document.addEventListener("DOMContentLoaded", async () => {
       const likeBtn = comentarioDiv.querySelector(".reaccion.like");
       const dislikeBtn = comentarioDiv.querySelector(".reaccion.dislike");
 
-      // Deshabilita ambos durante fetch
+      const prevLike = likeBtn.classList.contains("liked");
+      const prevDislike = dislikeBtn.classList.contains("disliked");
+
+      // deshabilita botones para evitar multiples fetch
       likeBtn.style.pointerEvents = "none";
       dislikeBtn.style.pointerEvents = "none";
 
-      // ¿El usuario ya tenía like/dislike?
-      const yaLike = likeBtn.classList.contains("liked");
-      const yaDislike = dislikeBtn.classList.contains("disliked");
-
-      // Si ya tenía ese tipo, es quitar
-      if ((tipo === "like" && yaLike) || (tipo === "dislike" && yaDislike)) {
-        console.log("Quitando reacción", { comentarioId, usuarioId, tipo });
-        fetch(endpointQuitarReaccion, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            comentario_id: comentarioId,
-            usuario_id: usuarioId,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Respuesta quitar reacción:", data);
-            if (data?.mensaje?.toLowerCase().includes("eliminada")) {
-              gcToast("Reacción eliminada.", "exito");
-              cargarComentarios(noticiaId);
-            } else {
-              gcToast(data?.mensaje || "No se pudo quitar reacción", "warning");
-            }
-          })
-          .catch(() => gcToast("Error de red al quitar reacción", "error"))
-          .finally(() => {
-            likeBtn.style.pointerEvents = "";
-            dislikeBtn.style.pointerEvents = "";
-          });
-        return;
-      }
-
-      // Si tenía la opuesta (like si da dislike, dislike si da like), primero quitar la opuesta
-      let quitarPrimero = false;
-      if ((tipo === "like" && yaDislike) || (tipo === "dislike" && yaLike)) {
-        quitarPrimero = true;
-      }
-
-      const quitarOpuesta = quitarPrimero
-        ? fetch(endpointQuitarReaccion, {
+      try {
+        if (
+          (tipo === "like" && prevDislike) ||
+          (tipo === "dislike" && prevLike)
+        ) {
+          await fetch(endpointQuitarReaccion, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               comentario_id: comentarioId,
               usuario_id: usuarioId,
             }),
-          }).then((res) => res.json())
-        : Promise.resolve();
-
-      quitarOpuesta.then((dataQuitar) => {
-        if (quitarPrimero) {
-          console.log("Primero quitando opuesta:", dataQuitar);
+          });
         }
-        // Ahora sí, registra la nueva reacción
-        console.log("Registrando nueva reacción", {
-          comentarioId,
-          usuarioId,
-          tipo,
-        });
-        fetch(endpointReaccion, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+
+        let endpoint, fetchBody;
+        if (
+          (tipo === "like" && prevLike) ||
+          (tipo === "dislike" && prevDislike)
+        ) {
+          // en caso de ya haber reaccionado quita la que estaba
+          endpoint = endpointQuitarReaccion;
+          fetchBody = {
+            comentario_id: comentarioId,
+            usuario_id: usuarioId,
+          };
+        } else {
+          endpoint = endpointReaccion;
+          fetchBody = {
             comentario_id: comentarioId,
             usuario_id: usuarioId,
             reaccion: tipo,
             estatus: 1,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Respuesta registrar reacción:", data);
-            if (data?.mensaje?.toLowerCase().includes("registrada")) {
-              gcToast(
-                `¡Gracias por tu ${tipo === "like" ? "like" : "dislike"}!`,
-                "exito"
-              );
-              cargarComentarios(noticiaId);
-            } else if (
-              data?.mensaje?.toLowerCase().includes("ya reaccionaste")
-            ) {
-              gcToast("Ya reaccionaste a este comentario", "advertencia");
-            } else {
-              gcToast(
-                data?.mensaje || "No se pudo actualizar la reacción",
-                "warning"
-              );
-            }
-          })
-          .catch(() => gcToast("Error de red al reaccionar", "error"))
-          .finally(() => {
-            likeBtn.style.pointerEvents = "";
-            dislikeBtn.style.pointerEvents = "";
-          });
-      });
+          };
+        }
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fetchBody),
+        });
+        const data = await res.json();
+
+        if (
+          endpoint === endpointReaccion &&
+          data?.mensaje?.toLowerCase().includes("registrada")
+        ) {
+          gcToast(
+            `¡Gracias por tu ${tipo === "like" ? "like" : "dislike"}!`,
+            "exito"
+          );
+        } else if (
+          endpoint === endpointQuitarReaccion &&
+          data?.mensaje?.toLowerCase().includes("eliminada")
+        ) {
+          gcToast("Reacción eliminada.", "exito");
+        } else if (data?.mensaje?.toLowerCase().includes("ya reaccionaste")) {
+          gcToast("Ya reaccionaste a este comentario", "advertencia");
+        } else {
+          gcToast(
+            data?.mensaje || "No se pudo actualizar la reacción",
+            "warning"
+          );
+        }
+        await recargarUnComentario(comentarioId, comentarioDiv);
+      } catch (err) {
+        gcToast("Error de red al reaccionar", "error");
+      } finally {
+        likeBtn.style.pointerEvents = "";
+        dislikeBtn.style.pointerEvents = "";
+      }
     }
   });
+
+  async function recargarUnComentario(comentarioId, comentarioDiv) {
+    try {
+      const res = await fetch(endpointComentarios, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          noticia_id: noticiaId,
+          estatus: 1,
+          ...(usuarioId ? { usuario_id: usuarioId } : {}),
+        }),
+      });
+      let data = await res.json();
+      if (!Array.isArray(data)) return;
+      let comentario = null;
+
+      for (const c of data) {
+        if (c.id == comentarioId) {
+          comentario = c;
+          break;
+        }
+        if (c.respuestas?.length) {
+          const sub = c.respuestas.find((r) => r.id == comentarioId);
+          if (sub) {
+            comentario = sub;
+            break;
+          }
+        }
+      }
+      if (!comentario) return;
+
+      const nuevoNodo =
+        comentario.respuesta_a == null
+          ? crearComentarioHTML(comentario)
+          : crearRespuestaHTML(comentario, {}, comentario.respuesta_a);
+      comentarioDiv.replaceWith(nuevoNodo);
+    } catch (e) {
+      cargarComentarios(noticiaId);
+    }
+  }
 
   // -------- Tiempo relativo --------
   function tiempoRelativo(fechaStr) {
