@@ -13,6 +13,11 @@ if ($path && file_exists($path)) {
 }
 
 $input = json_decode(file_get_contents("php://input"), true);
+if (!$input) {
+    echo json_encode(["error" => "No se recibió un cuerpo JSON válido."]);
+    exit;
+}
+
 $campos_obligatorios = [
     'nombre', 'descripcion_breve', 'descripcion_curso', 'descripcion_media',
     'actividades', 'tipo_evaluacion', 'calendario', 'certificado',
@@ -67,18 +72,33 @@ if (!$stmt) {
     exit;
 }
 
+// Tipos: s = string, i = int, d = double (float)
 $stmt->bind_param(
     "ssssiiiisssiidiiisi",
-    $nombre, $descripcion_breve, $descripcion_curso, $descripcion_media,
-    $actividades, $tipo_evaluacion, $calendario, $certificado,
-    $dirigido, $competencias, $tutor, $horas, $precio,
-    $estatus, $creado_por, $fecha_inicio, $categoria, $prioridad
+    $nombre,
+    $descripcion_breve,
+    $descripcion_curso,
+    $descripcion_media,
+    $actividades,
+    $tipo_evaluacion,
+    $calendario,
+    $certificado,
+    $dirigido,
+    $competencias,
+    $tutor,
+    $horas,
+    $precio,
+    $estatus,
+    $creado_por,
+    $fecha_inicio,
+    $categoria,
+    $prioridad
 );
 
 if ($stmt->execute()) {
     echo json_encode(["mensaje" => "Curso insertado correctamente", "id" => $stmt->insert_id]);
 } else {
-    echo json_encode(["error" => "Error al insertar curso: " . $stmt->error]);
+    echo json_encode(["error" => "Error en ejecución: " . $stmt->error]);
 }
 
 $stmt->close();
