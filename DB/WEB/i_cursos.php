@@ -11,13 +11,13 @@ if ($path && file_exists($path)) {
     die(json_encode(["error" => "No se encontró Conexion.php"]));
 }
 
-// Leer datos JSON del body
+// Leer JSON
 $input = json_decode(file_get_contents("php://input"), true);
 if (!$input) {
     die(json_encode(["error" => "No se recibió entrada JSON válida."]));
 }
 
-// Validar campos obligatorios
+// Campos requeridos
 $requeridos = [
     'nombre', 'descripcion_breve', 'descripcion_curso', 'descripcion_media',
     'actividades', 'tipo_evaluacion', 'calendario', 'certificado',
@@ -31,13 +31,13 @@ foreach ($requeridos as $campo) {
     }
 }
 
-// Conexión
+// Conectar
 $con = conectar();
 if (!$con) {
     die(json_encode(["error" => "No se pudo conectar a la base de datos."]));
 }
 
-// Insertar
+// Preparar query
 $query = "INSERT INTO god_code.gc_cursos (
     nombre, descripcion_breve, descripcion_curso, descripcion_media,
     actividades, tipo_evaluacion, calendario, certificado,
@@ -47,41 +47,53 @@ $query = "INSERT INTO god_code.gc_cursos (
 
 $stmt = $con->prepare($query);
 if (!$stmt) {
-    echo json_encode(["error" => "Error al preparar la consulta", "detalle" => $con->error]);
+    echo json_encode(["error" => "Error al preparar consulta", "detalle" => $con->error]);
     $con->close();
     exit;
 }
 
-// Vincular parámetros
-$stmt->bind_param(
-    "ssssiiiiiissiiiiss",
-    $input['nombre'],
-    $input['descripcion_breve'],
-    $input['descripcion_curso'],
-    $input['descripcion_media'],
-    $input['actividades'],
-    $input['tipo_evaluacion'],
-    $input['calendario'],
-    $input['certificado'],
-    $input['dirigido'],
-    $input['competencias'],
-    $input['tutor'],
-    $input['horas'],
-    $input['precio'],
-    $input['estatus'],
-    $input['creado_por'],
-    $input['fecha_inicio'],
-    $input['categoria'],
-    $input['prioridad']
-);
+// Asegurar casting correcto
+$nombre = $input['nombre'];
+$descripcion_breve = $input['descripcion_breve'];
+$descripcion_curso = $input['descripcion_curso'];
+$descripcion_media = $input['descripcion_media'];
+$actividades = (int)$input['actividades'];
+$tipo_evaluacion = (int)$input['tipo_evaluacion'];
+$calendario = (int)$input['calendario'];
+$certificado = (int)$input['certificado'];
+$dirigido = $input['dirigido'];
+$competencias = $input['competencias'];
+$tutor = (int)$input['tutor'];
+$horas = (float)$input['horas'];
+$precio = (int)$input['precio'];
+$estatus = (int)$input['estatus'];
+$creado_por = (int)$input['creado_por'];
+$fecha_inicio = $input['fecha_inicio'];
+$categoria = (int)$input['categoria'];
+$prioridad = (int)$input['prioridad'];
+
+// Vincular y verificar errores
+if (!$stmt->bind_param(
+    "ssssiiiisssidiissi",
+    $nombre, $descripcion_breve, $descripcion_curso, $descripcion_media,
+    $actividades, $tipo_evaluacion, $calendario, $certificado,
+    $dirigido, $competencias, $tutor, $horas, $precio,
+    $estatus, $creado_por, $fecha_inicio, $categoria, $prioridad
+)) {
+    echo json_encode(["error" => "Error al vincular parámetros", "detalle" => $stmt->error]);
+    $stmt->close();
+    $con->close();
+    exit;
+}
 
 // Ejecutar
 if ($stmt->execute()) {
     echo json_encode(["mensaje" => "Curso insertado correctamente", "id" => $stmt->insert_id]);
 } else {
-    echo json_encode(["error" => "Error al insertar el curso", "detalle" => $stmt->error]);
+    echo json_encode(["error" => "Error al ejecutar el insert", "detalle" => $stmt->error]);
 }
 
 $stmt->close();
 $con->close();
 ?>
+
