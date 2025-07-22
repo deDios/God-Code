@@ -513,33 +513,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       const btn = e.target.closest(".reaccion");
       const comentarioId = btn.dataset.id;
-      const tipo = btn.dataset.tipo;
-      const nodoComentario = btn.closest(".comentario");
-      const likeBtn = nodoComentario.querySelector(".reaccion.like");
-      const dislikeBtn = nodoComentario.querySelector(".reaccion.dislike");
-      const likeSpan = likeBtn.querySelector(".cantidad");
-      const dislikeSpan = dislikeBtn.querySelector(".cantidad");
+      const tipo = btn.dataset.tipo; // 'like' o 'dislike'
+      const esActivo = btn.classList.contains("activo");
 
-      const likeActivo = likeBtn.classList.contains("liked");
-      const dislikeActivo = dislikeBtn.classList.contains("disliked");
-
-      // Lógica local optimista
-      let newLike = parseInt(likeSpan.textContent);
-      let newDislike = parseInt(dislikeSpan.textContent);
-
-      // Si ya está activo, quitar reacción
-      if (
-        (tipo === "like" && likeActivo) ||
-        (tipo === "dislike" && dislikeActivo)
-      ) {
-        if (tipo === "like") {
-          likeBtn.classList.remove("liked");
-          likeSpan.textContent = Math.max(0, newLike - 1);
-        } else {
-          dislikeBtn.classList.remove("disliked");
-          dislikeSpan.textContent = Math.max(0, newDislike - 1);
-        }
-        // API quitar reacción
+      if (esActivo) {
+        // Quitar reacción actual
         console.log("Enviando QUITAR REACCION:", {
           comentario_id: comentarioId,
           usuario_id: usuarioId,
@@ -554,51 +532,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            if (data?.mensaje?.toLowerCase().includes("eliminada")) {
-              gcToast("Reacción eliminada.", "exito");
-            } else {
-              gcToast(data?.mensaje || "No se pudo quitar reacción", "warning");
-              // Revertir si hubo error
-              if (tipo === "like") {
-                likeBtn.classList.add("liked");
-                likeSpan.textContent = newLike;
-              } else {
-                dislikeBtn.classList.add("disliked");
-                dislikeSpan.textContent = newDislike;
-              }
-            }
-          })
-          .catch(() => {
-            gcToast("Error de red al quitar reacción", "error");
-            // Revertir
-            if (tipo === "like") {
-              likeBtn.classList.add("liked");
-              likeSpan.textContent = newLike;
-            } else {
-              dislikeBtn.classList.add("disliked");
-              dislikeSpan.textContent = newDislike;
-            }
+            console.log("Respuesta QUITAR REACCION:", data);
+            cargarComentarios(noticiaId);
           });
       } else {
-        // Si era like y tenía dislike activo, quita dislike y pone like
-        if (tipo === "like" && dislikeActivo) {
-          dislikeBtn.classList.remove("disliked");
-          dislikeSpan.textContent = Math.max(0, newDislike - 1);
-        }
-        // Si era dislike y tenía like activo, quita like y pone dislike
-        if (tipo === "dislike" && likeActivo) {
-          likeBtn.classList.remove("liked");
-          likeSpan.textContent = Math.max(0, newLike - 1);
-        }
-        // Sumar reacción activa
-        if (tipo === "like") {
-          likeBtn.classList.add("liked");
-          likeSpan.textContent = newLike + 1;
-        } else {
-          dislikeBtn.classList.add("disliked");
-          dislikeSpan.textContent = newDislike + 1;
-        }
-        // API poner reacción
+        // Intentar poner la nueva reacción
         console.log("Enviando REACCION:", {
           comentario_id: comentarioId,
           usuario_id: usuarioId,
@@ -617,52 +555,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            if (data?.mensaje?.toLowerCase().includes("registrada")) {
-              gcToast(
-                `¡Gracias por tu ${tipo === "like" ? "like" : "dislike"}!`,
-                "exito"
-              );
-            } else if (
-              data?.mensaje?.toLowerCase().includes("ya reaccionaste")
+            console.log("Respuesta REACCION:", data);
+            if (
+              data?.mensaje &&
+              data.mensaje.toLowerCase().includes("ya reaccionaste")
             ) {
-              gcToast("Ya reaccionaste a este comentario", "advertencia");
+              // Si ya reaccionaste, primero quitamos y luego ponemos la nueva reacción
+              fetch(endpointQuitarReaccion, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  comentario_id: comentarioId,
+                  usuario_id: usuarioId,
+                }),
+              })
+                .then((res2) => res2.json())
+                .then((data2) => {
+                  console.log("Respuesta QUITAR REACCION para cambiar:", data2);
+                  // Ahora sí, poner la nueva reacción
+                  fetch(endpointReaccion, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      comentario_id: comentarioId,
+                      usuario_id: usuarioId,
+                      reaccion: tipo,
+                      estatus: 1,
+                    }),
+                  })
+                    .then((res3) => res3.json())
+                    .then((data3) => {
+                      console.log("Respuesta REACCION tras quitar:", data3);
+                      cargarComentarios(noticiaId);
+                    });
+                });
             } else {
-              gcToast("No se pudo registrar la reacción", "error");
-              // Revertir
-              if (tipo === "like") {
-                likeBtn.classList.remove("liked");
-                likeSpan.textContent = newLike;
-                if (dislikeActivo) {
-                  dislikeBtn.classList.add("disliked");
-                  dislikeSpan.textContent = newDislike;
-                }
-              } else {
-                dislikeBtn.classList.remove("disliked");
-                dislikeSpan.textContent = newDislike;
-                if (likeActivo) {
-                  likeBtn.classList.add("liked");
-                  likeSpan.textContent = newLike;
-                }
-              }
-            }
-          })
-          .catch(() => {
-            gcToast("Error de red al reaccionar", "error");
-            // Revertir
-            if (tipo === "like") {
-              likeBtn.classList.remove("liked");
-              likeSpan.textContent = newLike;
-              if (dislikeActivo) {
-                dislikeBtn.classList.add("disliked");
-                dislikeSpan.textContent = newDislike;
-              }
-            } else {
-              dislikeBtn.classList.remove("disliked");
-              dislikeSpan.textContent = newDislike;
-              if (likeActivo) {
-                likeBtn.classList.add("liked");
-                likeSpan.textContent = newLike;
-              }
+              cargarComentarios(noticiaId);
             }
           });
       }
