@@ -95,9 +95,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 //----------------------- JS para los comentarios
 
-
-
-
 document.addEventListener("DOMContentLoaded", async () => {
   // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
@@ -543,6 +540,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           dislikeSpan.textContent = Math.max(0, newDislike - 1);
         }
         // API quitar reacción
+        console.log("Enviando QUITAR REACCION:", {
+          comentario_id: comentarioId,
+          usuario_id: usuarioId,
+        });
         fetch(endpointQuitarReaccion, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -598,6 +599,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           dislikeSpan.textContent = newDislike + 1;
         }
         // API poner reacción
+        console.log("Enviando REACCION:", {
+          comentario_id: comentarioId,
+          usuario_id: usuarioId,
+          reaccion: tipo,
+          estatus: 1,
+        });
         fetch(endpointReaccion, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
