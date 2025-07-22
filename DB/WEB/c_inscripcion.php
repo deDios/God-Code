@@ -13,7 +13,6 @@ if ($path && file_exists($path)) {
 
 $input = json_decode(file_get_contents("php://input"), true);
 
-// Validar que se reciba el campo usuario
 if (!isset($input['usuario'])) {
     die(json_encode(["error" => "El campo 'usuario' es obligatorio."]));
 }
@@ -25,25 +24,36 @@ if (!$con) {
     die(json_encode(["error" => "Error al conectar a la base de datos."]));
 }
 
-$query = "SELECT 
-            id,
-            curso,
-            usuario,
-            comentario,
-            estatus,
-            fecha_creacion,
-            fecha_modif
-          FROM god_code.gc_inscripcion
-          WHERE usuario = $usuario";
+$query = "
+SELECT 
+    ins.id,
+    ins.usuario,
+    ins.curso,
+    u.nombre AS nombre_usuario,
+    u.correo,
+    u.telefono,
+    c.nombre AS nombre_curso,
+    ins.comentario,
+    ins.estatus,
+    ins.fecha_creacion,
+    ins.fecha_modif
+FROM 
+    god_code.gc_inscripcion ins
+JOIN god_code.gc_usuario u ON ins.usuario = u.id
+JOIN god_code.gc_cursos c ON ins.curso = c.id
+WHERE 
+    ins.usuario = $usuario
+";
 
 $result = mysqli_query($con, $query);
 
 if ($result && $result->num_rows > 0) {
     $data = [];
+
     while ($row = $result->fetch_assoc()) {
         $row['id'] = (int)$row['id'];
-        $row['curso'] = (int)$row['curso'];
         $row['usuario'] = (int)$row['usuario'];
+        $row['curso'] = (int)$row['curso'];
         $row['estatus'] = (int)$row['estatus'];
         $data[] = $row;
     }
