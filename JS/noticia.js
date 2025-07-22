@@ -137,7 +137,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // --------- Estado input/btn ----------
   function actualizarEstadoInput() {
     if (!usuarioId) {
       textarea.disabled = true;
@@ -153,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   actualizarEstadoInput();
 
-  // --------- Skeleton cargando ---------
+  // Skeleton loading
   function mostrarSkeleton() {
     esperandoComentarios = true;
     lista.innerHTML = "";
@@ -170,7 +169,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       lista.appendChild(sk);
     }
   }
-
   function ocultarSkeleton() {
     esperandoComentarios = false;
     document
@@ -178,7 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .forEach((el) => el.remove());
   }
 
-  // -------- Contador y validador de textarea --------
+  // Contador y validación textarea
   textarea.addEventListener("input", () => {
     contador.textContent = `${textarea.value.length}/500`;
     btnEnviar.disabled =
@@ -189,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // -------- Cancelar respuesta --------
+  // Cancelar respuesta
   btnCancelar.addEventListener("click", () => {
     respuestaA = null;
     respuestaA_nombre = "";
@@ -199,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     contador.textContent = "0/500";
   });
 
-  // -------- Sticky animate (nuevo comentario) --------
+  // Sticky animate (nuevo comentario)
   function hacerStickyAnim(idComentario) {
     const coment = lista.querySelector(
       `[data-comentario-id="${idComentario}"]`
@@ -213,22 +211,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // -------- Enviar comentario/respuesta --------
+  // Enviar comentario/respuesta
   btnEnviar.addEventListener("click", async () => {
     let texto = textarea.value.trim();
     if (!texto || enviando || texto === ultimoComentario || !usuarioId) return;
-
-    // Evitar doble submit
     if (enviando) return;
-
-    // Si es respuesta, anteponer @nombre
     if (respuestaA && respuestaA_nombre) {
       const atText = `@${respuestaA_nombre} `;
       if (!texto.startsWith(atText)) {
         texto = atText + texto.replace(/^@[\w\s]+/, "").trim();
       }
     }
-
     if (texto.length > 500) {
       gcToast("Comentario demasiado largo", "warning");
       return;
@@ -256,9 +249,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
       const data = await res.json();
-
       if (data?.mensaje === "Comentario registrado correctamente") {
         ultimoComentario = texto;
         textarea.value = "";
@@ -268,8 +259,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         textarea.placeholder = "Añade un comentario...";
         btnCancelar.style.display = "none";
         gcToast("Comentario publicado", "exito");
-        // recarga y sticky animate
-        await cargarComentarios(noticiaId, data.id); // <- data.id debe ser el id del nuevo comentario
+        await cargarComentarios(noticiaId, data.id);
       } else {
         gcToast("No se pudo publicar el comentario", "error");
       }
@@ -283,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
 
-  // --------- Cargar comentarios ---------
+  // Cargar comentarios
   async function cargarComentarios(noticiaId, stickyId = null) {
     mostrarSkeleton();
     try {
@@ -315,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // --------- Error y botón reintentar ---------
+  // Error y botón reintentar
   function mostrarErrorCarga() {
     lista.innerHTML = `<div style="text-align:center;padding:1.6rem;">
       <p>Error al cargar comentarios.</p>
@@ -325,7 +315,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       cargarComentarios(noticiaId);
   }
 
-  // --------- Render comentario principal y respuestas ---------
+  // Render comentario principal y respuestas
   function crearComentarioHTML(data) {
     const idToNombre = {};
     (data.respuestas || []).forEach((res) => {
@@ -351,23 +341,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <p class="comentario-texto">${data.comentario}</p>
         <div class="comentario-interacciones">
-          <div class="reaccion like ${likeActivo ? "activo" : ""}" data-id="${
+          <div class="reaccion like${likeActivo ? " liked" : ""}" data-id="${
       data.id
     }" data-tipo="like" aria-label="Like">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="${
-              likeActivo ? "#1a73e8" : "#bbb"
-            }">
+            <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>
             </svg>
             <span class="cantidad">${data.likes}</span>
           </div>
-          <div class="reaccion dislike ${
-            dislikeActivo ? "activo" : ""
+          <div class="reaccion dislike${
+            dislikeActivo ? " disliked" : ""
           }" data-id="${data.id}" data-tipo="dislike" aria-label="Dislike">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="${
-              dislikeActivo ? "#e53935" : "#bbb"
-            }">
-              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17.79.44 1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>
             </svg>
             <span class="cantidad">${data.dislikes}</span>
           </div>
@@ -407,7 +393,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --------- Render respuesta ---------
+  // Render respuesta
   function crearRespuestaHTML(
     res,
     idToNombre,
@@ -428,11 +414,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }</span> `;
       }
     }
-
     // Like/dislike state
     const likeActivo = res.mi_reaccion === "like";
     const dislikeActivo = res.mi_reaccion === "dislike";
-
     const div = document.createElement("div");
     div.className = "comentario subcomentario";
     div.dataset.comentarioId = res.id;
@@ -447,22 +431,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <p class="comentario-texto">${prefijo}${res.comentario}</p>
         <div class="comentario-interacciones">
-          <div class="reaccion like ${likeActivo ? "activo" : ""}" data-id="${
+          <div class="reaccion like${likeActivo ? " liked" : ""}" data-id="${
       res.id
     }" data-tipo="like" aria-label="Like">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="${
-              likeActivo ? "#1a73e8" : "#bbb"
-            }">
+            <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>
             </svg>
             <span class="cantidad">${res.likes}</span>
           </div>
-          <div class="reaccion dislike ${
-            dislikeActivo ? "activo" : ""
+          <div class="reaccion dislike${
+            dislikeActivo ? " disliked" : ""
           }" data-id="${res.id}" data-tipo="dislike" aria-label="Dislike">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="${
-              dislikeActivo ? "#e53935" : "#bbb"
-            }">
+            <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>
             </svg>
             <span class="cantidad">${res.dislikes}</span>
@@ -474,9 +454,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return div;
   }
 
-  // --------- Eventos de click globales ---------
+  // Click global: responder, mostrar respuestas, reaccionar
   document.addEventListener("click", (e) => {
-    // ---- Responder a comentario/resp ----
+    // Responder a comentario/resp
     if (e.target.classList.contains("accion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -507,7 +487,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       contador.textContent = `${textarea.value.length}/500`;
     }
 
-    // ---- Mostrar/Ocultar respuestas ----
+    // Mostrar/Ocultar respuestas
     if (e.target.closest(".ver-respuestas")) {
       e.preventDefault();
       const enlace = e.target.closest(".ver-respuestas");
@@ -522,7 +502,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         : ` Ver ${subrespuestas.childElementCount} respuesta(s)`;
     }
 
-    // ---- Like/dislike (con quitar reacción) ----
+    // Like/dislike (con quitar reacción y mutual exclusión)
     if (e.target.closest(".reaccion")) {
       e.preventDefault();
       if (!usuarioId) {
@@ -532,9 +512,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = e.target.closest(".reaccion");
       const comentarioId = btn.dataset.id;
       const tipo = btn.dataset.tipo;
-      const esActivo = btn.classList.contains("activo");
+      const esActivo = btn.classList.contains(
+        tipo === "like" ? "liked" : "disliked"
+      );
 
-      // Quitar reacción si ya reaccionó igual
+      // Si ya reaccionó igual, quitar reacción
       if (esActivo) {
         fetch(endpointQuitarReaccion, {
           method: "POST",
@@ -558,6 +540,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
           .catch(() => gcToast("Error de red al quitar reacción", "error"));
       } else {
+        // Antes de poner like, quitar dislike si existe y viceversa (mutual exclusive)
         fetch(endpointReaccion, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -587,7 +570,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // -------- Tiempo relativo --------
+  // Tiempo relativo
   function tiempoRelativo(fechaStr) {
     const fecha = new Date(fechaStr);
     const ahora = new Date();
@@ -600,7 +583,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `Hace ${Math.floor(diff / 31536000)} año(s)`;
   }
 
-  // -------- Inicializar --------
+  // Inicializar
   if (noticiaId) {
     await cargarComentarios(noticiaId);
   }
