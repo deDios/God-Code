@@ -513,87 +513,115 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       const btn = e.target.closest(".reaccion");
       const comentarioId = btn.dataset.id;
-      const tipo = btn.dataset.tipo; // 'like' o 'dislike'
-      const esActivo = btn.classList.contains("activo");
+      const tipo = btn.dataset.tipo;
+      const comentarioDiv = btn.closest(".comentario, .subcomentario");
+      if (!comentarioDiv) return;
 
-      if (esActivo) {
-        // Quitar reacción actual
-        console.log("Enviando QUITAR REACCION:", {
-          comentario_id: comentarioId,
-          usuario_id: usuarioId,
-        });
-        fetch(endpointQuitarReaccion, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            comentario_id: comentarioId,
-            usuario_id: usuarioId,
-          }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("Respuesta QUITAR REACCION:", data);
-            cargarComentarios(noticiaId);
-          });
+      // Busca los botones de like/dislike en el comentario
+      const likeBtn = comentarioDiv.querySelector(".reaccion.like");
+      const dislikeBtn = comentarioDiv.querySelector(".reaccion.dislike");
+
+      // Guarda estados previos
+      const prevLike = likeBtn.classList.contains("activo");
+      const prevDislike = dislikeBtn.classList.contains("activo");
+
+      // Deshabilita ambos mientras el fetch
+      likeBtn.style.pointerEvents = "none";
+      dislikeBtn.style.pointerEvents = "none";
+
+      // Optimista: actualiza visual
+      if (tipo === "like") {
+        likeBtn.classList.add("activo", "liked");
+        dislikeBtn.classList.remove("activo", "disliked");
       } else {
-        // Intentar poner la nueva reacción
-        console.log("Enviando REACCION:", {
-          comentario_id: comentarioId,
-          usuario_id: usuarioId,
-          reaccion: tipo,
-          estatus: 1,
-        });
-        fetch(endpointReaccion, {
+        dislikeBtn.classList.add("activo", "disliked");
+        likeBtn.classList.remove("activo", "liked");
+      }
+
+      // Si ya tenía esa reacción, quítala (toggle)
+      const endpoint =
+        (tipo === "like" && prevLike) || (tipo === "dislike" && prevDislike)
+          ? endpointQuitarReaccion
+          : endpointReaccion;
+      const fetchBody =
+        endpoint === endpointReaccion
+          ? {
+              comentario_id: comentarioId,
+              usuario_id: usuarioId,
+              reaccion: tipo,
+              estatus: 1,
+            }
+          : {
+              comentario_id: comentarioId,
+              usuario_id: usuarioId,
+            };
+
+      // Si va a registrar la reacción y había la opuesta, quítala primero (mutual exclusión)
+      const quitarReaccionProm =
+        (tipo === "like" && prevDislike) || (tipo === "dislike" && prevLike)
+          ? fetch(endpointQuitarReaccion, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                comentario_id: comentarioId,
+                usuario_id: usuarioId,
+              }),
+            }).then((r) => r.json())
+          : Promise.resolve();
+
+      quitarReaccionProm.then(() => {
+        fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            comentario_id: comentarioId,
-            usuario_id: usuarioId,
-            reaccion: tipo,
-            estatus: 1,
-          }),
+          body: JSON.stringify(fetchBody),
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log("Respuesta REACCION:", data);
+            // Si fue registro de reacción
             if (
-              data?.mensaje &&
-              data.mensaje.toLowerCase().includes("ya reaccionaste")
+              endpoint === endpointReaccion &&
+              data?.mensaje?.toLowerCase().includes("registrada")
             ) {
-              // Si ya reaccionaste, primero quitamos y luego ponemos la nueva reacción
-              fetch(endpointQuitarReaccion, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  comentario_id: comentarioId,
-                  usuario_id: usuarioId,
-                }),
-              })
-                .then((res2) => res2.json())
-                .then((data2) => {
-                  console.log("Respuesta QUITAR REACCION para cambiar:", data2);
-                  // Ahora sí, poner la nueva reacción
-                  fetch(endpointReaccion, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      comentario_id: comentarioId,
-                      usuario_id: usuarioId,
-                      reaccion: tipo,
-                      estatus: 1,
-                    }),
-                  })
-                    .then((res3) => res3.json())
-                    .then((data3) => {
-                      console.log("Respuesta REACCION tras quitar:", data3);
-                      cargarComentarios(noticiaId);
-                    });
-                });
-            } else {
+              gcToast(
+                `¡Gracias por tu ${tipo === "like" ? "like" : "dislike"}!`,
+                "exito"
+              );
+              cargarComentarios(noticiaId); // recarga para que actualice el conteo
+            }
+            // Si fue quitar reacción
+            else if (
+              endpoint === endpointQuitarReaccion &&
+              data?.mensaje?.toLowerCase().includes("eliminada")
+            ) {
+              gcToast("Reacción eliminada.", "exito");
               cargarComentarios(noticiaId);
             }
+            // Errores y otros
+            else {
+              gcToast(
+                data?.mensaje || "No se pudo actualizar la reacción",
+                "warning"
+              );
+              // Regresa visual si fue error
+              if (prevLike) likeBtn.classList.add("activo", "liked");
+              else likeBtn.classList.remove("activo", "liked");
+              if (prevDislike) dislikeBtn.classList.add("activo", "disliked");
+              else dislikeBtn.classList.remove("activo", "disliked");
+            }
+          })
+          .catch(() => {
+            gcToast("Error de red al reaccionar", "error");
+            // Regresa visual
+            if (prevLike) likeBtn.classList.add("activo", "liked");
+            else likeBtn.classList.remove("activo", "liked");
+            if (prevDislike) dislikeBtn.classList.add("activo", "disliked");
+            else dislikeBtn.classList.remove("activo", "disliked");
+          })
+          .finally(() => {
+            likeBtn.style.pointerEvents = "";
+            dislikeBtn.style.pointerEvents = "";
           });
-      }
+      });
     }
   });
 
