@@ -352,7 +352,7 @@ function bloquearCampos(bloquear = true) {
   });
   btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
   btnSubmit.classList.remove("disabled");
-  checkboxCuenta.disabled = bloquear;
+  checkboxCuenta.disabled = bloquear; //aun no lo bloquea pero luego checamos porque de momento ya hace gran parte de las cosas.
 }
 function desbloquearCampos() {
   bloquearCampos(false);

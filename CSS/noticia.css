@@ -111,7 +111,7 @@
     margin-bottom: 1rem;
 }
 
-/*--------------------------------------- seccion 3 ------------------*/
+/*--------------------------------------- seccion 3 -----------------------------*/
 
 
 
@@ -141,7 +141,7 @@
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 2rem;
-    max-height: 420px;
+    max-height: 650px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -199,6 +199,7 @@
     background: transparent;
 }
 
+/* no lo pude hechar a jalar
 .pill-mencion {
     position: absolute;
     top: 13px;
@@ -227,6 +228,7 @@
 .input-contenedor textarea:focus~.pill-mencion {
     opacity: 0.18;
 }
+*/
 
 .acciones-comentario {
     display: flex;
@@ -606,6 +608,48 @@
         padding: 4px 10px;
     }
 }
+
+.comentario-sticky {
+    background: #eaf1fb !important;
+    border-left: 4px solid #1565c0;
+    animation: stickyPop 0.7s;
+}
+
+@keyframes stickyPop {
+    from {
+        box-shadow: 0 0 24px #1565c0;
+    }
+
+    to {
+        box-shadow: none;
+    }
+}
+
+.comentario-interacciones .reaccion svg {
+    fill: #bbb !important;
+    transition: fill 0.2s;
+}
+
+.comentario-interacciones .reaccion.liked svg {
+    fill: #1565c0 !important;
+}
+
+.comentario-interacciones .reaccion.disliked svg {
+    fill: #e53935 !important;
+}
+
+.comentario-interacciones .reaccion {
+    font-weight: normal;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.comentario-interacciones .reaccion.liked,
+.comentario-interacciones .reaccion.disliked {
+    font-weight: bold;
+    opacity: 1;
+}
+
 
 
 
