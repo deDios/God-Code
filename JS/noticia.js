@@ -483,18 +483,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         gcToast("Inicia sesión para responder", "advertencia");
         return;
       }
-      const comentario = e.target.closest(".comentario");
+      const comentario = e.target.closest(".comentario, .subcomentario");
       const autor =
         comentario.querySelector(".comentario-meta strong")?.textContent || "";
-      let principal = comentario;
-      while (principal && principal.classList.contains("subcomentario")) {
-        principal = principal.parentElement.closest(
-          ".comentario:not(.subcomentario)"
-        );
-      }
-      respuestaA = principal
-        ? parseInt(principal.querySelector(".reaccion")?.dataset.id)
-        : parseInt(comentario.querySelector(".reaccion")?.dataset.id);
+
+      respuestaA = parseInt(comentario.dataset.comentarioId, 10); // ← Cambia aquí
+
       respuestaA_nombre = autor;
 
       const atText = `@${respuestaA_nombre} `;
