@@ -358,6 +358,7 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
 
 function desbloquearCampos() {
   bloquearCampos(false, false);
+  console.log("se desbloquearon los campos");
 }
 
 // limpiar formulario y desbloquea al toggle
