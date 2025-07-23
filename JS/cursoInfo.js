@@ -353,6 +353,7 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
   btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
   btnSubmit.classList.remove("disabled");
   if (bloquearToggle) checkboxCuenta.disabled = true;
+  console.log("se bloquearon los campos");
 }
 
 function desbloquearCampos() {
