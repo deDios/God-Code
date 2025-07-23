@@ -323,7 +323,8 @@ const abrirModal = () => {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       if (datos?.id) {
-        llenarFormulario(datos, true, true); // <--- se bloquea todo, incluido toggle
+        llenarFormulario(datos, true);
+        bloquearCampos(true, true); // bloquea campos y toggle
         checkboxCuenta.checked = false;
         toggleFormularios(false);
       }
@@ -348,12 +349,12 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.disabled = bloquear;
   });
+  buscarBtn.disabled = bloquear;
   btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
   btnSubmit.classList.remove("disabled");
-  if (bloquearToggle) {
-    checkboxCuenta.disabled = true;
-  }
+  if (bloquearToggle) checkboxCuenta.disabled = true;
 }
+
 function desbloquearCampos() {
   bloquearCampos(false, false);
 }
@@ -368,6 +369,7 @@ const limpiarFormulario = () => {
   btnSubmit.classList.remove("disabled");
   desbloquearCampos();
   checkboxCuenta.disabled = false;
+  buscarBtn.disabled = false;
   document.querySelectorAll(".icono-alerta").forEach((el) => {
     el.textContent = "";
     el.classList.remove("valido");
@@ -422,12 +424,14 @@ const buscarCuentaExistente = async () => {
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       mostrarToast("Cuenta encontrada correctamente.", "exito");
-      llenarFormulario(data[0], true, true); // <--- se bloquea todo, incluido toggle
+      llenarFormulario(data[0], true);
+      bloquearCampos(true, true); // bloquea campos y toggle
     } else {
       mostrarToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
       desbloquearCampos();
       checkboxCuenta.disabled = false;
+      buscarBtn.disabled = false;
     }
   } catch (err) {
     mostrarToast("Error al consultar la cuenta.", "error");
@@ -435,7 +439,7 @@ const buscarCuentaExistente = async () => {
 };
 
 // llenar campos con datos de cuenta si hay usuario logeado
-const llenarFormulario = (cuenta, bloquear = false, bloquearToggle = false) => {
+const llenarFormulario = (cuenta, bloquear = false) => {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
@@ -450,7 +454,7 @@ const llenarFormulario = (cuenta, bloquear = false, bloquearToggle = false) => {
   document
     .querySelectorAll(".input-alerta-container")
     .forEach((c) => c.classList.remove("alerta"));
-  if (bloquear) bloquearCampos(true, bloquearToggle);
+  if (bloquear) bloquearCampos(true, true);
   btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
 };
@@ -669,7 +673,6 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
 checkboxCuenta.addEventListener("change", () => {
-  if (checkboxCuenta.disabled) return; // <-- Protección extra
   toggleFormularios(checkboxCuenta.checked);
 });
 buscarBtn.addEventListener("click", buscarCuentaExistente);
@@ -678,6 +681,7 @@ volverRegistro.addEventListener("click", (e) => {
   toggleFormularios(false);
   desbloquearCampos();
   checkboxCuenta.disabled = false;
+  buscarBtn.disabled = false;
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
