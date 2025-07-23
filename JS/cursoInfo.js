@@ -261,6 +261,7 @@ function inicializarAcordeones() {
 }
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
+
 console.log("DOM cargado modal listo");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -285,6 +286,9 @@ const ENDPOINT_INSERTAR =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
+
+// Bandera para bloquear/desbloquear campos según contexto
+let camposBloqueadosPorCuenta = false;
 
 // Notificaciones
 function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
@@ -324,8 +328,9 @@ const abrirModal = () => {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       if (datos?.id) {
         llenarFormulario(datos, true);
-        bloquearCampos(true, true); // bloquea campos y toggle
+        bloquearCampos(true, true); // bloquear campos y el toggle
         checkboxCuenta.checked = false;
+        checkboxCuenta.disabled = true;
         toggleFormularios(false);
       }
     } catch (e) {}
@@ -353,12 +358,16 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
   btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
   btnSubmit.classList.remove("disabled");
   if (bloquearToggle) checkboxCuenta.disabled = true;
-  console.log("se bloquearon los campos");
+  camposBloqueadosPorCuenta = bloquear;
+  if (bloquear) {
+    console.log("se bloquearon los campos");
+  } else {
+    console.log("se desbloquearon los campos");
+  }
 }
-
 function desbloquearCampos() {
+  camposBloqueadosPorCuenta = false;
   bloquearCampos(false, false);
-  console.log("se desbloquearon los campos");
 }
 
 // limpiar formulario y desbloquea al toggle
@@ -371,7 +380,6 @@ const limpiarFormulario = () => {
   btnSubmit.classList.remove("disabled");
   desbloquearCampos();
   checkboxCuenta.disabled = false;
-  buscarBtn.disabled = false;
   document.querySelectorAll(".icono-alerta").forEach((el) => {
     el.textContent = "";
     el.classList.remove("valido");
@@ -392,7 +400,8 @@ const toggleFormularios = (mostrarLogin) => {
   camposRegistro.classList.toggle("mostrar", !mostrarLogin);
   camposLogin.classList.toggle("mostrar", mostrarLogin);
   cursoNombreInput.value = nombreCursoGlobal;
-  if (!mostrarLogin) desbloquearCampos();
+  // Solo desbloquear si NO están bloqueados por cuenta encontrada/logeado
+  if (!mostrarLogin && !camposBloqueadosPorCuenta) desbloquearCampos();
 };
 
 // notificacion
@@ -427,13 +436,13 @@ const buscarCuentaExistente = async () => {
     if (Array.isArray(data) && data.length > 0) {
       mostrarToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(data[0], true);
-      bloquearCampos(true, true); // bloquea campos y toggle
+      bloquearCampos(true, true); // bloquear campos y toggle
+      checkboxCuenta.disabled = true;
     } else {
       mostrarToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
       desbloquearCampos();
       checkboxCuenta.disabled = false;
-      buscarBtn.disabled = false;
     }
   } catch (err) {
     mostrarToast("Error al consultar la cuenta.", "error");
@@ -683,7 +692,6 @@ volverRegistro.addEventListener("click", (e) => {
   toggleFormularios(false);
   desbloquearCampos();
   checkboxCuenta.disabled = false;
-  buscarBtn.disabled = false;
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
