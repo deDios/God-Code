@@ -323,10 +323,8 @@ const abrirModal = () => {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       if (datos?.id) {
-        llenarFormulario(datos, true);
-        bloquearCampos(true);
+        llenarFormulario(datos, true, true); // <--- se bloquea todo, incluido toggle
         checkboxCuenta.checked = false;
-        checkboxCuenta.disabled = true;
         toggleFormularios(false);
       }
     } catch (e) {}
@@ -342,7 +340,7 @@ const cerrarModal = () => {
 };
 
 // bloquear/desbloquear campos de registro y toggle
-function bloquearCampos(bloquear = true) {
+function bloquearCampos(bloquear = true, bloquearToggle = false) {
   document.getElementById("nombre").readOnly = bloquear;
   telefonoInput.readOnly = bloquear;
   correoInput.readOnly = bloquear;
@@ -352,10 +350,12 @@ function bloquearCampos(bloquear = true) {
   });
   btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
   btnSubmit.classList.remove("disabled");
-  checkboxCuenta.disabled = bloquear; //aun no lo bloquea pero luego checamos porque de momento ya hace gran parte de las cosas.
+  if (bloquearToggle) {
+    checkboxCuenta.disabled = true;
+  }
 }
 function desbloquearCampos() {
-  bloquearCampos(false);
+  bloquearCampos(false, false);
 }
 
 // limpiar formulario y desbloquea al toggle
@@ -422,9 +422,7 @@ const buscarCuentaExistente = async () => {
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
       mostrarToast("Cuenta encontrada correctamente.", "exito");
-      llenarFormulario(data[0], true);
-      bloquearCampos(true);
-      checkboxCuenta.disabled = true;
+      llenarFormulario(data[0], true, true); // <--- se bloquea todo, incluido toggle
     } else {
       mostrarToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
@@ -437,7 +435,7 @@ const buscarCuentaExistente = async () => {
 };
 
 // llenar campos con datos de cuenta si hay usuario logeado
-const llenarFormulario = (cuenta, bloquear = false) => {
+const llenarFormulario = (cuenta, bloquear = false, bloquearToggle = false) => {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
@@ -452,7 +450,7 @@ const llenarFormulario = (cuenta, bloquear = false) => {
   document
     .querySelectorAll(".input-alerta-container")
     .forEach((c) => c.classList.remove("alerta"));
-  if (bloquear) bloquearCampos(true);
+  if (bloquear) bloquearCampos(true, bloquearToggle);
   btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
 };
@@ -671,6 +669,7 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
 checkboxCuenta.addEventListener("change", () => {
+  if (checkboxCuenta.disabled) return; // <-- Protección extra
   toggleFormularios(checkboxCuenta.checked);
 });
 buscarBtn.addEventListener("click", buscarCuentaExistente);
