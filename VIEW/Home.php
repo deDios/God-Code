@@ -292,7 +292,13 @@
                 </div>
                 <div class="form-row split">
                     <div>
-                        <label for="perfil-password">Contraseña</label>
+                        <label for="perfil-password">Contraseña
+                            <span class="tooltip">ⓘ
+                                <span class="tooltiptext">
+                                    Puede dejar vacío este campo para conservar los datos actuales.
+                                </span>
+                            </span>
+                        </label>
                         <input type="password" id="perfil-password" name="password" />
                     </div>
                     <div>
