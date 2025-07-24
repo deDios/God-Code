@@ -454,8 +454,27 @@ const llenarFormulario = (cuenta, bloquear = false) => {
   document.getElementById("nombre").value = cuenta.nombre || "";
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
-  document.getElementById("fecha-nacimiento").value =
-    cuenta.fecha_nacimiento || "";
+
+  // ------ Normaliza la fecha_nacimiento (¡aquí está el ajuste importante!) ------
+  let fechaNacimiento = cuenta.fecha_nacimiento || "";
+  if (fechaNacimiento) {
+    if (fechaNacimiento.includes("T")) {
+      fechaNacimiento = fechaNacimiento.split("T")[0];
+    } else if (fechaNacimiento.includes(" ")) {
+      fechaNacimiento = fechaNacimiento.split(" ")[0];
+    } else if (fechaNacimiento.includes("/")) {
+      const partes = fechaNacimiento.split("/");
+      if (partes.length === 3) {
+        fechaNacimiento = `${partes[2]}-${partes[1].padStart(
+          2,
+          "0"
+        )}-${partes[0].padStart(2, "0")}`;
+      }
+    }
+  }
+  document.getElementById("fecha-nacimiento").value = fechaNacimiento;
+  // ------------------------------------------------------------------------------
+
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked =
       cuenta.tipo_contacto == 3 ||
