@@ -287,7 +287,6 @@ const ENDPOINT_INSERTAR =
 const ENDPOINT_INSCRIPCION =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
-// Bandera para bloquear/desbloquear campos según contexto
 let camposBloqueadosPorCuenta = false;
 
 // Notificaciones
@@ -355,7 +354,7 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
     cb.disabled = bloquear;
   });
   buscarBtn.disabled = bloquear;
-  btnSubmit.disabled = false; // el boton siempre debe quedar habilitado al rellenar
+  btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
   if (bloquearToggle) checkboxCuenta.disabled = true;
   camposBloqueadosPorCuenta = bloquear;
@@ -455,7 +454,6 @@ const llenarFormulario = (cuenta, bloquear = false) => {
   document.getElementById("telefono").value = cuenta.telefono || "";
   document.getElementById("correo").value = cuenta.correo || "";
 
-  // ------ Normaliza la fecha_nacimiento (¡aquí está el ajuste importante!) ------
   let fechaNacimiento = cuenta.fecha_nacimiento || "";
   if (fechaNacimiento) {
     if (fechaNacimiento.includes("T")) {
