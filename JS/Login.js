@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -7,8 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
       if (datos?.id) {
-        window.location.href = "../VIEW/testLogin.php"; //---redirecciona si hay una cookie de algun usuario logeado
-        return; 
+        window.location.href = "../VIEW/testLogin.php";
+        return;
       }
     } catch (err) {
       console.warn("Cookie malformada o inválida:", err);
@@ -21,18 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
     ".login-form input[type='password']"
   );
 
-  // ENDPOINT LOGIN
   const ENDPOINT_LOGIN =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/login_usuario.php";
+  const ENDPOINT_CONSULTA =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 
-  // notificaciones
   const mostrarToast =
     window.mostrarToast ||
     function (msg, tipo = "exito", duracion = 5000) {
       console.log(`[${tipo.toUpperCase()}] ${msg}`);
     };
 
-  // se eliminan cookies antiguas individuales (si existen) 
   function limpiarCookiesAntiguas() {
     const cookiesAntiguas = [
       "usuario_id",
@@ -47,32 +45,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // se guardan las cookies
   function guardarEnCookies(usuario) {
-    limpiarCookiesAntiguas(); // primero borramos las antiguas
-
+    limpiarCookiesAntiguas();
     const dias = 1;
     const fechaExp = new Date();
     fechaExp.setTime(fechaExp.getTime() + dias * 24 * 60 * 60 * 1000);
     const expira = "expires=" + fechaExp.toUTCString();
-
-    // se guardan los datos en una sola cookie con JSON codificado
     const datosJSON = encodeURIComponent(JSON.stringify(usuario));
     document.cookie = `usuario=${datosJSON}; ${expira}; path=/`;
   }
 
-  // login al click
   btnLogin.addEventListener("click", async () => {
     const usuario = inputUsuario.value.trim();
     const password = inputPassword.value.trim();
 
-    // validacion para evitar mandar algo vacio
     if (!usuario || !password) {
       mostrarToast("Por favor, completa todos los campos.", "warning");
       return;
     }
 
-    // desactivar boton en lo que carga
     btnLogin.disabled = true;
     btnLogin.textContent = "Iniciando...";
 
@@ -80,25 +71,38 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(ENDPOINT_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, password }),
+        body: JSON.stringify({
+          usuario,
+          password,
+        }),
       });
 
       const data = await res.json();
 
-      // mensaje de todo bien
       if (data.mensaje === "Acceso correcto" && data.usuario) {
-        mostrarToast("¡Bienvenido! Acceso concedido.", "exito", 4000);
-        guardarEnCookies(data.usuario);
-
-        // redirigir
-        setTimeout(() => {
-          window.location.href = "../VIEW/Home.php"; //--------------------------------------------- redireccion
-        }, 1500);
+        const consultaRes = await fetch(ENDPOINT_CONSULTA, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            correo: data.usuario.correo,
+            telefono: data.usuario.telefono,
+            estatus: "1",
+          }),
+        });
+        const arr = await consultaRes.json();
+        if (Array.isArray(arr) && arr[0]) {
+          mostrarToast("¡Bienvenido! Acceso concedido.", "exito", 4000);
+          guardarEnCookies(arr[0]);
+          setTimeout(() => {
+            window.location.href = "../VIEW/Home.php";
+          }, 1500);
+        } else {
+          mostrarToast("Error al obtener todos tus datos.", "error", 4000);
+        }
+        return;
       } else if (data.error) {
-        // mensaje de error
         mostrarToast(data.error, "error", 5000);
       } else {
-        // si no es ninguno de los anteriores
         mostrarToast("Ocurrió algo raro... intenta más tarde.", "warning");
       }
     } catch (err) {
@@ -106,11 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarToast("Error de conexión. Intenta más tarde.", "error");
     }
 
-    // reactivar boton
     btnLogin.disabled = false;
     btnLogin.textContent = "Iniciar sesión";
   });
-
 
   [inputUsuario, inputPassword].forEach((input) => {
     input.addEventListener("keydown", (e) => {
