@@ -1,4 +1,3 @@
-/* — Global — */
 *,
 *::before,
 *::after {
@@ -13,13 +12,11 @@ body {
   background: #fafafa;
 }
 
-/* — Layout principal — */
 #home-main {
   display: flex;
   min-height: 100vh;
 }
 
-/* — Sidebar — */
 .sidebar {
   width: 340px;
   padding: 0 24px;
@@ -29,12 +26,12 @@ body {
   flex-direction: column;
 }
 
-/* Perfil y búsqueda */
 .user-profile {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 32px 0 12px;
+  padding-top: 2rem;
 }
 
 .avatar-circle {
@@ -79,7 +76,6 @@ body {
   text-decoration: underline;
 }
 
-/* “¿Qué aprendera hoy?” */
 .aprender-hoy {
   margin: 18px 0 14px;
 }
@@ -121,7 +117,6 @@ body {
   opacity: .6;
 }
 
-/* — Objetivos (card con 3 datos) — */
 .bloque-objetivos {
   background: #fff;
   border: 1px solid #e3e3e3;
@@ -175,7 +170,6 @@ body {
   font-size: .93em;
 }
 
-/* Gráfica circular */
 .circular-chart {
   width: 44px;
   height: 44px;
@@ -207,7 +201,6 @@ body {
   color: #1565c0;
 }
 
-/* — Mis cursos (3 cols) — */
 .mis-cursos {
   margin-bottom: 24px;
 }
@@ -254,14 +247,12 @@ body {
   border-left-color: #66bb6a;
 }
 
-/* — Contenido principal — */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Navbar con botones verticales */
 .main-navbar {
   display: flex;
   gap: 24px;
@@ -305,8 +296,8 @@ body {
 .icon-plus {
   width: 28px;
   height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
+  margin-bottom: 6px;
+  color: #222;
 }
 
 .nav-btn:hover,
@@ -320,7 +311,6 @@ body {
   box-shadow: 0 4px 10px #e0e9fa;
 }
 
-/* — Sección Recursos — */
 .recursos-box {
   padding: 32px 38px 0;
 }
@@ -339,7 +329,6 @@ body {
   overflow: hidden;
 }
 
-/* Tabla */
 .table-header,
 .table-body {
   display: flex;
@@ -352,6 +341,7 @@ body {
   font-weight: 600;
   font-size: 1rem;
   border-bottom: 1px solid #e2e2e2;
+  padding-left: 1rem;
 }
 
 .table-header>div {
@@ -407,7 +397,6 @@ body {
   text-decoration: underline;
 }
 
-/* — Responsive — */
 @media (max-width: 950px) {
   #home-main {
     flex-direction: column;
@@ -450,5 +439,86 @@ body {
 
   .recursos-box {
     padding: 4px 2vw 0;
+  }
+}
+
+/*------------------------- css para la tabla de recursos (lo que va dentro) ------------------------*/
+
+.recursos-table .table-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background .2s;
+  padding-left: 2rem;
+}
+
+.recursos-table .table-row:last-child {
+  border-bottom: none;
+}
+
+.recursos-table .table-row:hover {
+  background: #f9f9f9;
+}
+
+.recursos-table .col-nombre {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-recurso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.icon-recurso img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.recurso-link {
+  font-size: 1rem;
+  color: #145bc7;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.recurso-link:hover {
+  color: #103d75;
+}
+
+.recursos-table .col-tipo {
+  flex: 1;
+  font-size: 0.95rem;
+  color: #666;
+  text-align: left;
+}
+
+.recursos-table .col-fecha {
+  flex: 1.3;
+  font-size: 0.93rem;
+  color: #888;
+  text-align: left;
+}
+
+@media (max-width: 700px) {
+  .recursos-table .table-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .recursos-table .col-nombre,
+  .recursos-table .col-tipo,
+  .recursos-table .col-fecha {
+    flex: none;
   }
 }

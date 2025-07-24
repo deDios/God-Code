@@ -231,15 +231,39 @@
                 <h2>Recursos</h2>
                 <div class="recursos-table">
                     <div class="table-header">
-                        <div class="col-nombre">Nombre <span class="flecha">&#8593;</span></div>
+                        <div class="col-nombre">
+                            Nombre <span class="flecha">&#8593;</span>
+                        </div>
                         <div class="col-tipo">Tipo</div>
-                        <div class="col-fecha">Fecha de solicitado <span class="flecha">&#8593;</span></div>
+                        <div class="col-fecha">
+                            Fecha de solicitado <span class="flecha">&#8593;</span>
+                        </div>
                     </div>
+
+                    <!-- Aquí arrancan tus filas -->
                     <div class="table-body" id="recursos-list">
-                        <!-- se van a insertar las cards, todavia falta hacerlas -->
+
+
+                        <!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div>
+
+                        <!-- mas recursos (luego los coloco con js) -->
                     </div>
+                    <!-- aca termina el body del table -->
                 </div>
             </section>
+
         </section>
     </main>
 
