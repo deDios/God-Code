@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <div class="dropdown-menu" id="user-dropdown">
             <ul>
-              <li onclick="window.location.href='../VIEW/testLogin.php'">
+              <li onclick="window.location.href='../VIEW/Home.php'">
                 <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
               </li>
               <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
