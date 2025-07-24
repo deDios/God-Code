@@ -471,7 +471,7 @@ const llenarFormulario = (cuenta, bloquear = false) => {
     }
   }
   document.getElementById("fecha-nacimiento").value = fechaNacimiento;
-  // ------------------------------------------------------------------------------
+  console.log(fechaNacimiento);
 
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked =
