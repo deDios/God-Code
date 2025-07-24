@@ -232,7 +232,7 @@
 
             <div class="contenedor-boton">
                 <button class="btn-contacto" onclick="location.href='../VIEW/Contacto.php'">
-                    <span>¡Contáctanos!</span>
+                    <span>Contáctanos!</span>
                 </button>
             </div>
         </section>

@@ -111,7 +111,7 @@
     margin-bottom: 1rem;
 }
 
-/*--------------------------------------- seccion 3 ------------------*/
+/*--------------------------------------- seccion 3 -----------------------------*/
 
 
 
@@ -141,7 +141,7 @@
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 2rem;
-    max-height: 420px;
+    max-height: 650px;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -199,6 +199,7 @@
     background: transparent;
 }
 
+/* no lo pude hechar a jalar
 .pill-mencion {
     position: absolute;
     top: 13px;
@@ -227,6 +228,7 @@
 .input-contenedor textarea:focus~.pill-mencion {
     opacity: 0.18;
 }
+*/
 
 .acciones-comentario {
     display: flex;
@@ -590,6 +592,62 @@
     color: #bbb;
 }
 
+#noticia-comentarios .nuevo-comentario {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(180deg,
+
+            #f9f9f9 100%);
+    border-radius: 12px;
+    box-shadow: 0 1.5px 8px 0 #0002;
+    margin-bottom: 1.5rem;
+    padding: 1.3rem 0.8rem 0.6rem 0.8rem;
+    transition: box-shadow 0.22s, background 0.18s;
+    border-bottom: 1.5px solid #d4e0ef;
+}
+
+#noticia-comentarios .nuevo-comentario:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #eaf1fb 0%, #f5faff 100%);
+    border-radius: 12px 12px 0 0;
+    z-index: 2;
+    opacity: 0.8;
+    pointer-events: none;
+    transition: opacity 0.18s;
+}
+
+#noticia-comentarios .nuevo-comentario:active,
+#noticia-comentarios .nuevo-comentario:focus-within {
+    box-shadow: 0 5px 22px 0 #1565c055;
+    background: #f7fbff;
+}
+
+#noticia-comentarios .nuevo-comentario-wrapper {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+}
+
+#noticia-comentarios .acciones-comentario {
+    margin: 0.7rem 0 0 62px;
+    padding-bottom: 0.1rem;
+    background: transparent;
+}
+
+@media (max-width: 600px) {
+    #noticia-comentarios .nuevo-comentario {
+        padding: 0.7rem 0.2rem 0.4rem 0.2rem;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 1rem;
+    }
+}
+
 @media (max-width: 600px) {
     .nuevo-comentario-wrapper img {
         width: 32px;
@@ -605,6 +663,98 @@
         font-size: 0.98rem;
         padding: 4px 10px;
     }
+}
+
+.comentario-sticky {
+    background: #eaf1fb !important;
+    border-left: 4px solid #1565c0;
+    animation: stickyPop 0.7s;
+}
+
+@keyframes stickyPop {
+    from {
+        box-shadow: 0 0 24px #1565c0;
+    }
+
+    to {
+        box-shadow: none;
+    }
+}
+
+.comentario-interacciones .reaccion svg {
+    fill: #bbb !important;
+    transition: fill 0.2s;
+}
+
+.comentario-interacciones .reaccion.liked svg {
+    fill: #1565c0 !important;
+}
+
+.comentario-interacciones .reaccion.disliked svg {
+    fill: #e53935 !important;
+}
+
+.comentario-interacciones .reaccion {
+    font-weight: normal;
+    opacity: 1;
+    cursor: pointer;
+}
+
+.comentario-interacciones .reaccion.liked,
+.comentario-interacciones .reaccion.disliked {
+    font-weight: bold;
+    opacity: 1;
+}
+
+.comentario.skeleton {
+    background: #f5f5f8 !important;
+    border-radius: 8px;
+    opacity: 0.7;
+    min-height: 72px;
+    display: flex;
+    gap: 1.2rem;
+    padding: 1.2rem 3rem;
+    animation: skelBlink 1.2s linear infinite alternate;
+}
+
+@keyframes skelBlink {
+    to {
+        opacity: 0.44;
+    }
+}
+
+.skel-avatar {
+    background: #e0e4ea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-top: 4px;
+}
+
+.skel-line {
+    background: #e0e4ea;
+    height: 12px;
+    border-radius: 4px;
+    margin: 8px 0 0 0;
+}
+
+.sticky-anim {
+    box-shadow: 0 0 0 4px #eaf1fb, 0 0 6px #1565c055;
+    animation: stickyIn 1.7s;
+}
+
+@keyframes stickyIn {
+    from {
+        box-shadow: 0 0 0 0 #eaf1fb;
+    }
+
+    to {
+        box-shadow: 0 0 0 4px #eaf1fb, 0 0 6px #1565c055;
+    }
+}
+
+#lista-comentarios .comentario {
+    transition: opacity 0.25s;
 }
 
 

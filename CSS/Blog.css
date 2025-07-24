@@ -161,6 +161,7 @@
 
 #filtros-cursos {
     background: #f9f9f9;
+    padding: 4rem 2rem;
     border-radius: 1rem;
     text-align: center;
     max-width: 900px;
@@ -277,7 +278,7 @@
 }
 
 #cursos-destacados {
-    padding: 1rem 1rem;
+    padding: 5rem 1rem;
     background: #f9fbff;
     margin: 0 auto 0rem;
     text-align: left;
