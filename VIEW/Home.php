@@ -571,6 +571,7 @@
 
 
     <script src="../JS/JSglobal.js"></script>
+    <script src="../JS/Hom.js"></script>
 </body>
 
 </html>
