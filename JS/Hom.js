@@ -26,7 +26,7 @@ async function fetchRecursos(usuarioId) {
     }
   );
   if (!res.ok) throw new Error("Error al cargar inscripciones");
-  return res.json(); 
+  return res.json();
 }
 
 // re-arma el sidebar especificamente perfil
@@ -65,7 +65,7 @@ function renderRecursosRows(lista) {
     const row = document.createElement("div");
     row.className = "table-row";
 
-    // nombre + icono 
+    // nombre + icono
     const colNombre = document.createElement("div");
     colNombre.className = "col-nombre";
     const spanIcon = document.createElement("span");
@@ -99,7 +99,7 @@ function renderRecursosRows(lista) {
 
 // paginacion
 let recursosData = [];
-const itemsPerPage = 10;
+const itemsPerPage = 6;
 let currentPage = 1;
 
 function renderPagination(totalPages) {
@@ -149,8 +149,43 @@ async function initDashboard() {
     renderPage(1);
   } catch (err) {
     console.error(err);
-    mostrarToast('No se pudieron cargar tus cursos', 'error');
+    mostrarToast("No se pudieron cargar tus cursos", "error");
   }
 }
 
 document.addEventListener("DOMContentLoaded", initDashboard);
+
+//--------------------------------- JS del MODAL
+
+document.addEventListener("DOMContentLoaded", () => {
+  // — tu initDashboard y demás ya definidos arriba —
+
+  initDashboard();
+
+  // —–––––––––––––––––––––––––—
+  // Lógica de apertura / cierre del modal de perfil
+  const editBtn = document.querySelector(".edit-profile");
+  const modal = document.getElementById("modal-perfil");
+  const closeBtn = modal.querySelector(".modal-close");
+
+  // Abrir modal
+  editBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden"; // opcional, bloquea scroll de fondo
+  });
+
+  // Cerrar con la X
+  closeBtn.addEventListener("click", () => {
+    modal.classList.remove("active");
+    document.body.style.overflow = "";
+  });
+
+  // Cerrar al clicar fuera del cuadro
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+});

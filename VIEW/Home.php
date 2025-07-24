@@ -248,7 +248,7 @@
                 <div id="pagination-controls" class="pagination-controls">
                 </div>
             </section>
-            
+
         </section>
     </main>
 
@@ -267,8 +267,64 @@
     </footer>
 
 
+
+
+
+
     <script src="../JS/JSglobal.js"></script>
     <script src="../JS/Hom.js"></script>
+
+
+    <!-- html para el modal -->
+    <div id="modal-perfil" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2>Administrar perfil</h2>
+
+            <form id="form-perfil">
+                <div class="form-row">
+                    <label for="perfil-nombre">Nombre completo</label>
+                    <input type="text" id="perfil-nombre" name="nombre" />
+                </div>
+                <div class="form-row">
+                    <label for="perfil-email">Correo electrónico</label>
+                    <input type="email" id="perfil-email" name="correo" />
+                </div>
+                <div class="form-row split">
+                    <div>
+                        <label for="perfil-password">Contraseña</label>
+                        <input type="password" id="perfil-password" name="password" />
+                    </div>
+                    <div>
+                        <label for="perfil-password2">Confirmar contraseña</label>
+                        <input type="password" id="perfil-password2" name="password2" />
+                    </div>
+                </div>
+                <div class="form-row split">
+                    <div>
+                        <label for="perfil-telefono">Teléfono</label>
+                        <input type="tel" id="perfil-telefono" name="telefono" />
+                    </div>
+                    <div>
+                        <label for="perfil-nacimiento">Fecha de nacimiento</label>
+                        <input type="date" id="perfil-nacimiento" name="fecha_nacimiento" />
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Cambiar información</button>
+            </form>
+
+            <p class="modal-note">
+                Tus datos están seguros con nosotros. Al completar tu registro, aceptas nuestras políticas de privacidad
+                y condiciones de uso. Si tienes dudas, contáctanos.
+            </p>
+            <p class="modal-copy">
+                © 2025 GodCode. Todos los derechos reservados. Queda prohibida la reproducción total o parcial sin
+                autorización previa.
+            </p>
+        </div>
+    </div>
+
+
 </body>
 
 </html>

@@ -552,3 +552,117 @@ body {
   opacity: .5;
   cursor: not-allowed;
 }
+
+/*---------------------------- css para MODAL ------------------------------*/
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+/* caja blanca central */
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  padding: 2rem 2.5rem;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* botón “X” de cerrar */
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* título centrado */
+.modal-content h2 {
+  text-align: center;
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* filas de formulario */
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f7f7f7;
+  transition: border .2s, background .2s;
+}
+
+.form-row input:focus {
+  background: #fff;
+  border-color: #1565c0;
+  outline: none;
+}
+
+/* dos columnas */
+.form-row.split {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row.split>div {
+  flex: 1;
+}
+
+/* botón principal */
+.btn-submit {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  background: #4285f4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 1.2rem;
+  transition: background .2s;
+}
+
+.btn-submit:hover {
+  background: #357ae8;
+}
+
+/* notas al pie */
+.modal-note {
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.modal-copy {
+  font-size: 0.65rem;
+  color: #999;
+  text-align: center;
+}
