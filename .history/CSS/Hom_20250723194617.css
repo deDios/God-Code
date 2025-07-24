@@ -302,11 +302,13 @@ body {
   padding: 16px 12px;
 }
 
-.icon-plus {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
+.nav-icon svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  stroke-width: 1.5;
+  stroke: currentColor;
+  color: #1565C0;
 }
 
 .nav-btn:hover,

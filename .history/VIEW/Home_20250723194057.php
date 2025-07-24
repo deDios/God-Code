@@ -209,14 +209,8 @@
         <!-- contenido -->
         <section class="main-content">
             <nav class="main-navbar">
-                <button class="nav-btn">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-plus" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="3" stroke-linecap="square" />
-                        </svg>
-                    </span>
-                    Nuevo recurso
-                </button>
+                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/+.png"
+                            alt=""></span>Nuevo recurso</button>
                 <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton1.png"
                             alt=""></span>Proyectos</button>
                 <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton2.png"

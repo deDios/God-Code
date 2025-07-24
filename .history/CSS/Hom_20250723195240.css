@@ -305,19 +305,22 @@ body {
 .icon-plus {
   width: 28px;
   height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
+  margin-bottom: 6px;
+  color: #222;
+}
+
+.nav-btn {
+  color: #222;
 }
 
 .nav-btn:hover,
 .nav-btn.active {
-  color: #0A57C6;
+  color: #1565c0;
 }
 
-.nav-btn.active,
-.nav-btn:hover {
-  background: #f1f7fe;
-  box-shadow: 0 4px 10px #e0e9fa;
+/* opcional: ajustar stroke en hover para un efecto sutil */
+.nav-btn:hover .icon-plus path {
+  stroke-width: 2.5;
 }
 
 /* — Sección Recursos — */

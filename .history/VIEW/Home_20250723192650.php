@@ -134,12 +134,12 @@
 
 
     <main id="home-main">
-
+        
         <!-- sidebar -->
         <section id="sidebar" class="sidebar">
             <div class="user-profile">
                 <div class="avatar-circle">
-                    <img src="../ASSETS/usuario/usuarioImg/img_user1.png" alt="avatar" id="avatar-img" />
+                    <img src="../ASSETS/usuario/usuarioImg.png" alt="avatar" id="avatar-img" />
                 </div>
                 <div class="user-info">
                     <div id="user-name">Luis Enrique Godcode</div>
@@ -209,21 +209,14 @@
         <!-- contenido -->
         <section class="main-content">
             <nav class="main-navbar">
-                <button class="nav-btn">
-                    <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-plus" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="3" stroke-linecap="square" />
-                        </svg>
-                    </span>
-                    Nuevo recurso
-                </button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton1.png"
+                <button class="nav-btn active"><span class="nav-icon">＋</span><span>Nuevo recurso</span></button>
+                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/projects.svg"
                             alt=""></span>Proyectos</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton2.png"
+                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/coworking.svg"
                             alt=""></span>Coworking</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton3.png"
+                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/cursos.svg"
                             alt=""></span>Cursos</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton4.png"
+                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/cotizar.svg"
                             alt=""></span>Cotizar</button>
             </nav>
 

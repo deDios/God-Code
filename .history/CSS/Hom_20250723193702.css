@@ -5,8 +5,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -48,7 +47,6 @@ body {
   justify-content: center;
   margin-bottom: 10px;
 }
-
 .avatar-circle img {
   width: 92px;
   height: 92px;
@@ -60,20 +58,17 @@ body {
   text-align: center;
   margin-bottom: 5px;
 }
-
 #user-name {
   font-size: 1.08rem;
   font-weight: 500;
   margin-bottom: 2px;
 }
-
 .edit-profile {
   font-size: 0.86rem;
   color: #1565c0;
   text-decoration: none;
   transition: color .2s;
 }
-
 .edit-profile:hover {
   color: #0a4596;
   text-decoration: underline;
@@ -83,17 +78,14 @@ body {
 .aprender-hoy {
   margin: 18px 0 14px;
 }
-
 .aprender-hoy h2 {
   font-size: 1.18rem;
   font-weight: 400;
   margin: 0 0 8px;
 }
-
 .input-search {
   position: relative;
 }
-
 .input-search input {
   width: 100%;
   padding: 8px 32px 8px 12px;
@@ -103,13 +95,11 @@ body {
   background: #f8f8f8;
   transition: border .2s, background .2s;
 }
-
 .input-search input:focus {
   border-color: #1565c0;
   background: #fff;
   outline: none;
 }
-
 .icon-search {
   position: absolute;
   top: 50%;
@@ -129,14 +119,12 @@ body {
   margin: 14px 0 24px;
   padding: 0;
 }
-
 .bloque-objetivos .tabs {
   display: flex;
   background: #f7f7fb;
   border-bottom: 1px solid #e3e3e3;
   border-radius: 8px 8px 0 0;
 }
-
 .bloque-objetivos .tab {
   flex: 1;
   text-align: center;
@@ -146,20 +134,16 @@ body {
   border: none;
   border-right: 1px solid #e3e3e3;
 }
-
 .bloque-objetivos .tab:last-child {
   border-right: none;
 }
-
 .bloque-objetivos .tab.active {
   background: #fff;
   color: #1565c0;
 }
-
 .bloque-objetivos .objetivos-content {
   display: flex;
 }
-
 .bloque-objetivos .objetivo,
 .bloque-objetivos .cursos-completados,
 .bloque-objetivos .titulo-recibido {
@@ -168,7 +152,6 @@ body {
   text-align: center;
   border-right: 1px solid #e3e3e3;
 }
-
 .bloque-objetivos .titulo-recibido {
   border: none;
   color: #666;
@@ -182,20 +165,17 @@ body {
   position: relative;
   margin: 0 auto 8px;
 }
-
 .circle-bg {
   fill: none;
   stroke: #e6e6e6;
   stroke-width: 3.5;
 }
-
 .circle {
   fill: none;
   stroke: #1565c0;
   stroke-width: 3.5;
   stroke-linecap: round;
 }
-
 .circle-text {
   position: absolute;
   inset: 0;
@@ -211,22 +191,18 @@ body {
 .mis-cursos {
   margin-bottom: 24px;
 }
-
 .cursos-seccion {
   display: flex;
   gap: 16px;
 }
-
 .cursos-list {
   flex: 1;
 }
-
 .cursos-subtitulo {
   font-size: .96em;
   font-weight: 600;
   margin-bottom: 8px;
 }
-
 .curso-card {
   background: #fff;
   border: 1px solid #e3e3e3;
@@ -236,23 +212,13 @@ body {
   cursor: pointer;
   transition: background .2s, box-shadow .2s;
 }
-
 .curso-card:hover {
   background: #e3f0ff;
-  box-shadow: 0 2px 6px rgba(188, 214, 243, .65);
+  box-shadow: 0 2px 6px rgba(188,214,243,.65);
 }
-
-#cursos-activos .curso-card {
-  border-left-color: #1565c0;
-}
-
-#cursos-pendientes .curso-card {
-  border-left-color: #ffa726;
-}
-
-#cursos-terminados .curso-card {
-  border-left-color: #66bb6a;
-}
+#cursos-activos   .curso-card { border-left-color: #1565c0; }
+#cursos-pendientes .curso-card { border-left-color: #ffa726; }
+#cursos-terminados .curso-card { border-left-color: #66bb6a; }
 
 /* — Contenido principal — */
 .main-content {
@@ -272,7 +238,6 @@ body {
   top: 3rem;
   z-index: 10;
 }
-
 .nav-btn {
   flex: 1;
   max-width: 140px;
@@ -290,30 +255,12 @@ body {
   cursor: pointer;
   transition: background .2s, box-shadow .15s;
 }
-
 .nav-btn img,
 .nav-icon {
   width: 44px;
   height: 44px;
   margin: 0;
 }
-
-.main-navbar .nav-btn {
-  padding: 16px 12px;
-}
-
-.icon-plus {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
-}
-
-.nav-btn:hover,
-.nav-btn.active {
-  color: #0A57C6;
-}
-
 .nav-btn.active,
 .nav-btn:hover {
   background: #f1f7fe;
@@ -324,13 +271,11 @@ body {
 .recursos-box {
   padding: 32px 38px 0;
 }
-
 .recursos-box h2 {
   margin-bottom: 17px;
   font-size: 1.38rem;
   font-weight: 600;
 }
-
 .recursos-table {
   width: 100%;
   background: #fff;
@@ -345,7 +290,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
 .table-header {
   flex-direction: row;
   background: #f4f7fb;
@@ -353,30 +297,13 @@ body {
   font-size: 1rem;
   border-bottom: 1px solid #e2e2e2;
 }
-
-.table-header>div {
+.table-header > div {
   padding: 12px 0 12px 13px;
 }
-
-.col-nombre {
-  flex: 2 1 240px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.col-tipo {
-  flex: 1 1 120px;
-}
-
-.col-fecha {
-  flex: 1.3 1 150px;
-}
-
-.flecha {
-  color: #1565c0;
-  margin-left: 2px;
-}
+.col-nombre { flex: 2 1 240px; display: flex; align-items: center; gap: 8px; }
+.col-tipo   { flex: 1 1 120px; }
+.col-fecha  { flex: 1.3 1 150px; }
+.flecha     { color: #1565c0; margin-left: 2px; }
 
 .table-body .table-row {
   display: flex;
@@ -387,68 +314,31 @@ body {
   cursor: pointer;
   transition: background .17s;
 }
-
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.table-row:hover {
-  background: #f2f9ff;
-}
-
-.icon-recurso {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-}
-
-.link {
-  color: #145bc7;
-  text-decoration: underline;
-}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover     { background: #f2f9ff; }
+.icon-recurso { width: 20px; height: 20px; margin-right: 8px; }
+.link         { color: #145bc7; text-decoration: underline; }
 
 /* — Responsive — */
 @media (max-width: 950px) {
-  #home-main {
-    flex-direction: column;
-  }
-
+  #home-main { flex-direction: column; }
   .sidebar {
     width: 100%;
     border-right: none;
     border-bottom: 1px solid #e3e3e3;
     padding: 14px 7vw 18px;
   }
-
   .main-content,
-  .recursos-box {
-    padding: 0 7vw;
-  }
-
-  .cursos-seccion {
-    flex-direction: column;
-  }
+  .recursos-box { padding: 0 7vw; }
+  .cursos-seccion { flex-direction: column; }
 }
 
 @media (max-width: 700px) {
-  .main-navbar {
-    flex-wrap: wrap;
-    gap: 7px;
-    padding: 22px 0 16px;
-  }
-
-  .sidebar {
-    padding: 7px 2vw;
-  }
+  .main-navbar { flex-wrap: wrap; gap: 7px; padding: 22px 0 16px; }
+  .sidebar { padding: 7px 2vw; }
 }
 
 @media (max-width: 520px) {
-  .main-navbar {
-    padding: 12px 0 10px;
-    gap: 2px;
-  }
-
-  .recursos-box {
-    padding: 4px 2vw 0;
-  }
+  .main-navbar { padding: 12px 0 10px; gap: 2px; }
+  .recursos-box  { padding: 4px 2vw 0; }
 }

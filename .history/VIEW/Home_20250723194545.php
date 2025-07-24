@@ -211,8 +211,9 @@
             <nav class="main-navbar">
                 <button class="nav-btn">
                     <span class="nav-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-plus" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="3" stroke-linecap="square" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
                         </svg>
                     </span>
                     Nuevo recurso

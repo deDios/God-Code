@@ -293,25 +293,9 @@ body {
 
 .nav-btn img,
 .nav-icon {
-  width: 44px;
-  height: 44px;
+  width: 22px;
+  height: 22px;
   margin: 0;
-}
-
-.main-navbar .nav-btn {
-  padding: 16px 12px;
-}
-
-.icon-plus {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
-}
-
-.nav-btn:hover,
-.nav-btn.active {
-  color: #0A57C6;
 }
 
 .nav-btn.active,

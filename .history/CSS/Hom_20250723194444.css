@@ -298,20 +298,23 @@ body {
   margin: 0;
 }
 
-.main-navbar .nav-btn {
-  padding: 16px 12px;
+.nav-icon svg {
+  width: 22px;
+  height: 22px;
+  color: #145BC7;
 }
 
-.icon-plus {
-  width: 28px;
-  height: 28px;
-  margin-bottom: 6px;      
-  color: #222;             
+.nav-btn {
+  color: #222;
 }
 
-.nav-btn:hover,
-.nav-btn.active {
-  color: #0A57C6;
+.nav-btn.active,
+.nav-btn:hover {
+  color: #1565C0;
+}
+
+.nav-icon svg {
+  stroke: currentColor;
 }
 
 .nav-btn.active,
