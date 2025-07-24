@@ -557,18 +557,18 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: none;
-  align-items: center;
   justify-content: center;
-  z-index: 1000;
+  align-items: center;
+  padding: 1rem;
+  z-index: 99999;
 }
 
 .modal-overlay.active {
   display: flex;
 }
 
-/* caja blanca central */
 .modal-content {
   background: #fff;
   border-radius: 8px;
@@ -580,7 +580,6 @@ body {
   overflow-y: auto;
 }
 
-/* botón “X” de cerrar */
 .modal-close {
   position: absolute;
   top: 1rem;
@@ -591,14 +590,12 @@ body {
   cursor: pointer;
 }
 
-/* título centrado */
 .modal-content h2 {
   text-align: center;
   font-size: 1.75rem;
   margin-bottom: 1.5rem;
 }
 
-/* filas de formulario */
 .form-row {
   margin-bottom: 1rem;
 }
@@ -624,7 +621,6 @@ body {
   outline: none;
 }
 
-/* dos columnas */
 .form-row.split {
   display: flex;
   gap: 1rem;
@@ -634,7 +630,6 @@ body {
   flex: 1;
 }
 
-/* botón principal */
 .btn-submit {
   display: block;
   width: 100%;
@@ -653,7 +648,6 @@ body {
   background: #357ae8;
 }
 
-/* notas al pie */
 .modal-note {
   font-size: 0.75rem;
   color: #666;

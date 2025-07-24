@@ -156,36 +156,148 @@ async function initDashboard() {
 document.addEventListener("DOMContentLoaded", initDashboard);
 
 //--------------------------------- JS del MODAL
-
 document.addEventListener("DOMContentLoaded", () => {
-  // — tu initDashboard y demás ya definidos arriba —
+  // —–––––––––––– tus initDashboard, renderPerfil, etc. –––––––––––—
 
-  initDashboard();
+  // 1) Helpers para cookie y fetch de usuario
+  function getUsuarioFromCookie() {
+    const cookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("usuario="));
+    if (!cookie) return null;
+    try {
+      return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
+    } catch {
+      return null;
+    }
+  }
 
-  // —–––––––––––––––––––––––––—
-  // Lógica de apertura / cierre del modal de perfil
+  async function fetchUsuario(correo, telefono, estatus) {
+    const res = await fetch(
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, telefono, estatus }),
+      }
+    );
+    if (!res.ok) throw new Error("No se pudo cargar perfil");
+    const arr = await res.json();
+    return arr; // array de usuarios
+  }
+
+  // 2) Elements del modal
   const editBtn = document.querySelector(".edit-profile");
   const modal = document.getElementById("modal-perfil");
   const closeBtn = modal.querySelector(".modal-close");
+  const form = document.getElementById("form-perfil");
 
-  // Abrir modal
-  editBtn.addEventListener("click", (e) => {
+  // IDs de inputs
+  const inpNombre = document.getElementById("perfil-nombre");
+  const inpEmail = document.getElementById("perfil-email");
+  const inpPass = document.getElementById("perfil-password");
+  const inpPass2 = document.getElementById("perfil-password2");
+  const inpTel = document.getElementById("perfil-telefono");
+  const inpNac = document.getElementById("perfil-nacimiento");
+
+  let usuarioCookie, usuarioActual;
+
+  // 3) Abrir modal y poblar campos
+  editBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden"; // opcional, bloquea scroll de fondo
+    usuarioCookie = getUsuarioFromCookie();
+    if (!usuarioCookie) {
+      window.location.href = "../VIEW/Login.php";
+      return;
+    }
+
+    try {
+      // fetch usuario por correo/telefono/estatus
+      const lista = await fetchUsuario(
+        usuarioCookie.correo,
+        usuarioCookie.telefono,
+        usuarioCookie.estatus
+      );
+      // buscamos el que coincida con el id de la cookie
+      usuarioActual =
+        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
+
+      // rellenamos inputs
+      inpNombre.value = usuarioActual.nombre || "";
+      inpEmail.value = usuarioActual.correo || "";
+      inpTel.value = usuarioActual.telefono || "";
+      inpNac.value = usuarioActual.fecha_nacimiento || "";
+
+      // dejamos password vacíos
+      inpPass.value = "";
+      inpPass2.value = "";
+
+      // mostramos el modal
+      modal.classList.add("active");
+      document.body.classList.add("modal-abierto");
+    } catch (err) {
+      console.error(err);
+      alert("Error al cargar datos de perfil.");
+    }
   });
 
-  // Cerrar con la X
-  closeBtn.addEventListener("click", () => {
+  // 4) Cerrar modal
+  const cerrarModal = () => {
     modal.classList.remove("active");
-    document.body.style.overflow = "";
+    document.body.classList.remove("modal-abierto");
+  };
+  closeBtn.addEventListener("click", cerrarModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) cerrarModal();
   });
 
-  // Cerrar al clicar fuera del cuadro
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.classList.remove("active");
-      document.body.style.overflow = "";
+  // 5) Submit: actualizar usuario
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // simple validación de contraseñas
+    if (inpPass.value !== inpPass2.value) {
+      return alert("Las contraseñas no coinciden.");
+    }
+
+    const payload = {
+      id: usuarioActual.id,
+      nombre: inpNombre.value.trim(),
+      correo: inpEmail.value.trim(),
+      telefono: inpTel.value.trim(),
+      fecha_nacimiento: inpNac.value, // YYYY-MM-DD
+      tipo_contacto: usuarioActual.tipo_contacto,
+      password: inpPass.value || usuarioActual.password,
+      estatus: usuarioActual.estatus,
+    };
+
+    try {
+      const res = await fetch(
+        "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await res.json();
+      if (data.mensaje) {
+        alert(data.mensaje);
+        // actualiza la cookie con los nuevos datos
+        const nuevoUsuario = { ...usuarioCookie, ...payload };
+        document.cookie =
+          "usuario=" +
+          encodeURIComponent(JSON.stringify(nuevoUsuario)) +
+          "; path=/; max-age=" +
+          24 * 60 * 60;
+        // refresca perfil en sidebar
+        renderPerfil(nuevoUsuario);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al actualizar perfil.");
+    } finally {
+      cerrarModal();
     }
   });
 });
