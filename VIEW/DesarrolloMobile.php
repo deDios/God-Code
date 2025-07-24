@@ -211,9 +211,9 @@
         <section id="descripcion-pagina-Productos" class="animado">
             <div class="descripcion-pagina-Productos__wrapper">
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Diseña, construye y lanza aplicaciones mobile que marcan la diferencia</span></h2>
+                    <h2><span>Diseña, construye y lanza aplicaciones móviles que marcan la diferencia</span></h2>
                     <p>
-                        Desde ideas simples hasta soluciones mobile robustas y escalables, planifica cada etapa del
+                        Desde ideas simples hasta soluciones móviles robustas y escalables, planifica cada etapa del
                         desarrollo con visión estratégica y atención al detalle. Define funcionalidades clave que
                         respondan a las verdaderas necesidades de tus usuarios, diseña interfaces intuitivas que
                         ofrezcan una experiencia fluida, y establece objetivos claros que orienten cada decisión del
@@ -223,9 +223,9 @@
                         de entrega, realiza pruebas en tiempo real y ajusta cada componente para lograr una aplicación
                         estable, rápida y centrada en la experiencia del usuario. Aprovecha herramientas modernas de
                         desarrollo, análisis, control de calidad y despliegue continuo para acelerar el proceso sin
-                        comprometer la calidad. Lanza aplicaciones mobile que no solo funcionan correctamente, sino que
+                        comprometer la calidad. Lanza aplicaciones móviles que no solo funcionan correctamente, sino que
                         conectan emocionalmente con los usuarios, generan fidelización, fortalecen tu marca y entregan
-                        resultados medibles. Transforma tus ideas en soluciones mobile funcionales, atractivas y
+                        resultados medibles. Transforma tus ideas en soluciones móviles funcionales, atractivas y
                         preparadas para competir en un mercado digital cada vez más exigente.
                     </p>
                 </div>

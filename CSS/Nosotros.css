@@ -291,7 +291,7 @@
     max-width: 600px;
 }
 
-.proyecto img {
+.proyecto .imagen {
     flex: 1 1 400px;
     max-width: 600px;
 }

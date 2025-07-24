@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const totalPaginas = Math.ceil(noticias.length / noticiasPorPagina);
       paginaActual = (paginaActual % totalPaginas) + 1;
       cambiarPaginaAnimada(paginaActual);
-    }, 10000);
+    }, 6000);
   } catch (error) {
     console.error("Error en carga de noticias:", error);
   }

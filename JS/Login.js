@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log(`[${tipo.toUpperCase()}] ${msg}`);
     };
 
-  // se eliminan cookies antiguas individuales (si existen) 
+  // se eliminan cookies antiguas individuales (si existen)
   function limpiarCookiesAntiguas() {
     const cookiesAntiguas = [
       "usuario_id",
