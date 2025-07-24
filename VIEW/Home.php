@@ -256,6 +256,294 @@
                             </div>
                             <div class="col-tipo">Proyecto</div>
                             <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
+                        </div><!-- Ejemplo 1 -->
+                        <div class="table-row">
+                            <div class="col-nombre">
+
+                                <span class="icon-recurso">
+                                    <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                                </span>
+
+                                <a href="#" class="recurso-link">Curso de python</a>
+                            </div>
+                            <div class="col-tipo">Proyecto</div>
+                            <div class="col-fecha">01 de Abril del 2025</div>
                         </div>
 
                         <!-- mas recursos (luego los coloco con js) -->

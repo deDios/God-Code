@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // redirigir
         setTimeout(() => {
-          window.location.href = "../VIEW/testLogin.php"; //--------------------------------------------- redireccion
+          window.location.href = "../VIEW/Home.php"; //--------------------------------------------- redireccion
         }, 1500);
       } else if (data.error) {
         // mensaje de error
