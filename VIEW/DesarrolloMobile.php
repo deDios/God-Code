@@ -231,7 +231,7 @@
                 </div>
 
                 <div class="descripcion-pagina-Productos__bloque">
-                    <h2><span>Lleva el control total del desarrollo de tu app móvil</span></h2>
+                    <h2><span>Lleva el control total del desarrollo de tu app mobile</span></h2>
                     <p> Gestiona cada etapa de tu proyecto de forma organizada, visual y eficiente con tableros, listas,
                         cronogramas y flujos de trabajo adaptados a tus procesos. Desde la concepción de la idea hasta
                         el despliegue en las tiendas de aplicaciones, mantén todo bajo control con una metodología
