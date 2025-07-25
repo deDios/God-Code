@@ -693,3 +693,77 @@ body {
   visibility: visible;
   opacity: 1;
 }
+
+/*----------------- css para las cards de "mis cursos" -----------------------*/
+.curso-card {
+  display: block;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #1565c0;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.curso-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.curso-card .curso-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.curso-card .curso-date {
+  font-size: 0.87rem;
+  color: #666;
+}
+
+#cursos-subscritos,
+#cursos-activos,
+#cursos-cancelados,
+#cursos-terminados {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  /* separación entre cards */
+  flex-wrap: nowrap;
+}
+
+
+.bloque-objetivos {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.bloque-objetivos::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bloque-objetivos::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.mis-cursos {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 16px;
+}
+
+.mis-cursos::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mis-cursos::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}

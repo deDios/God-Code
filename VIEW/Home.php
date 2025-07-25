@@ -143,7 +143,7 @@
                 </div>
                 <div class="user-info">
                     <div id="user-name">Luis Enrique Godcode</div>
-                    <a href="#" class="edit-profile">Administrar perfil ›</a>
+                    <a class="edit-profile">Administrar perfil ›</a>
                 </div>
             </div>
 
@@ -191,19 +191,47 @@
                 <h3>Mis cursos</h3>
                 <div class="cursos-seccion">
                     <div class="cursos-list">
-                        <div class="cursos-subtitulo">Activos</div>
-                        <div id="cursos-activos"></div>
+                        <div class="cursos-subtitulo">Suscritos</div>
+                        <div id="cursos-subscritos">
+                            
+                            <a href="#" class="curso-card">
+                                <div class="curso-title">Ejemplo: Fundamentos de Bases de Datos</div>
+                                <div class="curso-date">Fecha Inicio: 15/08/2025</div>
+                            </a>
+                            <a href="#" class="curso-card">
+                                <div class="curso-title">Ejemplo: Desarrollo de Apps Móviles</div>
+                                <div class="curso-date">Fecha Inicio: 01/09/2025</div>
+                            </a>
+                        </div>
+
                     </div>
                     <div class="cursos-list">
-                        <div class="cursos-subtitulo">Pendientes</div>
-                        <div id="cursos-pendientes"></div>
+                        <div class="cursos-subtitulo">Activos</div>
+                        <div id="cursos-activos">
+
+
+
+                        </div>
+                    </div>
+                    <div class="cursos-list">
+                        <div class="cursos-subtitulo">Cancelados</div>
+                        <div id="cursos-cancelados">
+
+
+
+                        </div>
                     </div>
                     <div class="cursos-list">
                         <div class="cursos-subtitulo">Terminados</div>
-                        <div id="cursos-terminados"></div>
+                        <div id="cursos-terminados">
+
+
+
+                        </div>
                     </div>
                 </div>
             </div>
+
         </section>
 
         <!-- contenido -->
