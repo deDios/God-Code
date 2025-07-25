@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (operativeViews.includes(currentPage)) {
     // coloca los botones para las vistas operativas
     const operativeMarkup = `
-      <a href="index.php">Home</a>
+      <a href="../index.php">Home</a>
       <a href="#">Proyectos</a>
       <a href="#">Cursos</a>
       <a href="#">Admin</a>
