@@ -326,14 +326,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     link.removeAttribute("href");
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      mostrarToast("Función deshabilitada", "warning", toastDuration);
+      gcToast("Función deshabilitada", "warning", toastDuration);
     });
   });
   document.querySelectorAll(".curso-card").forEach((card) => {
     card.removeAttribute("href");
     card.addEventListener("click", (e) => {
       e.preventDefault();
-      mostrarToast("Función deshabilitada", "warning", toastDuration);
+      gcToast("Función deshabilitada", "warning", toastDuration);
     });
   });
 
