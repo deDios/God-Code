@@ -229,7 +229,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   console.log("Se ejecutó todo el bloque para el topbar");
-
 });
 
-//--------------- aca estara el js para el manejo de seciones
+//--------------- deshabilitar el href de cotizar
+document.addEventListener("DOMContentLoaded", () => {
+  const cotizarBtn = document.querySelector(".actions .btn-outline");
+
+  if (cotizarBtn) {
+    cotizarBtn.removeAttribute("onclick");
+    cotizarBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      mostrarToast("Función deshabilitada", "warning", 4000);
+    });
+  }
+});
