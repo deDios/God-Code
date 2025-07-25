@@ -233,13 +233,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //--------------- deshabilitar el href de cotizar
 document.addEventListener("DOMContentLoaded", () => {
-  // Deshabilitar botón "Cotizar"
+  // deshabilitar boton "Cotizar"
   const cotizarBtn = document.querySelector(".actions .btn-outline");
   if (cotizarBtn) {
     cotizarBtn.removeAttribute("onclick");
     cotizarBtn.addEventListener("click", (e) => {
       e.preventDefault();
       gcToast("Función deshabilitada", "warning", 4000);
+    });
+  }
+});
+
+//------------------------------- js para el subnav
+document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    //"vistaOperativa2.php",
+    //"vistaOperativa3.php",
+    // esto esta listo para cuando se agreguen las demas vistas operativas
+  ];
+
+  // se guardan los subnavs de movile y desktop
+  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
+  subnavs.forEach((nav) => {
+    nav.dataset.originalHtml = nav.innerHTML;
+  });
+
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+
+  // si el usuario esta en una vista operativa coloca los nuevos botones si no deja los anteriores
+  if (operativeViews.includes(currentPage)) {
+    // coloca los botones para las vistas operativas
+    const operativeMarkup = `
+      <a href="index.php">Home</a>
+      <a href="#">Proyectos</a>
+      <a href="#">Cursos</a>
+      <a href="#">Admin</a>
+    `;
+    subnavs.forEach((nav) => {
+      nav.innerHTML = operativeMarkup;
+    });
+  } else {
+    // restaurar botones originales
+    subnavs.forEach((nav) => {
+      nav.innerHTML = nav.dataset.originalHtml;
     });
   }
 });
