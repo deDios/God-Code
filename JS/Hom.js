@@ -314,3 +314,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
+//esto es temporal para quitar la redireccion de las col y las cards de cursos del usuario
+document.addEventListener('DOMContentLoaded', () => {
+  const toastDuration = 4000;
+
+  // recursos (tabla)
+  document.querySelectorAll('.recurso-link').forEach(link => {
+    link.removeAttribute('href');
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      mostrarToast('Función deshabilitada', 'warning', toastDuration);
+    });
+  });
+
+  // mis cursos (cards)
+  document.querySelectorAll('.curso-card').forEach(card => {
+    card.removeAttribute('href');
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      mostrarToast('Función deshabilitada', 'warning', toastDuration);
+    });
+  });
+});
