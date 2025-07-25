@@ -1,7 +1,8 @@
-//------------------------------------ cursos y perfil del usuario
 // cursoDashboard.js
 
-// Lee y parsea la cookie “usuario”
+// ————— Helpers —————
+
+// Lee y parsea la cookie "usuario"
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
@@ -10,14 +11,14 @@ function getUsuarioFromCookie() {
   try {
     return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
   } catch (err) {
-    console.warn("Cookie “usuario” malformada:", err);
+    console.warn('Cookie "usuario" malformada:', err);
     return null;
   }
 }
 
-// ENDPOINTS
+// ————— API Fetchers —————
 
-// inscripciones (cursos) del usuario
+// Inscripciones (cursos) del usuario
 async function fetchInscripciones(usuarioId) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php",
@@ -31,7 +32,7 @@ async function fetchInscripciones(usuarioId) {
   return res.json();
 }
 
-// datos de usuario por correo/telefono/estatus
+// Datos de usuario por correo/telefono/estatus
 async function fetchUsuario(correo, telefono, estatus) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
@@ -42,11 +43,12 @@ async function fetchUsuario(correo, telefono, estatus) {
     }
   );
   if (!res.ok) throw new Error("No se pudo cargar perfil");
-  return res.json(); // devuelve array
+  return res.json(); // devuelve array de usuarios
 }
 
+// ————— Renderers —————
 
-// re-arma el sidebar
+// Reconstruye el sidebar con avatar y nombre
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
@@ -73,7 +75,7 @@ function renderPerfil(usuario) {
   profile.append(avatarCircle, userInfo);
 }
 
-// armar filas para tabla de recursos
+// Renderiza filas en la tabla de Recursos
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
@@ -82,7 +84,7 @@ function renderRecursosRows(lista) {
     const row = document.createElement("div");
     row.className = "table-row";
 
-    // nombre + icono
+    // Nombre + icono
     const colNombre = document.createElement("div");
     colNombre.className = "col-nombre";
     const spanIcon = document.createElement("span");
@@ -97,12 +99,12 @@ function renderRecursosRows(lista) {
     link.textContent = item.nombre_curso;
     colNombre.append(spanIcon, link);
 
-    // tipo
+    // Tipo
     const colTipo = document.createElement("div");
     colTipo.className = "col-tipo";
     colTipo.textContent = "Curso";
 
-    // fecha
+    // Fecha
     const colFecha = document.createElement("div");
     colFecha.className = "col-fecha";
     const fecha = new Date(item.fecha_creacion);
@@ -114,7 +116,7 @@ function renderRecursosRows(lista) {
   });
 }
 
-// armar cursos (cards)
+// Crea una card para Mis Cursos
 function createCursoCard(insc) {
   const a = document.createElement("a");
   a.className = "curso-card";
@@ -137,14 +139,14 @@ function createCursoCard(insc) {
   return a;
 }
 
-// renderizar mis cursos
+// Renderiza Mis Cursos en sus cuatro estados
 function renderMisCursos(inscripciones) {
   const contInscritos = document.getElementById("cursos-subscritos");
   const contActivos = document.getElementById("cursos-activos");
   const contCancelados = document.getElementById("cursos-cancelados");
   const contTerminados = document.getElementById("cursos-terminados");
 
-  // limpiar contenedores por para eliminar estructuras dummy 
+  // Limpia contenedores
   [contInscritos, contActivos, contCancelados, contTerminados].forEach(
     (c) => (c.innerHTML = "")
   );
@@ -170,7 +172,7 @@ function renderMisCursos(inscripciones) {
   });
 }
 
-// paginacion de recursos
+// ————— Paginación de Recursos —————
 let recursosData = [];
 const itemsPerPage = 6;
 let currentPage = 1;
@@ -208,8 +210,9 @@ function renderPage(page) {
   renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 }
 
+// ————— Inicialización y configuración de UI —————
 document.addEventListener("DOMContentLoaded", async () => {
-  // renderizar el perfil del usuario desde la cookie
+  // Dashboard: perfil + recursos + mis cursos
   const usuario = getUsuarioFromCookie();
   if (!usuario) {
     window.location.href = "../VIEW/Login.php";
@@ -226,7 +229,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mostrarToast("No se pudieron cargar tus cursos", "error", 5000);
   }
 
-  // js para modal para administrar perfil
+  // Modal “Administrar perfil”
   const editBtn = document.querySelector(".edit-profile");
   const modal = document.getElementById("modal-perfil");
   const closeBtn = modal.querySelector(".modal-close");
@@ -246,11 +249,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
     try {
       const lista = await fetchUsuario(
-        usuario.cookie?.correo || usuarioCorreo,
+        usuarioCookie.correo,
         usuarioCookie.telefono,
         usuarioCookie.estatus
       );
-      usuarioActual = lista.find((u) => +u.id === +usuario.id) || lista[0];
+      usuarioActual =
+        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
       inp.nombre.value = usuarioActual.nombre || "";
       inp.correo.value = usuarioActual.correo || "";
       inp.telefono.value = usuarioActual.telefono || "";
@@ -300,12 +304,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await res.json();
       if (data.mensaje) {
         mostrarToast(data.mensaje, "exito", 4000);
+        // actualiza cookie y sidebar
+        usuarioCookie = { ...usuarioCookie, ...payload };
         document.cookie =
           "usuario=" +
-          encodeURIComponent(JSON.stringify({ ...usuarioCookie, ...payload })) +
+          encodeURIComponent(JSON.stringify(usuarioCookie)) +
           "; path=/; max-age=" +
           24 * 60 * 60;
-        renderPerfil({ ...usuarioCookie, ...payload });
+        renderPerfil(usuarioCookie);
       }
     } catch {
       mostrarToast("Error al actualizar perfil.", "error", 5000);
@@ -313,27 +319,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       cerrarModal();
     }
   });
-});
 
-//esto es temporal para quitar la redireccion de las col y las cards de cursos del usuario
-document.addEventListener('DOMContentLoaded', () => {
+  // Deshabilitar links de recursos y cards de cursos
   const toastDuration = 4000;
-
-  // recursos (tabla)
-  document.querySelectorAll('.recurso-link').forEach(link => {
-    link.removeAttribute('href');
-    link.addEventListener('click', e => {
+  document.querySelectorAll(".recurso-link").forEach((link) => {
+    link.removeAttribute("href");
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-      mostrarToast('Función deshabilitada', 'warning', toastDuration);
+      mostrarToast("Función deshabilitada", "warning", toastDuration);
+    });
+  });
+  document.querySelectorAll(".curso-card").forEach((card) => {
+    card.removeAttribute("href");
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+      mostrarToast("Función deshabilitada", "warning", toastDuration);
     });
   });
 
-  // mis cursos (cards)
-  document.querySelectorAll('.curso-card').forEach(card => {
-    card.removeAttribute('href');
-    card.addEventListener('click', e => {
-      e.preventDefault();
-      mostrarToast('Función deshabilitada', 'warning', toastDuration);
-    });
-  });
+
 });

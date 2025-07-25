@@ -233,13 +233,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //--------------- deshabilitar el href de cotizar
 document.addEventListener("DOMContentLoaded", () => {
+  // Deshabilitar botón "Cotizar"
   const cotizarBtn = document.querySelector(".actions .btn-outline");
-
   if (cotizarBtn) {
     cotizarBtn.removeAttribute("onclick");
     cotizarBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      mostrarToast("Función deshabilitada", "warning", 4000);
+      mostrarToast("Función deshabilitada", "warning", toastDuration);
     });
   }
 });

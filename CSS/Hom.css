@@ -739,7 +739,7 @@ body {
 
 /*------------------------------------*/
 .sidebar {
-  width: 340px;
+  width: 500px;
   max-height: 100vh;
   display: flex;
   flex-direction: column;
