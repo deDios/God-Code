@@ -1,22 +1,24 @@
 //------------------------------------ cursos y perfil del usuario
+// cursoDashboard.js
 
+// Lee y parsea la cookie “usuario”
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
   if (!cookie) return null;
-
   try {
-    const json = decodeURIComponent(cookie.split("=")[1]);
-    return JSON.parse(json);
+    return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
   } catch (err) {
     console.warn("Cookie “usuario” malformada:", err);
     return null;
   }
 }
 
-//ENDPOINT CURSOS DEL USUARIO
-async function fetchRecursos(usuarioId) {
+// ENDPOINTS
+
+// inscripciones (cursos) del usuario
+async function fetchInscripciones(usuarioId) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php",
     {
@@ -29,7 +31,22 @@ async function fetchRecursos(usuarioId) {
   return res.json();
 }
 
-// re-arma el sidebar especificamente perfil
+// datos de usuario por correo/telefono/estatus
+async function fetchUsuario(correo, telefono, estatus) {
+  const res = await fetch(
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, telefono, estatus }),
+    }
+  );
+  if (!res.ok) throw new Error("No se pudo cargar perfil");
+  return res.json(); // devuelve array
+}
+
+
+// re-arma el sidebar
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
@@ -56,7 +73,7 @@ function renderPerfil(usuario) {
   profile.append(avatarCircle, userInfo);
 }
 
-// armar filas
+// armar filas para tabla de recursos
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
@@ -80,12 +97,12 @@ function renderRecursosRows(lista) {
     link.textContent = item.nombre_curso;
     colNombre.append(spanIcon, link);
 
-    // Tipo, en este caso es curso
+    // tipo
     const colTipo = document.createElement("div");
     colTipo.className = "col-tipo";
     colTipo.textContent = "Curso";
 
-    // Fecha
+    // fecha
     const colFecha = document.createElement("div");
     colFecha.className = "col-fecha";
     const fecha = new Date(item.fecha_creacion);
@@ -97,7 +114,63 @@ function renderRecursosRows(lista) {
   });
 }
 
-// paginacion
+// armar cursos (cards)
+function createCursoCard(insc) {
+  const a = document.createElement("a");
+  a.className = "curso-card";
+  a.href = `VIEW/Curso.php?id=${insc.curso}`;
+
+  const title = document.createElement("div");
+  title.className = "curso-title";
+  title.textContent = insc.nombre_curso;
+
+  const fechaIni = new Date(insc.fecha_creacion);
+  const opts = { day: "2-digit", month: "2-digit", year: "numeric" };
+  const date = document.createElement("div");
+  date.className = "curso-date";
+  date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString(
+    "es-ES",
+    opts
+  )}`;
+
+  a.append(title, date);
+  return a;
+}
+
+// renderizar mis cursos
+function renderMisCursos(inscripciones) {
+  const contInscritos = document.getElementById("cursos-subscritos");
+  const contActivos = document.getElementById("cursos-activos");
+  const contCancelados = document.getElementById("cursos-cancelados");
+  const contTerminados = document.getElementById("cursos-terminados");
+
+  // limpiar contenedores por para eliminar estructuras dummy 
+  [contInscritos, contActivos, contCancelados, contTerminados].forEach(
+    (c) => (c.innerHTML = "")
+  );
+
+  inscripciones.forEach((ins) => {
+    const card = createCursoCard(ins);
+    switch (String(ins.estatus)) {
+      case "1":
+        contInscritos.appendChild(card);
+        break;
+      case "2":
+        contActivos.appendChild(card);
+        break;
+      case "3":
+        contCancelados.appendChild(card);
+        break;
+      case "4":
+        contTerminados.appendChild(card);
+        break;
+      default:
+        console.warn("Estatus desconocido:", ins);
+    }
+  });
+}
+
+// paginacion de recursos
 let recursosData = [];
 const itemsPerPage = 6;
 let currentPage = 1;
@@ -132,11 +205,11 @@ function renderPage(page) {
   const start = (page - 1) * itemsPerPage;
   const slice = recursosData.slice(start, start + itemsPerPage);
   renderRecursosRows(slice);
-  const totalPages = Math.ceil(recursosData.length / itemsPerPage);
-  renderPagination(totalPages);
+  renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 }
 
-async function initDashboard() {
+document.addEventListener("DOMContentLoaded", async () => {
+  // renderizar el perfil del usuario desde la cookie
   const usuario = getUsuarioFromCookie();
   if (!usuario) {
     window.location.href = "../VIEW/Login.php";
@@ -145,103 +218,52 @@ async function initDashboard() {
   renderPerfil(usuario);
 
   try {
-    recursosData = await fetchRecursos(usuario.id);
+    recursosData = await fetchInscripciones(usuario.id);
     renderPage(1);
+    renderMisCursos(recursosData);
   } catch (err) {
     console.error(err);
-    mostrarToast("No se pudieron cargar tus cursos", "error");
-  }
-}
-
-document.addEventListener("DOMContentLoaded", initDashboard);
-
-//--------------------------------- JS del MODAL
-document.addEventListener("DOMContentLoaded", () => {
-  // —–––––––––––– tus initDashboard, renderPerfil, etc. –––––––––––—
-
-  // 1) Helpers para cookie y fetch de usuario
-  function getUsuarioFromCookie() {
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("usuario="));
-    if (!cookie) return null;
-    try {
-      return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
-    } catch {
-      return null;
-    }
+    mostrarToast("No se pudieron cargar tus cursos", "error", 5000);
   }
 
-  async function fetchUsuario(correo, telefono, estatus) {
-    const res = await fetch(
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo, telefono, estatus }),
-      }
-    );
-    if (!res.ok) throw new Error("No se pudo cargar perfil");
-    const arr = await res.json();
-    return arr; // array de usuarios
-  }
-
-  // 2) Elements del modal
+  // js para modal para administrar perfil
   const editBtn = document.querySelector(".edit-profile");
   const modal = document.getElementById("modal-perfil");
   const closeBtn = modal.querySelector(".modal-close");
   const form = document.getElementById("form-perfil");
+  const inp = {
+    nombre: document.getElementById("perfil-nombre"),
+    correo: document.getElementById("perfil-email"),
+    pass: document.getElementById("perfil-password"),
+    pass2: document.getElementById("perfil-password2"),
+    telefono: document.getElementById("perfil-telefono"),
+    nacimiento: document.getElementById("perfil-nacimiento"),
+  };
+  let usuarioActual,
+    usuarioCookie = usuario;
 
-  // IDs de inputs
-  const inpNombre = document.getElementById("perfil-nombre");
-  const inpEmail = document.getElementById("perfil-email");
-  const inpPass = document.getElementById("perfil-password");
-  const inpPass2 = document.getElementById("perfil-password2");
-  const inpTel = document.getElementById("perfil-telefono");
-  const inpNac = document.getElementById("perfil-nacimiento");
-
-  let usuarioCookie, usuarioActual;
-
-  // 3) Abrir modal y poblar campos
   editBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-    usuarioCookie = getUsuarioFromCookie();
-    if (!usuarioCookie) {
-      window.location.href = "../VIEW/Login.php";
-      return;
-    }
-
     try {
-      // fetch usuario por correo/telefono/estatus
       const lista = await fetchUsuario(
-        usuarioCookie.correo,
+        usuario.cookie?.correo || usuarioCorreo,
         usuarioCookie.telefono,
         usuarioCookie.estatus
       );
-      // buscamos el que coincida con el id de la cookie
-      usuarioActual =
-        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
-
-      // rellenamos inputs
-      inpNombre.value = usuarioActual.nombre || "";
-      inpEmail.value = usuarioActual.correo || "";
-      inpTel.value = usuarioActual.telefono || "";
-      inpNac.value = usuarioActual.fecha_nacimiento || "";
-
-      // dejamos password vacíos
-      inpPass.value = "";
-      inpPass2.value = "";
-
-      // mostramos el modal
+      usuarioActual = lista.find((u) => +u.id === +usuario.id) || lista[0];
+      inp.nombre.value = usuarioActual.nombre || "";
+      inp.correo.value = usuarioActual.correo || "";
+      inp.telefono.value = usuarioActual.telefono || "";
+      inp.nacimiento.value = usuarioActual.fecha_nacimiento || "";
+      inp.pass.value = "";
+      inp.pass2.value = "";
       modal.classList.add("active");
       document.body.classList.add("modal-abierto");
-    } catch (err) {
-      console.error(err);
-      alert("Error al cargar datos de perfil.");
+    } catch {
+      mostrarToast("Error al cargar datos de perfil.", "error", 5000);
     }
   });
 
-  // 4) Cerrar modal
   const cerrarModal = () => {
     modal.classList.remove("active");
     document.body.classList.remove("modal-abierto");
@@ -251,26 +273,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) cerrarModal();
   });
 
-  // 5) Submit: actualizar usuario
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    // simple validación de contraseñas
-    if (inpPass.value !== inpPass2.value) {
-      return alert("Las contraseñas no coinciden.");
+    if (inp.pass.value !== inp.pass2.value) {
+      return mostrarToast("Las contraseñas no coinciden.", "warning", 4000);
     }
-
     const payload = {
       id: usuarioActual.id,
-      nombre: inpNombre.value.trim(),
-      correo: inpEmail.value.trim(),
-      telefono: inpTel.value.trim(),
-      fecha_nacimiento: inpNac.value, // YYYY-MM-DD
+      nombre: inp.nombre.value.trim(),
+      correo: inp.correo.value.trim(),
+      telefono: inp.telefono.value.trim(),
+      fecha_nacimiento: inp.nacimiento.value,
       tipo_contacto: usuarioActual.tipo_contacto,
-      password: inpPass.value || usuarioActual.password,
       estatus: usuarioActual.estatus,
     };
-
+    if (inp.pass.value) payload.password = inp.pass.value;
     try {
       const res = await fetch(
         "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php",
@@ -282,20 +299,16 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       const data = await res.json();
       if (data.mensaje) {
-        alert(data.mensaje);
-        // actualiza la cookie con los nuevos datos
-        const nuevoUsuario = { ...usuarioCookie, ...payload };
+        mostrarToast(data.mensaje, "exito", 4000);
         document.cookie =
           "usuario=" +
-          encodeURIComponent(JSON.stringify(nuevoUsuario)) +
+          encodeURIComponent(JSON.stringify({ ...usuarioCookie, ...payload })) +
           "; path=/; max-age=" +
           24 * 60 * 60;
-        // refresca perfil en sidebar
-        renderPerfil(nuevoUsuario);
+        renderPerfil({ ...usuarioCookie, ...payload });
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error al actualizar perfil.");
+    } catch {
+      mostrarToast("Error al actualizar perfil.", "error", 5000);
     } finally {
       cerrarModal();
     }
