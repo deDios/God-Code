@@ -239,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cotizarBtn.removeAttribute("onclick");
     cotizarBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      gcToast("Función deshabilitada", "warning", toastDuration);
+      gcToast("Función deshabilitada", "warning", 4000);
     });
   }
 });
