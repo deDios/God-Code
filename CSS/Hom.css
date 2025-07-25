@@ -770,3 +770,9 @@ body {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
 }
+
+.mis-cursos .cursos-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
