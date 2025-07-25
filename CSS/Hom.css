@@ -737,33 +737,36 @@ body {
 }
 
 
-.bloque-objetivos {
-  max-height: 200px;
+/*------------------------------------*/
+.sidebar {
+  width: 340px;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  padding-right: 8px;
 }
 
-.bloque-objetivos::-webkit-scrollbar {
-  width: 6px;
+.sidebar-top {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.bloque-objetivos::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-}
-
+.bloque-objetivos,
 .mis-cursos {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  padding-right: 8px;
-  margin-bottom: 16px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+  margin-bottom: 0;
 }
 
-.mis-cursos::-webkit-scrollbar {
+.sidebar::-webkit-scrollbar {
   width: 6px;
 }
 
-.mis-cursos::-webkit-scrollbar-thumb {
+.sidebar::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
 }
