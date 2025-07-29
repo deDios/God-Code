@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //------------------------------- js para el subnav
 document.addEventListener("DOMContentLoaded", () => {
-  const operativeViews = ["home.php" /* , "vista2.php", "vista3.php" */]; // estas son las vistas operativas
+  const operativeViews = ["home.php" /* , "vista2.php", etc. */];
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
 
   subnavs.forEach(nav => {
@@ -255,41 +255,37 @@ document.addEventListener("DOMContentLoaded", () => {
     subnavs.forEach(nav => nav.innerHTML = markup);
 
   } else {
-    subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
+    subnavs.forEach(nav => {
+      nav.innerHTML = nav.dataset.originalHtml;
+    });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const submenu = document.getElementById("submenu-productos");
-    if (!submenu) return;
-
+  const submenu = document.getElementById("submenu-productos");
+  if (submenu) {
     const mega = submenu.querySelector(".megamenu");
-    if (!mega) return;
+    if (mega) {
+      mega.classList.remove("show");
 
-    mega.classList.remove("show");
-
-    let link = null;
-    for (const child of submenu.children) {
-      if (child.tagName === "A") {
-        link = child;
-        break;
+      let link = null;
+      for (const child of submenu.children) {
+        if (child.tagName === "A") {
+          link = child;
+          break;
+        }
       }
+      if (link) {
+        link.addEventListener("click", e => {
+          e.preventDefault();
+          mega.classList.toggle("show");
+        });
+      }
+
+      document.addEventListener("click", e => {
+        if (!submenu.contains(e.target)) {
+          mega.classList.remove("show");
+        }
+      });
     }
-    if (!link) return;
-
-    link.addEventListener("click", e => {
-      e.preventDefault();
-      mega.classList.toggle("show");
-      console.log("se abrio el megamenu");
-    });
-
-    document.addEventListener("click", e => {
-      if (!submenu.contains(e.target)) {
-        mega.classList.remove("show");
-        console.log("se cerro el megamenu");
-      }
-    });
-  });
+  }
 });
-
-
 
