@@ -1,27 +1,61 @@
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {
-  const submenu = document.getElementById("submenu-productos");
-  if (!submenu) return; // si no existe, salimos
+  const operativeViews = ["home.php" /* , "vista2.php", etc. */];
+  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
 
-  const menu = submenu.querySelector(".megamenu");
-  if (!menu) return; // idem
+  subnavs.forEach(nav => {
+    nav.dataset.originalHtml = nav.innerHTML;
+  });
 
-  menu.classList.remove("show");
+  const currentPage = window.location.pathname
+    .split("/")
+    .pop()
+    .toLowerCase();
 
-  const link = submenu.querySelector("> a");
-  if (link) {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      menu.classList.toggle("show");
-    });
+  if (operativeViews.includes(currentPage)) {
+    const mk = label => {
+      const slug = label.toLowerCase() + ".php";
+      const isActive = slug === currentPage;
+      return `<a href="${slug}" class="${isActive ? "active" : ""}">${label}</a>`;
+    };
+    const markup = `
+      ${mk("Home")}
+      ${mk("Proyectos")}
+      ${mk("Cursos")}
+      ${mk("Admin")}
+    `;
+    subnavs.forEach(nav => nav.innerHTML = markup);
+
+  } else {
+    subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
   }
 
-  document.addEventListener("click", (e) => {
-    if (!submenu.contains(e.target)) {
-      menu.classList.remove("show");
+  const submenu = document.getElementById("submenu-productos");
+  if (submenu) {
+    const mega = submenu.querySelector(".megamenu");
+    let link = null;
+    for (const ch of submenu.children) {
+      if (ch.tagName === "A") {
+        link = ch;
+        break;
+      }
     }
-  });
+    if (mega && link) {
+      mega.classList.remove("show");
+
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        mega.classList.toggle("show");
+      });
+
+      document.addEventListener("click", e => {
+        if (!submenu.contains(e.target)) {
+          mega.classList.remove("show");
+        }
+      });
+    }
+  }
 });
 
 //esta es la class "animado" que al colocarsela algo le agrega una transicion
