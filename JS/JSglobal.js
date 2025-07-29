@@ -272,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logo.style.cursor = "pointer";
     logo.addEventListener("click", () => {
       window.location.href = "/index.php";
+      console.log(window.location.href = "/index.php");
     });
   }
 });
