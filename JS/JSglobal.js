@@ -1,5 +1,4 @@
 //------------------------------------------------------------js global-----------------------------------------------------
-
 //esta es la class "animado" que al colocarsela algo le agrega una transicion
 document.addEventListener("DOMContentLoaded", () => {
   const animados = document.querySelectorAll(".animado");
@@ -228,12 +227,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //------------------------------- js para el subnav
 document.addEventListener("DOMContentLoaded", () => {
-  const operativeViews = ["home.php" /* , "vista2.php", etc. */];
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-
-  subnavs.forEach(nav => {
-    nav.dataset.originalHtml = nav.innerHTML;
-  });
+  subnavs.forEach(nav => nav.dataset.originalHtml = nav.innerHTML);
 
   const currentPage = window.location.pathname
     .split("/")
@@ -243,21 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (operativeViews.includes(currentPage)) {
     const mk = label => {
       const slug = label.toLowerCase() + ".php";
-      const isActive = slug === currentPage;
-      return `<a href="${slug}" class="${isActive ? "active" : ""}">${label}</a>`;
+      return `<a href="${slug}" class="${slug === currentPage ? "active" : ""}">${label}</a>`;
     };
-    const markup = `
-      ${mk("Home")}
-      ${mk("Proyectos")}
-      ${mk("Cursos")}
-      ${mk("Admin")}
-    `;
+    const markup = `${mk("Home")}${mk("Proyectos")}${mk("Cursos")}${mk("Admin")}`;
     subnavs.forEach(nav => nav.innerHTML = markup);
-
   } else {
-    subnavs.forEach(nav => {
-      nav.innerHTML = nav.dataset.originalHtml;
-    });
+    subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
   }
 
   const submenu = document.getElementById("submenu-productos");
@@ -265,13 +251,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const mega = submenu.querySelector(".megamenu");
     if (mega) {
       mega.classList.remove("show");
-
       let link = null;
-      for (const child of submenu.children) {
-        if (child.tagName === "A") {
-          link = child;
-          break;
-        }
+      for (const ch of submenu.children) {
+        if (ch.tagName === "A") { link = ch; break; }
       }
       if (link) {
         link.addEventListener("click", e => {
@@ -279,13 +261,17 @@ document.addEventListener("DOMContentLoaded", () => {
           mega.classList.toggle("show");
         });
       }
-
       document.addEventListener("click", e => {
-        if (!submenu.contains(e.target)) {
-          mega.classList.remove("show");
-        }
+        if (!submenu.contains(e.target)) mega.classList.remove("show");
       });
     }
   }
-});
 
+  const logo = document.querySelector(".logo");
+  if (logo) {
+    logo.style.cursor = "pointer";
+    logo.addEventListener("click", () => {
+      window.location.href = "/index.php";
+    });
+  }
+});
