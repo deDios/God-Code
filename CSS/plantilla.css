@@ -36,7 +36,7 @@ header {
     right: 0;
     background-color: #f1f1f1;
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     padding: 0.5rem 1rem;
     z-index: 1000;
     white-space: nowrap;
