@@ -1,18 +1,24 @@
 //------------------------------------------------------------js global-----------------------------------------------------
 //este es el menu del subnav
 document.addEventListener("DOMContentLoaded", () => {
-  const menu = document.querySelector("#submenu-productos .megamenu");
+  const submenu = document.getElementById("submenu-productos");
+  if (!submenu) return; // si no existe, salimos
+
+  const menu = submenu.querySelector(".megamenu");
+  if (!menu) return; // idem
+
   menu.classList.remove("show");
 
-  const link = document.querySelector("#submenu-productos > a");
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    menu.classList.toggle("show");
-  });
+  const link = submenu.querySelector("> a");
+  if (link) {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      menu.classList.toggle("show");
+    });
+  }
 
   document.addEventListener("click", (e) => {
-    const contenedor = document.querySelector("#submenu-productos");
-    if (!contenedor.contains(e.target)) {
+    if (!submenu.contains(e.target)) {
       menu.classList.remove("show");
     }
   });
