@@ -1,24 +1,18 @@
-// cursoDashboard.js
-
-// ————— Helpers —————
-
-// Lee y parsea la cookie "usuario"
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
-    .find((row) => row.startsWith("usuario="));
+    .find(row => row.startsWith("usuario="));
   if (!cookie) return null;
   try {
     return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
   } catch (err) {
-    console.warn('Cookie "usuario" malformada:', err);
+    console.warn("cookie inválida:", err);
     return null;
   }
 }
 
-// ————— API Fetchers —————
 
-// Inscripciones (cursos) del usuario
+// trae inscripciones (cursos) del usuario
 async function fetchInscripciones(usuarioId) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php",
@@ -28,11 +22,11 @@ async function fetchInscripciones(usuarioId) {
       body: JSON.stringify({ usuario: usuarioId }),
     }
   );
-  if (!res.ok) throw new Error("Error al cargar inscripciones");
+  if (!res.ok) throw new Error("no se cargaron inscripciones");
   return res.json();
 }
 
-// Datos de usuario por correo/telefono/estatus
+// trae datos de usuario (para el modal)
 async function fetchUsuario(correo, telefono, estatus) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
@@ -42,17 +36,17 @@ async function fetchUsuario(correo, telefono, estatus) {
       body: JSON.stringify({ correo, telefono, estatus }),
     }
   );
-  if (!res.ok) throw new Error("No se pudo cargar perfil");
-  return res.json(); // devuelve array de usuarios
+  if (!res.ok) throw new Error("no se pudo cargar perfil");
+  return res.json(); // array de usuarios
 }
 
-// ————— Renderers —————
 
-// Reconstruye el sidebar con avatar y nombre
+// reconstruye sidebar con avatar y nombre
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
-  profile.innerHTML = "";
+  profile.innerHTML = ""; // borra lo viejo
 
+  // avatar
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
   const img = document.createElement("img");
@@ -61,6 +55,7 @@ function renderPerfil(usuario) {
   img.alt = usuario.nombre;
   avatarCircle.appendChild(img);
 
+  // info
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
   const nameDiv = document.createElement("div");
@@ -75,16 +70,16 @@ function renderPerfil(usuario) {
   profile.append(avatarCircle, userInfo);
 }
 
-// Renderiza filas en la tabla de Recursos
+// pinta las filas de la tabla de Recursos
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
 
-  lista.forEach((item) => {
+  lista.forEach(item => {
     const row = document.createElement("div");
     row.className = "table-row";
 
-    // Nombre + icono
+    // nombre + icono
     const colNombre = document.createElement("div");
     colNombre.className = "col-nombre";
     const spanIcon = document.createElement("span");
@@ -99,12 +94,12 @@ function renderRecursosRows(lista) {
     link.textContent = item.nombre_curso;
     colNombre.append(spanIcon, link);
 
-    // Tipo
+    // tipo
     const colTipo = document.createElement("div");
     colTipo.className = "col-tipo";
     colTipo.textContent = "Curso";
 
-    // Fecha
+    // fecha
     const colFecha = document.createElement("div");
     colFecha.className = "col-fecha";
     const fecha = new Date(item.fecha_creacion);
@@ -116,11 +111,14 @@ function renderRecursosRows(lista) {
   });
 }
 
-// Crea una card para Mis Cursos
+// crea una card para Mis Cursos (accesible y con anim)
 function createCursoCard(insc) {
   const a = document.createElement("a");
   a.className = "curso-card";
   a.href = `VIEW/Curso.php?id=${insc.curso}`;
+  a.setAttribute("role", "button");
+  a.setAttribute("tabindex", "0");
+  a.setAttribute("aria-label", `Ver ${insc.nombre_curso}`);
 
   const title = document.createElement("div");
   title.className = "curso-title";
@@ -130,49 +128,38 @@ function createCursoCard(insc) {
   const opts = { day: "2-digit", month: "2-digit", year: "numeric" };
   const date = document.createElement("div");
   date.className = "curso-date";
-  date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString(
-    "es-ES",
-    opts
-  )}`;
+  date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString("es-ES", opts)}`;
 
   a.append(title, date);
   return a;
 }
 
-// Renderiza Mis Cursos en sus cuatro estados
+// pinta Mis Cursos en 4 estados, con anim entrada
 function renderMisCursos(inscripciones) {
-  const contInscritos = document.getElementById("cursos-subscritos");
-  const contActivos = document.getElementById("cursos-activos");
-  const contCancelados = document.getElementById("cursos-cancelados");
-  const contTerminados = document.getElementById("cursos-terminados");
+  const conts = {
+    inscritos: document.getElementById("cursos-subscritos"),
+    activos: document.getElementById("cursos-activos"),
+    cancelados: document.getElementById("cursos-cancelados"),
+    terminados: document.getElementById("cursos-terminados")
+  };
+  // limpia todo
+  Object.values(conts).forEach(c => c.innerHTML = "");
 
-  // Limpia contenedores
-  [contInscritos, contActivos, contCancelados, contTerminados].forEach(
-    (c) => (c.innerHTML = "")
-  );
-
-  inscripciones.forEach((ins) => {
+  inscripciones.forEach(ins => {
     const card = createCursoCard(ins);
     switch (String(ins.estatus)) {
-      case "1":
-        contInscritos.appendChild(card);
-        break;
-      case "2":
-        contActivos.appendChild(card);
-        break;
-      case "3":
-        contCancelados.appendChild(card);
-        break;
-      case "4":
-        contTerminados.appendChild(card);
-        break;
-      default:
-        console.warn("Estatus desconocido:", ins);
+      case "1": conts.inscritos.appendChild(card); break;
+      case "2": conts.activos.appendChild(card); break;
+      case "3": conts.cancelados.appendChild(card); break;
+      case "4": conts.terminados.appendChild(card); break;
+      default: console.warn("estatus raro:", ins);
     }
+    // anim al meterla
+    requestAnimationFrame(() => card.classList.add("enter"));
   });
 }
 
-// ————— Paginación de Recursos —————
+// ————— Paginación Recursos —————
 let recursosData = [];
 const itemsPerPage = 6;
 let currentPage = 1;
@@ -180,13 +167,11 @@ let currentPage = 1;
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";
-
   const prev = document.createElement("button");
   prev.textContent = "← Anterior";
   prev.disabled = currentPage === 1;
   prev.addEventListener("click", () => renderPage(currentPage - 1));
   ctrl.appendChild(prev);
-
   for (let p = 1; p <= totalPages; p++) {
     const btn = document.createElement("button");
     btn.textContent = p;
@@ -194,7 +179,6 @@ function renderPagination(totalPages) {
     btn.addEventListener("click", () => renderPage(p));
     ctrl.appendChild(btn);
   }
-
   const next = document.createElement("button");
   next.textContent = "Siguiente →";
   next.disabled = currentPage === totalPages;
@@ -210,9 +194,39 @@ function renderPage(page) {
   renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 }
 
-// ————— Inicialización y configuración de UI —————
+// ————— Sorting tabla Recursos —————
+let sortState = { column: null, asc: true };
+const comparadores = {
+  nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
+  tipo: (a, b) => 0, // todos "Curso"
+  fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
+};
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".table-header > div").forEach(header => {
+    header.style.cursor = "pointer";
+    header.addEventListener("click", () => {
+      let colKey = header.classList.contains("col-nombre") ? "nombre"
+        : header.classList.contains("col-tipo") ? "tipo"
+          : header.classList.contains("col-fecha") ? "fecha"
+            : null;
+      if (!colKey) return;
+      if (sortState.column === colKey) sortState.asc = !sortState.asc;
+      else {
+        sortState.column = colKey;
+        sortState.asc = true;
+      }
+      recursosData.sort((a, b) => sortState.asc
+        ? comparadores[colKey](a, b)
+        : comparadores[colKey](b, a)
+      );
+      renderPage(1);
+      // pondrías flechita aquí si quieres
+    });
+  });
+});
+
+// ————— Inicialización y UI —————
 document.addEventListener("DOMContentLoaded", async () => {
-  // Dashboard: perfil + recursos + mis cursos
   const usuario = getUsuarioFromCookie();
   if (!usuario) {
     window.location.href = "../VIEW/Login.php";
@@ -220,16 +234,65 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   renderPerfil(usuario);
 
+  // — skeleton loaders 👇
+  const tableBody = document.querySelector(".table-body");
+  tableBody.innerHTML = "";
+  for (let i = 0; i < itemsPerPage; i++) {
+    const row = document.createElement("div");
+    row.className = "skeleton-row";
+    ["name", "type", "date"].forEach(c => {
+      const cell = document.createElement("div");
+      cell.className = `skeleton-cell ${c}`;
+      row.appendChild(cell);
+    });
+    tableBody.appendChild(row);
+  }
+  ["subscritos", "activos", "cancelados", "terminados"].forEach(id => {
+    const cont = document.getElementById(`cursos-${id}`);
+    cont.innerHTML = "";
+    for (let j = 0; j < 3; j++) {
+      const ph = document.createElement("div");
+      ph.className = "curso-card skeleton";
+      cont.appendChild(ph);
+    }
+  });
+  // — fin skeleton
+
   try {
-    recursosData = await fetchInscripciones(usuario.id);
+    const data = await fetchInscripciones(usuario.id);
+
+    // si no hay nada, vacío con CTA
+    if (!Array.isArray(data) || data.length === 0) {
+      document.getElementById("recursos-list").innerHTML = `
+        <div class="empty-state">
+          <p>No solicitaste recursos aún.</p>
+          <button class="btn btn-primary" onclick="location.href='nuevo_recurso.php'">
+            Solicitar recurso
+          </button>
+        </div>
+      `;
+      document.querySelector(".mis-cursos .cursos-seccion").innerHTML = `
+        <div class="empty-state">
+          <p>No estás inscrito en ningún curso.</p>
+          <button class="btn btn-primary" onclick="location.href='cursos.php'">
+            Explorar cursos
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    // datos ok
+    recursosData = data;
     renderPage(1);
     renderMisCursos(recursosData);
+
   } catch (err) {
     console.error(err);
-    mostrarToast("No se pudieron cargar tus cursos", "error", 5000);
+    gcToast("Error al cargar tus cursos", "error", 5000);
   }
 
-  // Modal “Administrar perfil”
+  // — modal perfil, deshabilitar links, cotizar…
   const editBtn = document.querySelector(".edit-profile");
   const modal = document.getElementById("modal-perfil");
   const closeBtn = modal.querySelector(".modal-close");
@@ -242,10 +305,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     telefono: document.getElementById("perfil-telefono"),
     nacimiento: document.getElementById("perfil-nacimiento"),
   };
-  let usuarioActual,
-    usuarioCookie = usuario;
+  let usuarioActual, usuarioCookie = usuario;
 
-  editBtn.addEventListener("click", async (e) => {
+  editBtn.addEventListener("click", async e => {
     e.preventDefault();
     try {
       const lista = await fetchUsuario(
@@ -253,18 +315,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         usuarioCookie.telefono,
         usuarioCookie.estatus
       );
-      usuarioActual =
-        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
+      usuarioActual = lista.find(u => +u.id === +usuarioCookie.id) || lista[0];
       inp.nombre.value = usuarioActual.nombre || "";
       inp.correo.value = usuarioActual.correo || "";
       inp.telefono.value = usuarioActual.telefono || "";
       inp.nacimiento.value = usuarioActual.fecha_nacimiento || "";
-      inp.pass.value = "";
-      inp.pass2.value = "";
+      inp.pass.value = inp.pass2.value = "";
       modal.classList.add("active");
       document.body.classList.add("modal-abierto");
     } catch {
-      mostrarToast("Error al cargar datos de perfil.", "error", 5000);
+      gcToast("Error al cargar datos de perfil.", "error", 5000);
     }
   });
 
@@ -273,14 +333,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.body.classList.remove("modal-abierto");
   };
   closeBtn.addEventListener("click", cerrarModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) cerrarModal();
-  });
+  modal.addEventListener("click", e => { if (e.target === modal) cerrarModal(); });
 
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", async e => {
     e.preventDefault();
     if (inp.pass.value !== inp.pass2.value) {
-      return mostrarToast("Las contraseñas no coinciden.", "warning", 4000);
+      return gcToast("Las contraseñas no coinciden.", "warning", 4000);
     }
     const payload = {
       id: usuarioActual.id,
@@ -289,7 +347,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       telefono: inp.telefono.value.trim(),
       fecha_nacimiento: inp.nacimiento.value,
       tipo_contacto: usuarioActual.tipo_contacto,
-      estatus: usuarioActual.estatus,
+      estatus: usuarioActual.estatus
     };
     if (inp.pass.value) payload.password = inp.pass.value;
     try {
@@ -298,44 +356,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(payload)
         }
       );
       const data = await res.json();
       if (data.mensaje) {
-        mostrarToast(data.mensaje, "exito", 4000);
-        // actualiza cookie y sidebar
+        gcToast(data.mensaje, "exito", 4000);
         usuarioCookie = { ...usuarioCookie, ...payload };
-        document.cookie =
-          "usuario=" +
-          encodeURIComponent(JSON.stringify(usuarioCookie)) +
-          "; path=/; max-age=" +
-          24 * 60 * 60;
+        document.cookie = "usuario=" + encodeURIComponent(JSON.stringify(usuarioCookie)) +
+          "; path=/; max-age=" + 24 * 60 * 60;
         renderPerfil(usuarioCookie);
       }
     } catch {
-      mostrarToast("Error al actualizar perfil.", "error", 5000);
+      gcToast("Error al actualizar perfil.", "error", 5000);
     } finally {
       cerrarModal();
     }
   });
 
-  // Deshabilitar links de recursos y cards de cursos
+  // deshabilitar links de recursos y cards
   const toastDuration = 4000;
-  document.querySelectorAll(".recurso-link").forEach((link) => {
-    link.removeAttribute("href");
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      gcToast("Función deshabilitada", "warning", toastDuration);
-    });
-  });
-  document.querySelectorAll(".curso-card").forEach((card) => {
-    card.removeAttribute("href");
-    card.addEventListener("click", (e) => {
+  document.querySelectorAll(".recurso-link, .curso-card").forEach(el => {
+    el.removeAttribute("href");
+    el.addEventListener("click", e => {
       e.preventDefault();
       gcToast("Función deshabilitada", "warning", toastDuration);
     });
   });
 
-
+  // deshabilitar botón "Cotizar"
+  const cotizarBtn = document.querySelector(".actions .btn-outline");
+  if (cotizarBtn) {
+    cotizarBtn.removeAttribute("onclick");
+    cotizarBtn.addEventListener("click", e => {
+      e.preventDefault();
+      gcToast("Función deshabilitada", "warning", toastDuration);
+    });
+  }
 });
