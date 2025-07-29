@@ -227,6 +227,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //------------------------------- js para el subnav
 document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    // "vistaOperativa2.php",
+    // "vistaOperativa3.php",
+  ];
+
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
   subnavs.forEach(nav => nav.dataset.originalHtml = nav.innerHTML);
 
@@ -238,10 +244,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (operativeViews.includes(currentPage)) {
     const mk = label => {
       const slug = label.toLowerCase() + ".php";
-      return `<a href="${slug}" class="${slug === currentPage ? "active" : ""}">${label}</a>`;
+      const active = slug === currentPage ? "active" : "";
+      return `<a href="${slug}" class="${active}">${label}</a>`;
     };
-    const markup = `${mk("Home")}${mk("Proyectos")}${mk("Cursos")}${mk("Admin")}`;
+    const markup = `
+      ${mk("Home")}
+      ${mk("Proyectos")}
+      ${mk("Cursos")}
+      ${mk("Admin")}
+    `;
     subnavs.forEach(nav => nav.innerHTML = markup);
+
   } else {
     subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
   }
@@ -251,9 +264,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const mega = submenu.querySelector(".megamenu");
     if (mega) {
       mega.classList.remove("show");
-      let link = null;
       for (const ch of submenu.children) {
-        if (ch.tagName === "A") { link = ch; break; }
+        if (ch.tagName === "A") {
+          link = ch;
+          break;
+        }
       }
       if (link) {
         link.addEventListener("click", e => {
@@ -262,7 +277,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
       document.addEventListener("click", e => {
-        if (!submenu.contains(e.target)) mega.classList.remove("show");
+        if (!submenu.contains(e.target)) {
+          mega.classList.remove("show");
+        }
       });
     }
   }
