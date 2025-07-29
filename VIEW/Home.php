@@ -57,7 +57,7 @@
         <div id="mobile-menu" class="subnav">
             <a href="../index.php">Inicio</a>
             <div class="nav-item has-megamenu desktop-only" id="submenu-productos">
-                <a href="#" class="active">Productos</a>
+                <a class="active">Productos</a>
                 <div class="megamenu">
                     <div class="col">
                         <h4>Lo que hacemos</h4>
