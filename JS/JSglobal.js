@@ -267,12 +267,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const logo = document.querySelector(".logo");
-  if (logo) {
-    logo.style.cursor = "pointer";
-    logo.addEventListener("click", () => {
+  const logoBtn = document.getElementById("logo-btn");
+  if (logoBtn) {
+    logoBtn.style.cursor = "pointer";
+    logoBtn.addEventListener("click", () => {
       window.location.href = "/index.php";
-      console.log(window.location.href = "/index.php");
     });
   }
 });

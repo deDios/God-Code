@@ -34,7 +34,7 @@
         </div>
 
         <div class="top-bar" id="top-bar">
-            <div class="logo">
+            <div id="logo-btn" class="logo">
                 <img src="ASSETS/godcode_icon.png" alt="Logo GodCode" class="logo-icon">
                 GodCode
             </div>
