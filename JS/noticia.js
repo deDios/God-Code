@@ -108,51 +108,53 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-document.addEventListener("DOMContentLoaded", function () {
-  // -------- Variables y endpoints --------
-  var params = new URLSearchParams(window.location.search);
-  var noticiaId = parseInt(params.get("id"), 10);
-  var lista = document.getElementById("lista-comentarios");
-  var textarea = document.querySelector(".nuevo-comentario textarea");
-  var contador = document.getElementById("contador-caracteres");
-  var btnCancelar = document.getElementById("cancelar-respuesta");
-  var btnEnviar = document.getElementById("btn-enviar-comentario");
+// noticia.js
 
-  // Si falta algún elemento esencial, salimos
+document.addEventListener("DOMContentLoaded", async () => {
+  // -------- Variables y endpoints --------
+  const params = new URLSearchParams(window.location.search);
+  const noticiaId = parseInt(params.get("id"), 10);
+  const lista = document.getElementById("lista-comentarios");
+  const textarea = document.querySelector(".nuevo-comentario textarea");
+  const contador = document.getElementById("contador-caracteres");
+  const btnCancelar = document.getElementById("cancelar-respuesta");
+  const btnEnviar = document.getElementById("btn-enviar-comentario");
+
   if (!lista || !textarea || !contador || !btnCancelar || !btnEnviar) {
-    console.warn("Comments script: faltan elementos DOM críticos");
+    console.warn("Faltan elementos del DOM para comentarios");
     return;
   }
 
-  var endpointComentarios = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
-  var endpointInsertar = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_comentario_noticia.php";
-  var endpointReaccion = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_reaccion_comentario.php";
-  var endpointQuitarReaccion = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/d_reaccion_comentario.php";
+  const endpointComentarios =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
 
-  var usuarioId = null;
-  var usuarioNombre = "Tú";
-  var respuestaA = null;
-  var respuestaA_nombre = "";
-  var enviando = false;
-  var ultimoComentario = "";
+  const endpointInsertar =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_comentario_noticia.php";
+
+  const endpointReaccion =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_reaccion_comentario.php";
+
+  const endpointQuitarReaccion =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/d_reaccion_comentario.php";
+
+  let usuarioId = null,
+    usuarioNombre = "Tú",
+    respuestaA = null,
+    respuestaA_nombre = "",
+    enviando = false,
+    ultimoComentario = "";
 
   // -------- Helpers --------
   function getUsuarioDeCookie() {
-    var cookie = document.cookie.split("; ").find(function (c) {
-      return c.indexOf("usuario=") === 0;
-    });
+    const cookie = document.cookie.split("; ").find(r => r.startsWith("usuario="));
     if (!cookie) return null;
-    try {
-      return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
-    } catch (e) {
-      return null;
-    }
+    try { return JSON.parse(decodeURIComponent(cookie.split("=")[1])); }
+    catch { return null; }
   }
 
   function actualizarEstadoInput() {
     if (!usuarioId) {
-      textarea.disabled = true;
-      btnEnviar.disabled = true;
+      textarea.disabled = btnEnviar.disabled = true;
       textarea.placeholder = "Inicia sesión para comentar...";
       btnEnviar.classList.add("disabled");
     } else {
@@ -164,66 +166,67 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function esComentarioDuplicado(txt) {
-    var clean = txt.replace(/\s+/g, " ").trim().toLowerCase();
-    var last = (ultimoComentario || "").replace(/\s+/g, " ").trim().toLowerCase();
-    return clean === last;
+    const clean = s => s.replace(/\s+/g, " ").trim().toLowerCase();
+    return clean(txt) === clean(ultimoComentario);
+  }
+
+  function hacerStickyAnim(node) {
+    if (!node) return;
+    node.classList.add("sticky-anim");
+    setTimeout(() => node.classList.remove("sticky-anim"), 2000);
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function mostrarErrorCarga() {
-    lista.innerHTML = ''
-      + '<div style="text-align:center;padding:1.6rem;">'
-      + '<p>Error al cargar comentarios.</p>'
-      + '<button id="reintentar-cargar" class="btn btn-primary" style="margin-top:10px;">Reintentar</button>'
-      + '</div>';
-    var retry = document.getElementById("reintentar-cargar");
-    if (retry) {
-      retry.onclick = function () { cargarComentarios(noticiaId); };
+    lista.innerHTML = `
+      <div style="text-align:center;padding:1.6rem;">
+        <p>Error al cargar comentarios.</p>
+        <button id="reintentar-cargar" class="btn btn-primary" style="margin-top:10px;">Reintentar</button>
+      </div>`;
+    document.getElementById("reintentar-cargar")
+      .onclick = () => cargarComentarios(noticiaId);
+  }
+
+  function mostrarSkeleton() {
+    lista.innerHTML = "";
+    for (let i = 0; i < 5; i++) {
+      const sk = document.createElement("div");
+      sk.className = "comentario skeleton";
+      lista.appendChild(sk);
     }
   }
 
-  function hacerStickyAnim(nodo) {
-    if (!nodo || !nodo.classList) return;
-    nodo.classList.add("sticky-anim");
-    setTimeout(function () {
-      nodo.classList.remove("sticky-anim");
-    }, 2000);
-    // scrollIntoView suave con fallback
-    try {
-      nodo.scrollIntoView({ behavior: "smooth", block: "center" });
-    } catch (e) {
-      nodo.scrollIntoView();
-    }
-  }
-
-  // -------- Recuperar usuario y avatar --------
-  var usuario = getUsuarioDeCookie();
-  if (usuario && usuario.id) {
+  // -------- Usuario y avatar --------
+  const usuario = getUsuarioDeCookie();
+  if (usuario) {
     usuarioId = usuario.id;
     usuarioNombre = usuario.nombre || "Tú";
     if (usuario.avatar) {
-      var img = document.querySelector(".nuevo-comentario-wrapper img");
+      const img = document.querySelector(".nuevo-comentario-wrapper img");
       if (img) img.src = usuario.avatar;
     }
   }
 
   // -------- Input & contador --------
   actualizarEstadoInput();
-  textarea.addEventListener("input", function () {
-    contador.textContent = textarea.value.length + "/500";
-    var desh = !usuarioId || enviando || textarea.value.trim().length === 0 || textarea.value.length > 500;
-    btnEnviar.disabled = desh;
-    btnEnviar.classList.toggle("disabled", desh);
+  textarea.addEventListener("input", () => {
+    contador.textContent = `${textarea.value.length}/500`;
+    btnEnviar.disabled =
+      !usuarioId ||
+      enviando ||
+      textarea.value.trim().length === 0 ||
+      textarea.value.length > 500;
+    btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
   });
-  textarea.addEventListener("keydown", function (e) {
-    var code = e.keyCode || e.which;
-    if ((e.key === "Enter" || code === 13) && !e.shiftKey && !btnEnviar.disabled) {
+  textarea.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey && !btnEnviar.disabled) {
       e.preventDefault();
       btnEnviar.click();
     }
   });
 
   // -------- Cancelar respuesta --------
-  btnCancelar.addEventListener("click", function () {
+  btnCancelar.addEventListener("click", () => {
     respuestaA = null;
     respuestaA_nombre = "";
     textarea.value = "";
@@ -233,15 +236,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // -------- Enviar comentario/respuesta --------
-  btnEnviar.addEventListener("click", function () {
-    if (enviando) return;
-    var texto = textarea.value.trim();
-    if (!texto || !usuarioId || esComentarioDuplicado(texto)) return;
+  btnEnviar.addEventListener("click", async () => {
+    let texto = textarea.value.trim();
+    if (!texto || enviando || esComentarioDuplicado(texto) || !usuarioId) return;
 
-    // anteponer mención si corresponde
     if (respuestaA && respuestaA_nombre) {
-      var at = "@" + respuestaA_nombre + " ";
-      if (texto.indexOf(at) !== 0) {
+      const at = `@${respuestaA_nombre} `;
+      if (!texto.startsWith(at)) {
         texto = at + texto.replace(/^@[\w\s]+/, "").trim();
       }
     }
@@ -256,281 +257,353 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     enviando = true;
-    textarea.disabled = true;
-    btnEnviar.disabled = true;
+    btnEnviar.disabled = textarea.disabled = true;
 
-    fetch(endpointInsertar, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        noticia_id: noticiaId,
-        usuario_id: usuarioId,
-        comentario: texto,
-        estatus: 1,
-        respuesta_a: respuestaA || undefined
-      })
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (data && typeof data.mensaje === "string" && data.mensaje.toLowerCase().indexOf("registrado") > -1) {
-          ultimoComentario = texto;
-          if (respuestaA) {
-            var padre = document.querySelector('[data-comentario-id="' + respuestaA + '"]');
-            if (padre) recargarUnComentario(respuestaA, padre);
-          } else {
-            // crear y anteponer nodo optimista
-            crearComentarioHTML({
-              id: data.id || Date.now(),
-              usuario_id: usuarioId,
-              usuario_nombre: usuarioNombre,
-              comentario: texto,
-              fecha_creacion: new Date().toISOString(),
-              likes: 0,
-              dislikes: 0,
-              mi_reaccion: null,
-              respuestas: []
-            }).then(function (nodo) {
-              lista.insertBefore(nodo, lista.firstChild);
-              hacerStickyAnim(nodo);
-            });
-          }
-          textarea.value = "";
-          contador.textContent = "0/500";
-          respuestaA = null;
-          respuestaA_nombre = "";
-          textarea.placeholder = "Añade un comentario...";
-          btnCancelar.style.display = "none";
-          gcToast("Comentario publicado", "exito");
-        } else {
-          gcToast("No se pudo publicar el comentario", "error");
-        }
-      })
-      .catch(function () {
-        gcToast("Error de red al comentar", "error");
-      })
-      .finally(function () {
-        enviando = false;
-        textarea.disabled = false;
-        var desh2 = !usuarioId || textarea.value.trim().length === 0;
-        btnEnviar.disabled = desh2;
-        btnEnviar.classList.toggle("disabled", desh2);
+    try {
+      const res = await fetch(endpointInsertar, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          noticia_id: noticiaId,
+          usuario_id: usuarioId,
+          comentario: texto,
+          estatus: 1,
+          ...(respuestaA ? { respuesta_a: respuestaA } : {})
+        })
       });
+      const data = await res.json();
+      if (data.mensaje?.toLowerCase().includes("registrado")) {
+        ultimoComentario = texto;
+        if (respuestaA) {
+          const padre = document.querySelector(`[data-comentario-id="${respuestaA}"]`);
+          await recargarUnComentario(respuestaA, padre);
+        } else {
+          const nodo = await crearNodoInstantaneo({
+            id: data.id || Date.now(),
+            usuario_id: usuarioId,
+            usuario_nombre: usuarioNombre,
+            comentario: texto,
+            fecha_creacion: new Date().toISOString(),
+            likes: 0, dislikes: 0, mi_reaccion: null, respuestas: []
+          });
+          lista.insertBefore(nodo, lista.firstChild);
+          hacerStickyAnim(nodo);
+        }
+        textarea.value = "";
+        contador.textContent = "0/500";
+        respuestaA = respuestaA_nombre = "";
+        textarea.placeholder = "Añade un comentario...";
+        btnCancelar.style.display = "none";
+        gcToast("Comentario publicado", "exito");
+      } else {
+        gcToast("No se pudo publicar el comentario", "error");
+      }
+    } catch {
+      gcToast("Error de red al comentar", "error");
+    } finally {
+      enviando = false;
+      textarea.disabled = false;
+      btnEnviar.disabled = !usuarioId || textarea.value.trim().length === 0;
+      btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
+    }
   });
 
+  async function crearNodoInstantaneo(data) {
+    return crearComentarioHTML({ ...data, respuestas: [] });
+  }
+
   // -------- Cargar comentarios --------
-  function cargarComentarios(id) {
-    // skeleton
-    lista.innerHTML = "";
-    for (var i = 0; i < 5; i++) {
-      var sk = document.createElement("div");
-      sk.className = "comentario skeleton";
-      lista.appendChild(sk);
+  async function cargarComentarios(id) {
+    mostrarSkeleton();
+    try {
+      const res = await fetch(endpointComentarios, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          noticia_id: id,
+          estatus: 1,
+          ...(usuarioId ? { usuario_id: usuarioId } : {})
+        })
+      });
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        lista.innerHTML = `
+          <div class="sin-comentarios" style="text-align:center;padding:1rem;color:#666">
+            Sé el primero en comentar
+          </div>`;
+        return;
+      }
+      lista.innerHTML = "";
+      data
+        .sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
+        .forEach(c => lista.appendChild(crearComentarioHTML(c)));
+    } catch {
+      mostrarErrorCarga();
+      gcToast("Error al cargar comentarios", "error");
+    }
+  }
+
+  // -------- Crear comentario HTML --------
+  function crearComentarioHTML(data) {
+    const idToNombre = {};
+    (data.respuestas || []).forEach(r => idToNombre[r.id] = r.usuario_nombre);
+
+    const div = document.createElement("div");
+    div.className = "comentario";
+    div.dataset.comentarioId = data.id;
+
+    const likeOn = data.mi_reaccion === "like";
+    const disOn = data.mi_reaccion === "dislike";
+
+    div.innerHTML = ''
+      + '<div class="comentario-usuario">'
+      + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
+      + '</div>'
+      + '<div class="comentario-contenido">'
+      + '<div class="comentario-meta">'
+      + '<strong>' + data.usuario_nombre + '</strong>'
+      + '<span>' + tiempoRelativo(data.fecha_creacion) + '</span>'
+      + '</div>'
+      + '<p class="comentario-texto">' + data.comentario + '</p>'
+      + '<div class="comentario-interacciones">'
+      + '<div class="reaccion like' + (likeOn ? " liked" : "") + '" '
+      + 'data-id="' + data.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
+      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2'
+      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14'
+      + 'l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
+      + '</svg>'
+      + '<span class="cantidad">' + data.likes + '</span>'
+      + '</div>'
+      + '<div class="reaccion dislike' + (disOn ? " disliked" : "") + '" '
+      + 'data-id="' + data.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
+      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09'
+      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06'
+      + 'l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
+      + '</svg>'
+      + '<span class="cantidad">' + data.dislikes + '</span>'
+      + '</div>'
+      + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
+      + '</div>'
+      + (data.respuestas && data.respuestas.length
+        ? '<div class="comentario-respuestas">'
+        + '<a href="#" class="ver-respuestas" role="button" tabindex="0">'
+        + '<svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">'
+        + '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'
+        + '</svg>'
+        + 'Ver ' + data.respuestas.length + ' respuesta(s)'
+        + '</a>'
+        + '</div>'
+        : ''
+      )
+      + '</div>';
+
+    // subrespuestas
+    if (data.respuestas?.length) {
+      const sub = document.createElement("div");
+      sub.className = "subcomentarios subrespuestas";
+      sub.style.display = "none";
+      data.respuestas
+        .sort((a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion))
+        .forEach(r => sub.appendChild(crearRespuestaHTML(r, idToNombre)));
+      div.appendChild(sub);
     }
 
-    fetch(endpointComentarios, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        noticia_id: id,
-        estatus: 1,
-        usuario_id: usuarioId || undefined
-      })
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        // cuando no vengan comentarios
-        if (!Array.isArray(data) || data.length === 0) {
-          lista.innerHTML = ''
-            + '<div class="sin-comentarios" style="text-align:center;padding:1rem;color:#666">'
-            + 'Sé el primero en comentar'
-            + '</div>';
-          return;
-        }
-        // ordenar y renderizar
-        data.sort(function (a, b) {
-          return new Date(b.fecha_creacion) - new Date(a.fecha_creacion);
-        });
-        lista.innerHTML = "";
-        data.forEach(function (c) {
-          crearComentarioHTML(c).then(function (nodo) {
-            lista.appendChild(nodo);
-          });
-        });
-      })
-      .catch(function () {
-        mostrarErrorCarga();
-        gcToast("Error al cargar comentarios", "error");
-      });
+    return div;
   }
 
-  // -------- Crear comentario y respuesta HTML --------
-  function crearComentarioHTML(data) {
-    return new Promise(function (resolve) {
-      // crear el div
-      var div = document.createElement("div");
-      div.setAttribute("role", "article");
-      div.className = "comentario";
-      div.setAttribute("data-comentario-id", data.id);
-
-      // innerHTML básico
-      div.innerHTML = ''
-        + '<div class="comentario-usuario">'
-        + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
-        + '</div>'
-        + '<div class="comentario-contenido">'
-        + '<div class="comentario-meta">'
-        + '<strong>' + data.usuario_nombre + '</strong>'
-        + '<span>' + tiempoRelativo(data.fecha_creacion) + '</span>'
-        + '</div>'
-        + '<p class="comentario-texto">' + data.comentario + '</p>'
-        + '<div class="comentario-interacciones">'
-        + '<div class="reaccion like' + (data.mi_reaccion === "like" ? " liked" : "") + '" '
-        + 'data-id="' + data.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
-        + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
-        + '</svg>'
-        + '<span class="cantidad">' + data.likes + '</span>'
-        + '</div>'
-        + '<div class="reaccion dislike' + (data.mi_reaccion === "dislike" ? " disliked" : "") + '" '
-        + 'data-id="' + data.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
-        + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
-        + '</svg>'
-        + '<span class="cantidad">' + data.dislikes + '</span>'
-        + '</div>'
-        + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
-        + '</div>';
-
-      // si tiene respuestas, las añadimos ocultas
-      if (Array.isArray(data.respuestas) && data.respuestas.length) {
-        var cont = document.createElement("div");
-        cont.className = "subrespuestas";
-        data.respuestas.sort(function (a, b) {
-          return new Date(a.fecha_creacion) - new Date(b.fecha_creacion);
-        }).forEach(function (r) {
-          crearRespuestaHTML(r, data.respuestas.reduce(function (acc, cur) {
-            acc[cur.id] = cur.usuario_nombre; return acc;
-          }, {})).then(function (nr) {
-            cont.appendChild(nr);
-          });
-        });
-        div.appendChild(cont);
-      }
-
-      div.innerHTML += '</div>'; // cierra .comentario-contenido 
-      resolve(div);
-    });
-  }
-
+  // -------- Crear respuesta HTML --------
   function crearRespuestaHTML(r, idToNombre) {
-    return new Promise(function (resolve) {
-      var div = document.createElement("div");
-      div.className = "comentario subcomentario";
-      div.setAttribute("data-comentario-id", r.id);
-      var prefijo = "";
-      if (r.respuesta_a && idToNombre[r.respuesta_a]) {
-        prefijo = '<span class="mencion-usuario">@' + idToNombre[r.respuesta_a] + '</span> ';
+    const pref = (r.respuesta_a && idToNombre[r.respuesta_a])
+      ? '<span class="mencion-usuario">@' + idToNombre[r.respuesta_a] + '</span> '
+      : '';
+    const likeOn = r.mi_reaccion === "like";
+    const disOn = r.mi_reaccion === "dislike";
+    const div = document.createElement("div");
+    div.className = "comentario subcomentario";
+    div.dataset.comentarioId = r.id;
+
+    div.innerHTML = ''
+      + '<div class="comentario-usuario">'
+      + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
+      + '</div>'
+      + '<div class="comentario-contenido">'
+      + '<div class="comentario-meta">'
+      + '<strong>' + r.usuario_nombre + '</strong>'
+      + '<span>' + tiempoRelativo(r.fecha_creacion) + '</span>'
+      + '</div>'
+      + '<p class="comentario-texto">' + pref + r.comentario + '</p>'
+      + '<div class="comentario-interacciones">'
+      + '<div class="reaccion like' + (likeOn ? " liked" : "") + '" '
+      + 'data-id="' + r.id + '" data-tipo="like" role="button" tabindex="0">'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
+      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2'
+      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14'
+      + 'l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
+      + '</svg>'
+      + '<span class="cantidad">' + r.likes + '</span>'
+      + '</div>'
+      + '<div class="reaccion dislike' + (disOn ? " disliked" : "") + '" '
+      + 'data-id="' + r.id + '" data-tipo="dislike" role="button" tabindex="0">'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
+      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09'
+      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06'
+      + 'l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
+      + '</svg>'
+      + '<span class="cantidad">' + r.dislikes + '</span>'
+      + '</div>'
+      + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
+      + '</div>'
+      + '</div>';
+
+    return div;
+  }
+
+  // -------- Recargar un solo comentario --------
+  async function recargarUnComentario(id, viejo) {
+    try {
+      const res = await fetch(endpointComentarios, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          noticia_id: noticiaId,
+          estatus: 1,
+          ...(usuarioId ? { usuario_id: usuarioId } : {})
+        })
+      });
+      const data = await res.json();
+      let found = null;
+      for (const c of data) {
+        if (c.id == id) { found = c; break; }
+        if (c.respuestas) {
+          const sub = c.respuestas.find(r => r.id == id);
+          if (sub) { found = sub; break; }
+        }
       }
-      div.innerHTML = ''
-        + '<div class="comentario-usuario">'
-        + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
-        + '</div>'
-        + '<div class="comentario-contenido">'
-        + '<div class="comentario-meta">'
-        + '<strong>' + r.usuario_nombre + '</strong>'
-        + '<span>' + tiempoRelativo(r.fecha_creacion) + '</span>'
-        + '</div>'
-        + '<p class="comentario-texto">' + prefijo + r.comentario + '</p>'
-        + '<div class="comentario-interacciones">'
-        + '<div class="reaccion like' + (r.mi_reaccion === "like" ? " liked" : "") + '" '
-        + 'data-id="' + r.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
-        + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
-        + '</svg>'
-        + '<span class="cantidad">' + r.likes + '</span>'
-        + '</div>'
-        + '<div class="reaccion dislike' + (r.mi_reaccion === "dislike" ? " disliked" : "") + '" '
-        + 'data-id="' + r.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
-        + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
-        + '</svg>'
-        + '<span class="cantidad">' + r.dislikes + '</span>'
-        + '</div>'
-        + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
-        + '</div>'
-        + '</div>';
-      resolve(div);
-    });
+      if (!found) return;
+      const nuevo = found.respuesta_a == null
+        ? crearComentarioHTML(found)
+        : crearRespuestaHTML(found, {});
+      viejo.replaceWith(nuevo);
+    } catch {
+      cargarComentarios(noticiaId);
+    }
   }
 
-  function recargarUnComentario(id, viejo) {
-    fetch(endpointComentarios, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ noticia_id: noticiaId, estatus: 1, usuario_id: usuarioId })
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        var encontrado = null;
-        data.forEach(function (c) {
-          if (c.id == id) encontrado = c;
-          if (!encontrado && c.respuestas) {
-            c.respuestas.forEach(function (r) {
-              if (r.id == id) encontrado = r;
-            });
-          }
-        });
-        if (!encontrado) return;
-        crearComentarioHTML(encontrado).then(function (nuevo) {
-          viejo.parentNode.replaceChild(nuevo, viejo);
-        });
-      })
-      .catch(function () { cargarComentarios(noticiaId); });
-  }
-
+  // -------- Tiempo relativo --------
   function tiempoRelativo(fechaStr) {
-    var fecha = new Date(fechaStr);
-    var diff = (Date.now() - fecha) / 1000;
+    const fecha = new Date(fechaStr);
+    const diff = (Date.now() - fecha) / 1000;
     if (diff < 60) return "Hace unos segundos";
-    if (diff < 3600) return "Hace " + Math.floor(diff / 60) + " minuto(s)";
-    if (diff < 86400) return "Hace " + Math.floor(diff / 3600) + " hora(s)";
-    if (diff < 2592000) return "Hace " + Math.floor(diff / 86400) + " día(s)";
-    if (diff < 31536000) return "Hace " + Math.floor(diff / 2592000) + " mes(es)";
-    return "Hace " + Math.floor(diff / 31536000) + " año(s)";
+    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} minuto(s)`;
+    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)} hora(s)`;
+    if (diff < 2592000) return `Hace ${Math.floor(diff / 86400)} día(s)`;
+    if (diff < 31536000) return `Hace ${Math.floor(diff / 2592000)} mes(es)`;
+    return `Hace ${Math.floor(diff / 31536000)} año(s)`;
   }
 
-  // -------- Manejador global de clicks --------
-  document.addEventListener("click", function (e) {
-    var target = e.target;
-
-    // Mostrar/ocultar respuestas
-    var ver = target.closest && target.closest(".ver-respuestas");
-    if (ver) {
+  // -------- Manejo de clicks por delegación --------
+  lista.addEventListener("click", handleComentarioAction);
+  // permitir enter/space en elementos role=button
+  document.addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.getAttribute("role") === "button") {
       e.preventDefault();
-      var com = ver.closest(".comentario"),
-        sub = com.querySelector(".subrespuestas"),
-        flecha = ver.querySelector(".flecha"),
-        abierto = ver.classList.toggle("abierto");
+      e.target.click();
+    }
+  });
 
-      if (abierto) sub.classList.add("mostrar");
-      else sub.classList.remove("mostrar");
-
-      if (flecha) {
-        if (abierto) flecha.classList.add("girar");
-        else flecha.classList.remove("girar");
+  async function handleComentarioAction(e) {
+    // RESPONDER
+    if (e.target.classList.contains("accion")) {
+      e.preventDefault();
+      if (!usuarioId) return gcToast("Inicia sesión para responder", "warning");
+      const com = e.target.closest(".comentario");
+      const autor = com.querySelector(".comentario-meta strong").textContent;
+      let padre = com;
+      while (padre.classList.contains("subcomentario")) {
+        padre = padre.parentElement.closest(".comentario:not(.subcomentario)");
       }
-
-      var cnt = sub.children.length;
-      ver.childNodes[ver.childNodes.length - 1].textContent = abierto
-        ? " Ocultar " + cnt + " respuesta(s)"
-        : " Ver " + cnt + " respuesta(s)";
+      respuestaA = parseInt(padre.dataset.comentarioId, 10);
+      respuestaA_nombre = autor;
+      const at = `@${autor} `;
+      if (!textarea.value.startsWith(at)) textarea.value = at;
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      btnCancelar.style.display = "inline";
+      contador.textContent = `${textarea.value.length}/500`;
       return;
     }
 
-    // Responder o reaccionar se propaga al listener anterior y al btnEnviar
-    // …
-  });
+    // VER/OCULTAR RESPUESTAS
+    const ver = e.target.closest(".ver-respuestas");
+    if (ver) {
+      e.preventDefault();
+      const com = ver.closest(".comentario");
+      const sub = com.querySelector(".subrespuestas");
+      if (!sub) return;
+      const abierto = ver.classList.toggle("abierto");
+      sub.style.display = abierto ? "flex" : "none";
+      ver.querySelector(".flecha")?.classList.toggle("girar", abierto);
+      ver.lastChild.textContent = abierto
+        ? ` Ocultar ${sub.childElementCount} respuesta(s)`
+        : ` Ver ${sub.childElementCount} respuesta(s)`;
+      return;
+    }
 
-  // -------- Inicializar carga --------
-  if (noticiaId) cargarComentarios(noticiaId);
+    // LIKE/DISLIKE
+    const btn = e.target.closest(".reaccion");
+    if (btn) {
+      e.preventDefault();
+      if (!usuarioId) return gcToast("Inicia sesión para reaccionar", "warning");
+      const tipo = btn.dataset.tipo;
+      const cid = btn.dataset.id;
+      const comDiv = btn.closest(".comentario, .subcomentario");
+      const likeBtn = comDiv.querySelector(".reaccion.like");
+      const disBtn = comDiv.querySelector(".reaccion.dislike");
+      const prevLike = likeBtn.classList.contains("liked");
+      const prevDis = disBtn.classList.contains("disliked");
+
+      likeBtn.style.pointerEvents = disBtn.style.pointerEvents = "none";
+      try {
+        // si cambio de uno a otro, primero quito
+        if ((tipo === "like" && prevDis) || (tipo === "dislike" && prevLike)) {
+          await fetch(endpointQuitarReaccion, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ comentario_id: cid, usuario_id: usuarioId })
+          });
+        }
+        let url, body;
+        if ((tipo === "like" && prevLike) || (tipo === "dislike" && prevDis)) {
+          url = endpointQuitarReaccion;
+          body = { comentario_id: cid, usuario_id: usuarioId };
+        } else {
+          url = endpointReaccion;
+          body = { comentario_id: cid, usuario_id: usuarioId, reaccion: tipo, estatus: 1 };
+        }
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const jd = await resp.json();
+        if (url === endpointReaccion && jd.mensaje.toLowerCase().includes("registrada")) {
+          gcToast(`¡Gracias por tu ${tipo}!`, "exito");
+        } else if (url === endpointQuitarReaccion && jd.mensaje.toLowerCase().includes("eliminada")) {
+          gcToast("Reacción eliminada.", "exito");
+        } else {
+          gcToast(jd.mensaje || "Error al reaccionar", "warning");
+        }
+        await recargarUnComentario(cid, comDiv);
+      } catch {
+        gcToast("Error de red al reaccionar", "error");
+      } finally {
+        likeBtn.style.pointerEvents = disBtn.style.pointerEvents = "";
+      }
+    }
+  }
+
+  // -------- Inicialización final --------
+  if (noticiaId) await cargarComentarios(noticiaId);
 });
