@@ -387,14 +387,14 @@ document.addEventListener("DOMContentLoaded", function () {
         + '<div class="reaccion like' + (data.mi_reaccion === "like" ? " liked" : "") + '" '
         + 'data-id="' + data.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
         + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M1 21h4V9H1v12zM23 10...z"/>'
+        + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
         + '</svg>'
         + '<span class="cantidad">' + data.likes + '</span>'
         + '</div>'
         + '<div class="reaccion dislike' + (data.mi_reaccion === "dislike" ? " disliked" : "") + '" '
         + 'data-id="' + data.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
         + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M15 3H6...z"/>'
+        + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
         + '</svg>'
         + '<span class="cantidad">' + data.dislikes + '</span>'
         + '</div>'
@@ -405,7 +405,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (Array.isArray(data.respuestas) && data.respuestas.length) {
         var cont = document.createElement("div");
         cont.className = "subrespuestas";
-        // no seteamos style.display, lo hace el CSS por defecto
         data.respuestas.sort(function (a, b) {
           return new Date(a.fecha_creacion) - new Date(b.fecha_creacion);
         }).forEach(function (r) {
@@ -446,14 +445,14 @@ document.addEventListener("DOMContentLoaded", function () {
         + '<div class="reaccion like' + (r.mi_reaccion === "like" ? " liked" : "") + '" '
         + 'data-id="' + r.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
         + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M1 21h4V9H1v12zM23 10...z"/>'
+        + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
         + '</svg>'
         + '<span class="cantidad">' + r.likes + '</span>'
         + '</div>'
         + '<div class="reaccion dislike' + (r.mi_reaccion === "dislike" ? " disliked" : "") + '" '
         + 'data-id="' + r.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
         + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-        + '<path d="M15 3H6...z"/>'
+        + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
         + '</svg>'
         + '<span class="cantidad">' + r.dislikes + '</span>'
         + '</div>'
