@@ -757,6 +757,14 @@
     transition: opacity 0.25s;
 }
 
+#noticia-comentarios .subrespuestas {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+}
+#noticia-comentarios .subrespuestas.mostrar {
+  display: flex;
+}
 
 
 
