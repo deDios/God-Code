@@ -279,11 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", e => {
       e.preventDefault();
       mega.classList.toggle("show");
+      console.log("se abrio el megamenu");
     });
 
     document.addEventListener("click", e => {
       if (!submenu.contains(e.target)) {
         mega.classList.remove("show");
+        console.log("se cerro el megamenu");
       }
     });
   });
