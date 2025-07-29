@@ -108,8 +108,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-// noticia.js
-
 document.addEventListener("DOMContentLoaded", async () => {
   // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
@@ -366,38 +364,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       + '</div>'
       + '<p class="comentario-texto">' + data.comentario + '</p>'
       + '<div class="comentario-interacciones">'
-      + '<div class="reaccion like' + (likeOn ? " liked" : "") + '" '
+      + '<div class="reaccion like' + (likeOn ? ' liked' : '') + '" '
       + 'data-id="' + data.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2'
-      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">'
+      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 '
+      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14 '
       + 'l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
       + '</svg>'
       + '<span class="cantidad">' + data.likes + '</span>'
       + '</div>'
-      + '<div class="reaccion dislike' + (disOn ? " disliked" : "") + '" '
+      + '<div class="reaccion dislike' + (disOn ? ' disliked' : '') + '" '
       + 'data-id="' + data.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09'
-      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06'
+      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">'
+      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09 '
+      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06 '
       + 'l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
       + '</svg>'
       + '<span class="cantidad">' + data.dislikes + '</span>'
       + '</div>'
       + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
       + '</div>'
-      + (data.respuestas && data.respuestas.length
-        ? '<div class="comentario-respuestas">'
-        + '<a href="#" class="ver-respuestas" role="button" tabindex="0">'
-        + '<svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">'
-        + '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'
-        + '</svg>'
-        + 'Ver ' + data.respuestas.length + ' respuesta(s)'
-        + '</a>'
-        + '</div>'
-        : ''
+      + (
+        (data.respuestas && data.respuestas.length)
+          ? '<div class="comentario-respuestas">'
+          + '<a href="#" class="ver-respuestas" role="button" tabindex="0">'
+          + '<svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">'
+          + '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'
+          + '</svg>'
+          + 'Ver ' + data.respuestas.length + ' respuesta(s)'
+          + '</a>'
+          + '</div>'
+          : ''
       )
       + '</div>';
+
 
     // subrespuestas
     if (data.respuestas?.length) {
@@ -415,47 +415,50 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // -------- Crear respuesta HTML --------
   function crearRespuestaHTML(r, idToNombre) {
-    const pref = (r.respuesta_a && idToNombre[r.respuesta_a])
-      ? '<span class="mencion-usuario">@' + idToNombre[r.respuesta_a] + '</span> '
-      : '';
+    // Si la respuesta es a otra subrespuesta, añadimos @usuario al inicio
+    const prefijo = (r.respuesta_a && idToNombre[r.respuesta_a])
+      ? `<span class="mencion-usuario">@${idToNombre[r.respuesta_a]}</span> `
+      : "";
+
     const likeOn = r.mi_reaccion === "like";
     const disOn = r.mi_reaccion === "dislike";
+
     const div = document.createElement("div");
     div.className = "comentario subcomentario";
     div.dataset.comentarioId = r.id;
 
-    div.innerHTML = ''
-      + '<div class="comentario-usuario">'
-      + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
-      + '</div>'
-      + '<div class="comentario-contenido">'
-      + '<div class="comentario-meta">'
-      + '<strong>' + r.usuario_nombre + '</strong>'
-      + '<span>' + tiempoRelativo(r.fecha_creacion) + '</span>'
-      + '</div>'
-      + '<p class="comentario-texto">' + pref + r.comentario + '</p>'
-      + '<div class="comentario-interacciones">'
-      + '<div class="reaccion like' + (likeOn ? " liked" : "") + '" '
-      + 'data-id="' + r.id + '" data-tipo="like" role="button" tabindex="0">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2'
-      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14'
-      + 'l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
-      + '</svg>'
-      + '<span class="cantidad">' + r.likes + '</span>'
-      + '</div>'
-      + '<div class="reaccion dislike' + (disOn ? " disliked" : "") + '" '
-      + 'data-id="' + r.id + '" data-tipo="dislike" role="button" tabindex="0">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">'
-      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09'
-      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06'
-      + 'l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
-      + '</svg>'
-      + '<span class="cantidad">' + r.dislikes + '</span>'
-      + '</div>'
-      + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
-      + '</div>'
-      + '</div>';
+    div.innerHTML =
+      '' +
+      '<div class="comentario-usuario">' +
+      '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">' +
+      '</div>' +
+
+      '<div class="comentario-contenido">' +
+      '<div class="comentario-meta">' +
+      '<strong>' + r.usuario_nombre + '</strong>' +
+      '<span>' + tiempoRelativo(r.fecha_creacion) + '</span>' +
+      '</div>' +
+      '<p class="comentario-texto">' + prefijo + r.comentario + '</p>' +
+      '<div class="comentario-interacciones">' +
+      '<div class="reaccion like' + (likeOn ? ' liked' : '') + '" ' +
+      'data-id="' + r.id + '" data-tipo="like" ' +
+      'role="button" tabindex="0" aria-label="Like">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">' +
+      '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>' +
+      '</svg>' +
+      '<span class="cantidad">' + r.likes + '</span>' +
+      '</div>' +
+      '<div class="reaccion dislike' + (disOn ? ' disliked' : '') + '" ' +
+      'data-id="' + r.id + '" data-tipo="dislike" ' +
+      'role="button" tabindex="0" aria-label="Dislike">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">' +
+      '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>' +
+      '</svg>' +
+      '<span class="cantidad">' + r.dislikes + '</span>' +
+      '</div>' +
+      '<a href="#" class="accion" role="button" tabindex="0">Responder</a>' +
+      '</div>' +
+      '</div>';
 
     return div;
   }

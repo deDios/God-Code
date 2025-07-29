@@ -766,7 +766,21 @@
   display: flex;
 }
 
+.comentario-interacciones .reaccion svg {
+  stroke: #bbb;
+  fill: none;
+  transition: stroke 0.2s, fill 0.2s;
+}
 
+.comentario-interacciones .reaccion.liked svg {
+  stroke: none;
+  fill: #1565c0 !important;
+}
+
+.comentario-interacciones .reaccion.disliked svg {
+  stroke: none;
+  fill: #e53935 !important;
+}
 
 
 
