@@ -213,7 +213,7 @@
                         <p>Optimiza la gestión financiera con soluciones precisas, seguras y adaptadas a tus
                             necesidades.</p>
                         <p>Toma decisiones inteligentes y alcanza la eficiencia y estabilidad de tu negocio.</p>
-                        <a href="../VIEW/" class="btn-azul">Saber más...</a>
+                        <a href="../VIEW/IndustriaFinanciera.php" class="btn-azul">Saber más...</a>
                     </div>
                 </div>
 

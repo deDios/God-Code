@@ -268,7 +268,7 @@
                         </div>
                     </div>
                     <div class="table-body" id="recursos-list">
-                        <!-- Aquí se insertan las filas vía JS -->
+                        <!-- Aquí se insertan las filas desde el JS -->
                     </div>
                 </div>
 

@@ -854,3 +854,10 @@ body {
   font-size: 0.9em;
   margin-left: 4px;
 }
+
+.recursos-box .table-header {
+  position: sticky;
+  top: 0;
+  background: #f4f7fb;
+  z-index: 1;
+}
