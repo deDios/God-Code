@@ -220,7 +220,6 @@ document.addEventListener("DOMContentLoaded", () => {
         : comparadores[colKey](b, a)
       );
       renderPage(1);
-      // pondrías flechita aquí si quieres
     });
   });
 });
@@ -234,7 +233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   renderPerfil(usuario);
 
-  // — skeleton loaders 👇
+  // — skeleton loaders
   const tableBody = document.querySelector(".table-body");
   tableBody.innerHTML = "";
   for (let i = 0; i < itemsPerPage; i++) {
@@ -256,12 +255,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       cont.appendChild(ph);
     }
   });
-  // — fin skeleton
 
   try {
     const data = await fetchInscripciones(usuario.id);
 
-    // si no hay nada, vacío con CTA
+    // si no hay nada, vacio
     if (!Array.isArray(data) || data.length === 0) {
       document.getElementById("recursos-list").innerHTML = `
         <div class="empty-state">
@@ -282,7 +280,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // datos ok
     recursosData = data;
     renderPage(1);
     renderMisCursos(recursosData);
@@ -383,14 +380,5 @@ document.addEventListener("DOMContentLoaded", async () => {
       gcToast("Función deshabilitada", "warning", toastDuration);
     });
   });
-
-  // deshabilitar botón "Cotizar"
-  const cotizarBtn = document.querySelector(".actions .btn-outline");
-  if (cotizarBtn) {
-    cotizarBtn.removeAttribute("onclick");
-    cotizarBtn.addEventListener("click", e => {
-      e.preventDefault();
-      gcToast("Función deshabilitada", "warning", toastDuration);
-    });
-  }
+  
 });

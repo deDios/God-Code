@@ -248,34 +248,40 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const operativeViews = [
     "home.php",
-    //"vistaOperativa2.php",
-    //"vistaOperativa3.php",
-    // esto esta listo para cuando se agreguen las demas vistas operativas
+    // "vistaOperativa2.php",
+    // "vistaOperativa3.php",
   ];
 
-  // se guardan los subnavs de movile y desktop
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-  subnavs.forEach((nav) => {
+  subnavs.forEach(nav => {
     nav.dataset.originalHtml = nav.innerHTML;
   });
 
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+  const currentPage = window.location.pathname
+    .split("/")
+    .pop()
+    .toLowerCase();
 
-  // si el usuario esta en una vista operativa coloca los nuevos botones si no deja los anteriores
   if (operativeViews.includes(currentPage)) {
-    // coloca los botones para las vistas operativas
+    const mk = label => {
+      const slug = label.toLowerCase() + ".php";
+      const isActive = slug === currentPage;
+      return `<a href="${slug}" class="${isActive ? "active" : ""}">${label}</a>`;
+    };
+
     const operativeMarkup = `
-      <a href="../index.php">Home</a>
-      <a href="#">Proyectos</a>
-      <a href="#">Cursos</a>
-      <a href="#">Admin</a>
+      ${mk("Home")}
+      ${mk("Proyectos")}
+      ${mk("Cursos")}
+      ${mk("Admin")}
     `;
-    subnavs.forEach((nav) => {
+
+    subnavs.forEach(nav => {
       nav.innerHTML = operativeMarkup;
     });
+
   } else {
-    // restaurar botones originales
-    subnavs.forEach((nav) => {
+    subnavs.forEach(nav => {
       nav.innerHTML = nav.dataset.originalHtml;
     });
   }
