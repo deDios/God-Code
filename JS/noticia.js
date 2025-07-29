@@ -1,4 +1,102 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  const endpoint =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
+
+  const params = new URLSearchParams(window.location.search);
+  const id = parseInt(params.get("id"));
+
+  if (!id) {
+    console.warn("No se proporcionó un ID de noticia válido.");
+    return;
+  }
+
+  const seccion1 = document.querySelector("#noticia-detalle");
+  const seccion2 = document.querySelector("#noticia-bloque2");
+
+  const elementos = {
+    img1: seccion1.querySelector(".imagen-noticia img"),
+    img2: seccion2.querySelector(".imagen-noticia img"),
+    texto1: seccion1.querySelector(".contenido-noticia p"),
+    texto2: seccion2.querySelector(".contenido-noticia p"),
+  };
+
+  function insertarOverlayTitulo(titulo) {
+    console.log("Título insertado en overlay:", JSON.stringify(titulo));
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay-titulo");
+    overlay.innerHTML = `<h1>${titulo}</h1>`;
+    seccion1.querySelector(".imagen-noticia").appendChild(overlay);
+  }
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estatus: 1 }),
+    });
+
+    if (!res.ok) throw new Error("No se pudo obtener la noticia");
+
+    const data = await res.json();
+
+    const noticia = data.find((n) => n.id === id);
+
+    if (!noticia) {
+      console.warn("No se encontró una noticia con ese ID.");
+      return;
+    }
+
+    console.log("Noticia encontrada:", noticia);
+
+    elementos.img1.src = `../ASSETS/noticia/NoticiasImg/noticia_img1_${id}.png`;
+    elementos.img2.src = `../ASSETS/noticia/NoticiasImg/noticia_img2_${id}.png`;
+    elementos.img1.alt = noticia.titulo;
+    elementos.img2.alt = noticia.titulo;
+
+    elementos.texto1.innerHTML = noticia.desc_uno.replace(/\n/g, "<br>");
+    elementos.texto2.innerHTML = noticia.desc_dos.replace(/\n/g, "<br>");
+
+    insertarOverlayTitulo(noticia.titulo);
+
+    //------------- js para los botones
+    const btnAnterior = document.getElementById("btn-anterior");
+    const btnSiguiente = document.getElementById("btn-siguiente");
+    const tituloAnterior = document.getElementById("titulo-anterior");
+    const tituloSiguiente = document.getElementById("titulo-siguiente");
+
+    const noticiasOrdenadas = data.sort((a, b) => a.id - b.id);
+
+    const indiceActual = noticiasOrdenadas.findIndex((n) => n.id === id);
+
+    if (indiceActual > 0) {
+      const anterior = noticiasOrdenadas[indiceActual - 1];
+      tituloAnterior.textContent = anterior.titulo;
+      btnAnterior.addEventListener("click", () => {
+        window.location.href = `../VIEW/Noticia.php?id=${anterior.id}`;
+      });
+    } else {
+      btnAnterior.style.display = "none";
+    }
+
+    if (indiceActual < noticiasOrdenadas.length - 1) {
+      const siguiente = noticiasOrdenadas[indiceActual + 1];
+      tituloSiguiente.textContent = siguiente.titulo;
+      btnSiguiente.addEventListener("click", () => {
+        window.location.href = `../VIEW/Noticia.php?id=${siguiente.id}`;
+      });
+    } else {
+      btnSiguiente.style.display = "none";
+    }
+  } catch (error) {
+    console.error("Error al cargar la noticia:", error);
+  }
+});
+
+//----------------------- JS para los comentarios
+// comentariosNoticia.js
+
+document.addEventListener("DOMContentLoaded", async () => {
   // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"));
@@ -267,17 +365,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <p class="comentario-texto">${data.comentario}</p>
         <div class="comentario-interacciones">
-          <div class="reaccion like ${likeActivo ? "liked" : ""}" data-id="${
-      data.id
-    }" data-tipo="like" aria-label="Like">
+          <div class="reaccion like ${likeActivo ? "liked" : ""}" data-id="${data.id
+      }" data-tipo="like" aria-label="Like">
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M1 21h4V9H1v12zM23 10c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>
             </svg>
             <span class="cantidad">${data.likes}</span>
           </div>
-          <div class="reaccion dislike ${
-            dislikeActivo ? "disliked" : ""
-          }" data-id="${data.id}" data-tipo="dislike" aria-label="Dislike">
+          <div class="reaccion dislike ${dislikeActivo ? "disliked" : ""
+      }" data-id="${data.id}" data-tipo="dislike" aria-label="Dislike">
             <svg viewBox="0 0 24 24" width="18" height="18">
               <path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>
             </svg>
@@ -285,9 +381,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           <a href="#" class="accion">Responder</a>
         </div>
-        ${
-          data.respuestas?.length
-            ? `
+        ${data.respuestas?.length
+        ? `
           <div class="comentario-respuestas">
             <a href="#" class="ver-respuestas">
               <svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">
@@ -296,8 +391,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               Ver ${data.respuestas.length} respuesta(s)
             </a>
           </div>`
-            : ""
-        }
+        : ""
+      }
       </div>
     `;
 
