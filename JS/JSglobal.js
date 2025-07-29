@@ -258,29 +258,36 @@ document.addEventListener("DOMContentLoaded", () => {
     subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
   }
 
-  const submenu = document.getElementById("submenu-productos");
-  if (submenu) {
+  document.addEventListener("DOMContentLoaded", () => {
+    const submenu = document.getElementById("submenu-productos");
+    if (!submenu) return;
+
     const mega = submenu.querySelector(".megamenu");
+    if (!mega) return;
+
+    mega.classList.remove("show");
+
     let link = null;
-    for (const ch of submenu.children) {
-      if (ch.tagName === "A") {
-        link = ch;
+    for (const child of submenu.children) {
+      if (child.tagName === "A") {
+        link = child;
         break;
       }
     }
-    if (mega && link) {
-      mega.classList.remove("show");
+    if (!link) return;
 
-      link.addEventListener("click", e => {
-        e.preventDefault();
-        mega.classList.toggle("show");
-      });
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      mega.classList.toggle("show");
+    });
 
-      document.addEventListener("click", e => {
-        if (!submenu.contains(e.target)) {
-          mega.classList.remove("show");
-        }
-      });
-    }
-  }
+    document.addEventListener("click", e => {
+      if (!submenu.contains(e.target)) {
+        mega.classList.remove("show");
+      }
+    });
+  });
 });
+
+
+
