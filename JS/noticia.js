@@ -97,6 +97,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 // V1
 
 
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
   // -------- Variables y endpoints --------
   var params = new URLSearchParams(window.location.search);
@@ -113,10 +124,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  var endpointComentarios = "https://.../c_comentario_noticia.php";
-  var endpointInsertar = "https://.../i_comentario_noticia.php";
-  var endpointReaccion = "https://.../i_reaccion_comentario.php";
-  var endpointQuitarReaccion = "https://.../d_reaccion_comentario.php";
+  var endpointComentarios = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php";
+  var endpointInsertar = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_comentario_noticia.php";
+  var endpointReaccion = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_reaccion_comentario.php";
+  var endpointQuitarReaccion = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/d_reaccion_comentario.php";
 
   var usuarioId = null;
   var usuarioNombre = "Tú";
