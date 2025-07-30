@@ -426,72 +426,61 @@ async function loadRecursos(usuarioId) {
   }
 }
 
-// ————— Inicialización —————
-document.addEventListener("DOMContentLoaded", async () => {
-  const usuario = getUsuarioFromCookie();
-  if (!usuario) {
-    window.location.href = "../VIEW/Login.php";
-    return;
-  }
-  renderPerfil(usuario);
-  showSkeletons();
-  await loadRecursos(usuario.id);
-  initModalPerfil();
-  disableLinks();
-});
 
-function initMisCursosToggle() {
-  document.querySelectorAll(".mis-cursos .cursos-list").forEach(lista => {
-    const subtitulo = lista.querySelector(".cursos-subtitulo");
-    const container = lista.querySelector("div[id^='cursos-']");
-    if (!subtitulo || !container) return;
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".mis-cursos .cursos-list").forEach(listEl => {
+    const subtitle = listEl.querySelector(".cursos-subtitulo");
+    const container = listEl.querySelector("div[id^='cursos-']");
+    if (!subtitle || !container) return;
 
-    // Actualizamos contador
     const count = container.children.length;
-    // Sacamos texto base (sin "(n)")
-    const baseLabel = subtitulo.textContent.trim().replace(/\(\d+\)\s*$/, "");
-    subtitulo.textContent = `${baseLabel} (${count})`;
+    const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
+    subtitle.textContent = `${baseLabel} (${count})`;
 
-    // Insertamos flecha
-    const arrow = document.createElement("span");
-    arrow.className = "arrow-wrapper";
-    arrow.innerHTML = `
-      <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
-           viewBox="0 0 24 24" width="24" height="24">
-        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-      </svg>
-    `;
-    subtitulo.appendChild(arrow);
+    const arrow = document.createElement("svg");
+    arrow.className = "arrow-icon";
+    arrow.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    arrow.setAttribute("viewBox", "0 0 24 24");
+    arrow.setAttribute("width", "24");
+    arrow.setAttribute("height", "24");
+    arrow.innerHTML = `<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>`;
+    subtitle.appendChild(arrow);
 
-    // Accesibilidad
-    subtitulo.setAttribute("role", "button");
-    subtitulo.tabIndex = 0;
+    subtitle.setAttribute("role", "button");
+    subtitle.tabIndex = 0;
+    subtitle.setAttribute("aria-expanded", "true");
 
-    // Estado persistente por sección
+    container.style.overflow = "hidden";
+    container.style.transition = "max-height 0.3s ease";
+
     const key = `mis-cursos:${container.id}`;
     let collapsed = localStorage.getItem(key) === "closed";
-    const svgIcon = arrow.querySelector(".arrow-icon");
 
-    const apply = () => {
-      // Si está colapsado ocultamos, sino dejamos el estilo por defecto (grid/block)
-      container.style.display = collapsed ? "none" : "";
-      svgIcon.classList.toggle("open", collapsed);
-      subtitulo.setAttribute("aria-expanded", (!collapsed).toString());
-    };
-    apply(); // estado inicial
+    function applyState() {
+      if (collapsed) {
+        container.style.maxHeight = "0px";
+        subtitle.setAttribute("aria-expanded", "false");
+        arrow.classList.add("open");
+      } else {
+        container.style.maxHeight = container.scrollHeight + "px";
+        subtitle.setAttribute("aria-expanded", "true");
+        arrow.classList.remove("open");
+      }
+    }
+    applyState();
 
-    const toggle = () => {
+    function toggleSection() {
       collapsed = !collapsed;
-      apply();
+      applyState();
       localStorage.setItem(key, collapsed ? "closed" : "open");
-    };
+    }
 
-    subtitulo.addEventListener("click", toggle);
-    subtitulo.addEventListener("keydown", e => {
+    subtitle.addEventListener("click", toggleSection);
+    subtitle.addEventListener("keydown", e => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        toggle();
+        toggleSection();
       }
     });
   });
-}
+});
