@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       if (prioridadSeleccionada) {
         console.log(`filtro por prioridad:  ${prioridadSeleccionada}`);
+        console.log(`filtro por prioridad: `,prioridadSeleccionada);
       }
     }
 
