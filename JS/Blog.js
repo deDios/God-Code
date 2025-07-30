@@ -151,27 +151,48 @@ document.addEventListener("DOMContentLoaded", () => {
     const categoriaSeleccionada = categoriaSelect.value;
     const explorarSeleccionado = explorarSelect.value;
 
+    console.log("🚦 aplicarFiltros disparado con:", {
+      categoria: categoriaSeleccionada,
+      prioridad: explorarSeleccionado
+    });
+
     let cursosFiltrados = [...cursosOriginales];
+    console.log("Cursos sin filtrar: ", cursosOriginales.map(c => c.nombre));
 
     if (categoriaSeleccionada) {
       cursosFiltrados = cursosFiltrados.filter(
-        (curso) => curso.categoria == categoriaSeleccionada
+        curso => curso.categoria == categoriaSeleccionada
       );
-      console.log(`filtro por categoria:  ${categoriaSeleccionada}`);
+      console.log(
+        `filtro de categoria aplicado: (ID=${categoriaSeleccionada}):`,
+        cursosFiltrados.map(c => c.nombre)
+      );
     }
 
     if (explorarSeleccionado) {
+      console.log(
+        "⏭ Antes de filtrar prioridad:",
+        cursosFiltrados.map(c => c.nombre)
+      );
+
       cursosFiltrados = cursosFiltrados.filter(
-        (curso) => curso.prioridad == explorarSeleccionado
+        curso => curso.prioridad == explorarSeleccionado
       );
 
       const prioridadSeleccionada = prioridadesData.find(
-        (p) => p.id == explorarSeleccionado
+        p => p.id == explorarSeleccionado
       );
-      console.log(`Prioridad seleccionada: "${nombrePrioridad}"`);
-      console.log("Cursos tras filtrar prioridad: ",cursosFiltrados.map(c => c.nombre));
+      const nombrePrioridad = prioridadSeleccionada
+        ? prioridadSeleccionada.nombre
+        : `(ID=${explorarSeleccionado})`;
+
+      console.log(`prioridad aplicada: "${nombrePrioridad}"`);
+      console.log(
+        "despues de aplicar la prioridad:", cursosFiltrados.map(c => c.nombre)
+      );
     }
 
+    // Finalmente renderizamos
     renderizarCursos(cursosFiltrados);
     inicializarCarrusel();
   }
