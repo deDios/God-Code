@@ -222,7 +222,7 @@ function renderPage(page) {
 // ————— Sorting tabla Recursos —————
 function montarSortingRecursos() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((header) => {
+  headers.forEach((header, idx) => {
     header.style.cursor = "pointer";
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
@@ -248,7 +248,17 @@ function montarSortingRecursos() {
         sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
       );
       renderPage(1);
+
       actualizarFlechasSorting();
+      headers.forEach((h, i) => {
+        if (i === idx) {
+          h.style.pointerEvents = "";
+          h.style.opacity = "1";
+        } else {
+          h.style.pointerEvents = "none";
+          h.style.opacity = "0.6";
+        }
+      });
     });
   });
 }
@@ -256,16 +266,26 @@ function montarSortingRecursos() {
 function actualizarFlechasSorting() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((h) => {
-    h.querySelector(".flecha").textContent = "";
+    const slot = h.querySelector(".sort-icon");
+    if (slot) slot.remove();
     h.setAttribute("aria-sort", "none");
   });
+
   if (!sortState.column) return;
 
   const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
   const idx = idxMap[sortState.column];
   const header = headers[idx];
-  const flecha = header.querySelector(".flecha");
-  flecha.textContent = sortState.asc ? "↑" : "↓";
+
+  const svg = document.createElement("span");
+  svg.className = "sort-icon " + (sortState.asc ? "asc" : "desc");
+  svg.innerHTML = `
+    <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="currentColor">
+      <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+    </svg>
+  `;
+  header.appendChild(svg);
+
   header.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
 }
 

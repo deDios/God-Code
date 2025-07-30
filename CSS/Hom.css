@@ -928,3 +928,22 @@ body {
 .arrow-icon.open {
   color: #0d47a1;
 }
+
+.sort-icon {
+  width: 0.9em;
+  height: 0.9em;
+  fill: #666;
+  transition: transform .2s ease, fill .2s ease;
+}
+
+.sort-icon.asc {
+  transform: rotate(0deg);
+}
+
+.sort-icon.desc {
+  transform: rotate(180deg);
+}
+
+.table-header div:hover .sort-icon {
+  fill: #1565c0;
+}
