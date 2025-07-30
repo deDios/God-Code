@@ -440,29 +440,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".mis-cursos .cursos-list").forEach((lista) => {
+  document.querySelectorAll(".mis-cursos .cursos-list").forEach(lista => {
     const subtitulo = lista.querySelector(".cursos-subtitulo");
     const container = lista.querySelector("div[id^='cursos-']");
     if (!subtitulo || !container) return;
 
+    // ——— contemos los ítems y actualizamos el texto sin pisar el original ———
     const count = container.children.length;
-    subtitulo.textContent = `${subtitulo.textContent.trim()} (${count})`;
+    // sacamos solo la parte de texto (sin "(n)")
+    const label = subtitulo.textContent.trim().replace(/\(\d+\)\s*$/, "");
+    subtitulo.textContent = `${label} (${count})`;
 
+    // ——— metemos la flecha ———
     const arrow = document.createElement("span");
     arrow.className = "arrow-wrapper";
     arrow.innerHTML = `
       <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
            viewBox="0 0 24 24" width="24" height="24">
-        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
       </svg>
     `;
     subtitulo.appendChild(arrow);
 
+    // ——— accesibilidad ———
     subtitulo.setAttribute("role", "button");
     subtitulo.tabIndex = 0;
     subtitulo.setAttribute("aria-expanded", "true");
 
-    const key = `mis-cursos:${subtitulo.textContent.trim()}`;
+    // ——— clave única basada en el id del container ———
+    const key = `mis-cursos:${container.id}`;
     let collapsed = localStorage.getItem(key) === "closed";
     const svgEl = arrow.querySelector(".arrow-icon");
 
@@ -471,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
       svgEl.classList.toggle("open", collapsed);
       subtitulo.setAttribute("aria-expanded", collapsed ? "false" : "true");
     }
-    applyState();
+    applyState(); // estado inicial
 
     function toggleSection() {
       collapsed = !collapsed;
@@ -480,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     subtitulo.addEventListener("click", toggleSection);
-    subtitulo.addEventListener("keydown", (e) => {
+    subtitulo.addEventListener("keydown", e => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         toggleSection();
