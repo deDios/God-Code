@@ -378,7 +378,6 @@ function disableLinks() {
   });
 }
 
-// ————— Skeleton loaders —————
 function showSkeletons() {
   // tabla recursos
   const tableBody = document.querySelector(".recursos-table .table-body");
@@ -440,14 +439,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   disableLinks();
 });
 
-// ————— Toggle “Mis cursos” (con flecha y anim) —————
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach((lista) => {
     const subtitulo = lista.querySelector(".cursos-subtitulo");
     const container = lista.querySelector("div[id^='cursos-']");
     if (!subtitulo || !container) return;
 
-    // metemos la flecha
+    const count = container.children.length;
+    subtitulo.textContent = `${subtitulo.textContent.trim()} (${count})`;
+
     const arrow = document.createElement("span");
     arrow.className = "arrow-wrapper";
     arrow.innerHTML = `
@@ -458,12 +458,10 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     subtitulo.appendChild(arrow);
 
-    // accesibilidad
     subtitulo.setAttribute("role", "button");
     subtitulo.tabIndex = 0;
     subtitulo.setAttribute("aria-expanded", "true");
 
-    // guardamos estado en localStorage
     const key = `mis-cursos:${subtitulo.textContent.trim()}`;
     let collapsed = localStorage.getItem(key) === "closed";
     const svgEl = arrow.querySelector(".arrow-icon");
@@ -473,7 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
       svgEl.classList.toggle("open", collapsed);
       subtitulo.setAttribute("aria-expanded", collapsed ? "false" : "true");
     }
-    applyState(); // estado inicial
+    applyState();
 
     function toggleSection() {
       collapsed = !collapsed;
