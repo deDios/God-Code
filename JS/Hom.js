@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadRecursos(usuario.id);
   initModalPerfil();
   disableLinks();
-  initMisCursosToggle(); // <-- ahora arrancamos el toggle de Mis Cursos
+  initMisCursosToggle(); // 
 });
 
 function initMisCursosToggle() {
@@ -447,12 +447,10 @@ function initMisCursosToggle() {
     const container = listEl.querySelector("div[id^='cursos-']");
     if (!subtitle || !container) return;
 
-    // 1) Contador independiente
     const count = container.children.length;
     const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
     subtitle.textContent = `${baseLabel} (${count})`;
 
-    // 2) Insertamos la flecha
     const wrapper = document.createElement("span");
     wrapper.className = "arrow-wrapper";
     wrapper.innerHTML = `
@@ -463,16 +461,13 @@ function initMisCursosToggle() {
     `;
     subtitle.appendChild(wrapper);
 
-    // 3) Accesibilidad
     subtitle.setAttribute("role", "button");
     subtitle.tabIndex = 0;
     subtitle.setAttribute("aria-expanded", "true");
 
-    // 4) Preparamos la animación vía max-height
     container.style.overflow = "hidden";
     container.style.transition = "max-height 0.3s ease";
 
-    // 5) Estado persistente por sección
     const key = `mis-cursos:${container.id}`;
     let collapsed = localStorage.getItem(key) === "closed";
     const svgIcon = wrapper.querySelector(".arrow-icon");
@@ -480,15 +475,21 @@ function initMisCursosToggle() {
     function applyState() {
       if (collapsed) {
         container.style.maxHeight = "0px";
+        container.style.display = "none";
         subtitle.setAttribute("aria-expanded", "false");
         svgIcon.classList.add("open");
       } else {
+        // forzamos columna y sin wrap
+        container.style.display = "flex";
+        container.style.flexDirection = "column";
+        container.style.flexWrap = "nowrap";
+
         container.style.maxHeight = container.scrollHeight + "px";
         subtitle.setAttribute("aria-expanded", "true");
         svgIcon.classList.remove("open");
       }
     }
-    applyState(); // estado inicial
+    applyState();
 
     function toggleSection() {
       collapsed = !collapsed;
