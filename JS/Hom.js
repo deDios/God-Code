@@ -426,48 +426,69 @@ async function loadRecursos(usuarioId) {
   }
 }
 
+// ————— Inicialización —————
+document.addEventListener("DOMContentLoaded", async () => {
+  const usuario = getUsuarioFromCookie();
+  if (!usuario) {
+    window.location.href = "../VIEW/Login.php";
+    return;
+  }
+  renderPerfil(usuario);
+  showSkeletons();
+  await loadRecursos(usuario.id);
+  initModalPerfil();
+  disableLinks();
+  initMisCursosToggle(); // <-- ahora arrancamos el toggle de Mis Cursos
+});
 
-document.addEventListener("DOMContentLoaded", () => {
+function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach(listEl => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
     const container = listEl.querySelector("div[id^='cursos-']");
     if (!subtitle || !container) return;
 
+    // 1) Contador independiente
     const count = container.children.length;
     const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
     subtitle.textContent = `${baseLabel} (${count})`;
 
-    const arrow = document.createElement("svg");
-    arrow.className = "arrow-icon";
-    arrow.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    arrow.setAttribute("viewBox", "0 0 24 24");
-    arrow.setAttribute("width", "24");
-    arrow.setAttribute("height", "24");
-    arrow.innerHTML = `<path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>`;
-    subtitle.appendChild(arrow);
+    // 2) Insertamos la flecha
+    const wrapper = document.createElement("span");
+    wrapper.className = "arrow-wrapper";
+    wrapper.innerHTML = `
+      <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 24 24" width="24" height="24">
+        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+      </svg>
+    `;
+    subtitle.appendChild(wrapper);
 
+    // 3) Accesibilidad
     subtitle.setAttribute("role", "button");
     subtitle.tabIndex = 0;
     subtitle.setAttribute("aria-expanded", "true");
 
+    // 4) Preparamos la animación vía max-height
     container.style.overflow = "hidden";
     container.style.transition = "max-height 0.3s ease";
 
+    // 5) Estado persistente por sección
     const key = `mis-cursos:${container.id}`;
     let collapsed = localStorage.getItem(key) === "closed";
+    const svgIcon = wrapper.querySelector(".arrow-icon");
 
     function applyState() {
       if (collapsed) {
         container.style.maxHeight = "0px";
         subtitle.setAttribute("aria-expanded", "false");
-        arrow.classList.add("open");
+        svgIcon.classList.add("open");
       } else {
         container.style.maxHeight = container.scrollHeight + "px";
         subtitle.setAttribute("aria-expanded", "true");
-        arrow.classList.remove("open");
+        svgIcon.classList.remove("open");
       }
     }
-    applyState();
+    applyState(); // estado inicial
 
     function toggleSection() {
       collapsed = !collapsed;
@@ -483,4 +504,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-});
+}
