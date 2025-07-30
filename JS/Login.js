@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // referencias DOM
   const btnLogin = document.querySelector(".login-form button");
   const inputUsuario = document.querySelector(".login-form input[type='text']");
   const inputPassword = document.querySelector(
