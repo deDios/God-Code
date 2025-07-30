@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const correoInput = form.querySelector('input[name="correo"]');
   const telefonoInput = form.querySelector('input[name="telefono"]');
 
-  // Toast simplificado
   function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
     console.log(`[TOAST] tipo=${tipo} msg="${mensaje}"`);
     const cont = document.querySelector(".toast-container");
@@ -26,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, duracion);
   }
 
-  // 1) Valida FORMATO y marca alerta si falla
+  // valida FORMATO y marca alerta si falla
   function validarFormato(input) {
     const cont = input.closest(".input-alerta-container");
     const icono = cont.querySelector(".icono-alerta");
@@ -61,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 2) Valida DUPLICADOS **solo si** no hay alerta de formato
+  // valida DUPLICADOS *solo si* no hay alerta de formato
   async function validarDuplicado(input) {
     const cont = input.closest(".input-alerta-container");
     if (cont.dataset.origen === "formato") {
@@ -106,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 3) Rutina de validación completa de un campo
   async function validarCampo(input) {
     validarFormato(input);
     await validarDuplicado(input);
@@ -137,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const conf = form.confirmarPassword.value.trim();
     const fecha = form.fecha_nacimiento.value;
 
-    // campos vacíos
+    // campos vacios
     if (!nombre || !correo || !telefono || !pass || !conf || !fecha) {
       console.log("Error: hay campos vacíos");
       mostrarToast("Por favor, completa todos los campos.", "warning");
@@ -168,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // envío
     try {
       console.log("Enviando datos de registro:", { nombre, correo, telefono });
       const res = await fetch(ENDPOINT_INSERTAR, {
