@@ -471,7 +471,7 @@ const llenarFormulario = (cuenta, bloquear = false) => {
     }
   }
   document.getElementById("fecha-nacimiento").value = fechaNacimiento;
-  console.log("la fecha es: ",fechaNacimiento);
+  console.log("la fecha es: ", fechaNacimiento);
 
   document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
     cb.checked =
@@ -700,9 +700,6 @@ modal.addEventListener("click", (e) => {
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") cerrarModal();
 });
-checkboxCuenta.addEventListener("change", () => {
-  toggleFormularios(checkboxCuenta.checked);
-});
 buscarBtn.addEventListener("click", buscarCuentaExistente);
 volverRegistro.addEventListener("click", (e) => {
   e.preventDefault();
@@ -712,3 +709,23 @@ volverRegistro.addEventListener("click", (e) => {
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
+
+checkboxCuenta.addEventListener("change", () => {
+  const modoCuenta = checkboxCuenta.checked;
+  toggleFormularios(modoCuenta);
+
+  [telefonoInput, correoInput].forEach((input) => {
+    if (modoCuenta) {
+      input.addEventListener("keydown", onEnterBuscar);
+    } else {
+      input.removeEventListener("keydown", onEnterBuscar);
+    }
+  });
+});
+
+function onEnterBuscar(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buscarCuentaExistente();
+  }
+}

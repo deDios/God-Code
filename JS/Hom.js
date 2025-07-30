@@ -11,14 +11,14 @@ const sortState = { column: null, asc: true };
 const comparators = {
   nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
   tipo: () => 0, // todos "Curso" por ahora
-  fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion)
+  fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
 };
 
 // ————— Helpers —————
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
-    .find(row => row.startsWith("usuario="));
+    .find((row) => row.startsWith("usuario="));
   if (!cookie) return null;
   try {
     return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
@@ -75,20 +75,24 @@ function renderPerfil(usuario) {
   const nameDiv = document.createElement("div");
   nameDiv.id = "user-name";
   nameDiv.textContent = usuario.nombre;
+
   const editLink = document.createElement("a");
   editLink.className = "edit-profile";
-  editLink.href = `VIEW/Perfil.php?id=${usuario.id}`;
+  editLink.href = "#";
   editLink.textContent = "Administrar perfil ›";
   userInfo.append(nameDiv, editLink);
 
   profile.append(avatarCircle, userInfo);
+
+  // volvemos a enlazar el modal handler
+  initModalPerfil();
 }
 
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
 
-  lista.forEach(item => {
+  lista.forEach((item) => {
     const row = document.createElement("div");
     row.className = "table-row";
 
@@ -140,7 +144,10 @@ function createCursoCard(insc) {
   const opts = { day: "2-digit", month: "2-digit", year: "numeric" };
   const date = document.createElement("div");
   date.className = "curso-date";
-  date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString("es-ES", opts)}`;
+  date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString(
+    "es-ES",
+    opts
+  )}`;
 
   a.append(title, date);
   return a;
@@ -151,18 +158,27 @@ function renderMisCursos(inscripciones) {
     inscritos: document.getElementById("cursos-subscritos"),
     activos: document.getElementById("cursos-activos"),
     cancelados: document.getElementById("cursos-cancelados"),
-    terminados: document.getElementById("cursos-terminados")
+    terminados: document.getElementById("cursos-terminados"),
   };
-  Object.values(conts).forEach(c => c.innerHTML = "");
+  Object.values(conts).forEach((c) => (c.innerHTML = ""));
 
-  inscripciones.forEach(ins => {
+  inscripciones.forEach((ins) => {
     const card = createCursoCard(ins);
     switch (String(ins.estatus)) {
-      case "1": conts.inscritos.appendChild(card); break;
-      case "2": conts.activos.appendChild(card); break;
-      case "3": conts.cancelados.appendChild(card); break;
-      case "4": conts.terminados.appendChild(card); break;
-      default: console.warn("Estatus desconocido:", ins);
+      case "1":
+        conts.inscritos.appendChild(card);
+        break;
+      case "2":
+        conts.activos.appendChild(card);
+        break;
+      case "3":
+        conts.cancelados.appendChild(card);
+        break;
+      case "4":
+        conts.terminados.appendChild(card);
+        break;
+      default:
+        console.warn("Estatus desconocido:", ins);
     }
     // anim entrada
     requestAnimationFrame(() => card.classList.add("enter"));
@@ -206,17 +222,20 @@ function renderPage(page) {
 // ————— Sorting tabla Recursos —————
 function montarSortingRecursos() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach(header => {
+  headers.forEach((header) => {
     header.style.cursor = "pointer";
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
 
     header.addEventListener("click", () => {
-      let colKey = header.classList.contains("col-nombre") ? "nombre"
-        : header.classList.contains("col-tipo") ? "tipo"
-          : header.classList.contains("col-fecha") ? "fecha"
-            : null;
+      let colKey = header.classList.contains("col-nombre")
+        ? "nombre"
+        : header.classList.contains("col-tipo")
+        ? "tipo"
+        : header.classList.contains("col-fecha")
+        ? "fecha"
+        : null;
       if (!colKey) return;
 
       if (sortState.column === colKey) sortState.asc = !sortState.asc;
@@ -225,9 +244,8 @@ function montarSortingRecursos() {
         sortState.asc = true;
       }
 
-      recursosData.sort((a, b) => sortState.asc
-        ? comparators[colKey](a, b)
-        : comparators[colKey](b, a)
+      recursosData.sort((a, b) =>
+        sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
       );
       renderPage(1);
       actualizarFlechasSorting();
@@ -237,7 +255,7 @@ function montarSortingRecursos() {
 
 function actualizarFlechasSorting() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach(h => {
+  headers.forEach((h) => {
     h.querySelector(".flecha").textContent = "";
     h.setAttribute("aria-sort", "none");
   });
@@ -276,8 +294,7 @@ function showErrorRecursos(message, retryFn) {
       <p>${message}</p>
       <button id="retry-recursos" class="btn btn-primary">Reintentar</button>
     </div>`;
-  document.getElementById("retry-recursos")
-    .addEventListener("click", retryFn);
+  document.getElementById("retry-recursos").addEventListener("click", retryFn);
 }
 
 // ————— Modal “Administrar perfil” —————
@@ -297,13 +314,16 @@ function initModalPerfil() {
   let usuarioCookie = getUsuarioFromCookie();
   let usuarioActual = null;
 
-  editBtn.addEventListener("click", async e => {
+  editBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     try {
       const lista = await fetchUsuario(
-        usuarioCookie.correo, usuarioCookie.telefono, usuarioCookie.estatus
+        usuarioCookie.correo,
+        usuarioCookie.telefono,
+        usuarioCookie.estatus
       );
-      usuarioActual = lista.find(u => +u.id === +usuarioCookie.id) || lista[0];
+      usuarioActual =
+        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
       inp.nombre.value = usuarioActual.nombre || "";
       inp.correo.value = usuarioActual.correo || "";
       inp.telefono.value = usuarioActual.telefono || "";
@@ -321,11 +341,11 @@ function initModalPerfil() {
     document.body.classList.remove("modal-abierto");
   };
   closeBtn.addEventListener("click", cerrarModal);
-  modal.addEventListener("click", e => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) cerrarModal();
   });
 
-  form.addEventListener("submit", async e => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (inp.pass.value !== inp.pass2.value) {
       return gcToast("Las contraseñas no coinciden.", "warning", 4000);
@@ -337,7 +357,7 @@ function initModalPerfil() {
       telefono: inp.telefono.value.trim(),
       fecha_nacimiento: inp.nacimiento.value,
       tipo_contacto: usuarioActual.tipo_contacto,
-      estatus: usuarioActual.estatus
+      estatus: usuarioActual.estatus,
     };
     if (inp.pass.value) payload.password = inp.pass.value;
     try {
@@ -346,7 +366,7 @@ function initModalPerfil() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         }
       );
       const data = await res.json();
@@ -354,8 +374,10 @@ function initModalPerfil() {
         gcToast(data.mensaje, "exito", 4000);
         usuarioCookie = { ...usuarioCookie, ...payload };
         document.cookie =
-          "usuario=" + encodeURIComponent(JSON.stringify(usuarioCookie)) +
-          "; path=/; max-age=" + 24 * 60 * 60;
+          "usuario=" +
+          encodeURIComponent(JSON.stringify(usuarioCookie)) +
+          "; path=/; max-age=" +
+          24 * 60 * 60;
         renderPerfil(usuarioCookie);
       }
     } catch {
@@ -369,9 +391,9 @@ function initModalPerfil() {
 // ————— Deshabilitar enlaces de prueba —————
 function disableLinks() {
   const toastDuration = 4000;
-  document.querySelectorAll(".recurso-link, .curso-card").forEach(el => {
+  document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
-    el.addEventListener("click", e => {
+    el.addEventListener("click", (e) => {
       e.preventDefault();
       gcToast("Función deshabilitada", "warning", toastDuration);
     });
@@ -385,7 +407,7 @@ function showSkeletons() {
   for (let i = 0; i < itemsPerPage; i++) {
     const row = document.createElement("div");
     row.className = "skeleton-row";
-    ["name", "type", "date"].forEach(c => {
+    ["name", "type", "date"].forEach((c) => {
       const cell = document.createElement("div");
       cell.className = `skeleton-cell ${c}`;
       row.appendChild(cell);
@@ -393,7 +415,7 @@ function showSkeletons() {
     tableBody.appendChild(row);
   }
   // mis cursos
-  ["subscritos", "activos", "cancelados", "terminados"].forEach(id => {
+  ["subscritos", "activos", "cancelados", "terminados"].forEach((id) => {
     const cont = document.getElementById(`cursos-${id}`);
     cont.innerHTML = "";
     for (let j = 0; j < 3; j++) {
@@ -419,9 +441,8 @@ async function loadRecursos(usuarioId) {
     initMisCursosToggle();
   } catch (err) {
     console.error(err);
-    showErrorRecursos(
-      "Error al cargar tus recursos. Intenta de nuevo.",
-      () => loadRecursos(usuarioId)
+    showErrorRecursos("Error al cargar tus recursos. Intenta de nuevo.", () =>
+      loadRecursos(usuarioId)
     );
   }
 }
@@ -438,11 +459,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadRecursos(usuario.id);
   initModalPerfil();
   disableLinks();
-  initMisCursosToggle(); // 
+  initMisCursosToggle(); //
 });
 
 function initMisCursosToggle() {
-  document.querySelectorAll(".mis-cursos .cursos-list").forEach(listEl => {
+  document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
     const container = listEl.querySelector("div[id^='cursos-']");
     if (!subtitle || !container) return;
@@ -498,7 +519,7 @@ function initMisCursosToggle() {
     }
 
     subtitle.addEventListener("click", toggleSection);
-    subtitle.addEventListener("keydown", e => {
+    subtitle.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         toggleSection();
