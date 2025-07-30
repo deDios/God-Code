@@ -421,12 +421,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   disableLinks();
 });
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".mis-cursos .cursos-list").forEach((lista) => {
-    const subtitulo = lista.querySelector(".cursos-subtitulo");
-    const container = lista.querySelector("div[id^='cursos-']");
-    const count = container.children.length;
-    subtitulo.textContent = `${subtitulo.textContent.trim()} (${count})`;
+  const courseLists = document.querySelectorAll(".mis-cursos .cursos-list");
+
+  courseLists.forEach(list => {
+    const subtitulo = list.querySelector(".cursos-subtitulo");
+    const container = list.querySelector("div[id^='cursos-']");
+    if (!subtitulo || !container) return;
 
     const arrow = document.createElement("span");
     arrow.className = "arrow-wrapper";
@@ -438,23 +441,33 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     subtitulo.appendChild(arrow);
 
-    subtitulo.style.cursor = "pointer";
+    subtitulo.setAttribute("role", "button");
+    subtitulo.tabIndex = 0;
+    subtitulo.setAttribute("aria-expanded", "true");
+
+    const key = `mis-cursos:${subtitulo.textContent.trim()}`;
+    let collapsed = localStorage.getItem(key) === "closed";
+
+    const svgEl = arrow.querySelector(".arrow-icon");
+    function applyState() {
+      container.style.display = collapsed ? "none" : "flex";
+      svgEl.classList.toggle("open", collapsed);
+      subtitulo.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    }
+    applyState();
 
     function toggleSection() {
-      const isHidden = container.style.display === "none";
-      container.style.display = isHidden ? "flex" : "none";
-      arrow.querySelector(".arrow-icon")
-        .classList.toggle("open", isHidden);
+      collapsed = !collapsed;
+      applyState();
+      localStorage.setItem(key, collapsed ? "closed" : "open");
     }
 
     subtitulo.addEventListener("click", toggleSection);
-
-    if (count === 0) {
-      container.style.display = "none";
-      arrow.querySelector(".arrow-icon").classList.add("open");
-    } else {
-      container.style.display = "flex";
-      arrow.querySelector(".arrow-icon").classList.remove("open");
-    }
+    subtitulo.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleSection();
+      }
+    });
   });
 });

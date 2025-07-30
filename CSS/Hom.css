@@ -869,15 +869,6 @@ body {
   margin-left: 0.5rem;
 }
 
-.arrow-icon {
-  transition: transform 0.25s ease;
-  transform: rotate(0deg);
-}
-
-.arrow-icon.open {
-  transform: rotate(180deg);
-}
-
 #cursos-subscritos,
 #cursos-activos,
 #cursos-cancelados,
@@ -885,4 +876,46 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+.cursos-list > div {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.cursos-list.collapsed > div {
+  max-height: 0;
+}
+
+.mis-cursos .cursos-list > div[id^="cursos-"] {
+  transition: max-height 0.3s ease;
+}
+
+.arrow-wrapper .arrow-icon {
+  transition: transform 0.3s ease;
+  display: inline-block;
+  vertical-align: middle;
+}
+.arrow-wrapper .arrow-icon.open {
+  transform: rotate(-180deg);
+}
+
+.curso-card {
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.curso-card.enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cursos-subtitulo:hover,
+.cursos-subtitulo:focus {
+  background: #f0f4fe;
+}
+.arrow-icon {
+  color: #1565c0;
+}
+.arrow-icon.open {
+  color: #0d47a1;
 }
