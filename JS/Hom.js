@@ -1,4 +1,4 @@
-// cursoDashboard.js
+// home.js
 
 // ————— Estado global —————
 const itemsPerPage = 6;
@@ -59,6 +59,7 @@ async function fetchUsuario(correo, telefono, estatus) {
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
+
   // avatar
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
@@ -67,6 +68,7 @@ function renderPerfil(usuario) {
   img.src = usuario.avatarUrl || "../ASSETS/usuario/usuarioImg/img_user1.png";
   img.alt = usuario.nombre;
   avatarCircle.appendChild(img);
+
   // info
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
@@ -78,15 +80,18 @@ function renderPerfil(usuario) {
   editLink.href = `VIEW/Perfil.php?id=${usuario.id}`;
   editLink.textContent = "Administrar perfil ›";
   userInfo.append(nameDiv, editLink);
+
   profile.append(avatarCircle, userInfo);
 }
 
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
+
   lista.forEach(item => {
     const row = document.createElement("div");
     row.className = "table-row";
+
     // nombre + icono
     const colNombre = document.createElement("div");
     colNombre.className = "col-nombre";
@@ -101,16 +106,19 @@ function renderRecursosRows(lista) {
     link.className = "recurso-link";
     link.textContent = item.nombre_curso;
     colNombre.append(spanIcon, link);
+
     // tipo
     const colTipo = document.createElement("div");
     colTipo.className = "col-tipo";
     colTipo.textContent = "Curso";
+
     // fecha
     const colFecha = document.createElement("div");
     colFecha.className = "col-fecha";
     const fecha = new Date(item.fecha_creacion);
     const opts = { year: "numeric", month: "long", day: "2-digit" };
     colFecha.textContent = fecha.toLocaleDateString("es-MX", opts);
+
     row.append(colNombre, colTipo, colFecha);
     container.appendChild(row);
   });
@@ -123,14 +131,17 @@ function createCursoCard(insc) {
   a.setAttribute("role", "button");
   a.setAttribute("tabindex", "0");
   a.setAttribute("aria-label", `Ver ${insc.nombre_curso}`);
+
   const title = document.createElement("div");
   title.className = "curso-title";
   title.textContent = insc.nombre_curso;
+
   const fechaIni = new Date(insc.fecha_creacion);
   const opts = { day: "2-digit", month: "2-digit", year: "numeric" };
   const date = document.createElement("div");
   date.className = "curso-date";
   date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString("es-ES", opts)}`;
+
   a.append(title, date);
   return a;
 }
@@ -143,6 +154,7 @@ function renderMisCursos(inscripciones) {
     terminados: document.getElementById("cursos-terminados")
   };
   Object.values(conts).forEach(c => c.innerHTML = "");
+
   inscripciones.forEach(ins => {
     const card = createCursoCard(ins);
     switch (String(ins.estatus)) {
@@ -161,11 +173,13 @@ function renderMisCursos(inscripciones) {
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";
+
   const prev = document.createElement("button");
   prev.textContent = "← Anterior";
   prev.disabled = currentPage === 1;
   prev.addEventListener("click", () => renderPage(currentPage - 1));
   ctrl.appendChild(prev);
+
   for (let p = 1; p <= totalPages; p++) {
     const btn = document.createElement("button");
     btn.textContent = p;
@@ -173,6 +187,7 @@ function renderPagination(totalPages) {
     btn.addEventListener("click", () => renderPage(p));
     ctrl.appendChild(btn);
   }
+
   const next = document.createElement("button");
   next.textContent = "Siguiente →";
   next.disabled = currentPage === totalPages;
@@ -196,17 +211,20 @@ function montarSortingRecursos() {
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
+
     header.addEventListener("click", () => {
       let colKey = header.classList.contains("col-nombre") ? "nombre"
         : header.classList.contains("col-tipo") ? "tipo"
           : header.classList.contains("col-fecha") ? "fecha"
             : null;
       if (!colKey) return;
+
       if (sortState.column === colKey) sortState.asc = !sortState.asc;
       else {
         sortState.column = colKey;
         sortState.asc = true;
       }
+
       recursosData.sort((a, b) => sortState.asc
         ? comparators[colKey](a, b)
         : comparators[colKey](b, a)
@@ -224,6 +242,7 @@ function actualizarFlechasSorting() {
     h.setAttribute("aria-sort", "none");
   });
   if (!sortState.column) return;
+
   const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
   const idx = idxMap[sortState.column];
   const header = headers[idx];
@@ -361,7 +380,7 @@ function disableLinks() {
 
 // ————— Skeleton loaders —————
 function showSkeletons() {
-  // tabla
+  // tabla recursos
   const tableBody = document.querySelector(".recursos-table .table-body");
   tableBody.innerHTML = "";
   for (let i = 0; i < itemsPerPage; i++) {
@@ -421,16 +440,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   disableLinks();
 });
 
-
-
+// ————— Toggle “Mis cursos” (con flecha y anim) —————
 document.addEventListener("DOMContentLoaded", () => {
-  const courseLists = document.querySelectorAll(".mis-cursos .cursos-list");
-
-  courseLists.forEach(list => {
-    const subtitulo = list.querySelector(".cursos-subtitulo");
-    const container = list.querySelector("div[id^='cursos-']");
+  document.querySelectorAll(".mis-cursos .cursos-list").forEach((lista) => {
+    const subtitulo = lista.querySelector(".cursos-subtitulo");
+    const container = lista.querySelector("div[id^='cursos-']");
     if (!subtitulo || !container) return;
 
+    // metemos la flecha
     const arrow = document.createElement("span");
     arrow.className = "arrow-wrapper";
     arrow.innerHTML = `
@@ -441,20 +458,22 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     subtitulo.appendChild(arrow);
 
+    // accesibilidad
     subtitulo.setAttribute("role", "button");
     subtitulo.tabIndex = 0;
     subtitulo.setAttribute("aria-expanded", "true");
 
+    // guardamos estado en localStorage
     const key = `mis-cursos:${subtitulo.textContent.trim()}`;
     let collapsed = localStorage.getItem(key) === "closed";
-
     const svgEl = arrow.querySelector(".arrow-icon");
+
     function applyState() {
       container.style.display = collapsed ? "none" : "flex";
       svgEl.classList.toggle("open", collapsed);
       subtitulo.setAttribute("aria-expanded", collapsed ? "false" : "true");
     }
-    applyState();
+    applyState(); // estado inicial
 
     function toggleSection() {
       collapsed = !collapsed;
