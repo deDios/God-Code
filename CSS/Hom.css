@@ -878,15 +878,16 @@ body {
   gap: 1rem;
 }
 
-.cursos-list > div {
+.cursos-list>div {
   overflow: hidden;
   transition: max-height 0.3s ease;
 }
-.cursos-list.collapsed > div {
+
+.cursos-list.collapsed>div {
   max-height: 0;
 }
 
-.mis-cursos .cursos-list > div[id^="cursos-"] {
+.mis-cursos .cursos-list>div[id^="cursos-"] {
   transition: max-height 0.3s ease;
 }
 
@@ -895,6 +896,11 @@ body {
   display: inline-block;
   vertical-align: middle;
 }
+
+.arrow-wrapper {
+  float: right;
+}
+
 .arrow-wrapper .arrow-icon.open {
   transform: rotate(-180deg);
 }
@@ -904,6 +910,7 @@ body {
   transform: translateY(-5px);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
+
 .curso-card.enter {
   opacity: 1;
   transform: translateY(0);
@@ -913,9 +920,11 @@ body {
 .cursos-subtitulo:focus {
   background: #f0f4fe;
 }
+
 .arrow-icon {
   color: #1565c0;
 }
+
 .arrow-icon.open {
   color: #0d47a1;
 }
