@@ -13,11 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
     const contenedor = document.querySelector(".toast-container");
     if (!contenedor) return;
-
     const toast = document.createElement("div");
     toast.className = `toast ${tipo}`;
     toast.textContent = mensaje;
-
     contenedor.appendChild(toast);
     setTimeout(() => toast.classList.add("mostrar"), 10);
     setTimeout(() => {
@@ -29,21 +27,23 @@ document.addEventListener("DOMContentLoaded", () => {
   async function validarDuplicados() {
     const correo = correoInput.value.trim().toLowerCase();
     const telefono = telefonoInput.value.trim();
-
     const contCorreo = correoInput.closest(".input-alerta-container");
     const contTel = telefonoInput.closest(".input-alerta-container");
-
     const iconoCorreo = contCorreo.querySelector(".icono-alerta");
     const iconoTel = contTel.querySelector(".icono-alerta");
 
-    contCorreo.classList.remove("alerta");
-    contTel.classList.remove("alerta");
-    iconoCorreo.textContent = "";
-    iconoTel.textContent = "";
-    iconoCorreo.classList.remove("valido");
-    iconoTel.classList.remove("valido");
+    [contCorreo, contTel].forEach((c) => {
+      if (c.dataset.origen === "duplicado") {
+        c.classList.remove("alerta");
+        delete c.dataset.origen;
+      }
+    });
 
-    if (!correo && !telefono) return;
+    if (!correo && !telefono) {
+      validarCampoIndividual(correoInput);
+      validarCampoIndividual(telefonoInput);
+      return;
+    }
 
     try {
       const res = await fetch(ENDPOINT_CONSULTA, {
@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, telefono }),
       });
-
       const data = await res.json();
       let hayWarning = false;
 
@@ -61,16 +60,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (yaCorreo) {
           contCorreo.classList.add("alerta");
+          contCorreo.dataset.origen = "duplicado";
           iconoCorreo.textContent = "⚠️";
           hayWarning = true;
         }
-
         if (yaTelefono) {
           contTel.classList.add("alerta");
+          contTel.dataset.origen = "duplicado";
           iconoTel.textContent = "⚠️";
           hayWarning = true;
         }
-
         if (hayWarning) {
           mostrarToast(
             "Ya existe una cuenta con ese " +
@@ -83,44 +82,44 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       }
-
-      if (!contCorreo.classList.contains("alerta") && correo) {
-        iconoCorreo.textContent = "✅";
-        iconoCorreo.classList.add("valido");
-      }
-
-      if (!contTel.classList.contains("alerta") && telefono) {
-        iconoTel.textContent = "✅";
-        iconoTel.classList.add("valido");
-      }
-
-      const hayAlerta =
-        document.querySelectorAll(".input-alerta-container.alerta").length > 0;
-      btn.disabled = hayAlerta;
     } catch (error) {
       console.warn("Error validando duplicados:", error);
+    } finally {
+      validarCampoIndividual(correoInput);
+      validarCampoIndividual(telefonoInput);
     }
   }
 
   function validarCampoIndividual(input) {
-    const contenedor = input.closest(".input-alerta-container");
-    const icono = contenedor.querySelector(".icono-alerta");
+    const cont = input.closest(".input-alerta-container");
+    const icono = cont.querySelector(".icono-alerta");
     const valor = input.value.trim();
 
-    if (contenedor.classList.contains("alerta")) {
-      icono.textContent = "⚠️";
-      icono.classList.remove("valido");
-    } else if (valor) {
-      icono.textContent = "✅";
-      icono.classList.add("valido");
-    } else {
-      icono.textContent = "";
-      icono.classList.remove("valido");
+    // validación de formato
+    let formatoValido = true;
+    if (input === telefonoInput) {
+      formatoValido = /^\d{10}$/.test(valor);
+    } else if (input === correoInput) {
+      formatoValido = valor.includes("@");
     }
 
-    const hayWarning =
-      document.querySelectorAll(".input-alerta-container.alerta").length > 0;
-    btn.disabled = hayWarning;
+    if (!formatoValido) {
+      cont.classList.add("alerta");
+      icono.textContent = "⚠️";
+      icono.classList.remove("valido");
+    } else if (!cont.classList.contains("alerta")) {
+      if (valor) {
+        icono.textContent = "✅";
+        icono.classList.add("valido");
+      } else {
+        icono.textContent = "";
+        icono.classList.remove("valido");
+      }
+    }
+    const hayAlertas = document.querySelectorAll(
+      ".input-alerta-container.alerta"
+    ).length;
+    btn.disabled = hayAlertas > 0;
   }
 
   correoInput.addEventListener("blur", () =>
@@ -135,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     btn.disabled = true;
     btn.textContent = "Registrando...";
 
@@ -152,21 +150,17 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.textContent = "Registrarse";
       return;
     }
-
     if (password !== confirmar) {
       mostrarToast("Las contraseñas no coinciden.", "warning");
       btn.disabled = false;
       btn.textContent = "Registrarse";
       return;
     }
-
-    const hayWarning =
-      document.querySelectorAll(".input-alerta-container.alerta").length > 0;
-    if (hayWarning) {
-      mostrarToast(
-        "Corrige los campos con advertencia antes de continuar.",
-        "warning"
-      );
+    const hayAlertasFinal = document.querySelectorAll(
+      ".input-alerta-container.alerta"
+    ).length;
+    if (hayAlertasFinal) {
+      mostrarToast("Corrige los campos en rojo antes de continuar.", "warning");
       btn.disabled = false;
       btn.textContent = "Registrarse";
       return;
@@ -185,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
           password,
         }),
       });
-
       const insertarData = await insertarRes.json();
       if (insertarData?.mensaje === "Usuario registrado correctamente") {
         mostrarToast("Registro exitoso. ¡Bienvenido!", "exito", 6000);
