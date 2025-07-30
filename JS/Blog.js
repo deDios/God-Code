@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(`Prioridad seleccionada: "${nombrePrioridad}"`);
         console.log(
           "→ Cursos tras filtrar prioridad: ",
-          cursosFiltrados.map(c => c.nombre)
+          cursosFiltrados.map(c => c.nombre));
       }
     }
 
