@@ -104,24 +104,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const icono = cont.querySelector(".icono-alerta");
     const valor = input.value.trim();
 
+    // validación de formato
     let formatoValido = true;
     if (input === telefonoInput) {
       formatoValido = /^\d{10}$/.test(valor);
-      console.log("validarFormato telefono:", valor, "→", formatoValido);
     } else if (input === correoInput) {
       formatoValido = valor.includes("@");
-      console.log("validarFormato correo:", valor, "→", formatoValido);
     }
 
     if (!formatoValido) {
-      console.log("  formato inválido en:", input.name);
+      console.log(`validarFormato ${input.name}: ${valor} → false`);
       cont.classList.add("alerta");
       icono.textContent = "⚠️";
       icono.classList.remove("valido");
-    } else if (!cont.classList.contains("alerta")) {
-      // solo dibujamos el check si no hay ya alerta
+    } else {
+      console.log(`validarFormato ${input.name}: ${valor} → true`);
+      cont.classList.remove("alerta");
+      delete cont.dataset.origen;
+
+      // Ponemos el check si hay algo escrito
       if (valor) {
-        console.log("  formato válido, mostrando check en:", input.name);
         icono.textContent = "✅";
         icono.classList.add("valido");
       } else {
@@ -130,11 +132,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const hayAlertas = document.querySelectorAll(
-      ".input-alerta-container.alerta"
-    ).length;
-    console.log("  alertas totales en form:", hayAlertas);
-    btn.disabled = hayAlertas > 0;
+    const alertas = document.querySelectorAll(".input-alerta-container.alerta");
+    console.log("alertas totales en form:", alertas.length, alertas);
+    btn.disabled = alertas.length > 0;
   }
 
   // eventos
