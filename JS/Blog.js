@@ -169,8 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
         (p) => p.id == explorarSeleccionado
       );
       if (prioridadSeleccionada) {
-        console.log(`filtro por prioridad:  ${prioridadSeleccionada}`);
-        console.log(`filtro por prioridad: `,prioridadSeleccionada);
+        console.log(`Prioridad seleccionada: "${nombrePrioridad}"`);
+        console.log(
+          "→ Cursos tras filtrar prioridad: ",
+          cursosFiltrados.map(c => c.nombre)
       }
     }
 

@@ -149,7 +149,7 @@
 
                     <a href="#">¿Olvidaste tu contraseña?</a>
                     <div class="footer-links">
-                        ¿No tienes una cuenta? <a href="#">Regístrate</a>
+                        ¿No tienes una cuenta? <a href="../VIEW/Inscripcion.php">Regístrate</a>
                     </div>
                 </div>
             </section>
