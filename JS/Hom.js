@@ -420,3 +420,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   initModalPerfil();
   disableLinks();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".mis-cursos .cursos-list").forEach((lista) => {
+    const subtitulo = lista.querySelector(".cursos-subtitulo");
+    const container = lista.querySelector("div[id^='cursos-']");
+    const count = container.children.length;
+    subtitulo.textContent = `${subtitulo.textContent.trim()} (${count})`;
+
+    const arrow = document.createElement("span");
+    arrow.className = "arrow-wrapper";
+    arrow.innerHTML = `
+      <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 24 24" width="24" height="24">
+        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+      </svg>
+    `;
+    subtitulo.appendChild(arrow);
+
+    subtitulo.style.cursor = "pointer";
+
+    function toggleSection() {
+      const isHidden = container.style.display === "none";
+      container.style.display = isHidden ? "flex" : "none";
+      arrow.querySelector(".arrow-icon")
+        .classList.toggle("open", isHidden);
+    }
+
+    subtitulo.addEventListener("click", toggleSection);
+
+    if (count === 0) {
+      container.style.display = "none";
+      arrow.querySelector(".arrow-icon").classList.add("open");
+    } else {
+      container.style.display = "flex";
+      arrow.querySelector(".arrow-icon").classList.remove("open");
+    }
+  });
+});

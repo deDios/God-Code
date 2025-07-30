@@ -846,6 +846,7 @@ body {
   padding: 2rem;
   color: #555;
 }
+
 .empty-state .btn {
   margin-top: 1rem;
 }
@@ -860,4 +861,28 @@ body {
   top: 0;
   background: #f4f7fb;
   z-index: 1;
+}
+
+.arrow-wrapper {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+
+.arrow-icon {
+  transition: transform 0.25s ease;
+  transform: rotate(0deg);
+}
+
+.arrow-icon.open {
+  transform: rotate(180deg);
+}
+
+#cursos-subscritos,
+#cursos-activos,
+#cursos-cancelados,
+#cursos-terminados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
