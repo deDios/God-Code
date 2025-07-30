@@ -39,42 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-//notificaciones tipo toast para manejarlas en todas las vistas
-(function () {
-  if (!document.querySelector(".gc-toast-container")) {
-    const contenedor = document.createElement("div");
-    contenedor.className = "gc-toast-container";
-    document.body.appendChild(contenedor);
-  }
-
-  /**
-   * notificaciones
-   * @param {string} mensaje - El texto que quiero mostrar
-   * @param {string} tipo - 'exito' | 'error' | 'warning', por defecto 'exito'
-   * @param {number} duracion - Tiempo en milisegundos, por defecto 5000ms (5 segundos)
-   */
-
-  window.gcToast = function (mensaje, tipo = "exito", duracion = 5000) {
-    const contenedor = document.querySelector(".gc-toast-container");
-    if (!contenedor) return;
-
-    const toast = document.createElement("div");
-    toast.className = `gc-toast ${tipo}`;
-    toast.textContent = mensaje;
-
-    contenedor.appendChild(toast);
-
-    // animacion de entrada
-    setTimeout(() => toast.classList.add("mostrar"), 10);
-
-    // ocultar
-    setTimeout(() => {
-      toast.classList.remove("mostrar");
-      setTimeout(() => contenedor.removeChild(toast), 400);
-    }, duracion);
-  };
-})(); //------------------ aca termina el js para las notificaciones.
-
 document.addEventListener("DOMContentLoaded", () => {
   //--------------- js para topbar
 
@@ -234,15 +198,12 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-  subnavs.forEach(nav => nav.dataset.originalHtml = nav.innerHTML);
+  subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
 
-  const currentPage = window.location.pathname
-    .split("/")
-    .pop()
-    .toLowerCase();
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
 
   if (operativeViews.includes(currentPage)) {
-    const mk = label => {
+    const mk = (label) => {
       const slug = label.toLowerCase() + ".php";
       const active = slug === currentPage ? "active" : "";
       return `<a href="${slug}" class="${active}">${label}</a>`;
@@ -253,10 +214,9 @@ document.addEventListener("DOMContentLoaded", () => {
       ${mk("Cursos")}
       ${mk("Admin")}
     `;
-    subnavs.forEach(nav => nav.innerHTML = markup);
-
+    subnavs.forEach((nav) => (nav.innerHTML = markup));
   } else {
-    subnavs.forEach(nav => nav.innerHTML = nav.dataset.originalHtml);
+    subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
   }
 
   const submenu = document.getElementById("submenu-productos");
@@ -271,12 +231,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       if (link) {
-        link.addEventListener("click", e => {
+        link.addEventListener("click", (e) => {
           e.preventDefault();
           mega.classList.toggle("show");
         });
       }
-      document.addEventListener("click", e => {
+      document.addEventListener("click", (e) => {
         if (!submenu.contains(e.target)) {
           mega.classList.remove("show");
         }
@@ -295,14 +255,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const socialMap = {
     tiktok: "https://www.tiktok.com/@godcodemx",
     instagram: "https://www.instagram.com/god_code_mx/",
-    facebook: "https://www.facebook.com/profile.php?id=61578204608103"
+    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
   };
 
   const socialIcons = document.querySelectorAll(
     "#header .icon-mobile, #header .circle-icon"
   );
 
-  socialIcons.forEach(el => {
+  socialIcons.forEach((el) => {
     const img = el.querySelector("img");
     if (!img) return;
     const key = img.alt.trim().toLowerCase();
@@ -315,6 +275,40 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open(url, "_blank", "noopener");
     });
   });
-
-
 });
+
+//notificaciones tipo toast para manejarlas en todas las vistas
+(function () {
+  if (!document.querySelector(".gc-toast-container")) {
+    const contenedor = document.createElement("div");
+    contenedor.className = "gc-toast-container";
+    document.body.appendChild(contenedor);
+  }
+
+  /**
+   * notificaciones
+   * @param {string} mensaje - El texto que quiero mostrar
+   * @param {string} tipo - 'exito' | 'error' | 'warning', por defecto 'exito'
+   * @param {number} duracion - Tiempo en milisegundos, por defecto 5000ms (5 segundos)
+   */
+
+  window.gcToast = function (mensaje, tipo = "exito", duracion = 5000) {
+    const contenedor = document.querySelector(".gc-toast-container");
+    if (!contenedor) return;
+
+    const toast = document.createElement("div");
+    toast.className = `gc-toast ${tipo}`;
+    toast.textContent = mensaje;
+
+    contenedor.appendChild(toast);
+
+    // animacion de entrada
+    setTimeout(() => toast.classList.add("mostrar"), 10);
+
+    // ocultar
+    setTimeout(() => {
+      toast.classList.remove("mostrar");
+      setTimeout(() => contenedor.removeChild(toast), 400);
+    }, duracion);
+  };
+})(); //------------------ aca termina el js para las notificaciones.

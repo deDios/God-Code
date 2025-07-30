@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // referencias DOM
   const btnLogin = document.querySelector(".login-form button");
   const inputUsuario = document.querySelector(".login-form input[type='text']");
   const inputPassword = document.querySelector(
@@ -25,31 +26,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const ENDPOINT_CONSULTA =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 
-  const mostrarToast =
-    window.mostrarToast ||
-    function (msg, tipo = "exito", duracion = 5000) {
-      console.log(`[${tipo.toUpperCase()}] ${msg}`);
-    };
-
+  // Limpia cookies antiguas
   function limpiarCookiesAntiguas() {
-    const cookiesAntiguas = [
+    [
       "usuario_id",
       "nombre",
       "correo",
       "telefono",
       "tipo_contacto",
       "estatus",
-    ];
-    cookiesAntiguas.forEach((clave) => {
+    ].forEach((clave) => {
       document.cookie = `${clave}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
     });
   }
 
+  // Guarda usuario en cookie
   function guardarEnCookies(usuario) {
     limpiarCookiesAntiguas();
-    const dias = 1;
     const fechaExp = new Date();
-    fechaExp.setTime(fechaExp.getTime() + dias * 24 * 60 * 60 * 1000);
+    fechaExp.setTime(fechaExp.getTime() + 24 * 60 * 60 * 1000); // 1 día
     const expira = "expires=" + fechaExp.toUTCString();
     const datosJSON = encodeURIComponent(JSON.stringify(usuario));
     document.cookie = `usuario=${datosJSON}; ${expira}; path=/`;
@@ -60,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = inputPassword.value.trim();
 
     if (!usuario || !password) {
-      mostrarToast("Por favor, completa todos los campos.", "warning");
+      gcToast("Por favor, completa todos los campos.", "warning");
       return;
     }
 
@@ -71,12 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(ENDPOINT_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuario,
-          password,
-        }),
+        body: JSON.stringify({ usuario, password }),
       });
-
       const data = await res.json();
 
       if (data.mensaje === "Acceso correcto" && data.usuario) {
@@ -90,28 +81,33 @@ document.addEventListener("DOMContentLoaded", () => {
           }),
         });
         const arr = await consultaRes.json();
+
         if (Array.isArray(arr) && arr[0]) {
-          mostrarToast("¡Bienvenido! Acceso concedido.", "exito", 4000);
+          gcToast("¡Bienvenido! Acceso concedido.", "exito", 4000);
           guardarEnCookies(arr[0]);
           setTimeout(() => {
             window.location.href = "../VIEW/Home.php";
           }, 1500);
         } else {
-          mostrarToast("Error al obtener todos tus datos.", "error", 4000);
+          gcToast("Error al obtener tus datos.", "error", 4000);
+          btnLogin.disabled = false;
+          btnLogin.textContent = "Iniciar sesión";
         }
-        return;
       } else if (data.error) {
-        mostrarToast(data.error, "error", 5000);
+        gcToast(data.error, "error", 5000);
+        btnLogin.disabled = false;
+        btnLogin.textContent = "Iniciar sesión";
       } else {
-        mostrarToast("Ocurrió algo raro... intenta más tarde.", "warning");
+        gcToast("Ocurrió algo raro... intenta más tarde.", "warning", 4000);
+        btnLogin.disabled = false;
+        btnLogin.textContent = "Iniciar sesión";
       }
     } catch (err) {
       console.error("Error en login:", err);
-      mostrarToast("Error de conexión. Intenta más tarde.", "error");
+      gcToast("Error de conexión. Intenta más tarde.", "error", 5000);
+      btnLogin.disabled = false;
+      btnLogin.textContent = "Iniciar sesión";
     }
-
-    btnLogin.disabled = false;
-    btnLogin.textContent = "Iniciar sesión";
   });
 
   [inputUsuario, inputPassword].forEach((input) => {
