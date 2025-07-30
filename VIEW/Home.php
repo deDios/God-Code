@@ -193,15 +193,9 @@
                     <div class="cursos-list">
                         <div class="cursos-subtitulo">Suscritos</div>
                         <div id="cursos-subscritos">
-                            
-                            <a href="#" class="curso-card">
-                                <div class="curso-title">Ejemplo: Fundamentos de Bases de Datos</div>
-                                <div class="curso-date">Fecha Inicio: 15/08/2025</div>
-                            </a>
-                            <a href="#" class="curso-card">
-                                <div class="curso-title">Ejemplo: Desarrollo de Apps Móviles</div>
-                                <div class="curso-date">Fecha Inicio: 01/09/2025</div>
-                            </a>
+
+                            <!-- aca se colocan las cards de mis cursos desde el js -->
+
                         </div>
 
                     </div>

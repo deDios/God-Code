@@ -416,6 +416,7 @@ async function loadRecursos(usuarioId) {
     renderPage(1);
     renderMisCursos(recursosData);
     montarSortingRecursos();
+    initMisCursosToggle();
   } catch (err) {
     console.error(err);
     showErrorRecursos(
@@ -439,19 +440,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   disableLinks();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach(lista => {
     const subtitulo = lista.querySelector(".cursos-subtitulo");
     const container = lista.querySelector("div[id^='cursos-']");
     if (!subtitulo || !container) return;
 
-    // ——— contemos los ítems y actualizamos el texto sin pisar el original ———
+    // Actualizamos contador
     const count = container.children.length;
-    // sacamos solo la parte de texto (sin "(n)")
-    const label = subtitulo.textContent.trim().replace(/\(\d+\)\s*$/, "");
-    subtitulo.textContent = `${label} (${count})`;
+    // Sacamos texto base (sin "(n)")
+    const baseLabel = subtitulo.textContent.trim().replace(/\(\d+\)\s*$/, "");
+    subtitulo.textContent = `${baseLabel} (${count})`;
 
-    // ——— metemos la flecha ———
+    // Insertamos flecha
     const arrow = document.createElement("span");
     arrow.className = "arrow-wrapper";
     arrow.innerHTML = `
@@ -462,35 +463,35 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     subtitulo.appendChild(arrow);
 
-    // ——— accesibilidad ———
+    // Accesibilidad
     subtitulo.setAttribute("role", "button");
     subtitulo.tabIndex = 0;
-    subtitulo.setAttribute("aria-expanded", "true");
 
-    // ——— clave única basada en el id del container ———
+    // Estado persistente por sección
     const key = `mis-cursos:${container.id}`;
     let collapsed = localStorage.getItem(key) === "closed";
-    const svgEl = arrow.querySelector(".arrow-icon");
+    const svgIcon = arrow.querySelector(".arrow-icon");
 
-    function applyState() {
-      container.style.display = collapsed ? "none" : "flex";
-      svgEl.classList.toggle("open", collapsed);
-      subtitulo.setAttribute("aria-expanded", collapsed ? "false" : "true");
-    }
-    applyState(); // estado inicial
+    const apply = () => {
+      // Si está colapsado ocultamos, sino dejamos el estilo por defecto (grid/block)
+      container.style.display = collapsed ? "none" : "";
+      svgIcon.classList.toggle("open", collapsed);
+      subtitulo.setAttribute("aria-expanded", (!collapsed).toString());
+    };
+    apply(); // estado inicial
 
-    function toggleSection() {
+    const toggle = () => {
       collapsed = !collapsed;
-      applyState();
+      apply();
       localStorage.setItem(key, collapsed ? "closed" : "open");
-    }
+    };
 
-    subtitulo.addEventListener("click", toggleSection);
+    subtitulo.addEventListener("click", toggle);
     subtitulo.addEventListener("keydown", e => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        toggleSection();
+        toggle();
       }
     });
   });
-});
+}
