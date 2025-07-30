@@ -168,12 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const prioridadSeleccionada = prioridadesData.find(
         (p) => p.id == explorarSeleccionado
       );
-      if (prioridadSeleccionada) {
-        console.log(`Prioridad seleccionada: "${nombrePrioridad}"`);
-        console.log(
-          "→ Cursos tras filtrar prioridad: ",
-          cursosFiltrados.map(c => c.nombre));
-      }
+      console.log(`Prioridad seleccionada: "${nombrePrioridad}"`);
+      console.log("Cursos tras filtrar prioridad: ",cursosFiltrados.map(c => c.nombre));
     }
 
     renderizarCursos(cursosFiltrados);
