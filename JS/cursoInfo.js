@@ -392,40 +392,45 @@ const mostrarMensaje = (mensaje, tipo = "error") => {
 };
 
 // buscar cuenta existente
-const buscarCuentaExistente = async () => {
-  const iden = loginInput.value.trim().toLowerCase();
-  if (!iden) return mostrarMensaje("Ingresa correo o teléfono", "warning");
+async function buscarCuentaExistente() {
+  const identificador = loginInput.value.trim().toLowerCase();
+  if (!identificador) {
+    gcToast("Ingresa un correo o teléfono.", "warning");
+    return;
+  }
 
+  // evita buscar si hay usuario logeado
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
   if (usuarioCookie) {
-    return gcToast("Ya has iniciado sesión", "warning");
+    gcToast("Ya has iniciado sesión. No puedes buscar otra cuenta.", "warning");
+    return;
   }
 
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ correo: iden, telefono: iden }),
+      body: JSON.stringify({ correo: identificador, telefono: identificador }),
     });
     const data = await res.json();
+
     if (Array.isArray(data) && data.length > 0) {
-      gcToast("Cuenta encontrada.", "exito");
+      gcToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(data[0], true);
-      bloquearCampos(true, true);
+      bloquearCampos(true, true); // bloquea campos + toggle
       checkboxCuenta.disabled = true;
     } else {
       gcToast("No encontramos tu cuenta.", "warning");
-      limpiarFormulario();
-      desbloquearCampos();
-      checkboxCuenta.disabled = false;
+      loginInput.value = "";
+      loginInput.focus();
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error al consultar cuenta:", err);
     gcToast("Error al consultar la cuenta.", "error");
   }
-};
+}
 
 // llenar formulario desde cuenta
 const llenarFormulario = (cuenta, bloquear = false) => {
@@ -645,17 +650,14 @@ formInscripcion.addEventListener("submit", async (e) => {
   }
 });
 
-//- listeners
+// listeners
 checkboxCuenta.addEventListener("change", () => {
   const modoCuenta = checkboxCuenta.checked;
   toggleFormularios(modoCuenta);
 
   [loginInput, telefonoInput, correoInput].forEach((input) => {
-    if (modoCuenta) {
-      input.addEventListener("keydown", onEnterBuscar);
-    } else {
-      input.removeEventListener("keydown", onEnterBuscar);
-    }
+    if (modoCuenta) input.addEventListener("keydown", onEnterBuscar);
+    else input.removeEventListener("keydown", onEnterBuscar);
   });
 });
 
