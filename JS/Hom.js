@@ -22,8 +22,8 @@ function getUsuarioFromCookie() {
   if (!cookie) return null;
   try {
     return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
-  } catch (err) {
-    console.warn("Cookie inválida:", err);
+  } catch {
+    console.warn("Cookie inválida");
     return null;
   }
 }
@@ -83,15 +83,12 @@ function renderPerfil(usuario) {
   userInfo.append(nameDiv, editLink);
 
   profile.append(avatarCircle, userInfo);
-
-  // volvemos a enlazar el modal handler
-  initModalPerfil();
 }
 
+// filas de recursos
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
-
   lista.forEach((item) => {
     const row = document.createElement("div");
     row.className = "table-row";
@@ -177,10 +174,7 @@ function renderMisCursos(inscripciones) {
       case "4":
         conts.terminados.appendChild(card);
         break;
-      default:
-        console.warn("Estatus desconocido:", ins);
     }
-    // anim entrada
     requestAnimationFrame(() => card.classList.add("enter"));
   });
 }
@@ -214,8 +208,7 @@ function renderPagination(totalPages) {
 function renderPage(page) {
   currentPage = page;
   const start = (page - 1) * itemsPerPage;
-  const slice = recursosData.slice(start, start + itemsPerPage);
-  renderRecursosRows(slice);
+  renderRecursosRows(recursosData.slice(start, start + itemsPerPage));
   renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 }
 
@@ -238,6 +231,7 @@ function montarSortingRecursos() {
         : null;
       if (!colKey) return;
 
+      // alterna orden
       if (sortState.column === colKey) sortState.asc = !sortState.asc;
       else {
         sortState.column = colKey;
@@ -248,16 +242,12 @@ function montarSortingRecursos() {
         sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
       );
       renderPage(1);
-
       actualizarFlechasSorting();
-      headers.forEach((h, i) => {
-        if (i === idx) {
-          h.style.pointerEvents = "";
-          h.style.opacity = "1";
-        } else {
-          h.style.pointerEvents = "none";
-          h.style.opacity = "0.6";
-        }
+
+      // reactivar todos, en caso de que quieras cambiar de columna
+      headers.forEach((h) => {
+        h.style.pointerEvents = "";
+        h.style.opacity = "1";
       });
     });
   });
@@ -266,26 +256,23 @@ function montarSortingRecursos() {
 function actualizarFlechasSorting() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((h) => {
-    const slot = h.querySelector(".sort-icon");
-    if (slot) slot.remove();
+    const existing = h.querySelector(".sort-icon");
+    if (existing) existing.remove();
     h.setAttribute("aria-sort", "none");
   });
-
   if (!sortState.column) return;
 
   const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
   const idx = idxMap[sortState.column];
   const header = headers[idx];
 
-  const svg = document.createElement("span");
-  svg.className = "sort-icon " + (sortState.asc ? "asc" : "desc");
-  svg.innerHTML = `
+  const span = document.createElement("span");
+  span.className = "sort-icon " + (sortState.asc ? "asc" : "desc");
+  span.innerHTML = `
     <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="currentColor">
       <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-    </svg>
-  `;
-  header.appendChild(svg);
-
+    </svg>`;
+  header.appendChild(span);
   header.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
 }
 
@@ -318,7 +305,11 @@ function showErrorRecursos(message, retryFn) {
 }
 
 // ————— Modal “Administrar perfil” —————
+let perfilModalIniciado = false;
 function initModalPerfil() {
+  if (perfilModalIniciado) return;
+  perfilModalIniciado = true;
+
   const editBtn = document.querySelector(".edit-profile");
   const modal = document.getElementById("modal-perfil");
   const closeBtn = modal.querySelector(".modal-close");
@@ -352,23 +343,27 @@ function initModalPerfil() {
       modal.classList.add("active");
       document.body.classList.add("modal-abierto");
     } catch {
-      gcToast("Error al cargar datos de perfil.", "error", 5000);
+      gcToast("Error al cargar datos de perfil.", "error");
     }
   });
 
-  const cerrarModal = () => {
+  const cerrarPerfilModal = () => {
     modal.classList.remove("active");
     document.body.classList.remove("modal-abierto");
   };
-  closeBtn.addEventListener("click", cerrarModal);
+  closeBtn.addEventListener("click", cerrarPerfilModal);
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) cerrarModal();
+    if (e.target === modal) cerrarPerfilModal();
   });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    // limpiamos toasts anteriores
+    const cont = document.querySelector(".gc-toast-container");
+    if (cont) cont.innerHTML = "";
+
     if (inp.pass.value !== inp.pass2.value) {
-      return gcToast("Las contraseñas no coinciden.", "warning", 4000);
+      return gcToast("Las contraseñas no coinciden.", "warning");
     }
     const payload = {
       id: usuarioActual.id,
@@ -380,6 +375,7 @@ function initModalPerfil() {
       estatus: usuarioActual.estatus,
     };
     if (inp.pass.value) payload.password = inp.pass.value;
+
     try {
       const res = await fetch(
         "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php",
@@ -391,7 +387,7 @@ function initModalPerfil() {
       );
       const data = await res.json();
       if (data.mensaje) {
-        gcToast(data.mensaje, "exito", 4000);
+        gcToast(data.mensaje, "exito");
         usuarioCookie = { ...usuarioCookie, ...payload };
         document.cookie =
           "usuario=" +
@@ -401,27 +397,26 @@ function initModalPerfil() {
         renderPerfil(usuarioCookie);
       }
     } catch {
-      gcToast("Error al actualizar perfil.", "error", 5000);
+      gcToast("Error al actualizar perfil.", "error");
     } finally {
-      cerrarModal();
+      cerrarPerfilModal();
     }
   });
 }
 
 // ————— Deshabilitar enlaces de prueba —————
 function disableLinks() {
-  const toastDuration = 4000;
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
     el.addEventListener("click", (e) => {
       e.preventDefault();
-      gcToast("Función deshabilitada", "warning", toastDuration);
+      gcToast("Función deshabilitada", "warning");
     });
   });
 }
 
+// ————— Skeleton loaders —————
 function showSkeletons() {
-  // tabla recursos
   const tableBody = document.querySelector(".recursos-table .table-body");
   tableBody.innerHTML = "";
   for (let i = 0; i < itemsPerPage; i++) {
@@ -434,7 +429,6 @@ function showSkeletons() {
     });
     tableBody.appendChild(row);
   }
-  // mis cursos
   ["subscritos", "activos", "cancelados", "terminados"].forEach((id) => {
     const cont = document.getElementById(`cursos-${id}`);
     cont.innerHTML = "";
@@ -446,42 +440,7 @@ function showSkeletons() {
   });
 }
 
-// ————— Carga de recursos principal —————
-async function loadRecursos(usuarioId) {
-  try {
-    const data = await fetchInscripciones(usuarioId);
-    if (!Array.isArray(data) || data.length === 0) {
-      showEmptyRecursos();
-      return;
-    }
-    recursosData = data.slice();
-    renderPage(1);
-    renderMisCursos(recursosData);
-    montarSortingRecursos();
-    initMisCursosToggle();
-  } catch (err) {
-    console.error(err);
-    showErrorRecursos("Error al cargar tus recursos. Intenta de nuevo.", () =>
-      loadRecursos(usuarioId)
-    );
-  }
-}
-
-// ————— Inicialización —————
-document.addEventListener("DOMContentLoaded", async () => {
-  const usuario = getUsuarioFromCookie();
-  if (!usuario) {
-    window.location.href = "../VIEW/Login.php";
-    return;
-  }
-  renderPerfil(usuario);
-  showSkeletons();
-  await loadRecursos(usuario.id);
-  initModalPerfil();
-  disableLinks();
-  initMisCursosToggle(); //
-});
-
+// ————— Toggle “Mis cursos” —————
 function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
@@ -520,11 +479,9 @@ function initMisCursosToggle() {
         subtitle.setAttribute("aria-expanded", "false");
         svgIcon.classList.add("open");
       } else {
-        // forzamos columna y sin wrap
         container.style.display = "flex";
         container.style.flexDirection = "column";
         container.style.flexWrap = "nowrap";
-
         container.style.maxHeight = container.scrollHeight + "px";
         subtitle.setAttribute("aria-expanded", "true");
         svgIcon.classList.remove("open");
@@ -537,7 +494,6 @@ function initMisCursosToggle() {
       applyState();
       localStorage.setItem(key, collapsed ? "closed" : "open");
     }
-
     subtitle.addEventListener("click", toggleSection);
     subtitle.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -547,3 +503,39 @@ function initMisCursosToggle() {
     });
   });
 }
+
+// ————— Carga de recursos principal —————
+async function loadRecursos(usuarioId) {
+  try {
+    const data = await fetchInscripciones(usuarioId);
+    if (!Array.isArray(data) || data.length === 0) {
+      showEmptyRecursos();
+      return;
+    }
+    recursosData = data.slice();
+    renderPage(1);
+    renderMisCursos(recursosData);
+    montarSortingRecursos();
+    initMisCursosToggle();
+  } catch (err) {
+    console.error(err);
+    showErrorRecursos("Error al cargar tus recursos. Intenta de nuevo.", () =>
+      loadRecursos(usuarioId)
+    );
+  }
+}
+
+// ————— Inicialización —————
+document.addEventListener("DOMContentLoaded", async () => {
+  const usuario = getUsuarioFromCookie();
+  if (!usuario) {
+    window.location.href = "../VIEW/Login.php";
+    return;
+  }
+
+  renderPerfil(usuario);
+  showSkeletons();
+  await loadRecursos(usuario.id);
+  initModalPerfil();
+  disableLinks();
+});
