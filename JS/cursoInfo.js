@@ -290,9 +290,12 @@ if (typeof idCursoGlobal === "undefined") {
 }
 
 // ————— Endpoints —————
-const ENDPOINT_CONSULTA = "https://godcode-.../c_usuario.php";
-const ENDPOINT_INSERTAR = "https://godcode-.../i_usuario.php";
-const ENDPOINT_INSCRIPCION = "https://godcode-.../i_inscripcion.php";
+const ENDPOINT_CONSULTA =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
+const ENDPOINT_INSERTAR =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
+const ENDPOINT_INSCRIPCION =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
 // ————— Estado interno —————
 let camposBloqueadosPorCuenta = false;
