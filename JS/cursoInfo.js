@@ -645,7 +645,27 @@ formInscripcion.addEventListener("submit", async (e) => {
   }
 });
 
-// listeners
+//- listeners
+checkboxCuenta.addEventListener("change", () => {
+  const modoCuenta = checkboxCuenta.checked;
+  toggleFormularios(modoCuenta);
+
+  [loginInput, telefonoInput, correoInput].forEach((input) => {
+    if (modoCuenta) {
+      input.addEventListener("keydown", onEnterBuscar);
+    } else {
+      input.removeEventListener("keydown", onEnterBuscar);
+    }
+  });
+});
+
+function onEnterBuscar(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buscarCuentaExistente();
+  }
+}
+
 abrirBtn.addEventListener("click", abrirModal);
 cerrarBtn.addEventListener("click", cerrarModal);
 modal.addEventListener("click", (e) => {
@@ -663,19 +683,3 @@ volverRegistro.addEventListener("click", (e) => {
 });
 telefonoInput.addEventListener("input", validarDuplicados);
 correoInput.addEventListener("input", validarDuplicados);
-
-checkboxCuenta.addEventListener("change", () => {
-  const modo = checkboxCuenta.checked;
-  toggleFormularios(modo);
-  [telefonoInput, correoInput].forEach((input) => {
-    if (modo) input.addEventListener("keydown", onEnterBuscar);
-    else input.removeEventListener("keydown", onEnterBuscar);
-  });
-});
-
-function onEnterBuscar(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    buscarCuentaExistente();
-  }
-}
