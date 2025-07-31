@@ -253,13 +253,19 @@
                 <h2>Recursos</h2>
                 <div class="recursos-table">
                     <div class="table-header">
+
                         <div class="col-nombre">
-                            Nombre <span class="flecha">&#8593;</span>
+                            Nombre 
                         </div>
-                        <div class="col-tipo">Tipo</div>
+
+                        <div class="col-tipo">
+                            Tipo
+                        </div>
+
                         <div class="col-fecha">
-                            Fecha de solicitado <span class="flecha">&#8593;</span>
+                            Fecha de solicitado 
                         </div>
+                        
                     </div>
                     <div class="table-body" id="recursos-list">
                         <!-- Aquí se insertan las filas desde el JS -->
