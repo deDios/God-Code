@@ -221,33 +221,34 @@ function montarSortingRecursos() {
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
 
-    const icon = document.createElement("span");
-    icon.className = "sort-icon asc"; // start ascendente
-    icon.innerHTML = `
-      <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="currentColor">
-        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-      </svg>
-    `;
-    header.appendChild(icon);
+    if (!header.querySelector(".sort-icon")) {
+      const icon = document.createElement("span");
+      icon.className = "sort-icon asc";
+      icon.innerHTML = `
+        <svg viewBox="0 0 24 24" width="0.9em" height="0.9em">
+          <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+        </svg>`;
+      header.appendChild(icon);
+    }
 
     header.addEventListener("click", () => {
-      let key;
-      if (header.classList.contains("col-nombre")) key = "nombre";
-      else if (header.classList.contains("col-tipo")) key = "tipo";
-      else if (header.classList.contains("col-fecha")) key = "fecha";
-      else return;
+      let colKey = null;
+      if (header.classList.contains("col-nombre")) colKey = "nombre";
+      else if (header.classList.contains("col-tipo")) colKey = "tipo";
+      else if (header.classList.contains("col-fecha")) colKey = "fecha";
+      if (!colKey) return;
 
-      if (sortState.column === key) sortState.asc = !sortState.asc;
-      else {
-        sortState.column = key;
-        sortState.asc = true;
+      if (sortState.column === colKey) {
+        sortState.asc = !sortState.asc;
+      } else {
+        sortState.column = colKey;
+        sortState.asc = false;
       }
 
       recursosData.sort((a, b) =>
-        sortState.asc ? comparators[key](a, b) : comparators[key](b, a)
+        sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
       );
       renderPage(1);
-
       actualizarFlechasSorting();
     });
   });
@@ -256,9 +257,9 @@ function montarSortingRecursos() {
 function actualizarFlechasSorting() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((hdr) => {
-    hdr.setAttribute("aria-sort", "none");
     const icon = hdr.querySelector(".sort-icon");
-    icon.classList.remove("desc");
+    hdr.setAttribute("aria-sort", "none");
+    icon.classList.remove("asc", "desc");
     icon.classList.add("asc");
   });
 
