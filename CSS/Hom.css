@@ -947,3 +947,28 @@ body {
 .table-header div:hover .sort-icon {
   fill: #1565c0;
 }
+
+/*------------------*/
+.sort-icon {
+  display: inline-flex;
+  transition: transform 0.3s ease, fill 0.2s ease;
+  fill: #666;
+  margin-left: 0.25rem;
+}
+
+.sort-icon.asc {
+  transform: rotate(0deg);
+}
+
+.sort-icon.desc {
+  transform: rotate(180deg);
+}
+
+.recursos-table .table-header>div:hover .sort-icon {
+  fill: #1565c0;
+}
+
+.recursos-table .table-header>div[aria-sort="ascending"] .sort-icon,
+.recursos-table .table-header>div[aria-sort="descending"] .sort-icon {
+  fill: #1565c0;
+}

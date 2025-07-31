@@ -215,65 +215,67 @@ function renderPage(page) {
 // ————— Sorting tabla Recursos —————
 function montarSortingRecursos() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((header, idx) => {
+  headers.forEach((header) => {
     header.style.cursor = "pointer";
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
 
-    header.addEventListener("click", () => {
-      let colKey = header.classList.contains("col-nombre")
-        ? "nombre"
-        : header.classList.contains("col-tipo")
-        ? "tipo"
-        : header.classList.contains("col-fecha")
-        ? "fecha"
-        : null;
-      if (!colKey) return;
+    const icon = document.createElement("span");
+    icon.className = "sort-icon asc"; // start ascendente
+    icon.innerHTML = `
+      <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="currentColor">
+        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
+      </svg>
+    `;
+    header.appendChild(icon);
 
-      // alterna orden
-      if (sortState.column === colKey) sortState.asc = !sortState.asc;
+    header.addEventListener("click", () => {
+      let key;
+      if (header.classList.contains("col-nombre")) key = "nombre";
+      else if (header.classList.contains("col-tipo")) key = "tipo";
+      else if (header.classList.contains("col-fecha")) key = "fecha";
+      else return;
+
+      if (sortState.column === key) sortState.asc = !sortState.asc;
       else {
-        sortState.column = colKey;
+        sortState.column = key;
         sortState.asc = true;
       }
 
       recursosData.sort((a, b) =>
-        sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
+        sortState.asc ? comparators[key](a, b) : comparators[key](b, a)
       );
       renderPage(1);
-      actualizarFlechasSorting();
 
-      // reactivar todos, en caso de que quieras cambiar de columna
-      headers.forEach((h) => {
-        h.style.pointerEvents = "";
-        h.style.opacity = "1";
-      });
+      actualizarFlechasSorting();
     });
   });
 }
 
 function actualizarFlechasSorting() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((h) => {
-    const existing = h.querySelector(".sort-icon");
-    if (existing) existing.remove();
-    h.setAttribute("aria-sort", "none");
+  headers.forEach((hdr) => {
+    hdr.setAttribute("aria-sort", "none");
+    const icon = hdr.querySelector(".sort-icon");
+    icon.classList.remove("desc");
+    icon.classList.add("asc");
   });
-  if (!sortState.column) return;
 
+  if (!sortState.column) return;
   const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
   const idx = idxMap[sortState.column];
-  const header = headers[idx];
+  const activeHdr = headers[idx];
+  activeHdr.setAttribute(
+    "aria-sort",
+    sortState.asc ? "ascending" : "descending"
+  );
+  const activeIcon = activeHdr.querySelector(".sort-icon");
 
-  const span = document.createElement("span");
-  span.className = "sort-icon " + (sortState.asc ? "asc" : "desc");
-  span.innerHTML = `
-    <svg viewBox="0 0 24 24" width="0.9em" height="0.9em" fill="currentColor">
-      <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-    </svg>`;
-  header.appendChild(span);
-  header.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
+  if (!sortState.asc) {
+    activeIcon.classList.remove("asc");
+    activeIcon.classList.add("desc");
+  }
 }
 
 // ————— Estados vacíos y error —————
