@@ -345,6 +345,7 @@
                 <label>
                     <input type="checkbox" id="ya-tengo-cuenta" /> Ya tengo cuenta
                 </label>
+                <div id="resumen-usuario-container"></div>
             </div>
 
             <div class="form-contenedor">
