@@ -413,7 +413,7 @@
                             <label for="curso-nombre">Curso seleccionado</label>
                             <input type="text" id="curso-nombre" readonly />
                         </div>
-
+                        <button id="otra-cuenta" class="btn-link">Inscribirme con otra cuenta</button>
                         <button type="submit" class="btn-inscribirme">Enviar Inscripción</button>
 
                         <p class="aviso">
