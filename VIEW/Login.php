@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="../CSS/plantilla.css" />
 </head>
 
-<body> 
-     <!-- Tope de pagina -->
+<body>
+    <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
@@ -132,7 +132,7 @@
         </div>
     </header>
 
-    
+
     <main class="animado">
         <div class="login-wrapper">
             <section class="login-container">
@@ -157,10 +157,11 @@
         <section class="footer2">
             <div class="footer2-content">
                 <div class="footer2-links">
-                    <a href="#">Ubicación</a>
-                    <a href="#">Galería</a>
-                    <a href="#">Productos</a>
-                    <a href="#">Información</a>
+                    <a href="https://www.google.com/maps?q=20.34936485462205,-103.19288651201947"
+                        target="_blank">Ubicación</a>
+                    <a href="https://www.instagram.com/god_code_mx/">Galería</a>
+                    <a href="../VIEW/Servicios.php">Productos</a>
+                    <a href="../VIEW/MasInformacion.php">Información</a>
                 </div>
                 <div class="footer2-copyright">
                     <p>©2025 God Code</p>
