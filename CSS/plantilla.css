@@ -667,3 +667,13 @@ footer small {
   align-items: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
+
+@media (min-width: 800px) {
+  .social-bar-mobile,
+  .icon-mobile,
+  .user-icon-mobile,
+  .mobile-only {
+    display: none !important;
+  }
+}
+

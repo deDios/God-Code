@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="../CSS/Login.css" />
     <link rel="stylesheet" href="../CSS/plantilla.css" />
+    <link rel="stylesheet" href="../CSS/Login.css" />
 </head>
 
 <body>
