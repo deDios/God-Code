@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const iconoLogin = document.createElement("div");
       iconoLogin.className = "user-icon";
       iconoLogin.innerHTML = `
-      <img src="ASSETS/usuario/usuarioImg/img_user1.png"
+      <img src="../ASSETS/usuario/usuarioImg/img_user1.png"
            alt="Usuario" title="Iniciar sesión" class="img-perfil" />
     `;
       iconoLogin.addEventListener("click", () => {
