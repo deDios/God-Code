@@ -345,7 +345,6 @@
                 <label>
                     <input type="checkbox" id="ya-tengo-cuenta" /> Ya tengo cuenta
                 </label>
-                <div id="resumen-usuario-container"></div>
             </div>
 
             <div class="form-contenedor">
@@ -357,6 +356,7 @@
                                 class="input-size-control" />
                             <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
                         </div>
+                        <div id="resumen-usuario-container"></div>
                     </div>
 
                     <p class="volver-a-registro">
