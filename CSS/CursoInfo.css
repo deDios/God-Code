@@ -861,94 +861,6 @@ input[type="checkbox"] {
     }
 }
 
-/*-------------------- notificaciones tipo toast --------------------*/
-.toast-container {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    pointer-events: none;
-}
-
-.toast {
-    min-width: 250px;
-    max-width: 320px;
-    background-color: #fff;
-    padding: 1rem 1.2rem;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.4s ease;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #333;
-    pointer-events: auto;
-}
-
-.toast.mostrar {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.toast.exito {
-    border-left: 5px solid #28a745;
-}
-
-.toast.error {
-    border-left: 5px solid #dc3545;
-}
-
-.toast.warning {
-    border-left: 5px solid #ffc107;
-}
-
-.input-alerta-container {
-    position: relative;
-}
-
-.btn-inscribirme.disabled {
-    background-color: #ccc;
-    color: #888;
-    cursor: not-allowed;
-}
-
-/*----------------------- alerta para email o telefonos incorreectos --------------------------*/
-.input-alerta-container {
-    position: relative;
-    width: 100%;
-}
-
-.input-alerta-container input {
-    width: 100%;
-    padding-right: 2rem;
-    box-sizing: border-box;
-}
-
-.icono-alerta {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    pointer-events: none;
-    display: none;
-}
-
-.input-alerta-container.alerta .icono-alerta {
-    display: inline;
-    color: #e6b400;
-}
-
-.icono-alerta.valido {
-    display: inline;
-    color: #28a745;
-}
-
-
 
 /*----------------------- css para el modal de que ya se encontro una cuenta ---------------------------*/
 #resumen-usuario-container {
@@ -989,4 +901,44 @@ input[type="checkbox"] {
 #resumen-usuario-container form.mostrar {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* ============================== */
+/* Ajustes para el formulario clonado dentro de #resumen-usuario-container */
+/* ============================== */
+#resumen-usuario-container {
+  margin-top: 1.5rem;      /* separa bien del toggle y de la vista de login */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fuerza que la sección .campos-registro dentro del clone sea estática y visible */
+#resumen-usuario-container .campos-registro {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  max-height: none !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+
+/* Asegura que el <form> clonado esté siempre a la vista */
+#resumen-usuario-container form {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none;   /* elimina la animación de entrada si está interfiriendo */
+  margin-top: 1rem;   /* un poco de espacio antes del form clonado */
+}
+
+/* Ajusta el botón del clone para que no herede estilos de posicionamiento absoluto */
+#resumen-usuario-container .btn-inscribirme {
+  margin: 2rem auto 0;
+  display: block;
 }
