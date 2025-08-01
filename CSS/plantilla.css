@@ -47,6 +47,10 @@ header.scrolled .top-bar {
     opacity: 0;
 }
 
+.hamburger{
+  display: none;
+}
+
 /* Subnav */
 .subnav {
     position: fixed;
