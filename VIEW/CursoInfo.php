@@ -345,6 +345,7 @@
                 <label>
                     <input type="checkbox" id="ya-tengo-cuenta" /> Ya tengo cuenta
                 </label>
+                <div id="resumen-usuario-container"></div>
             </div>
 
             <div class="form-contenedor">
@@ -354,7 +355,9 @@
                         <div class="input-contenedor">
                             <input type="text" id="login-identificador" placeholder="Ingresa tu correo o teléfono"
                                 class="input-size-control" />
-                            <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
+                            <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">
+                                Buscar
+                            </button>
                         </div>
                     </div>
 
@@ -362,8 +365,6 @@
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
                     </p>
                 </div>
-
-                <div id="resumen-usuario-container"></div>
 
                 <form id="form-inscripcion">
                     <div class="campos-registro">
@@ -420,16 +421,15 @@
 
                         <p class="aviso">
                             Al enviar tu inscripción, aceptas nuestras políticas de privacidad y autorizas el uso de tus
-                            datos
-                            para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
+                            datos para fines académicos y administrativos. Pronto nos pondremos en contacto contigo para
                             confirmar tu registro.
                         </p>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
+
 
 
 
