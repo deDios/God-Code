@@ -356,13 +356,14 @@
                                 class="input-size-control" />
                             <button type="button" id="buscar-cuenta" class="btn-buscar-cuenta">Buscar</button>
                         </div>
-                        <div id="resumen-usuario-container"></div>
                     </div>
 
                     <p class="volver-a-registro">
                         ¿No tienes cuenta? <a href="#" id="volver-a-registro">Regístrate</a>
                     </p>
                 </div>
+
+                <div id="resumen-usuario-container"></div>
 
                 <form id="form-inscripcion">
                     <div class="campos-registro">
@@ -425,7 +426,7 @@
                         </p>
                     </div>
                 </form>
-                
+
             </div>
         </div>
     </div>
