@@ -947,3 +947,46 @@ input[type="checkbox"] {
     display: inline;
     color: #28a745;
 }
+
+
+
+/*----------------------- css para el modal de que ya se encontro una cuenta ---------------------------*/
+#resumen-usuario-container {
+    margin-top: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#resumen-usuario-container .campos-registro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+#resumen-usuario-container .form-group {
+    flex: 1 1 45%;
+}
+
+@media (max-width: 600px) {
+    #resumen-usuario-container .form-group {
+        flex: 1 1 100%;
+    }
+}
+
+#resumen-usuario-container .btn-inscribirme {
+    margin: 2rem auto 1rem;
+    display: block;
+    width: auto;
+}
+
+#resumen-usuario-container form {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#resumen-usuario-container form.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}

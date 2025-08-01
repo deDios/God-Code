@@ -451,6 +451,7 @@ function mostrarFormularioExistente(cuenta) {
   });
 
   resumenContainer.appendChild(clone);
+  clone.classList.add("mostrar");
 }
 
 // ————— Enviar inscripción para cuenta existente —————
