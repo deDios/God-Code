@@ -461,7 +461,6 @@
 
 
 /* --------------------- seccion para la ventana emergente -----------------------------*/
-
 #modal-inscripcion {
     display: none;
     position: fixed;
@@ -488,6 +487,17 @@
     position: relative;
     font-family: "Segoe UI", sans-serif;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    scrollbar-width: none;
+}
+
+.modal-contenido::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.modal-contenido::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
 }
 
 body.modal-abierto {
@@ -519,9 +529,74 @@ body.modal-abierto {
     cursor: pointer;
 }
 
-.form-contenedor {
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 45%;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    color: #111;
+}
+
+.form-group input,
+.form-group select,
+.inputs-contacto input {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.inputs-contacto input:focus {
+    border-color: #1a73e8;
+}
+
+input[type="checkbox"] {
+    accent-color: #1a73e8;
+    transform: scale(1.1);
+    margin-right: 0.5rem;
+}
+
+#ya-tengo-cuenta {
+    appearance: none;
+    width: 42px;
+    height: 22px;
+    background: #ccc;
+    border-radius: 50px;
     position: relative;
-    min-height: 500px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#ya-tengo-cuenta::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+}
+
+#ya-tengo-cuenta:checked {
+    background: #1a73e8;
+}
+
+#ya-tengo-cuenta:checked::before {
+    transform: translateX(20px);
 }
 
 .campos-login,
@@ -561,46 +636,22 @@ body.modal-abierto {
     margin-bottom: 1rem;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 45%;
-}
-
-.form-group label {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 0.3rem;
-    color: #111;
-}
-
-.form-group input,
-.input-alerta-container input,
-.fila-buscar input {
+.btn-inscribirme {
+    margin: 2rem auto 1rem;
+    display: block;
+    background: #1a73e8;
+    color: #fff;
+    padding: 0.8rem 2rem;
     border: none;
-    border-bottom: 1px solid #ccc;
-    padding: 0.5rem 0;
-    font-size: 0.95rem;
-    background: transparent;
-    outline: none;
-}
-
-.form-group input:focus,
-.input-alerta-container input:focus,
-.fila-buscar input:focus {
-    border-color: #1a73e8;
-}
-
-.input-alerta-container {
-    position: relative;
-}
-
-.icono-alerta {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    border-radius: 50px;
     font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-inscribirme:hover {
+    background: #0d5bba;
+    transform: translateY(-2px);
 }
 
 .btn-buscar-cuenta {
@@ -619,22 +670,8 @@ body.modal-abierto {
     transform: translateY(-2px);
 }
 
-.btn-inscribirme {
-    margin: 2rem auto 1rem;
-    display: block;
-    background: #1a73e8;
-    color: #fff;
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 50px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn-inscribirme:hover {
-    background: #0d5bba;
-    transform: translateY(-2px);
+.btn-buscar-cuenta:active {
+    transform: translateY(0);
 }
 
 .volver-a-registro {
@@ -662,4 +699,251 @@ body.modal-abierto {
 
 .volver-a-registro a:hover {
     text-decoration: underline;
+}
+
+.modal-contenido p.aviso {
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.4;
+}
+
+.fila-buscar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.fila-buscar label {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111;
+}
+
+.fila-buscar .input-contenedor {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.fila-buscar input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    background: transparent;
+    outline: none;
+}
+
+.fila-buscar input:focus {
+    border-color: #1a73e8;
+}
+
+.fila-buscar .btn-buscar-cuenta {
+    flex-shrink: 0;
+}
+
+.form-contenedor {
+    position: relative;
+    min-height: 500px;
+}
+
+.grupo-contacto {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.label-contacto {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.inputs-contacto {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inputs-contacto input {
+    flex: 1 1 45%;
+    min-width: 140px;
+}
+
+@media (max-width: 600px) {
+    .modal-contenido {
+        padding: 1.5rem;
+    }
+
+    .campos-registro .form-group {
+        flex: 1 1 100%;
+    }
+
+    .fila-buscar {
+        width: 100%;
+    }
+
+    .fila-buscar .input-contenedor {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fila-buscar input {
+        width: 100%;
+    }
+
+    .fila-buscar .btn-buscar-cuenta {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .inputs-contacto {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .inputs-contacto input {
+        flex: 1 1 100%;
+    }
+}
+
+.grupo-contacto {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.label-contacto {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.inputs-contacto {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.inputs-contacto input {
+    flex: 1 1 45%;
+    min-width: 140px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
+}
+
+.inputs-contacto input:focus {
+    border-color: #1a73e8;
+}
+
+@media (max-width: 600px) {
+    .inputs-contacto {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .inputs-contacto input {
+        flex: 1 1 100%;
+    }
+}
+
+/*-------------------- notificaciones tipo toast --------------------*/
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast {
+    min-width: 250px;
+    max-width: 320px;
+    background-color: #fff;
+    padding: 1rem 1.2rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    pointer-events: auto;
+}
+
+.toast.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.exito {
+    border-left: 5px solid #28a745;
+}
+
+.toast.error {
+    border-left: 5px solid #dc3545;
+}
+
+.toast.warning {
+    border-left: 5px solid #ffc107;
+}
+
+.input-alerta-container {
+    position: relative;
+}
+
+.btn-inscribirme.disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/*----------------------- alerta para email o telefonos incorreectos --------------------------*/
+.input-alerta-container {
+    position: relative;
+    width: 100%;
+}
+
+.input-alerta-container input {
+    width: 100%;
+    padding-right: 2rem;
+    box-sizing: border-box;
+}
+
+.icono-alerta {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    pointer-events: none;
+    display: none;
+}
+
+.input-alerta-container.alerta .icono-alerta {
+    display: inline;
+    color: #e6b400;
+}
+
+.icono-alerta.valido {
+    display: inline;
+    color: #28a745;
 }
