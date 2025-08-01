@@ -947,3 +947,15 @@ input[type="checkbox"] {
     display: inline;
     color: #28a745;
 }
+
+.input-alerta-container.alerta .icono-alerta.valido {
+  display: none !important;
+}
+
+.input-alerta-container:not(.alerta) .icono-alerta.valido {
+  display: inline;
+}
+
+.input-alerta-container:not(.alerta) .icono-alerta:not(.valido) {
+  display: none;
+}

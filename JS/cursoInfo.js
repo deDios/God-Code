@@ -313,6 +313,7 @@ function validarFormato(input) {
       input === telefonoInput
         ? "El teléfono debe tener almenos 10 dígitos numéricos."
         : "El correo debe tener al menos un @ y un dominio válido.";
+    icono.setAttribute("title", icono.title);
     icono.classList.remove("valido");
   } else {
     if (cont.dataset.origen === "formato") {
