@@ -353,3 +353,96 @@ header.scrolled .social-bar-mobile {
         display: block;
     }
 }
+
+#submenu-productos {
+    position: relative;
+}
+
+#submenu-productos>a {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
+#submenu-productos .megamenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 100vw;
+    max-width: 1000px;
+    padding: 2rem;
+    border-radius: 10px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#submenu-productos .megamenu.show {
+    display: flex;
+}
+
+#submenu-productos .col {
+    flex: 1 1 200px;
+}
+
+#submenu-productos .full-width {
+    flex: 1 1 100%;
+    text-align: center;
+}
+
+#submenu-productos h4 {
+    font-size: 1rem;
+    color: #0a61d0;
+    margin-bottom: 1rem;
+}
+
+#submenu-productos ul {
+    list-style: none;
+    padding: 0;
+}
+
+#submenu-productos ul li {
+    margin-bottom: 0.5rem;
+}
+
+#submenu-productos ul li a {
+    text-decoration: none;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#submenu-productos ul li a img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+#submenu-productos .tech-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+#submenu-productos .tech-icons span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: #444;
+}
+
+#submenu-productos .tech-icons img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}

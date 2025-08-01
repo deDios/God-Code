@@ -158,8 +158,8 @@
                             <input type="tel" placeholder="Teléfono" required />
                             <select required>
                                 <option value="">Selecciona una opción</option>
-                                <option value="#">Puesto1</option>
-                                <option value="#">Puesto2</option>
+                                <option value="#">Administrativo</option>
+                                <option value="#">Programación</option>
                             </select>
                         </div>
 
