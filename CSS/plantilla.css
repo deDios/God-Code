@@ -503,3 +503,21 @@ header.scrolled .social-bar-mobile {
   pointer-events: auto;
   cursor: help;
 }
+
+footer {
+    background-color: #004393;
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+footer div {
+    margin-bottom: 10px;
+}
+
+footer small {
+    display: block;
+    font-size: 0.8rem;
+}

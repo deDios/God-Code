@@ -391,6 +391,7 @@ async function validarCampo(input) {
     document.querySelectorAll(".input-alerta-container.alerta").length > 0;
   buscarBtn.classList.toggle("disabled", hayAlertas);
   btnSubmit.disabled = hayAlertas;
+  btnSubmit.classList.toggle("disabled", hayAlertas);
 }
 
 // Listeners de validación en tiempo real
