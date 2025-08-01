@@ -444,8 +444,10 @@ footer small {
 
 /*------------------------- bloque mobile ------------------------*/
 
+
+
+
 @media (max-width: 768px) {
-  /* Icono hamburguesa */
   .hamburger {
     display: flex;
     font-size: 1.8rem;
@@ -457,7 +459,6 @@ footer small {
     color: #0a61d0;
   }
 
-  /* Ocultar elementos de desktop en mobile */
   .top-bar .actions,
   .subnav .social-icons,
   #submenu-productos.desktop-only {
@@ -465,14 +466,13 @@ footer small {
   }
 
   .mobile-only {
-    display: block;
+    display: block !important;
   }
 
   .desktop-only {
     display: none !important;
   }
 
-  /* Barra superior social en mobile */
   .social-bar-mobile {
     display: flex;
     justify-content: flex-end;
@@ -482,7 +482,7 @@ footer small {
     width: 100%;
     z-index: 1001;
     background-color: #f1f1f1;
-    padding: 6px 20px;
+    padding: 5px 20px;
     gap: 12px;
     box-sizing: border-box;
   }
@@ -493,27 +493,33 @@ footer small {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  /* Íconos sociales */
+  .social-bar-mobile .social-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
   .icon-mobile,
   .user-icon-mobile {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background-color: transparent;
-    box-shadow: none;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     overflow: hidden;
     flex-shrink: 0;
   }
 
   .icon-mobile img,
   .user-icon-mobile img {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
-    display: block;
+    padding: 2px;
   }
 
   .icon-mobile:hover,
@@ -521,7 +527,6 @@ footer small {
     transform: scale(1.05);
   }
 
-  /* Menú desplegable */
   .subnav {
     display: none;
   }
@@ -529,7 +534,7 @@ footer small {
   .subnav.show {
     display: flex;
     position: fixed;
-    top: 120px; /* debajo del top-bar + social-bar */
+    top: 120px;
     left: 0;
     right: 0;
     background-color: #f9f9f9;
@@ -538,7 +543,7 @@ footer small {
     align-items: flex-start;
     padding: 1rem 1.5rem;
     gap: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     overflow-y: auto;
     max-height: calc(100vh - 120px);
   }
@@ -555,4 +560,110 @@ footer small {
     font-weight: 700;
     text-decoration: underline;
   }
+}
+@media (max-width: 768px) {
+  .social-bar-mobile {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: fixed;
+    top: 85px;
+    width: 100%;
+    z-index: 1001;
+    background-color: #f1f1f1;
+    padding: 5px 20px;
+    box-sizing: border-box;
+  }
+
+  header.scrolled .social-bar-mobile {
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .social-bar-mobile .social-icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-mobile,
+  .user-icon-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  .icon-mobile:hover,
+  .user-icon-mobile:hover {
+    transform: scale(1.05);
+  }
+
+  .icon-mobile img,
+  .user-icon-mobile img {
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Asegura el subnav sigue funcionando */
+  .subnav {
+    display: none;
+  }
+
+  .subnav.show {
+    display: flex;
+    position: fixed;
+    top: 120px;
+    left: 0;
+    right: 0;
+    background-color: #f9f9f9;
+    z-index: 1000;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    overflow-y: auto;
+    max-height: calc(100vh - 120px);
+  }
+
+  .subnav.show a {
+    color: #444;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .subnav.show a.active {
+    color: #0a61d0;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* Oculta íconos de redes dentro de .subnav */
+  .subnav .social-icons {
+    display: none !important;
+  }
+}
+
+.user-icon-mobile {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }

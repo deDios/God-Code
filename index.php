@@ -27,7 +27,7 @@
                 </div>
                 <!-- Icono de usuario para login en vista mobile -->
                 <div class="user-icon-mobile" onclick="window.location.href='VIEW/Login.php'">
-                    <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+                    <img src="ASSETS/usuario/usuarioImg/img_user1.png"
                         alt="Usuario" />
                 </div>
             </div>
