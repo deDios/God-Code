@@ -1,9 +1,4 @@
-/*----------------- css global ------------------------*/
-/*cosas que no estan renderizadas en pantallas de resoluciones grandes*/
-.social-bar-mobile {
-    display: none;
-}
-
+/*---------------- CSS global ----------------*/
 html,
 body {
     margin: 0;
@@ -29,609 +24,7 @@ header {
     border-bottom: 1px solid #ddd;
 }
 
-.subnav {
-    position: fixed;
-    top: 82px;
-    left: 0;
-    right: 0;
-    background-color: #f1f1f1;
-    display: flex;
-    justify-content: flex-start;
-    padding: 0.5rem 1rem;
-    z-index: 1000;
-    white-space: nowrap;
-    transition: all 0.4s ease-in-out;
-}
-
-.subnav a {
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 8px 12px;
-}
-
-/*----------------- css de la funcion scroller, todavia falta ver porque se mueven los iconos ---------------------------*/
-
-header.scrolled .top-bar {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-
-header.scrolled .subnav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-header.scrolled .social-bar-mobile {
-    top: 1px;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #0a61d0;
-}
-
-.logo-icon {
-    height: 40px;
-    width: auto;
-    margin-right: 8px;
-    vertical-align: middle;
-}
-
-.actions {
-    display: flex;
-    gap: 10px;
-}
-
-.user-icon img {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    cursor: pointer;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn {
-    padding: 5px 12px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    white-space: normal;
-    word-break: break-word;
-    text-align: center;
-    max-width: 200px;
-    min-height: 40px;
-}
-
-.btn-outline {
-    border: 1px solid #0a61d0;
-    color: #0a61d0;
-    background-color: white;
-    text-decoration: none;
-}
-
-.btn-primary {
-    background-color: #0a61d0;
-    color: white;
-    text-decoration: none;
-}
-
-footer {
-    background-color: #004393;
-    color: white;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-footer div {
-    margin-bottom: 10px;
-}
-
-footer small {
-    display: block;
-    font-size: 0.8rem;
-}
-
-#submenu-productos {
-    position: relative;
-}
-
-#submenu-productos .megamenu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    width: 100vw;
-    max-width: 1000px;
-    padding: 2rem;
-    border-radius: 10px;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-#submenu-productos .megamenu.show {
-    display: flex;
-}
-
-#submenu-productos .col {
-    flex: 1 1 200px;
-}
-
-#submenu-productos .full-width {
-    flex: 1 1 100%;
-    text-align: center;
-}
-
-#submenu-productos h4 {
-    font-size: 1rem;
-    color: #0a61d0;
-    margin-bottom: 1rem;
-}
-
-#submenu-productos ul {
-    list-style: none;
-    padding: 0;
-}
-
-#submenu-productos ul li {
-    margin-bottom: 0.5rem;
-}
-
-#submenu-productos ul li a {
-    text-decoration: none;
-    color: #444;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-#submenu-productos ul li a img {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-}
-
-#submenu-productos .tech-icons {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 2rem;
-}
-
-#submenu-productos .tech-icons span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    color: #444;
-}
-
-#submenu-productos .tech-icons img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-}
-
-#submenu-productos>a {
-    display: inline-flex;
-    align-items: center;
-    padding-top: 6px;
-    padding-bottom: 8px;
-}
-
-
-/*el menu de hamburguesa estara oculto por defecto*/
-.hamburger {
-    display: none;
-    font-size: 2rem;
-    cursor: pointer;
-    padding: 10px 40px;
-    text-align: right;
-    margin-left: auto;
-}
-
-/*---------------------------Animaciones para los botones-----------------------------*/
-/*estos son botones / iconos del tope de pagina*/
-/* Logo, se hace mas grande*/
-.logo:hover {
-    color: #094bb0;
-    cursor: pointer;
-}
-
-/* Imagen del logo se hace mas grande*/
-.logo-icon:hover {
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
-}
-
-/*el contorno del boton cambia de color*/
-.btn-outline:hover {
-    background-color: #0a61d0;
-    color: white;
-    transition: 0.3s ease;
-}
-
-/*boton principal cambia de color*/
-.btn-primary:hover {
-    background-color: #094bb0;
-    transition: 0.3s ease;
-}
-
-/*Barra de navegacion mas pequeña*/
-.subnav a {
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    padding: 6px 12px;
-    border-radius: 5px;
-}
-
-/*----------------css para los iconos de redes sociales-----------------*/
-.subnav .social-icons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    width: 100%;
-    padding-right: 30px;
-}
-
-
-.subnav .circle-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 0;
-    overflow: visible;
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.subnav .circle-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-    cursor: pointer;
-    background-color: transparent;
-}
-
-/* efecto hover sencillo para los iconos */
-.subnav .social-icons img:hover {
-    transform: scale(1.1);
-}
-
-/*-----------Efecto hover para la barrra de navegacion pequeña----------------*/
-.subnav a:hover {
-    background-color: #e0eaff;
-    color: #0a61d0;
-}
-
-/*cambia la fuente según que pagina este activa */
-.subnav a.active {
-    color: #0a61d0;
-    font-weight: 700;
-    text-decoration: underline;
-}
-
-/*----------- Otros productos ----------------*/
-#otros-productos {
-    background-color: #f2f2f2;
-    padding: 3rem 2rem;
-    text-align: center;
-    font-family: 'Arial', sans-serif;
-}
-
-#otros-productos h2 {
-    color: #0562EF;
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
-}
-
-#otros-productos .productos-random {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    flex-wrap: wrap;
-}
-
-#otros-productos .producto-item {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    font-size: 1rem;
-    color: #222;
-    font-weight: 500;
-    background-color: white;
-    padding: 0.7rem 1.2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-#otros-productos .producto-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    color: #0562EF;
-}
-
-#otros-productos .producto-item img {
-    width: 28px;
-    height: 28px;
-    object-fit: contain;
-}
-
-
-/*esto es para que el menu de produstos solo se vea en vista desktop y en mobile redirige a una view*/
-.desktop-only {
-    display: block;
-}
-
-.mobile-only {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .desktop-only {
-        display: none;
-    }
-
-    .mobile-only {
-        display: block;
-    }
-}
-
-/*--------------------------------Resuluciones pequeñas-----------------------------------*/
-@media (max-width: 768px) {
-
-    /*barra de iconos de redes sociales que renderizan en pantallas pequeñas*/
-    .social-bar-mobile {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        padding: 5px 20px;
-        width: 100%;
-        background-color: #f1f1f1;
-        position: fixed;
-        top: 86px;
-        z-index: 999;
-        transition: top 0.4s ease-in-out, background-color 0.3s ease;
-    }
-
-
-
-    /*----------------css para los iconos de redes sociales MOBILE-----------------*/
-    .social-bar-mobile .social-icons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-    }
-
-    /*css para el icono mobile de usuario*/
-    .user-icon-mobile img {
-        display: flex;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        cursor: pointer;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* contenedor circular para que no se vea feo */
-    .social-bar-mobile .icon-mobile {
-        width: 24px;
-        height: 24px;
-        border-radius: 0;
-        overflow: visible;
-        background-color: transparent;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .social-bar-mobile .icon-mobile img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-        cursor: pointer;
-        background-color: transparent;
-    }
-
-    /* efecto hover sencillo para los iconos */
-    .social-bar-mobile .social-icons img:hover {
-        transform: scale(1.1);
-    }
-
-    .actions {
-        flex-direction: column;
-        align-items: flex-start;
-        display: none;
-    }
-
-    .botones {
-        margin-top: 4rem;
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .btn {
-        width: 100%;
-    }
-
-    /*esto hace que se oculte el subnav y salga el menu hamburguesa*/
-    .subnav {
-        display: none;
-    }
-
-    .subnav .social-icons {
-        display: none;
-    }
-
-    .hamburger {
-        display: flex;
-        font-size: 1.8rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        margin-left: auto;
-        padding: 8px;
-        color: #0a61d0;
-    }
-
-    .subnav.show {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    }
-
-    /*----------------cosas que no renderizan en MOBILE-----------------*/
-    .actions {
-        display: none;
-    }
-
-    .imagen img {
-        display: none;
-    }
-
-    .noticias {
-        display: none;
-    }
-
-    .columna.noticias {
-        display: none;
-    }
-}
-
-/*--------------------- para notificaciones tipo toast ------------------------- */
-.gc-toast-container {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.gc-toast {
-    opacity: 0;
-    transform: translateY(-20px);
-    transition: all 0.4s ease;
-    padding: 0.75rem 1.2rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    min-width: 220px;
-    max-width: 320px;
-    word-wrap: break-word;
-}
-
-.gc-toast.mostrar {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.gc-toast.exito {
-    background-color: #28a745;
-}
-
-.gc-toast.error {
-    background-color: #dc3545;
-}
-
-.gc-toast.warning {
-    background-color: #ffc107;
-    color: #333;
-}
-
-
-/*------------------ css para el top bar y email e imagen de perfil ---------*/
-.actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-shrink: 0;
-
-}
-
-.actions .user-icon {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: #f4f4f4;
-    padding: 0.3rem 1rem;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-}
-
-.actions .user-icon:hover {
-    background-color: #e8e8e8;
-}
-
-.actions .user-icon .user-email {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
-    max-width: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.img-perfil {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-  object-fit: cover;
-}
-
-.social-icons .user-icon-mobile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.social-icons .user-icon-mobile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-
+/* TopBar */
 .top-bar {
     position: fixed;
     top: 0;
@@ -649,50 +42,202 @@ footer small {
     transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
 
-/*---------------------- css para evitar parpadeo de informacion en la pagina */
+header.scrolled .top-bar {
+    transform: translateY(-100%);
+    opacity: 0;
+}
 
-/*esto para evitar el parpadeo en el topbar con e lboton registrarse y el icono de perfil*/
-.actions,
-.user-icon-mobile {
+/* Subnav */
+.subnav {
+    position: fixed;
+    top: 82px;
+    left: 0;
+    right: 0;
+    background-color: #f1f1f1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    z-index: 1000;
+    white-space: nowrap;
+    transition: all 0.4s ease-in-out;
+}
+
+header.scrolled .subnav {
+    top: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.subnav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 6px 12px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.subnav a:hover {
+    background-color: #e0eaff;
+    color: #0a61d0;
+}
+
+.subnav a.active {
+    color: #0a61d0;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.subnav .social-icons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-right: 30px;
+    margin-left: auto;
+}
+
+.subnav .circle-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+}
+
+.subnav .circle-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.subnav .social-icons img:hover {
+    transform: scale(1.1);
+}
+
+/* Logo */
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0a61d0;
+}
+
+.logo-icon {
+    height: 40px;
+    margin-right: 8px;
+}
+
+.logo:hover {
+    color: #094bb0;
+    cursor: pointer;
+}
+
+.logo-icon:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/* Botones */
+.btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    max-width: 200px;
+    min-height: 40px;
+}
+
+.btn-outline {
+    background-color: white;
+    border: 1px solid #0a61d0;
+    color: #0a61d0;
+}
+
+.btn-primary {
+    background-color: #0a61d0;
+    color: white;
+}
+
+.btn-outline:hover {
+    background-color: #0a61d0;
+    color: white;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #094bb0;
+    transition: 0.3s ease;
+}
+
+/* Acciones */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-.actions.mostrar,
-.user-icon-mobile.mostrar {
+.actions.mostrar {
     visibility: visible;
     opacity: 1;
 }
 
-/*----------------------- css para el submenu de perfil ------------------*/
-.user-session {
-    position: relative;
+.actions .user-icon {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     background-color: #f4f4f4;
-    padding: 0.3rem 0.8rem;
+    padding: 0.3rem 1rem;
     border-radius: 999px;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.actions .user-icon:hover {
+    background-color: #e8e8e8;
+}
+
+.actions .user-icon .user-email {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.img-perfil {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    object-fit: cover;
 }
 
 .dropdown-menu {
     position: absolute;
     top: 110%;
-    right: 8;
-    background-color: white;
+    right: 0;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     width: 180px;
     padding: 0.5rem 0;
-    z-index: 1000;
-
     opacity: 0;
     transform: translateY(-6px);
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 1000;
 }
 
 .dropdown-menu.active {
@@ -703,20 +248,19 @@ footer small {
 
 .dropdown-menu ul {
     list-style: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
 }
 
 .dropdown-menu li {
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.5rem 1rem;
     font-size: 0.95rem;
     color: #333;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    user-select: none;
 }
 
 .dropdown-menu li:hover {
@@ -726,11 +270,86 @@ footer small {
 .dropdown-menu img {
     width: 20px;
     height: 20px;
-    object-fit: contain;
-    border: none;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-    display: block;
-    padding: 0;
+}
+
+.social-bar-mobile {
+    display: none;
+    position: fixed;
+    top: 86px;
+    width: 100%;
+    z-index: 999;
+    background-color: #f1f1f1;
+    padding: 5px 20px;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+header.scrolled .social-bar-mobile {
+    top: 1px;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.social-icons .user-icon-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.user-icon-mobile img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+
+    .top-bar .actions,
+    .subnav .social-icons {
+        display: none;
+    }
+
+    .subnav {
+        display: none;
+    }
+
+    .subnav.show {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .hamburger {
+        display: flex;
+        font-size: 1.8rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: auto;
+        padding: 8px;
+        color: #0a61d0;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none;
+    }
+
+    .desktop-only {
+        display: block;
+    }
 }

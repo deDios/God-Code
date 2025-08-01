@@ -39,143 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  //--------------- js para topbar
-
-  const usuarioCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("usuario="));
-
-  const actionsDesktop = document.querySelector(".actions");
-  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
-  const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
-
-  const socialIconsContainer = document.querySelector(".social-icons");
-  const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
-
-  // función para verificar si la imagen del usuario existe
-  function verificarImagen(src, callback) {
-    const img = new Image();
-    img.onload = () => callback(src);
-    img.onerror = () => callback("../ASSETS/usuario/usuarioImg/img_user1.png");
-    img.src = src;
-  }
-
-  if (usuarioCookie) {
-    try {
-      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
-      const email = datos.correo || "Usuario";
-      const id = datos.id || "1";
-      const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
-
-      // mensaje de bienvenida que solo se activa una vez
-      if (!sessionStorage.getItem("bienvenidaMostrada")) {
-        gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
-        sessionStorage.setItem("bienvenidaMostrada", "true");
-      }
-
-      verificarImagen(ruta, (rutaFinal) => {
-        // DESKTOP
-        if (actionsDesktop) {
-          btnRegistrarse?.remove();
-          userIconDesktop?.remove();
-
-          const nuevo = document.createElement("div");
-          nuevo.className = "user-icon";
-          nuevo.innerHTML = `
-          <span class="user-email">${email}</span>
-          <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
-
-          <div class="dropdown-menu" id="user-dropdown">
-            <ul>
-              <li onclick="window.location.href='../VIEW/Home.php'">
-                <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
-              </li>
-              <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
-                <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
-              </li>
-            </ul>
-          </div>
-        `;
-
-          actionsDesktop.appendChild(nuevo);
-          actionsDesktop.classList.add("mostrar");
-
-          // js para el submenu
-          const userDropdown = nuevo.querySelector("#user-dropdown");
-
-          nuevo.addEventListener("click", (e) => {
-            e.stopPropagation();
-            userDropdown.classList.toggle("active");
-          });
-
-          document.addEventListener("click", () => {
-            userDropdown.classList.remove("active");
-          });
-
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              userDropdown.classList.remove("active");
-            }
-          });
-
-          // boton de logout
-          const btnLogout = nuevo.querySelector("#logout-btn");
-          btnLogout?.addEventListener("click", () => {
-            document.cookie =
-              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-            sessionStorage.removeItem("bienvenidaMostrada");
-          });
-        }
-
-        // MOBILE
-        if (socialIconsContainer && iconMobile) {
-          iconMobile.remove();
-
-          const nuevoMob = document.createElement("div");
-          nuevoMob.className = "user-icon-mobile";
-          nuevoMob.innerHTML = `
-          <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
-        `;
-          nuevoMob.addEventListener("click", () => {
-            window.location.href = "../VIEW/testLogin.php";
-          });
-
-          socialIconsContainer.appendChild(nuevoMob);
-          nuevoMob.classList.add("mostrar");
-        }
-      });
-    } catch (e) {
-      console.warn("Cookie malformada:", e);
-    }
-  } else {
-    // cuando no hay usuario logeado muestra el icono de perfil por default (desktop)
-    if (actionsDesktop) {
-      actionsDesktop.querySelector(".user-icon")?.remove();
-
-      const iconoLogin = document.createElement("div");
-      iconoLogin.className = "user-icon";
-      iconoLogin.innerHTML = `
-      <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
-           alt="Usuario" title="Iniciar sesión" class="img-perfil" />
-    `;
-      iconoLogin.addEventListener("click", () => {
-        window.location.href = "../VIEW/Login.php";
-      });
-
-      actionsDesktop.appendChild(iconoLogin);
-      actionsDesktop.classList.add("mostrar");
-    }
-
-    // MOBILE
-    if (iconMobile) {
-      iconMobile.classList.add("mostrar");
-    }
-  }
-
-  console.log("Se ejecutó todo el bloque para el topbar");
-});
-
 //--------------- deshabilitar el href de cotizar
 document.addEventListener("DOMContentLoaded", () => {
   // deshabilitar boton "Cotizar"
@@ -312,3 +175,140 @@ document.addEventListener("DOMContentLoaded", () => {
     }, duracion);
   };
 })(); //------------------ aca termina el js para las notificaciones.
+
+document.addEventListener("DOMContentLoaded", () => {
+  //--------------- js para topbar
+
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
+
+  const actionsDesktop = document.querySelector(".actions");
+  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
+  const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
+
+  const socialIconsContainer = document.querySelector(".social-icons");
+  const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
+
+  // función para verificar si la imagen del usuario existe
+  function verificarImagen(src, callback) {
+    const img = new Image();
+    img.onload = () => callback(src);
+    img.onerror = () => callback("../ASSETS/usuario/usuarioImg/img_user1.png");
+    img.src = src;
+  }
+
+  if (usuarioCookie) {
+    try {
+      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+      const email = datos.correo || "Usuario";
+      const id = datos.id || "1";
+      const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
+
+      // mensaje de bienvenida que solo se activa una vez
+      if (!sessionStorage.getItem("bienvenidaMostrada")) {
+        gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
+        sessionStorage.setItem("bienvenidaMostrada", "true");
+      }
+
+      verificarImagen(ruta, (rutaFinal) => {
+        // DESKTOP
+        if (actionsDesktop) {
+          btnRegistrarse?.remove();
+          userIconDesktop?.remove();
+
+          const nuevo = document.createElement("div");
+          nuevo.className = "user-icon";
+          nuevo.innerHTML = `
+          <span class="user-email">${email}</span>
+          <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
+
+          <div class="dropdown-menu" id="user-dropdown">
+            <ul>
+              <li onclick="window.location.href='../VIEW/Home.php'">
+                <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+              </li>
+              <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
+                <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+              </li>
+            </ul>
+          </div>
+        `;
+
+          actionsDesktop.appendChild(nuevo);
+          actionsDesktop.classList.add("mostrar");
+
+          // js para el submenu
+          const userDropdown = nuevo.querySelector("#user-dropdown");
+
+          nuevo.addEventListener("click", (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle("active");
+          });
+
+          document.addEventListener("click", () => {
+            userDropdown.classList.remove("active");
+          });
+
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              userDropdown.classList.remove("active");
+            }
+          });
+
+          // boton de logout
+          const btnLogout = nuevo.querySelector("#logout-btn");
+          btnLogout?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+          });
+        }
+
+        // MOBILE
+        if (socialIconsContainer && iconMobile) {
+          iconMobile.remove();
+
+          const nuevoMob = document.createElement("div");
+          nuevoMob.className = "user-icon-mobile";
+          nuevoMob.innerHTML = `
+          <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+        `;
+          nuevoMob.addEventListener("click", () => {
+            window.location.href = "../VIEW/testLogin.php";
+          });
+
+          socialIconsContainer.appendChild(nuevoMob);
+          nuevoMob.classList.add("mostrar");
+        }
+      });
+    } catch (e) {
+      console.warn("Cookie malformada:", e);
+    }
+  } else {
+    // cuando no hay usuario logeado muestra el icono de perfil por default (desktop)
+    if (actionsDesktop) {
+      actionsDesktop.querySelector(".user-icon")?.remove();
+
+      const iconoLogin = document.createElement("div");
+      iconoLogin.className = "user-icon";
+      iconoLogin.innerHTML = `
+      <img src="https://img.freepik.com/premium-vector/free-vector-user-icon-simple-line_901408-588.jpg"
+           alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+    `;
+      iconoLogin.addEventListener("click", () => {
+        window.location.href = "../VIEW/Login.php";
+      });
+
+      actionsDesktop.appendChild(iconoLogin);
+      actionsDesktop.classList.add("mostrar");
+    }
+
+    // MOBILE
+    if (iconMobile) {
+      iconMobile.classList.add("mostrar");
+    }
+  }
+
+  console.log("Se ejecutó todo el bloque para el topbar");
+});
