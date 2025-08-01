@@ -461,176 +461,205 @@
 
 
 /* --------------------- seccion para la ventana emergente -----------------------------*/
-/* =======================
-   Modal “Inscribirme”
-   ======================= */
+
 #modal-inscripcion {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
 }
+
 #modal-inscripcion.mostrar {
-  display: flex;
+    display: flex;
 }
+
 .modal-contenido {
-  background: #fff;
-  max-width: 700px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 12px;
-  padding: 2rem 2.5rem;
-  position: relative;
-  font-family: "Segoe UI", sans-serif;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    background: #fff;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    position: relative;
+    font-family: "Segoe UI", sans-serif;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
+
 body.modal-abierto {
-  overflow: hidden;
+    overflow: hidden;
 }
+
 .modal-contenido h2 {
-  font-size: 1.3rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
 }
+
+.titulo-modal {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #111;
+    padding-top: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
 .cerrar-modal {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
 }
 
-/* ————— Fila de búsqueda ————— */
-.fila-buscar {
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
-  margin-bottom: 1rem;
-}
-.fila-buscar .input-contenedor {
-  display: flex;
-  gap: .5rem;
-}
-.fila-buscar input {
-  flex: 1;
-  padding: .5rem;
-  border: none;
-  border-bottom: 1px solid #ccc;
-  background: transparent;
-  outline: none;
-}
-.fila-buscar input:focus {
-  border-color: #1a73e8;
-}
-.btn-buscar-cuenta {
-  padding: .5rem 1rem;
-  background: #1a73e8;
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: background .3s, transform .2s;
-}
-.btn-buscar-cuenta:hover {
-  background: #0d5bba;
-  transform: translateY(-2px);
+.form-contenedor {
+    position: relative;
+    min-height: 500px;
 }
 
-/* ————— Toggle login/registro ————— */
 .campos-login,
 .campos-registro {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transform: translateY(-10px);
-  transition: opacity .3s, max-height .3s, transform .3s;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, max-height 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
+
 .campos-login.mostrar,
 .campos-registro.mostrar {
-  opacity: 1;
-  max-height: 2000px;
-  transform: translateY(0);
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+    pointer-events: auto;
+    padding-top: 10px;
 }
 
-/* ————— Botones y campos ————— */
+.campos-registro {
+    justify-content: space-between;
+    z-index: 2;
+}
+
+.campos-registro .registro-header {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
 .form-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 45%;
-}
-.form-group label {
-  font-weight: 500;
-  margin-bottom: .3rem;
-}
-.form-group input {
-  border: none;
-  border-bottom: 1px solid #ccc;
-  padding: .5rem 0;
-  background: transparent;
-  outline: none;
-}
-.form-group input:focus {
-  border-color: #1a73e8;
-}
-input[type="checkbox"] {
-  accent-color: #1a73e8;
-  transform: scale(1.1);
-  margin-right: .5rem;
-}
-.btn-inscribirme {
-  margin: 2rem auto 1rem;
-  display: block;
-  background: #1a73e8;
-  color: #fff;
-  padding: .8rem 2rem;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: background .3s, transform .2s;
-}
-.btn-inscribirme:hover {
-  background: #0d5bba;
-  transform: translateY(-2px);
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 45%;
 }
 
-/* ================================
-   Estilos del formulario clonado
-   ================================ */
-#resumen-usuario-container {
-  margin-top: 1.5rem;
-  width: 100%;
-  box-sizing: border-box;
-  clear: both;
+.form-group label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    color: #111;
 }
-#resumen-usuario-container .clon-registro {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  justify-content: space-between;
-  position: static !important;
+
+.form-group input,
+.input-alerta-container input,
+.fila-buscar input {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    background: transparent;
+    outline: none;
 }
-#resumen-usuario-container .clon-registro .form-group {
-  flex: 1 1 45%;
+
+.form-group input:focus,
+.input-alerta-container input:focus,
+.fila-buscar input:focus {
+    border-color: #1a73e8;
 }
-#resumen-usuario-container .clon-registro #telefono-container {
-  flex: 1 1 100%;
+
+.input-alerta-container {
+    position: relative;
 }
-#resumen-usuario-container .clon-registro .btn-inscribirme {
-  margin: 2rem auto 0;
-  width: auto;
-  display: block;
+
+.icono-alerta {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+}
+
+.btn-buscar-cuenta {
+    padding: 0.5rem 1rem;
+    background-color: #1a73e8;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-buscar-cuenta:hover {
+    background-color: #0d5bba;
+    transform: translateY(-2px);
+}
+
+.btn-inscribirme {
+    margin: 2rem auto 1rem;
+    display: block;
+    background: #1a73e8;
+    color: #fff;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-inscribirme:hover {
+    background: #0d5bba;
+    transform: translateY(-2px);
+}
+
+.volver-a-registro {
+    display: block;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 0.8rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.volver-a-registro.mostrar {
+    opacity: 1;
+    max-height: 50px;
+}
+
+.volver-a-registro a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.volver-a-registro a:hover {
+    text-decoration: underline;
 }
