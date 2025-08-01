@@ -300,7 +300,7 @@ function validarFormato(input) {
 
   let esValido = true;
   if (input === telefonoInput) {
-    esValido = /^\d{10,15}$/.test(valor);
+    esValido = /^\d{10,13}$/.test(valor);
   } else if (input === correoInput) {
     esValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
   }
@@ -311,7 +311,7 @@ function validarFormato(input) {
     icono.textContent = "⚠️";
     icono.title =
       input === telefonoInput
-        ? "El teléfono debe tener entre 10 y 15 dígitos numéricos."
+        ? "El teléfono debe tener almenos 10 dígitos numéricos."
         : "El correo debe tener al menos un @ y un dominio válido.";
     icono.classList.remove("valido");
   } else {
@@ -667,7 +667,7 @@ formInscripcion.addEventListener("submit", async (e) => {
   }
 });
 
-// Event listeners generales
+// listeners
 abrirBtn.addEventListener("click", abrirModal);
 cerrarBtn.addEventListener("click", cerrarModal);
 modal.addEventListener("click", (e) => {
@@ -678,9 +678,11 @@ window.addEventListener("keydown", (e) => {
 });
 
 checkboxCuenta.addEventListener("change", () => {
-  toggleFormularios(checkboxCuenta.checked);
-  [telefonoInput, correoInput].forEach((input) => {
-    if (checkboxCuenta.checked) {
+  const modoCuenta = checkboxCuenta.checked;
+  toggleFormularios(modoCuenta);
+
+  [telefonoInput, correoInput, loginInput].forEach((input) => {
+    if (modoCuenta) {
       input.addEventListener("keydown", onEnterBuscar);
     } else {
       input.removeEventListener("keydown", onEnterBuscar);
