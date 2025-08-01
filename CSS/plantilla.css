@@ -50,7 +50,7 @@ header.scrolled .top-bar {
 /* Subnav */
 .subnav {
     position: fixed;
-    top: 82px;
+    top: 75px;
     left: 0;
     right: 0;
     background-color: #f1f1f1;

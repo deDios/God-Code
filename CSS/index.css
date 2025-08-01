@@ -3,6 +3,10 @@
     display: none;
 }
 
+.hamburger{
+  display: none;
+}
+
 html,
 body {
     margin: 0;
