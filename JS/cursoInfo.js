@@ -262,9 +262,6 @@ function inicializarAcordeones() {
 
 // ---------------------------------------- js para la pestaña emergente ---------------------------------------------------
 
-
-
-
 console.log("DOM cargado modal listo");
 
 const modal = document.getElementById("modal-inscripcion");
@@ -283,40 +280,133 @@ const telefonoInput = document.getElementById("telefono");
 const correoInput = document.getElementById("correo");
 const btnSubmit = document.querySelector(".btn-inscribirme");
 
-const ENDPOINT_CONSULTA = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
-const ENDPOINT_INSERTAR = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
-const ENDPOINT_INSCRIPCION = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
+const ENDPOINT_CONSULTA =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
+const ENDPOINT_INSERTAR =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_usuario.php";
+const ENDPOINT_INSCRIPCION =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_inscripcion.php";
 
 let camposBloqueadosPorCuenta = false;
 
-function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
-  const contenedor = document.querySelector(".toast-container");
-  if (!contenedor) return;
-  const toast = document.createElement("div");
-  toast.className = `toast ${tipo}`;
-  toast.textContent = mensaje;
-  contenedor.appendChild(toast);
-  setTimeout(() => toast.classList.add("mostrar"), 10);
-  setTimeout(() => {
-    toast.classList.remove("mostrar");
-    setTimeout(() => contenedor.removeChild(toast), 400);
-  }, duracion);
+// Validar formato
+function validarFormato(input) {
+  const cont = input.closest(".input-alerta-container");
+  const icono = cont.querySelector(".icono-alerta");
+  const valorOriginal = input.value.trim();
+  const valor =
+    input === correoInput ? valorOriginal.toLowerCase() : valorOriginal;
+  if (input === correoInput) input.value = valor;
+
+  let esValido = true;
+  if (input === telefonoInput) {
+    esValido = /^\d{10,15}$/.test(valor);
+  } else if (input === correoInput) {
+    esValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+  }
+
+  if (!esValido) {
+    cont.classList.add("alerta");
+    cont.dataset.origen = "formato";
+    icono.textContent = "⚠️";
+    icono.title =
+      input === telefonoInput
+        ? "El teléfono debe tener entre 10 y 15 dígitos numéricos."
+        : "El correo debe tener al menos un @ y un dominio válido.";
+    icono.classList.remove("valido");
+  } else {
+    if (cont.dataset.origen === "formato") {
+      cont.classList.remove("alerta");
+      delete cont.dataset.origen;
+    }
+    if (valor) {
+      icono.textContent = "✅";
+      icono.classList.add("valido");
+      icono.title = "Campo válido.";
+    } else {
+      icono.textContent = "";
+      icono.classList.remove("valido");
+      icono.title = "";
+    }
+  }
 }
 
-function validarEmail(email) {
-  return email.includes("@");
+// Validar duplicado
+async function validarDuplicado(input) {
+  const cont = input.closest(".input-alerta-container");
+  const icono = cont.querySelector(".icono-alerta");
+  if (cont.dataset.origen === "formato") return;
+
+  if (cont.dataset.origen === "duplicado") {
+    cont.classList.remove("alerta");
+    delete cont.dataset.origen;
+  }
+
+  const correo = correoInput.value.trim().toLowerCase();
+  const telefono = telefonoInput.value.trim();
+
+  try {
+    const res = await fetch(ENDPOINT_CONSULTA, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, telefono }),
+    });
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      const field = input === correoInput ? "correo" : "telefono";
+      const valor = input.value.trim().toLowerCase();
+      const existe = data.some((u) => u[field] === valor);
+      if (existe) {
+        cont.classList.add("alerta");
+        cont.dataset.origen = "duplicado";
+        icono.textContent = "⚠️";
+        icono.title = `Ya existe una cuenta con este ${field}.`;
+        icono.classList.remove("valido");
+        gcToast(`Ya existe una cuenta con ese ${field}.`, "warning");
+      }
+    }
+  } catch (err) {
+    console.warn("Error al validar duplicado:", err);
+  }
 }
 
-function validarTelefono(tel) {
-  return /^\d{10,15}$/.test(tel);
+// Validar campo (formato + duplicado)
+async function validarCampo(input) {
+  validarFormato(input);
+  await validarDuplicado(input);
+
+  const icono = input
+    .closest(".input-alerta-container")
+    .querySelector(".icono-alerta");
+  const warningActivo = input
+    .closest(".input-alerta-container")
+    .classList.contains("alerta");
+  if (!warningActivo && input.value.trim()) {
+    icono.textContent = "✅";
+    icono.classList.add("valido");
+    icono.title = "Campo válido.";
+  }
+  const hayAlertas =
+    document.querySelectorAll(".input-alerta-container.alerta").length > 0;
+  buscarBtn.classList.toggle("disabled", hayAlertas);
+  btnSubmit.disabled = hayAlertas;
 }
 
+// Listeners de validación en tiempo real
+telefonoInput.addEventListener("blur", () => validarCampo(telefonoInput));
+correoInput.addEventListener("blur", () => validarCampo(correoInput));
+telefonoInput.addEventListener("input", () => validarCampo(telefonoInput));
+correoInput.addEventListener("input", () => validarCampo(correoInput));
+
+// Abrir/Cerrar Modal
 const abrirModal = () => {
   modal.classList.add("mostrar");
   document.body.classList.add("modal-abierto");
   limpiarFormulario();
   cursoNombreInput.value = nombreCursoGlobal;
-  const usuarioCookie = document.cookie.split("; ").find((row) => row.startsWith("usuario="));
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
   if (usuarioCookie) {
     try {
       const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
@@ -338,25 +428,17 @@ const cerrarModal = () => {
   limpiarFormulario();
 };
 
-function bloquearCampos(bloquear = true, bloquearToggle = false) {
-  document.getElementById("nombre").readOnly = bloquear;
-  telefonoInput.readOnly = bloquear;
-  correoInput.readOnly = bloquear;
-  document.getElementById("fecha-nacimiento").readOnly = bloquear;
-  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => cb.disabled = bloquear);
-  buscarBtn.disabled = bloquear;
-  btnSubmit.disabled = false;
-  btnSubmit.classList.remove("disabled");
-  if (bloquearToggle) checkboxCuenta.disabled = true;
-  camposBloqueadosPorCuenta = bloquear;
-  console.log(bloquear ? "se bloquearon los campos" : "se desbloquearon los campos");
-}
+// Toggle entre login y registro
+const toggleFormularios = (mostrarLogin) => {
+  titulo.style.display = mostrarLogin ? "none" : "flex";
+  checkboxCuenta.checked = mostrarLogin;
+  camposRegistro.classList.toggle("mostrar", !mostrarLogin);
+  camposLogin.classList.toggle("mostrar", mostrarLogin);
+  cursoNombreInput.value = nombreCursoGlobal;
+  if (!mostrarLogin && !camposBloqueadosPorCuenta) desbloquearCampos();
+};
 
-function desbloquearCampos() {
-  camposBloqueadosPorCuenta = false;
-  bloquearCampos(false, false);
-}
-
+// Limpiar formulario
 const limpiarFormulario = () => {
   formInscripcion.reset();
   toggleFormularios(false);
@@ -369,34 +451,53 @@ const limpiarFormulario = () => {
   document.querySelectorAll(".icono-alerta").forEach((el) => {
     el.textContent = "";
     el.classList.remove("valido");
+    el.removeAttribute("title");
   });
-  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => cb.checked = false);
-  document.querySelectorAll(".input-alerta-container").forEach((c) => c.classList.remove("alerta"));
+  document
+    .querySelectorAll('input[name="medios-contacto"]')
+    .forEach((cb) => (cb.checked = false));
+  document
+    .querySelectorAll(".input-alerta-container")
+    .forEach((c) => c.classList.remove("alerta"));
   buscarBtn.classList.remove("disabled");
 };
 
-const toggleFormularios = (mostrarLogin) => {
-  titulo.style.display = mostrarLogin ? "none" : "flex";
-  checkboxCuenta.checked = mostrarLogin;
-  camposRegistro.classList.toggle("mostrar", !mostrarLogin);
-  camposLogin.classList.toggle("mostrar", mostrarLogin);
-  cursoNombreInput.value = nombreCursoGlobal;
-  if (!mostrarLogin && !camposBloqueadosPorCuenta) desbloquearCampos();
-};
+// Bloquear campos de edición
+function bloquearCampos(bloquear = true, bloquearToggle = false) {
+  document.getElementById("nombre").readOnly = bloquear;
+  telefonoInput.readOnly = bloquear;
+  correoInput.readOnly = bloquear;
+  document.getElementById("fecha-nacimiento").readOnly = bloquear;
+  document
+    .querySelectorAll('input[name="medios-contacto"]')
+    .forEach((cb) => (cb.disabled = bloquear));
+  buscarBtn.disabled = bloquear;
+  btnSubmit.disabled = false;
+  btnSubmit.classList.remove("disabled");
+  if (bloquearToggle) checkboxCuenta.disabled = true;
+  camposBloqueadosPorCuenta = bloquear;
+}
 
-const mostrarMensaje = (mensaje, tipo = "error") => {
-  volverRegistro.classList.toggle("mostrar", tipo === "error");
-  mostrarToast(mensaje, tipo);
-};
+// Desbloquear campos
+function desbloquearCampos() {
+  camposBloqueadosPorCuenta = false;
+  bloquearCampos(false, false);
+}
 
+// Buscar cuenta existente
 const buscarCuentaExistente = async () => {
   const identificador = loginInput.value.trim().toLowerCase();
-  if (!identificador) return mostrarMensaje("Ingresa un correo o teléfono.", "warning");
-  const usuarioCookie = document.cookie.split("; ").find((row) => row.startsWith("usuario="));
+  if (!identificador)
+    return gcToast("Ingresa un correo o teléfono.", "warning");
+
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
   if (usuarioCookie) {
-    mostrarToast("Ya has iniciado sesión. No puedes buscar otra cuenta.", "warning");
+    gcToast("Ya has iniciado sesión. No puedes buscar otra cuenta.", "warning");
     return;
   }
+
   try {
     const res = await fetch(ENDPOINT_CONSULTA, {
       method: "POST",
@@ -405,17 +506,200 @@ const buscarCuentaExistente = async () => {
     });
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
-      mostrarToast("Cuenta encontrada correctamente.", "exito");
+      gcToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(data[0], true);
       bloquearCampos(true, true);
       checkboxCuenta.disabled = true;
     } else {
-      mostrarToast("No encontramos tu cuenta.", "warning");
+      gcToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
       desbloquearCampos();
       checkboxCuenta.disabled = false;
     }
   } catch (err) {
-    mostrarToast("Error al consultar la cuenta.", "error");
+    gcToast("Error al consultar la cuenta.", "error");
   }
 };
+
+// Llenar el formulario con datos de una cuenta existente
+function llenarFormulario(cuenta, bloquear = false) {
+  document.getElementById("nombre").value = cuenta.nombre || "";
+  document.getElementById("telefono").value = cuenta.telefono || "";
+  document.getElementById("correo").value = cuenta.correo?.toLowerCase() || "";
+
+  let fechaNacimiento = cuenta.fecha_nacimiento || "";
+  if (fechaNacimiento.includes("T")) {
+    fechaNacimiento = fechaNacimiento.split("T")[0];
+  } else if (fechaNacimiento.includes(" ")) {
+    fechaNacimiento = fechaNacimiento.split(" ")[0];
+  } else if (fechaNacimiento.includes("/")) {
+    const partes = fechaNacimiento.split("/");
+    if (partes.length === 3) {
+      fechaNacimiento = `${partes[2]}-${partes[1].padStart(
+        2,
+        "0"
+      )}-${partes[0].padStart(2, "0")}`;
+    }
+  }
+  document.getElementById("fecha-nacimiento").value = fechaNacimiento;
+
+  document.querySelectorAll('input[name="medios-contacto"]').forEach((cb) => {
+    cb.checked =
+      cuenta.tipo_contacto == 3 ||
+      cb.value === (cuenta.tipo_contacto == 1 ? "telefono" : "correo");
+  });
+
+  toggleFormularios(false);
+  document
+    .querySelectorAll(".input-alerta-container")
+    .forEach((c) => c.classList.remove("alerta"));
+  if (bloquear) bloquearCampos(true, true);
+  btnSubmit.disabled = false;
+  btnSubmit.classList.remove("disabled");
+}
+
+// Obtener tipo de contacto seleccionado
+function obtenerTipoContacto() {
+  const seleccionados = Array.from(
+    document.querySelectorAll('input[name="medios-contacto"]:checked')
+  ).map((cb) => cb.value);
+  if (seleccionados.includes("telefono") && seleccionados.includes("correo"))
+    return 3;
+  if (seleccionados.includes("telefono")) return 1;
+  if (seleccionados.includes("correo")) return 2;
+  return 0;
+}
+
+// Validar que al menos un medio de contacto esté seleccionado
+function validarMediosContacto() {
+  return (
+    document.querySelectorAll('input[name="medios-contacto"]:checked').length >
+    0
+  );
+}
+
+// Enviar inscripción
+formInscripcion.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  btnSubmit.disabled = true;
+  btnSubmit.classList.add("disabled");
+
+  if (!validarMediosContacto()) {
+    gcToast("Selecciona al menos un medio de contacto.", "warning");
+    btnSubmit.disabled = false;
+    btnSubmit.classList.remove("disabled");
+    return;
+  }
+
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = telefonoInput.value.trim();
+  const correo = correoInput.value.trim().toLowerCase();
+  const fecha_nacimiento = document.getElementById("fecha-nacimiento").value;
+  const tipo_contacto = obtenerTipoContacto();
+
+  if (!nombre || !telefono || !correo || !fecha_nacimiento) {
+    gcToast("Completa todos los campos.", "warning");
+    btnSubmit.disabled = false;
+    btnSubmit.classList.remove("disabled");
+    return;
+  }
+
+  try {
+    const checkRes = await fetch(ENDPOINT_CONSULTA, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correo, telefono }),
+    });
+    const checkData = await checkRes.json();
+    let idUsuario = null;
+
+    if (Array.isArray(checkData) && checkData.length > 0) {
+      idUsuario = checkData[0].id;
+    } else {
+      const insertRes = await fetch(ENDPOINT_INSERTAR, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre,
+          correo,
+          telefono,
+          fecha_nacimiento,
+          tipo_contacto,
+          password: "godcode123",
+        }),
+      });
+      const insertData = await insertRes.json();
+      if (insertData?.mensaje === "Usuario registrado correctamente") {
+        const nuevoRes = await fetch(ENDPOINT_CONSULTA, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo, telefono }),
+        });
+        const nuevoUsuario = await nuevoRes.json();
+        idUsuario = nuevoUsuario[0]?.id;
+      } else {
+        throw new Error(
+          insertData?.mensaje || "No se pudo registrar el usuario."
+        );
+      }
+    }
+
+    const inscRes = await fetch(ENDPOINT_INSCRIPCION, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        curso: idCursoGlobal,
+        usuario: idUsuario,
+        comentario: "",
+      }),
+    });
+    const inscData = await inscRes.json();
+    gcToast(inscData?.mensaje || "Inscripción completada.", "exito", 6000);
+    cerrarModal();
+  } catch (err) {
+    console.error("Error en inscripción:", err);
+    gcToast(
+      err?.message || "Hubo un error al procesar tu inscripción.",
+      "error"
+    );
+    btnSubmit.disabled = false;
+    btnSubmit.classList.remove("disabled");
+  }
+});
+
+// Event listeners generales
+abrirBtn.addEventListener("click", abrirModal);
+cerrarBtn.addEventListener("click", cerrarModal);
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) cerrarModal();
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") cerrarModal();
+});
+
+checkboxCuenta.addEventListener("change", () => {
+  toggleFormularios(checkboxCuenta.checked);
+  [telefonoInput, correoInput].forEach((input) => {
+    if (checkboxCuenta.checked) {
+      input.addEventListener("keydown", onEnterBuscar);
+    } else {
+      input.removeEventListener("keydown", onEnterBuscar);
+    }
+  });
+});
+
+buscarBtn.addEventListener("click", buscarCuentaExistente);
+
+volverRegistro.addEventListener("click", (e) => {
+  e.preventDefault();
+  toggleFormularios(false);
+  desbloquearCampos();
+  checkboxCuenta.disabled = false;
+});
+
+function onEnterBuscar(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    buscarCuentaExistente();
+  }
+}
