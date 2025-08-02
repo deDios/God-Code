@@ -177,8 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
 })(); //------------------ aca termina el js para las notificaciones.
 
 document.addEventListener("DOMContentLoaded", () => {
-  //--------------- js para topbar
-
   const usuarioCookie = document.cookie
     .split("; ")
     .find((row) => row.startsWith("usuario="));
@@ -186,11 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const actionsDesktop = document.querySelector(".actions");
   const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
   const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
-
   const socialIconsContainer = document.querySelector(".social-icons");
-  const iconMobile = socialIconsContainer?.querySelector(".user-icon-mobile");
 
-  // función para verificar si la imagen del usuario existe
   function verificarImagen(src, callback) {
     const img = new Image();
     img.onload = () => callback(src);
@@ -205,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = datos.id || "1";
       const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
 
-      // mensaje de bienvenida que solo se activa una vez
       if (!sessionStorage.getItem("bienvenidaMostrada")) {
         gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
         sessionStorage.setItem("bienvenidaMostrada", "true");
@@ -220,88 +214,73 @@ document.addEventListener("DOMContentLoaded", () => {
           const nuevo = document.createElement("div");
           nuevo.className = "user-icon";
           nuevo.innerHTML = `
-          <span class="user-email">${email}</span>
-          <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
-
-          <div class="dropdown-menu" id="user-dropdown">
-            <ul>
-              <li onclick="window.location.href='../VIEW/Home.php'">
-                <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
-              </li>
-              <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
-                <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
-              </li>
-            </ul>
-          </div>
-        `;
-
+            <span class="user-email">${email}</span>
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
+            <div class="dropdown-menu" id="user-dropdown">
+              <ul>
+                <li onclick="window.location.href='../VIEW/Home.php'">
+                  <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+                </li>
+                <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
+                  <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+                </li>
+              </ul>
+            </div>
+          `;
           actionsDesktop.appendChild(nuevo);
           actionsDesktop.classList.add("mostrar");
 
           const userDropdown = nuevo.querySelector("#user-dropdown");
-
           nuevo.addEventListener("click", (e) => {
             e.stopPropagation();
             userDropdown.classList.toggle("active");
           });
-
-          document.addEventListener("click", () => {
-            userDropdown.classList.remove("active");
-          });
-
+          document.addEventListener("click", () => userDropdown.classList.remove("active"));
           document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              userDropdown.classList.remove("active");
-            }
+            if (e.key === "Escape") userDropdown.classList.remove("active");
           });
 
           const btnLogout = nuevo.querySelector("#logout-btn");
           btnLogout?.addEventListener("click", () => {
-            document.cookie =
-              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
           });
         }
 
-        // MOBILE
+        // MOBILE – insertamos como portal
         if (socialIconsContainer) {
-          const iconoPrevio =
-            socialIconsContainer.querySelector(".user-icon-mobile");
+          const iconoPrevio = socialIconsContainer.querySelector(".user-icon-mobile");
           if (iconoPrevio) iconoPrevio.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
           nuevoMob.innerHTML = `
-    <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
-    <div class=" " id="user-dropdown-mobile">
-      <ul>
-        <li onclick="window.location.href='../VIEW/Home.php'">
-          <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
-        </li>
-        <li id="logout-btn-mobile">
-          <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
-        </li>
-      </ul>
-    </div>
-  `;
-
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+          `;
           socialIconsContainer.appendChild(nuevoMob);
-          nuevoMob.classList.add("mostrar");
 
-          const dropdownMobile = nuevoMob.querySelector(
-            "#user-dropdown-mobile"
-          );
+          const dropdownMobile = document.createElement("div");
+          dropdownMobile.className = "dropdown-menu mobile";
+          dropdownMobile.id = "user-dropdown-mobile";
+          dropdownMobile.innerHTML = `
+            <ul>
+              <li onclick="window.location.href='../VIEW/Home.php'">
+                <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+              </li>
+              <li id="logout-btn-mobile">
+                <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+              </li>
+            </ul>
+          `;
+          document.body.appendChild(dropdownMobile);
 
-          // evento sobre todo el div (ya no el <img>)
-          nuevoMob.addEventListener("click", (e) => {
+          // evento para mostrar el dropdown y posicionarlo
+          nuevoMob.querySelector("img").addEventListener("click", (e) => {
             e.stopPropagation();
+            const rect = nuevoMob.getBoundingClientRect();
+            dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
+            dropdownMobile.style.left = `${rect.right - 180}px`;
             dropdownMobile.classList.toggle("active");
-
-            // ayuda visual para depuración
-            console.log(
-              "Dropdown móvil toggled:",
-              dropdownMobile.classList.contains("active")
-            );
           });
 
           document.addEventListener("click", () => {
@@ -309,15 +288,12 @@ document.addEventListener("DOMContentLoaded", () => {
           });
 
           document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              dropdownMobile.classList.remove("active");
-            }
+            if (e.key === "Escape") dropdownMobile.classList.remove("active");
           });
 
-          const btnLogoutMobile = nuevoMob.querySelector("#logout-btn-mobile");
+          const btnLogoutMobile = dropdownMobile.querySelector("#logout-btn-mobile");
           btnLogoutMobile?.addEventListener("click", () => {
-            document.cookie =
-              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
             window.location.href = "../VIEW/Login.php";
           });
@@ -327,27 +303,20 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("Cookie malformada:", e);
     }
   } else {
-    // cuando no hay usuario logeado muestra el icono de perfil por default (desktop)
+    // usuario no logeado
     if (actionsDesktop) {
       actionsDesktop.querySelector(".user-icon")?.remove();
-
       const iconoLogin = document.createElement("div");
       iconoLogin.className = "user-icon";
       iconoLogin.innerHTML = `
-      <img src="../ASSETS/usuario/usuarioImg/img_user1.png"
-           alt="Usuario" title="Iniciar sesión" class="img-perfil" />
-    `;
+        <img src="../ASSETS/usuario/usuarioImg/img_user1.png"
+             alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+      `;
       iconoLogin.addEventListener("click", () => {
         window.location.href = "../VIEW/Login.php";
       });
-
       actionsDesktop.appendChild(iconoLogin);
       actionsDesktop.classList.add("mostrar");
-    }
-
-    // MOBILE
-    if (iconMobile) {
-      iconMobile.classList.add("mostrar");
     }
   }
 

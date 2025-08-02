@@ -646,3 +646,21 @@ footer small {
   opacity: 1;
   visibility: visible;
 }
+
+.dropdown-menu.mobile {
+  position: absolute;
+  width: 180px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9999;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.dropdown-menu.mobile.active {
+  opacity: 1;
+  visibility: visible;
+}
