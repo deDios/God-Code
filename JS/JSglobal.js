@@ -238,7 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
           actionsDesktop.appendChild(nuevo);
           actionsDesktop.classList.add("mostrar");
 
-          // js para el submenu
           const userDropdown = nuevo.querySelector("#user-dropdown");
 
           nuevo.addEventListener("click", (e) => {
@@ -256,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
 
-          // boton de logout
           const btnLogout = nuevo.querySelector("#logout-btn");
           btnLogout?.addEventListener("click", () => {
             document.cookie =
@@ -267,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // MOBILE
         if (socialIconsContainer) {
-          // Si existía uno previo, lo removemos
           const iconoPrevio =
             socialIconsContainer.querySelector(".user-icon-mobile");
           if (iconoPrevio) iconoPrevio.remove();
@@ -294,27 +291,29 @@ document.addEventListener("DOMContentLoaded", () => {
           const dropdownMobile = nuevoMob.querySelector(
             "#user-dropdown-mobile"
           );
-          const iconoImg = nuevoMob.querySelector("img");
 
-          // Abrir/cerrar el menú al hacer clic en la imagen
-          iconoImg.addEventListener("click", (e) => {
+          // evento sobre todo el div (ya no el <img>)
+          nuevoMob.addEventListener("click", (e) => {
             e.stopPropagation();
             dropdownMobile.classList.toggle("active");
+
+            // ayuda visual para depuración
+            console.log(
+              "Dropdown móvil toggled:",
+              dropdownMobile.classList.contains("active")
+            );
           });
 
-          // Cierra el menú al hacer clic fuera
           document.addEventListener("click", () => {
             dropdownMobile.classList.remove("active");
           });
 
-          // Cierra con tecla Escape
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
               dropdownMobile.classList.remove("active");
             }
           });
 
-          // Logout en mobile
           const btnLogoutMobile = nuevoMob.querySelector("#logout-btn-mobile");
           btnLogoutMobile?.addEventListener("click", () => {
             document.cookie =
