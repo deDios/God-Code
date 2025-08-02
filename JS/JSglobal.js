@@ -288,6 +288,38 @@ document.addEventListener("DOMContentLoaded", () => {
           socialIconsContainer.appendChild(nuevoMob);
           nuevoMob.classList.add("mostrar");
 
+          const userMobileIcon = document.querySelector(".user-icon-mobile");
+          const userDropdownMobile = document.getElementById(
+            "user-dropdown-mobile"
+          );
+
+          if (userMobileIcon && userDropdownMobile) {
+            userMobileIcon.addEventListener("click", (e) => {
+              e.stopPropagation();
+              userDropdownMobile.classList.toggle("active");
+            });
+
+            document.addEventListener("click", () => {
+              userDropdownMobile.classList.remove("active");
+            });
+
+            document.addEventListener("keydown", (e) => {
+              if (e.key === "Escape") {
+                userDropdownMobile.classList.remove("active");
+              }
+            });
+
+            const logoutMobile = document.getElementById("logout-btn-mobile");
+            if (logoutMobile) {
+              logoutMobile.addEventListener("click", () => {
+                document.cookie =
+                  "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+                sessionStorage.removeItem("bienvenidaMostrada");
+                window.location.href = "../VIEW/Login.php";
+              });
+            }
+          }
+
           const dropdownMobile = nuevoMob.querySelector(
             "#user-dropdown-mobile"
           );
