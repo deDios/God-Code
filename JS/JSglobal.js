@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
         `;
           nuevoMob.addEventListener("click", () => {
-            window.location.href = "../VIEW/testLogin.php";
+            window.location.href = "../VIEW/Home.php";
           });
 
           socialIconsContainer.appendChild(nuevoMob);
