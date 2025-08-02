@@ -266,8 +266,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // MOBILE
-        if (window.innerWidth <= 768 && socialIconsContainer) {
-          if (iconMobile) iconMobile.remove();
+        if (socialIconsContainer && iconMobile) {
+          iconMobile.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
@@ -285,26 +285,36 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
 
+          socialIconsContainer.appendChild(nuevoMob);
+          nuevoMob.classList.add("mostrar");
+
+          const dropdownMobile = nuevoMob.querySelector(
+            "#user-dropdown-mobile"
+          );
+
           nuevoMob.addEventListener("click", (e) => {
             e.stopPropagation();
-            const dropdown = nuevoMob.querySelector("#user-dropdown-mobile");
-            dropdown.classList.toggle("active");
+            dropdownMobile.classList.toggle("active");
           });
 
           document.addEventListener("click", () => {
-            const dropdown = document.querySelector("#user-dropdown-mobile");
-            dropdown?.classList.remove("active");
+            dropdownMobile.classList.remove("active");
           });
 
-          const btnLogout = nuevoMob.querySelector("#logout-btn-mobile");
-          btnLogout?.addEventListener("click", () => {
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              dropdownMobile.classList.remove("active");
+            }
+          });
+
+          // logout mobile
+          const btnLogoutMobile = nuevoMob.querySelector("#logout-btn-mobile");
+          btnLogoutMobile?.addEventListener("click", () => {
             document.cookie =
               "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
             window.location.href = "../VIEW/Login.php";
           });
-
-          socialIconsContainer.appendChild(nuevoMob);
         }
       });
     } catch (e) {
