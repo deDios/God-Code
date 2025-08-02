@@ -266,9 +266,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // MOBILE
-        // MOBILE
-        if (socialIconsContainer && iconMobile) {
-          iconMobile.remove();
+        if (socialIconsContainer) {
+          // Si existía uno previo, lo removemos
+          const iconoPrevio =
+            socialIconsContainer.querySelector(".user-icon-mobile");
+          if (iconoPrevio) iconoPrevio.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
@@ -292,22 +294,27 @@ document.addEventListener("DOMContentLoaded", () => {
           const dropdownMobile = nuevoMob.querySelector(
             "#user-dropdown-mobile"
           );
+          const iconoImg = nuevoMob.querySelector("img");
 
-          nuevoMob.addEventListener("click", (e) => {
+          // Abrir/cerrar el menú al hacer clic en la imagen
+          iconoImg.addEventListener("click", (e) => {
             e.stopPropagation();
             dropdownMobile.classList.toggle("active");
           });
 
+          // Cierra el menú al hacer clic fuera
           document.addEventListener("click", () => {
             dropdownMobile.classList.remove("active");
           });
 
+          // Cierra con tecla Escape
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
               dropdownMobile.classList.remove("active");
             }
           });
 
+          // Logout en mobile
           const btnLogoutMobile = nuevoMob.querySelector("#logout-btn-mobile");
           btnLogoutMobile?.addEventListener("click", () => {
             document.cookie =
