@@ -266,20 +266,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // MOBILE
-        if (socialIconsContainer && iconMobile) {
-          iconMobile.remove();
+        if (window.innerWidth <= 768 && socialIconsContainer) {
+          if (iconMobile) iconMobile.remove();
 
           const nuevoMob = document.createElement("div");
           nuevoMob.className = "user-icon-mobile";
           nuevoMob.innerHTML = `
-          <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
-        `;
-          nuevoMob.addEventListener("click", () => {
-            window.location.href = "../VIEW/Home.php";
+    <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+    <div class="dropdown-menu mobile" id="user-dropdown-mobile">
+      <ul>
+        <li onclick="window.location.href='../VIEW/Home.php'">
+          <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+        </li>
+        <li id="logout-btn-mobile">
+          <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+        </li>
+      </ul>
+    </div>
+  `;
+
+          nuevoMob.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const dropdown = nuevoMob.querySelector("#user-dropdown-mobile");
+            dropdown.classList.toggle("active");
+          });
+
+          document.addEventListener("click", () => {
+            const dropdown = document.querySelector("#user-dropdown-mobile");
+            dropdown?.classList.remove("active");
+          });
+
+          const btnLogout = nuevoMob.querySelector("#logout-btn-mobile");
+          btnLogout?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+            window.location.href = "../VIEW/Login.php";
           });
 
           socialIconsContainer.appendChild(nuevoMob);
-          nuevoMob.classList.add("mostrar");
         }
       });
     } catch (e) {
