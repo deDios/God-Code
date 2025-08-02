@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
           nuevoMob.className = "user-icon-mobile";
           nuevoMob.innerHTML = `
     <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
-    <div class="dropdown-menu mobile" id="user-dropdown-mobile">
+    <div class=" " id="user-dropdown-mobile">
       <ul>
         <li onclick="window.location.href='../VIEW/Home.php'">
           <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
