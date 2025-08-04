@@ -976,125 +976,160 @@ body {
 
 /*---------------------------------- Mobile ----------------------------------------------------*/
 
-@media screen and (max-width: 768px) {
 
-  main {
-    padding: 1rem;
+@media (max-width: 700px) {
+  #home-main {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
   }
 
-  .user-profile {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e3e3e3;
+    padding: 1rem;
+  }
+
+  .main-content {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .main-navbar {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 1rem 4vw;
+  }
+
+  .main-navbar .nav-btn {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
-  }
-
-  .user-profile .avatar-circle {
-    width: 80px;
-    height: 80px;
-  }
-
-  .user-profile .user-info {
-    margin-top: 0.5rem;
-  }
-
-  .user-profile .edit-profile {
-    display: inline-block;
-    margin-top: 0.25rem;
+    justify-content: center;
+    padding: 12px 0;
     font-size: 0.9rem;
   }
 
-  .recursos-box {
-    padding: 1rem;
+  .main-navbar .nav-icon {
+    margin-bottom: 4px;
   }
 
-  .recursos-box .table-header {
+  .main-navbar .nav-icon svg,
+  .main-navbar .nav-icon img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .recursos-table {
+    border: none;
+    box-shadow: none;
+  }
+
+  .recursos-table .table-header {
     display: none;
   }
 
-  .recursos-box .table-body .table-row {
+  .recursos-table .table-body .table-row {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    border-bottom: 1px solid #ccc;
-    padding: 0.75rem 0;
+    gap: 0.4rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    background: #fff;
   }
 
-  .recursos-box .col-nombre,
-  .recursos-box .col-tipo,
-  .recursos-box .col-fecha {
-    width: 100%;
-    font-size: 0.95rem;
+  .recursos-table .col-nombre,
+  .recursos-table .col-tipo,
+  .recursos-table .col-fecha {
+    padding-left: 0;
   }
 
-  .recurso-link {
-    display: inline-block;
-    margin-top: 0.2rem;
-    font-weight: bold;
-  }
-
-  #pagination-controls {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  #pagination-controls button {
-    flex: 1 1 30%;
-    max-width: 120px;
-  }
-
-  .mis-cursos .cursos-list {
-    gap: 1rem;
-  }
-
-  .curso-card {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-
-  .curso-title {
+  .recursos-table .col-nombre {
+    font-weight: 600;
     font-size: 1rem;
-    margin-bottom: 0.25rem;
   }
 
-  .curso-date {
+  .recursos-table .col-nombre a {
+    color: #004393;
+    text-decoration: underline;
+  }
+
+  .recursos-table .col-tipo,
+  .recursos-table .col-fecha {
     font-size: 0.85rem;
     color: #555;
   }
 
-  .empty-state {
-    text-align: center;
+  #pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
   }
 
-  .empty-state button {
-    margin-top: 0.75rem;
+  #pagination-controls button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
   }
 
-  #modal-perfil .modal-content {
-    padding: 1rem;
-    width: 90%;
+  main {
+    padding-bottom: 6rem;
   }
 
-  #form-perfil input {
-    font-size: 1rem;
-    padding: 0.6rem;
+  main {
+    padding-bottom: 12rem;
   }
 
-  #form-perfil button {
-    width: 100%;
-    margin-top: 1rem;
+}
+
+main {
+  flex: 0 0 auto;
+  height: auto;
+}
+
+@media (max-width: 700px) {
+
+  .main-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1002;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #fff;
+    padding: 0.5rem 0;
+    gap: 0.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  .arrow-wrapper {
-    margin-left: 0.5rem;
+  .main-navbar .nav-btn {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+    min-width: 0;
   }
 
-  .arrow-icon {
-    width: 18px;
-    height: 18px;
+  .main-navbar .nav-icon svg,
+  .main-navbar .nav-icon img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
   }
 
+  #home-main {
+    overflow: visible;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
 }
