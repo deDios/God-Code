@@ -661,7 +661,7 @@ footer small {
 
 
 /*---- notificaciones toast */
-/* Contenedor general fijo */
+
 .gc-toast-container {
     position: fixed;
     top: 1rem;
@@ -673,7 +673,6 @@ footer small {
     pointer-events: none;
 }
 
-/* Estilo base para cada toast */
 .gc-toast {
     min-width: 220px;
     max-width: 320px;
@@ -705,4 +704,21 @@ footer small {
 .gc-toast.warning {
     background-color: #ffc107;
     color: #333;
+}
+
+@media (max-width: 480px) {
+    .gc-toast-container {
+        top: auto;
+        bottom: 20px;
+        right: 10px;
+        left: 10px;
+        max-width: unset;
+        align-items: center;
+    }
+
+    .gc-toast {
+        width: 100%;
+        font-size: 0.9rem;
+        text-align: center;
+    }
 }

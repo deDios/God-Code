@@ -349,7 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btn) {
       btn.href = "#";
-      btn.style.cursor = "not-allowed";
       btn.dataset.disabled = "true";
 
       btn.addEventListener("click", (e) => {

@@ -1,12 +1,10 @@
 // home.js
 
-// ————— Estado global —————
 const itemsPerPage = 6;
 let recursosData = [];
 let currentPage = 1;
 const HEADER_SELECTOR = ".recursos-box .table-header > div";
 
-// ————— Sorting tabla Recursos —————
 const sortState = { column: null, asc: true };
 const comparators = {
   nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
@@ -14,7 +12,6 @@ const comparators = {
   fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
 };
 
-// ————— Helpers —————
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
@@ -28,7 +25,6 @@ function getUsuarioFromCookie() {
   }
 }
 
-// ————— API Fetchers —————
 async function fetchInscripciones(usuarioId) {
   const res = await fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php",
@@ -55,12 +51,10 @@ async function fetchUsuario(correo, telefono, estatus) {
   return res.json();
 }
 
-// ————— Renderers —————
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
 
-  // avatar
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
   const img = document.createElement("img");
@@ -69,7 +63,6 @@ function renderPerfil(usuario) {
   img.alt = usuario.nombre;
   avatarCircle.appendChild(img);
 
-  // info
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
   const nameDiv = document.createElement("div");
@@ -179,7 +172,7 @@ function renderMisCursos(inscripciones) {
   });
 }
 
-// ————— Paginación —————
+// paginacion
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";
@@ -212,7 +205,7 @@ function renderPage(page) {
   renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 }
 
-// ————— Sorting tabla Recursos —————
+// sorting tabla recursos
 function montarSortingRecursos() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((header) => {
@@ -279,7 +272,7 @@ function actualizarFlechasSorting() {
   }
 }
 
-// ————— Estados vacíos y error —————
+// estados vacios y error
 function showEmptyRecursos() {
   document.getElementById("recursos-list").innerHTML = `
     <div class="empty-state">
@@ -307,7 +300,7 @@ function showErrorRecursos(message, retryFn) {
   document.getElementById("retry-recursos").addEventListener("click", retryFn);
 }
 
-// ————— Modal “Administrar perfil” —————
+// modal “Administrar perfil”
 let perfilModalIniciado = false;
 function initModalPerfil() {
   if (perfilModalIniciado) return;
@@ -407,7 +400,7 @@ function initModalPerfil() {
   });
 }
 
-// ————— Deshabilitar enlaces de prueba —————
+// deshabilitar enlaces de prueba
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
@@ -418,7 +411,6 @@ function disableLinks() {
   });
 }
 
-// ————— Skeleton loaders —————
 function showSkeletons() {
   const tableBody = document.querySelector(".recursos-table .table-body");
   tableBody.innerHTML = "";
@@ -443,7 +435,7 @@ function showSkeletons() {
   });
 }
 
-// ————— Toggle “Mis cursos” —————
+// toggle “Mis cursos”
 function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
@@ -507,7 +499,7 @@ function initMisCursosToggle() {
   });
 }
 
-// ————— Carga de recursos principal —————
+// carga de recursos principal 
 async function loadRecursos(usuarioId) {
   try {
     const data = await fetchInscripciones(usuarioId);
@@ -528,7 +520,7 @@ async function loadRecursos(usuarioId) {
   }
 }
 
-// ————— Inicialización —————
+// inicializacion
 document.addEventListener("DOMContentLoaded", async () => {
   const usuario = getUsuarioFromCookie();
   if (!usuario) {

@@ -972,3 +972,128 @@ body {
 .recursos-table .table-header>div[aria-sort="descending"] .sort-icon {
   fill: #1565c0;
 }
+
+
+/*---------------------------------- Mobile ----------------------------------------------------*/
+@media screen and (max-width: 768px) {
+
+  main {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .user-profile .avatar-circle {
+    width: 80px;
+    height: 80px;
+  }
+
+  .user-profile .user-info {
+    margin-top: 0.5rem;
+  }
+
+  .user-profile .edit-profile {
+    display: inline-block;
+    margin-top: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .recursos-box {
+    padding: 1rem;
+  }
+
+  .recursos-box .table-header {
+    display: none;
+  }
+
+  .recursos-box .table-body .table-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    border-bottom: 1px solid #ccc;
+    padding: 0.75rem 0;
+  }
+
+  .recursos-box .col-nombre,
+  .recursos-box .col-tipo,
+  .recursos-box .col-fecha {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+
+  .recurso-link {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-weight: bold;
+  }
+
+  #pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  #pagination-controls button {
+    flex: 1 1 30%;
+    max-width: 120px;
+  }
+
+  .mis-cursos .cursos-list {
+    gap: 1rem;
+  }
+
+  .curso-card {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .curso-title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .curso-date {
+    font-size: 0.85rem;
+    color: #555;
+  }
+
+  .empty-state {
+    text-align: center;
+  }
+
+  .empty-state button {
+    margin-top: 0.75rem;
+  }
+
+  #modal-perfil .modal-content {
+    padding: 1rem;
+    width: 90%;
+  }
+
+  #form-perfil input {
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
+
+  #form-perfil button {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .arrow-wrapper {
+    margin-left: 0.5rem;
+  }
+
+  .arrow-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+}
