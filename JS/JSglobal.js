@@ -39,19 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-//--------------- deshabilitar el href de cotizar
-document.addEventListener("DOMContentLoaded", () => {
-  // deshabilitar boton "Cotizar"
-  const cotizarBtn = document.querySelector(".actions .btn-outline");
-  if (cotizarBtn) {
-    cotizarBtn.removeAttribute("onclick");
-    cotizarBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      gcToast("Función deshabilitada", "warning", 4000);
-    });
-  }
-});
-
 //notificaciones tipo toast para manejarlas en todas las vistas
 (function () {
   if (!document.querySelector(".gc-toast-container")) {
@@ -240,13 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Se ejecutó todo el bloque para el topbar");
 });
 
-
-
-
-
-
-
-
 //------------------------------- js para el subnav
 document.addEventListener("DOMContentLoaded", () => {
   const operativeViews = [
@@ -335,26 +315,51 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+//--------------- deshabilitar el href de cotizar
+document.addEventListener("DOMContentLoaded", () => {
+  // deshabilitar boton "Cotizar"
+  const cotizarBtn = document.querySelector(".actions .btn-outline");
+  if (cotizarBtn) {
+    cotizarBtn.removeAttribute("onclick");
+    cotizarBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      gcToast("Función deshabilitada", "warning", 4000);
+    });
+  }
+});
 
+// botones inhabilitados del subnav
+document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    "vistaoperativa2.php",
+    "vistaoperativa3.php",
+  ];
 
-const mk = (label) => {
-  const slug = label.toLowerCase() + ".php";
-  const active = slug === currentPage ? "active" : "";
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
 
-  // Deshabilitar las vistas que estan aqui
-  const deshabilitadas = ["proyectos.php", "cursos.php", "admin.php"];
-  const isDisabled = deshabilitadas.includes(slug);
-  
-  const attrs = isDisabled ? `href="#" data-disabled="true"` : `href="${slug}"`;
-  
-  return `<a ${attrs} class="${active}">${label}</a>`;
-};
+  if (!operativeViews.includes(currentPage)) return;
 
-// encontrar botones deshabilitados y notificar al usuario que no esta disponible
-document.querySelectorAll('.subnav a[data-disabled="true"]').forEach(link => {
-  link.style.cursor = "not-allowed";
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    gcToast("Función deshabilitada", "warning");
+  const deshabilitados = ["Proyectos", "Cursos", "Admin"];
+
+  deshabilitados.forEach((nombre) => {
+    const btn = Array.from(document.querySelectorAll("#header .subnav a")).find(
+      (a) => a.textContent.trim().toLowerCase() === nombre.toLowerCase()
+    );
+
+    if (btn) {
+      btn.href = "#";
+      btn.style.cursor = "not-allowed";
+      btn.dataset.disabled = "true";
+
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (window.gcToast) {
+          gcToast("Función deshabilitada", "warning");
+        } else {
+          alert("Función deshabilitada");
+        }
+      });
+    }
   });
 });
