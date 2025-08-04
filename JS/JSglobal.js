@@ -235,21 +235,25 @@ document.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
             userDropdown.classList.toggle("active");
           });
-          document.addEventListener("click", () => userDropdown.classList.remove("active"));
+          document.addEventListener("click", () =>
+            userDropdown.classList.remove("active")
+          );
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") userDropdown.classList.remove("active");
           });
 
           const btnLogout = nuevo.querySelector("#logout-btn");
           btnLogout?.addEventListener("click", () => {
-            document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
           });
         }
 
-        // MOBILE – insertamos como portal
+        // MOBILE
         if (socialIconsContainer) {
-          const iconoPrevio = socialIconsContainer.querySelector(".user-icon-mobile");
+          const iconoPrevio =
+            socialIconsContainer.querySelector(".user-icon-mobile");
           if (iconoPrevio) iconoPrevio.remove();
 
           const nuevoMob = document.createElement("div");
@@ -274,7 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
           document.body.appendChild(dropdownMobile);
 
-          // evento para mostrar el dropdown y posicionarlo
           nuevoMob.querySelector("img").addEventListener("click", (e) => {
             e.stopPropagation();
             const rect = nuevoMob.getBoundingClientRect();
@@ -291,9 +294,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.key === "Escape") dropdownMobile.classList.remove("active");
           });
 
-          const btnLogoutMobile = dropdownMobile.querySelector("#logout-btn-mobile");
+          const btnLogoutMobile =
+            dropdownMobile.querySelector("#logout-btn-mobile");
           btnLogoutMobile?.addEventListener("click", () => {
-            document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             sessionStorage.removeItem("bienvenidaMostrada");
             window.location.href = "../VIEW/Login.php";
           });
