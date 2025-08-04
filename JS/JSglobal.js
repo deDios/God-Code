@@ -52,94 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-//------------------------------- js para el subnav
-document.addEventListener("DOMContentLoaded", () => {
-  const operativeViews = [
-    "home.php",
-    // "vistaOperativa2.php",
-    // "vistaOperativa3.php",
-  ];
-
-  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-  subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
-
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
-
-  if (operativeViews.includes(currentPage)) {
-    const mk = (label) => {
-      const slug = label.toLowerCase() + ".php";
-      const active = slug === currentPage ? "active" : "";
-      return `<a href="${slug}" class="${active}">${label}</a>`;
-    };
-    const markup = `
-      ${mk("Home")}
-      ${mk("Proyectos")}
-      ${mk("Cursos")}
-      ${mk("Admin")}
-    `;
-    subnavs.forEach((nav) => (nav.innerHTML = markup));
-  } else {
-    subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
-  }
-
-  const submenu = document.getElementById("submenu-productos");
-  if (submenu) {
-    const mega = submenu.querySelector(".megamenu");
-    if (mega) {
-      mega.classList.remove("show");
-      for (const ch of submenu.children) {
-        if (ch.tagName === "A") {
-          link = ch;
-          break;
-        }
-      }
-      if (link) {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          mega.classList.toggle("show");
-        });
-      }
-      document.addEventListener("click", (e) => {
-        if (!submenu.contains(e.target)) {
-          mega.classList.remove("show");
-        }
-      });
-    }
-  }
-
-  const logoBtn = document.getElementById("logo-btn");
-  if (logoBtn) {
-    logoBtn.style.cursor = "pointer";
-    logoBtn.addEventListener("click", () => {
-      window.location.href = "/index.php";
-    });
-  }
-
-  const socialMap = {
-    tiktok: "https://www.tiktok.com/@godcodemx",
-    instagram: "https://www.instagram.com/god_code_mx/",
-    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
-  };
-
-  const socialIcons = document.querySelectorAll(
-    "#header .icon-mobile, #header .circle-icon"
-  );
-
-  socialIcons.forEach((el) => {
-    const img = el.querySelector("img");
-    if (!img) return;
-    const key = img.alt.trim().toLowerCase();
-    const url = socialMap[key];
-    if (!url) return;
-
-    el.style.cursor = "pointer";
-
-    el.addEventListener("click", () => {
-      window.open(url, "_blank", "noopener");
-    });
-  });
-});
-
 //notificaciones tipo toast para manejarlas en todas las vistas
 (function () {
   if (!document.querySelector(".gc-toast-container")) {
@@ -326,4 +238,123 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   console.log("Se ejecutó todo el bloque para el topbar");
+});
+
+
+
+
+
+
+
+
+//------------------------------- js para el subnav
+document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    // "vistaOperativa2.php",
+    // "vistaOperativa3.php",
+  ];
+
+  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
+  subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
+
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+
+  if (operativeViews.includes(currentPage)) {
+    const mk = (label) => {
+      const slug = label.toLowerCase() + ".php";
+      const active = slug === currentPage ? "active" : "";
+      return `<a href="${slug}" class="${active}">${label}</a>`;
+    };
+    const markup = `
+      ${mk("Home")}
+      ${mk("Proyectos")}
+      ${mk("Cursos")}
+      ${mk("Admin")}
+    `;
+    subnavs.forEach((nav) => (nav.innerHTML = markup));
+  } else {
+    subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
+  }
+
+  const submenu = document.getElementById("submenu-productos");
+  if (submenu) {
+    const mega = submenu.querySelector(".megamenu");
+    if (mega) {
+      mega.classList.remove("show");
+      for (const ch of submenu.children) {
+        if (ch.tagName === "A") {
+          link = ch;
+          break;
+        }
+      }
+      if (link) {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          mega.classList.toggle("show");
+        });
+      }
+      document.addEventListener("click", (e) => {
+        if (!submenu.contains(e.target)) {
+          mega.classList.remove("show");
+        }
+      });
+    }
+  }
+
+  const logoBtn = document.getElementById("logo-btn");
+  if (logoBtn) {
+    logoBtn.style.cursor = "pointer";
+    logoBtn.addEventListener("click", () => {
+      window.location.href = "/index.php";
+    });
+  }
+
+  const socialMap = {
+    tiktok: "https://www.tiktok.com/@godcodemx",
+    instagram: "https://www.instagram.com/god_code_mx/",
+    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
+  };
+
+  const socialIcons = document.querySelectorAll(
+    "#header .icon-mobile, #header .circle-icon"
+  );
+
+  socialIcons.forEach((el) => {
+    const img = el.querySelector("img");
+    if (!img) return;
+    const key = img.alt.trim().toLowerCase();
+    const url = socialMap[key];
+    if (!url) return;
+
+    el.style.cursor = "pointer";
+
+    el.addEventListener("click", () => {
+      window.open(url, "_blank", "noopener");
+    });
+  });
+});
+
+
+
+const mk = (label) => {
+  const slug = label.toLowerCase() + ".php";
+  const active = slug === currentPage ? "active" : "";
+
+  // Deshabilitar las vistas que estan aqui
+  const deshabilitadas = ["proyectos.php", "cursos.php", "admin.php"];
+  const isDisabled = deshabilitadas.includes(slug);
+  
+  const attrs = isDisabled ? `href="#" data-disabled="true"` : `href="${slug}"`;
+  
+  return `<a ${attrs} class="${active}">${label}</a>`;
+};
+
+// encontrar botones deshabilitados y notificar al usuario que no esta disponible
+document.querySelectorAll('.subnav a[data-disabled="true"]').forEach(link => {
+  link.style.cursor = "not-allowed";
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    gcToast("Función deshabilitada", "warning");
+  });
 });
