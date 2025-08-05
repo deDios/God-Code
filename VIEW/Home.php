@@ -249,32 +249,38 @@
                             alt=""></span>Cotizar</button>
             </nav>
 
-            <section class="recursos-box">
+            
+            <!-- desktop version -->
+            <section class="recursos-box desktop-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table">
                     <div class="table-header">
-
-                        <div class="col-nombre">
-                            Nombre 
-                        </div>
-
-                        <div class="col-tipo">
-                            Tipo
-                        </div>
-
-                        <div class="col-fecha">
-                            Fecha de solicitado 
-                        </div>
-                        
+                        <div class="col-nombre">Nombre</div>
+                        <div class="col-tipo">Tipo</div>
+                        <div class="col-fecha">Fecha de solicitado</div>
                     </div>
-                    <div class="table-body" id="recursos-list">
-                        <!-- Aquí se insertan las filas desde el JS -->
+                    <div class="table-body" id="recursos-list-desktop">
+                        <!-- Aquí se insertan las filas desde JS -->
                     </div>
                 </div>
+                <div id="pagination-desktop" class="pagination-controls"></div>
+            </section>
 
-                <!-- controles para la paginacion -->
-                <div id="pagination-controls" class="pagination-controls">
+
+            <!-- mobile version -->
+            <section class="recursos-box mobile-only">
+                <h2>Recursos</h2>
+                <div class="recursos-table-mobile">
+                    <div class="table-header">
+                        <div class="col-nombre">Nombre</div>
+                        <div class="col-tipo">Tipo</div>
+                        <div class="col-fecha">Fecha de solicitado</div>
+                    </div>
+                    <div class="table-body" id="recursos-list-mobile">
+                        <!-- Aquí se insertan las filas desde JS -->
+                    </div>
                 </div>
+                <div id="pagination-mobile" class="pagination-controls"></div>
             </section>
 
         </section>

@@ -718,4 +718,9 @@ footer small {
     padding-bottom: 8px;
 }
 
-
+@media (max-width: 768px) {
+#seccion-innovacion .noticias {
+    display: none;
+   
+}
+}
