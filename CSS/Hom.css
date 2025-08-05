@@ -1236,7 +1236,8 @@ main {
     text-align: left;
   }
 
-  .icon-chevron {
+   .icon-chevron {
+    transform: rotate(-90deg);
     transition: transform 0.2s ease;
     flex-shrink: 0;
   }

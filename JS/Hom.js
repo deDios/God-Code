@@ -195,7 +195,7 @@ function renderRecursosRowsMobile(lista) {
   });
 }
 
-// ---- Render paginación Mobile ----
+// ---- Render paginacion para mobile ----
 function renderPaginationMobile(totalPages) {
   const ctrl = document.getElementById("pagination-mobile");
   ctrl.innerHTML = "";
@@ -221,7 +221,7 @@ function renderPaginationMobile(totalPages) {
   ctrl.appendChild(next);
 }
 
-// ---- Render de página unificado (desktop + mobile) ----
+// ---- Render para la pagina ----
 function renderPage(page) {
   currentPage = page;
   const start = (page - 1) * itemsPerPage;
@@ -238,20 +238,24 @@ function renderPage(page) {
 
 // ---- Sorting de la tabla desktop ----
 function montarSortingRecursos() {
-  const headers = document.querySelectorAll(HEADER_SELECTOR);
+  const headers = document.querySelectorAll(
+    ".recursos-box .table-header > div"
+  );
   headers.forEach((header) => {
     header.style.cursor = "pointer";
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
 
+    // Si no tiene icono, se inserta
     if (!header.querySelector(".sort-icon")) {
       const icon = document.createElement("span");
       icon.className = "sort-icon asc";
       icon.innerHTML = `
         <svg viewBox="0 0 24 24" width="0.9em" height="0.9em">
           <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-        </svg>`;
+        </svg>
+      `;
       header.appendChild(icon);
     }
 
@@ -262,8 +266,10 @@ function montarSortingRecursos() {
       else if (header.classList.contains("col-fecha")) colKey = "fecha";
       if (!colKey) return;
 
-      if (sortState.column === colKey) sortState.asc = !sortState.asc;
-      else {
+      // alternama entre asc/desc
+      if (sortState.column === colKey) {
+        sortState.asc = !sortState.asc;
+      } else {
         sortState.column = colKey;
         sortState.asc = false;
       }
@@ -278,27 +284,21 @@ function montarSortingRecursos() {
 }
 
 function actualizarFlechasSorting() {
-  const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((hdr) => {
-    const icon = hdr.querySelector(".sort-icon");
-    hdr.setAttribute("aria-sort", "none");
-    icon.classList.remove("asc", "desc");
+  document.querySelectorAll(".recursos-box .sort-icon").forEach((ic) => {
+    ic.classList.remove("asc", "desc");
+    const hdr = ic.closest("[role=columnheader]");
+    hdr && hdr.setAttribute("aria-sort", "none");
   });
 
   if (!sortState.column) return;
 
-  // elegimos el header activo
-  const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
-  const activeHdr = headers[idxMap[sortState.column]];
-  const activeIcon = activeHdr.querySelector(".sort-icon");
-
-  if (sortState.asc) {
-    activeHdr.setAttribute("aria-sort", "ascending");
-    activeIcon.classList.add("asc"); 
-  } else {
-    activeHdr.setAttribute("aria-sort", "descending");
-    activeIcon.classList.add("desc"); 
-  }
+  const sel = `.recursos-box .col-${sortState.column}`;
+  document.querySelectorAll(sel).forEach((hdr) => {
+    const icon = hdr.querySelector(".sort-icon");
+    if (!icon) return;
+    hdr.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
+    icon.classList.add(sortState.asc ? "asc" : "desc");
+  });
 }
 
 // ---- Estados vacíos y error ----
