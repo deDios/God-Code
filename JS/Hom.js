@@ -5,16 +5,16 @@ const ENDPOINT_USUARIO_FETCH =
 const ENDPOINT_USUARIO_UPDATE =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
 
-// ---- Variables globales y configuración ----
-const itemsPerPage = 6;
+
+const itemsPerPage = 6; //esto es la paginacion de momento son 6 objetos por pagina
 let recursosData = [];
-let currentPage = 1;
+let currentPage = 1; //la pagina por default
 const HEADER_SELECTOR = ".recursos-box .table-header > div";
 
 const sortState = { column: null, asc: true };
 const comparators = {
   nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
-  tipo: () => 0, // por ahora todos “Curso”
+  tipo: () => 0, 
   fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
 };
 

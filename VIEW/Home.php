@@ -229,7 +229,7 @@
         </section>
 
         <!-- contenido -->
-        <section class="main-content desktop-only">
+        <section class="main-content">
             <nav class="main-navbar">
                 <button class="nav-btn">
                     <span class="nav-icon">
@@ -266,7 +266,7 @@
             </nav>
 
             <!-- Tabla de Recursos -->
-            <section class="recursos-box">
+            <section class="recursos-box desktop-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table">
                     <div class="table-header">
