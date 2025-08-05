@@ -1,528 +1,364 @@
-// =========================
-// home.js – GodCode Home Page
-// =========================
+//------------------------------------------------------------js global-----------------------------------------------------
+//esta es la class "animado" que al colocarsela algo le agrega una transicion
+document.addEventListener("DOMContentLoaded", () => {
+  const animados = document.querySelectorAll(".animado");
 
-// ---- Variables globales y configuración ----
-const itemsPerPage = 6;
-let recursosData = [];
-let currentPage = 1;
-const HEADER_SELECTOR = ".recursos-box .table-header > div";
-
-const sortState = { column: null, asc: true };
-const comparators = {
-  nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
-  tipo: () => 0, // por ahora todos “Curso”
-  fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
-};
-
-// ---- Helpers para cookies / usuario ----
-function getUsuarioFromCookie() {
-  const cookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("usuario="));
-  if (!cookie) return null;
-  try {
-    return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
-  } catch {
-    console.warn("Cookie inválida");
-    return null;
-  }
-}
-
-// ---- Fetch de inscripciones y perfil ----
-async function fetchInscripciones(usuarioId) {
-  const res = await fetch(
-    /* tu endpoint */ "https://godcode…/c_inscripcion.php",
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
     {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usuario: usuarioId }),
+      threshold: 0.2,
     }
   );
-  if (!res.ok) throw new Error("No se cargaron inscripciones");
-  return res.json();
+
+  animados.forEach((el) => observer.observe(el));
+});
+
+//menu hamburguesa
+function toggleMenu() {
+  const menu = document.getElementById("mobile-menu");
+  menu.classList.toggle("show");
 }
 
-async function fetchUsuario(correo, telefono, estatus) {
-  const res = await fetch(/* tu endpoint */ "https://godcode…/c_usuario.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ correo, telefono, estatus }),
-  });
-  if (!res.ok) throw new Error("No se pudo cargar perfil");
-  return res.json();
-}
+//subnav sticky que no se vea feo
+document.addEventListener("DOMContentLoaded", () => {
+  const header = document.getElementById("header");
 
-// ---- Render del perfil en la sidebar ----
-function renderPerfil(usuario) {
-  const profile = document.querySelector(".user-profile");
-  profile.innerHTML = ""; // limpiamos
-
-  // avatar
-  const avatarCircle = document.createElement("div");
-  avatarCircle.className = "avatar-circle";
-  const img = document.createElement("img");
-  img.id = "avatar-img";
-  img.src = usuario.avatarUrl || "../ASSETS/usuario/usuarioImg/img_user1.png";
-  img.alt = usuario.nombre;
-  avatarCircle.appendChild(img);
-
-  // nombre y link de editar
-  const userInfo = document.createElement("div");
-  userInfo.className = "user-info";
-  const nameDiv = document.createElement("div");
-  nameDiv.id = "user-name";
-  nameDiv.textContent = usuario.nombre;
-  const editLink = document.createElement("a");
-  editLink.className = "edit-profile";
-  editLink.href = "#";
-  editLink.textContent = "Administrar perfil ›";
-
-  userInfo.append(nameDiv, editLink);
-  profile.append(avatarCircle, userInfo);
-}
-
-// ---- Render de filas (tabla desktop) ----
-function renderRecursosRows(lista) {
-  const container = document.getElementById("recursos-list");
-  container.innerHTML = "";
-  lista.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "table-row";
-
-    // columna Nombre + icono
-    const colNombre = document.createElement("div");
-    colNombre.className = "col-nombre";
-    const spanIcon = document.createElement("span");
-    spanIcon.className = "icon-recurso";
-    const imgIcon = document.createElement("img");
-    imgIcon.src = "../ASSETS/Home/recursos/boton3.png";
-    imgIcon.alt = "Curso";
-    spanIcon.appendChild(imgIcon);
-    const link = document.createElement("a");
-    link.href = `VIEW/Curso.php?id=${item.curso}`;
-    link.className = "recurso-link";
-    link.textContent = item.nombre_curso;
-    colNombre.append(spanIcon, link);
-
-    // columna Tipo
-    const colTipo = document.createElement("div");
-    colTipo.className = "col-tipo";
-    colTipo.textContent = "Curso";
-
-    // columna Fecha
-    const colFecha = document.createElement("div");
-    colFecha.className = "col-fecha";
-    const fecha = new Date(item.fecha_creacion);
-    const opts = { year: "numeric", month: "long", day: "2-digit" };
-    colFecha.textContent = fecha.toLocaleDateString("es-MX", opts);
-
-    row.append(colNombre, colTipo, colFecha);
-    container.appendChild(row);
-  });
-}
-
-// ---- Render de paginación (tabla desktop) ----
-function renderPagination(totalPages) {
-  const ctrl = document.getElementById("pagination-controls");
-  ctrl.innerHTML = "";
-
-  const prev = document.createElement("button");
-  prev.textContent = "← Anterior";
-  prev.disabled = currentPage === 1;
-  prev.addEventListener("click", () => renderPage(currentPage - 1));
-  ctrl.appendChild(prev);
-
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement("button");
-    btn.textContent = p;
-    if (p === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => renderPage(p));
-    ctrl.appendChild(btn);
-  }
-
-  const next = document.createElement("button");
-  next.textContent = "Siguiente →";
-  next.disabled = currentPage === totalPages;
-  next.addEventListener("click", () => renderPage(currentPage + 1));
-  ctrl.appendChild(next);
-}
-
-// ---- Render de filas Mobile (accordion) ----
-function renderRecursosRowsMobile(lista) {
-  const container = document.getElementById("recursos-list-mobile");
-  container.innerHTML = "";
-  lista.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "table-row-mobile";
-
-    // botón toggle: nombre + flecha
-    const btn = document.createElement("button");
-    btn.className = "row-toggle";
-    btn.innerHTML = `
-      <span class="col-nombre">${item.nombre_curso}</span>
-      <svg class="icon-chevron" viewBox="0 0 24 24" width="20" height="20">
-        <path d="M9 6l6 6-6 6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
-      </svg>
-    `;
-
-    // detalles escondidos
-    const details = document.createElement("div");
-    details.className = "row-details";
-    const fecha = new Date(item.fecha_creacion);
-    const opts = { year: "numeric", month: "long", day: "2-digit" };
-    details.innerHTML = `
-      <div><strong>Tipo:</strong> Curso</div>
-      <div><strong>Fecha:</strong> ${fecha.toLocaleDateString(
-        "es-MX",
-        opts
-      )}</div>
-    `;
-
-    // toggle expand/collapse
-    btn.addEventListener("click", () => {
-      row.classList.toggle("expanded");
-    });
-
-    row.append(btn, details);
-    container.appendChild(row);
-  });
-}
-
-// ---- Render paginación Mobile ----
-function renderPaginationMobile(totalPages) {
-  const ctrl = document.getElementById("pagination-mobile");
-  ctrl.innerHTML = "";
-
-  const prev = document.createElement("button");
-  prev.textContent = "← Anterior";
-  prev.disabled = currentPage === 1;
-  prev.addEventListener("click", () => renderPage(currentPage - 1));
-  ctrl.appendChild(prev);
-
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement("button");
-    btn.textContent = p;
-    if (p === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => renderPage(p));
-    ctrl.appendChild(btn);
-  }
-
-  const next = document.createElement("button");
-  next.textContent = "Siguiente →";
-  next.disabled = currentPage === totalPages;
-  next.addEventListener("click", () => renderPage(currentPage + 1));
-  ctrl.appendChild(next);
-}
-
-// ---- Render de página unificado (desktop + mobile) ----
-function renderPage(page) {
-  currentPage = page;
-  const start = (page - 1) * itemsPerPage;
-  const slice = recursosData.slice(start, start + itemsPerPage);
-
-  // Desktop
-  renderRecursosRows(slice);
-  renderPagination(Math.ceil(recursosData.length / itemsPerPage));
-
-  // Mobile
-  renderRecursosRowsMobile(slice);
-  renderPaginationMobile(Math.ceil(recursosData.length / itemsPerPage));
-}
-
-// ---- Sorting de la tabla desktop ----
-function montarSortingRecursos() {
-  const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((header) => {
-    header.style.cursor = "pointer";
-    header.setAttribute("role", "columnheader");
-    header.setAttribute("aria-sort", "none");
-    header.tabIndex = 0;
-
-    if (!header.querySelector(".sort-icon")) {
-      const icon = document.createElement("span");
-      icon.className = "sort-icon asc";
-      icon.innerHTML = `
-        <svg viewBox="0 0 24 24" width="0.9em" height="0.9em">
-          <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-        </svg>`;
-      header.appendChild(icon);
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 50) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
     }
+  });
+});
 
-    header.addEventListener("click", () => {
-      let colKey = null;
-      if (header.classList.contains("col-nombre")) colKey = "nombre";
-      else if (header.classList.contains("col-tipo")) colKey = "tipo";
-      else if (header.classList.contains("col-fecha")) colKey = "fecha";
-      if (!colKey) return;
+//notificaciones tipo toast para manejarlas en todas las vistas
+(function () {
+  if (!document.querySelector(".gc-toast-container")) {
+    const contenedor = document.createElement("div");
+    contenedor.className = "gc-toast-container";
+    document.body.appendChild(contenedor);
+  }
 
-      if (sortState.column === colKey) sortState.asc = !sortState.asc;
-      else {
-        sortState.column = colKey;
-        sortState.asc = false;
+  /**
+   * notificaciones
+   * @param {string} mensaje - El texto que quiero mostrar
+   * @param {string} tipo - 'exito' | 'error' | 'warning', por defecto 'exito'
+   * @param {number} duracion - Tiempo en milisegundos, por defecto 5000ms (5 segundos)
+   */
+
+  window.gcToast = function (mensaje, tipo = "exito", duracion = 5000) {
+    const contenedor = document.querySelector(".gc-toast-container");
+    if (!contenedor) return;
+
+    const toast = document.createElement("div");
+    toast.className = `gc-toast ${tipo}`;
+    toast.textContent = mensaje;
+
+    contenedor.appendChild(toast);
+
+    // animacion de entrada
+    setTimeout(() => toast.classList.add("mostrar"), 10);
+
+    // ocultar
+    setTimeout(() => {
+      toast.classList.remove("mostrar");
+      setTimeout(() => contenedor.removeChild(toast), 400);
+    }, duracion);
+  };
+})(); //------------------ aca termina el js para las notificaciones.
+
+document.addEventListener("DOMContentLoaded", () => {
+  const usuarioCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("usuario="));
+
+  const actionsDesktop = document.querySelector(".actions");
+  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
+  const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
+  const socialIconsContainer = document.querySelector(".social-icons");
+
+  function verificarImagen(src, callback) {
+    const img = new Image();
+    img.onload = () => callback(src);
+    img.onerror = () => callback("../ASSETS/usuario/usuarioImg/img_user1.png");
+    img.src = src;
+  }
+
+  if (usuarioCookie) {
+    try {
+      const datos = JSON.parse(decodeURIComponent(usuarioCookie.split("=")[1]));
+      const email = datos.correo || "Usuario";
+      const id = datos.id || "1";
+      const ruta = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
+
+      if (!sessionStorage.getItem("bienvenidaMostrada")) {
+        gcToast(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
+        sessionStorage.setItem("bienvenidaMostrada", "true");
       }
 
-      recursosData.sort((a, b) =>
-        sortState.asc ? comparators[colKey](a, b) : comparators[colKey](b, a)
-      );
-      renderPage(1);
-      actualizarFlechasSorting();
-    });
-  });
-}
+      verificarImagen(ruta, (rutaFinal) => {
+        // DESKTOP
+        if (actionsDesktop) {
+          btnRegistrarse?.remove();
+          userIconDesktop?.remove();
 
-function actualizarFlechasSorting() {
-  const headers = document.querySelectorAll(HEADER_SELECTOR);
-  headers.forEach((hdr) => {
-    const icon = hdr.querySelector(".sort-icon");
-    hdr.setAttribute("aria-sort", "none");
-    icon.classList.remove("asc", "desc");
-    icon.classList.add("asc");
-  });
-  if (!sortState.column) return;
+          const nuevo = document.createElement("div");
+          nuevo.className = "user-icon";
+          nuevo.innerHTML = `
+            <span class="user-email">${email}</span>
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
+            <div class="dropdown-menu" id="user-dropdown">
+              <ul>
+                <li onclick="window.location.href='../VIEW/Home.php'">
+                  <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+                </li>
+                <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
+                  <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+                </li>
+              </ul>
+            </div>
+          `;
+          actionsDesktop.appendChild(nuevo);
+          actionsDesktop.classList.add("mostrar");
 
-  const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
-  const hdr =
-    document.querySelectorAll(HEADER_SELECTOR)[idxMap[sortState.column]];
-  hdr.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
-  const icon = hdr.querySelector(".sort-icon");
-  if (!sortState.asc) {
-    icon.classList.remove("asc");
-    icon.classList.add("desc");
-  }
-}
+          const userDropdown = nuevo.querySelector("#user-dropdown");
+          nuevo.addEventListener("click", (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle("active");
+          });
+          document.addEventListener("click", () =>
+            userDropdown.classList.remove("active")
+          );
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") userDropdown.classList.remove("active");
+          });
 
-// ---- Estados vacíos y error ----
-function showEmptyRecursos() {
-  document.getElementById("recursos-list").innerHTML = `
-    <div class="empty-state">
-      <p>No solicitaste recursos aún.</p>
-      <button class="btn btn-primary" onclick="location.href='nuevo_recurso.php'">
-        Solicitar recurso
-      </button>
-    </div>`;
-}
+          const btnLogout = nuevo.querySelector("#logout-btn");
+          btnLogout?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+          });
+        }
 
-function showErrorRecursos(message, retryFn) {
-  const box = document.querySelector(".recursos-box");
-  box.innerHTML = `
-    <div class="error-state">
-      <p>${message}</p>
-      <button id="retry-recursos" class="btn btn-primary">Reintentar</button>
-    </div>`;
-  document.getElementById("retry-recursos").addEventListener("click", retryFn);
-}
+        // MOBILE
+        if (socialIconsContainer) {
+          const iconoPrevio =
+            socialIconsContainer.querySelector(".user-icon-mobile");
+          if (iconoPrevio) iconoPrevio.remove();
 
-// ---- Modal “Administrar perfil” ----
-let perfilModalIniciado = false;
-function initModalPerfil() {
-  if (perfilModalIniciado) return;
-  perfilModalIniciado = true;
+          const nuevoMob = document.createElement("div");
+          nuevoMob.className = "user-icon-mobile";
+          nuevoMob.innerHTML = `
+            <img src="${rutaFinal}" alt="Perfil" title="Perfil" />
+          `;
+          socialIconsContainer.appendChild(nuevoMob);
 
-  const editBtn = document.querySelector(".edit-profile");
-  const modal = document.getElementById("modal-perfil");
-  const closeBtn = modal.querySelector(".modal-close");
-  const form = document.getElementById("form-perfil");
-  const inp = {
-    nombre: document.getElementById("perfil-nombre"),
-    correo: document.getElementById("perfil-email"),
-    pass: document.getElementById("perfil-password"),
-    pass2: document.getElementById("perfil-password2"),
-    telefono: document.getElementById("perfil-telefono"),
-    nacimiento: document.getElementById("perfil-nacimiento"),
-  };
+          const dropdownMobile = document.createElement("div");
+          dropdownMobile.className = "dropdown-menu mobile";
+          dropdownMobile.id = "user-dropdown-mobile";
+          dropdownMobile.innerHTML = `
+            <ul>
+              <li onclick="window.location.href='../VIEW/Home.php'">
+                <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
+              </li>
+              <li id="logout-btn-mobile">
+                <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
+              </li>
+            </ul>
+          `;
+          document.body.appendChild(dropdownMobile);
 
-  let usuarioCookie = getUsuarioFromCookie();
-  let usuarioActual = null;
+          nuevoMob.querySelector("img").addEventListener("click", (e) => {
+            e.stopPropagation();
+            const rect = nuevoMob.getBoundingClientRect();
+            dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
+            dropdownMobile.style.left = `${rect.right - 180}px`;
+            dropdownMobile.classList.toggle("active");
+          });
 
-  editBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    try {
-      const lista = await fetchUsuario(
-        usuarioCookie.correo,
-        usuarioCookie.telefono,
-        usuarioCookie.estatus
-      );
-      usuarioActual =
-        lista.find((u) => +u.id === +usuarioCookie.id) || lista[0];
-      inp.nombre.value = usuarioActual.nombre || "";
-      inp.correo.value = usuarioActual.correo || "";
-      inp.telefono.value = usuarioActual.telefono || "";
-      inp.nacimiento.value = usuarioActual.fecha_nacimiento || "";
-      inp.pass.value = inp.pass2.value = "";
-      modal.classList.add("active");
-      document.body.classList.add("modal-abierto");
-    } catch {
-      gcToast("Error al cargar datos de perfil.", "error");
-    }
-  });
+          document.addEventListener("click", () => {
+            dropdownMobile.classList.remove("active");
+          });
 
-  const cerrarPerfilModal = () => {
-    modal.classList.remove("active");
-    document.body.classList.remove("modal-abierto");
-  };
-  closeBtn.addEventListener("click", cerrarPerfilModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) cerrarPerfilModal();
-  });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") dropdownMobile.classList.remove("active");
+          });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (inp.pass.value !== inp.pass2.value)
-      return gcToast("Las contraseñas no coinciden.", "warning");
-    const payload = {
-      id: usuarioActual.id,
-      nombre: inp.nombre.value.trim(),
-      correo: inp.correo.value.trim(),
-      telefono: inp.telefono.value.trim(),
-      fecha_nacimiento: inp.nacimiento.value,
-      tipo_contacto: usuarioActual.tipo_contacto,
-      estatus: usuarioActual.estatus,
-      ...(inp.pass.value && { password: inp.pass.value }),
-    };
-    try {
-      const res = await fetch("https://godcode…/u_usuario.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+          const btnLogoutMobile =
+            dropdownMobile.querySelector("#logout-btn-mobile");
+          btnLogoutMobile?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+            window.location.href = "../VIEW/Login.php";
+          });
+        }
       });
-      const data = await res.json();
-      data.mensaje && gcToast(data.mensaje, "exito");
-      usuarioCookie = { ...usuarioCookie, ...payload };
-      document.cookie =
-        "usuario=" +
-        encodeURIComponent(JSON.stringify(usuarioCookie)) +
-        "; path=/; max-age=" +
-        86400;
-      renderPerfil(usuarioCookie);
-    } catch {
-      gcToast("Error al actualizar perfil.", "error");
-    } finally {
-      cerrarPerfilModal();
+    } catch (e) {
+      console.warn("Cookie malformada:", e);
     }
-  });
-}
+  } else {
+    // usuario no logeado
+    if (actionsDesktop) {
+      actionsDesktop.querySelector(".user-icon")?.remove();
+      const iconoLogin = document.createElement("div");
+      iconoLogin.className = "user-icon";
+      iconoLogin.innerHTML = `
+        <img src="../ASSETS/usuario/usuarioImg/img_user1.png"
+             alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+      `;
+      iconoLogin.addEventListener("click", () => {
+        window.location.href = "../VIEW/Login.php";
+      });
+      actionsDesktop.appendChild(iconoLogin);
+      actionsDesktop.classList.add("mostrar");
+    }
+  }
 
-// ---- Deshabilitar enlaces de prueba ----
-function disableLinks() {
-  document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
-    el.removeAttribute("href");
-    el.addEventListener("click", (e) => {
+  console.log("Se ejecutó todo el bloque para el topbar");
+});
+
+//------------------------------- js para el subnav
+document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    // "vistaOperativa2.php",
+    // "vistaOperativa3.php",
+  ];
+
+  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
+  subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
+
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+
+  if (operativeViews.includes(currentPage)) {
+    const mk = (label) => {
+      const slug = label.toLowerCase() + ".php";
+      const active = slug === currentPage ? "active" : "";
+      return `<a href="${slug}" class="${active}">${label}</a>`;
+    };
+    const markup = `
+      ${mk("Home")}
+      ${mk("Proyectos")}
+      ${mk("Cursos")}
+      ${mk("Admin")}
+    `;
+    subnavs.forEach((nav) => (nav.innerHTML = markup));
+  } else {
+    subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
+  }
+
+  const submenu = document.getElementById("submenu-productos");
+  if (submenu) {
+    const mega = submenu.querySelector(".megamenu");
+    if (mega) {
+      mega.classList.remove("show");
+      for (const ch of submenu.children) {
+        if (ch.tagName === "A") {
+          link = ch;
+          break;
+        }
+      }
+      if (link) {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          mega.classList.toggle("show");
+        });
+      }
+      document.addEventListener("click", (e) => {
+        if (!submenu.contains(e.target)) {
+          mega.classList.remove("show");
+        }
+      });
+    }
+  }
+
+  const logoBtn = document.getElementById("logo-btn");
+  if (logoBtn) {
+    logoBtn.style.cursor = "pointer";
+    logoBtn.addEventListener("click", () => {
+      window.location.href = "/index.php";
+    });
+  }
+
+  const socialMap = {
+    tiktok: "https://www.tiktok.com/@godcodemx",
+    instagram: "https://www.instagram.com/god_code_mx/",
+    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
+  };
+
+  const socialIcons = document.querySelectorAll(
+    "#header .icon-mobile, #header .circle-icon"
+  );
+
+  socialIcons.forEach((el) => {
+    const img = el.querySelector("img");
+    if (!img) return;
+    const key = img.alt.trim().toLowerCase();
+    const url = socialMap[key];
+    if (!url) return;
+
+    el.style.cursor = "pointer";
+
+    el.addEventListener("click", () => {
+      window.open(url, "_blank", "noopener");
+    });
+  });
+});
+
+//--------------- deshabilitar el href de cotizar
+document.addEventListener("DOMContentLoaded", () => {
+  // deshabilitar boton "Cotizar"
+  const cotizarBtn = document.querySelector(".actions .btn-outline");
+  if (cotizarBtn) {
+    cotizarBtn.removeAttribute("onclick");
+    cotizarBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      gcToast("Función deshabilitada", "warning");
+      gcToast("Función deshabilitada", "warning", 4000);
     });
-  });
-}
-
-// ---- Skeleton loaders ----
-function showSkeletons() {
-  const tableBody = document.querySelector(".recursos-table .table-body");
-  tableBody.innerHTML = "";
-  for (let i = 0; i < itemsPerPage; i++) {
-    const row = document.createElement("div");
-    row.className = "skeleton-row";
-    ["name", "type", "date"].forEach((c) => {
-      const cell = document.createElement("div");
-      cell.className = `skeleton-cell ${c}`;
-      row.appendChild(cell);
-    });
-    tableBody.appendChild(row);
   }
-}
+});
 
-// ---- Toggle “Mis cursos” (sidebar) ----
-function initMisCursosToggle() {
-  document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
-    const subtitle = listEl.querySelector(".cursos-subtitulo");
-    const container = listEl.querySelector("div[id^='cursos-']");
-    if (!subtitle || !container) return;
+// botones inhabilitados del subnav
+document.addEventListener("DOMContentLoaded", () => {
+  const operativeViews = [
+    "home.php",
+    "vistaoperativa2.php",
+    "vistaoperativa3.php",
+  ];
 
-    const count = container.children.length;
-    const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
-    subtitle.textContent = `${baseLabel} (${count})`;
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
 
-    const wrapper = document.createElement("span");
-    wrapper.className = "arrow-wrapper";
-    wrapper.innerHTML = `
-      <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
-           viewBox="0 0 24 24" width="24" height="24">
-        <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-      </svg>`;
-    subtitle.appendChild(wrapper);
+  if (!operativeViews.includes(currentPage)) return;
 
-    subtitle.setAttribute("role", "button");
-    subtitle.tabIndex = 0;
-    subtitle.setAttribute("aria-expanded", "true");
+  const deshabilitados = ["Proyectos", "Cursos", "Admin"];
 
-    container.style.overflow = "hidden";
-    container.style.transition = "max-height 0.3s ease";
-
-    const key = `mis-cursos:${container.id}`;
-    let collapsed = localStorage.getItem(key) === "closed";
-    const svgIcon = wrapper.querySelector(".arrow-icon");
-
-    function applyState() {
-      if (collapsed) {
-        container.style.maxHeight = "0px";
-        container.style.display = "none";
-        subtitle.setAttribute("aria-expanded", "false");
-        svgIcon.classList.add("open");
-      } else {
-        container.style.display = "flex";
-        container.style.flexDirection = "column";
-        container.style.flexWrap = "nowrap";
-        container.style.maxHeight = container.scrollHeight + "px";
-        subtitle.setAttribute("aria-expanded", "true");
-        svgIcon.classList.remove("open");
-      }
-    }
-    applyState();
-
-    function toggleSection() {
-      collapsed = !collapsed;
-      applyState();
-      localStorage.setItem(key, collapsed ? "closed" : "open");
-    }
-    subtitle.addEventListener("click", toggleSection);
-    subtitle.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleSection();
-      }
-    });
-  });
-}
-
-// ---- Carga de recursos y arranque ----
-async function loadRecursos(usuarioId) {
-  try {
-    const data = await fetchInscripciones(usuarioId);
-    if (!Array.isArray(data) || data.length === 0) {
-      showEmptyRecursos();
-      return;
-    }
-    recursosData = data.slice();
-    renderPage(1);
-    montarSortingRecursos();
-    initMisCursosToggle();
-  } catch (err) {
-    console.error(err);
-    showErrorRecursos("Error al cargar tus recursos. Intenta de nuevo.", () =>
-      loadRecursos(usuarioId)
+  deshabilitados.forEach((nombre) => {
+    const btn = Array.from(document.querySelectorAll("#header .subnav a")).find(
+      (a) => a.textContent.trim().toLowerCase() === nombre.toLowerCase()
     );
-  }
-}
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const usuario = getUsuarioFromCookie();
-  if (!usuario) {
-    window.location.href = "../VIEW/Login.php";
-    return;
-  }
+    if (btn) {
+      btn.href = "#";
+      btn.dataset.disabled = "true";
 
-  renderPerfil(usuario);
-  showSkeletons();
-  await loadRecursos(usuario.id);
-  initModalPerfil();
-  disableLinks();
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (window.gcToast) {
+          gcToast("Función deshabilitada", "warning");
+        } else {
+          alert("Función deshabilitada");
+        }
+      });
+    }
+  });
 });
