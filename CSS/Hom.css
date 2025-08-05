@@ -1146,23 +1146,64 @@ main {
 }
 
 
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
 /*--------------------- recursos y css para las data tables -------------------------*/
 
 @media (max-width: 768px) {
+
+  .recursos-box.mobile-only {
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0 1rem;
+  }
+
+  .recursos-box.mobile-only h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #222;
+    text-align: left;
+  }
+
+  .recursos-table-mobile {
+    width: 100%;
+    border: 1px solid #F2E5E6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  }
+
   .recursos-table-mobile .table-header {
     display: none;
   }
 
   .table-row-mobile {
-    border: 1px solid #F2E5E6;
-    border-radius: 8px;
-    margin: 0.5rem 0;
-    overflow: hidden;
-    background: #fff;
+    border-top: 1px solid #F2E5E6;
   }
 
-  .table-row-mobile+.table-row-mobile {
-    margin-top: 0.75rem;
+  .table-row-mobile:first-child {
+    border-top: none;
+  }
+
+  .table-row-mobile {
+    background: #fff;
   }
 
   .row-toggle {
@@ -1176,8 +1217,16 @@ main {
     cursor: pointer;
   }
 
+  .row-toggle .col-nombre {
+    font-size: 1rem;
+    color: #222;
+    flex: 1;
+    text-align: left;
+  }
+
   .icon-chevron {
     transition: transform 0.2s ease;
+    flex-shrink: 0;
   }
 
   .table-row-mobile.expanded .icon-chevron {
@@ -1192,7 +1241,7 @@ main {
   }
 
   .table-row-mobile.expanded .row-details {
-    max-height: 100px;
+    max-height: 4rem;
     padding: 0.5rem 1rem 1rem;
   }
 
@@ -1204,5 +1253,17 @@ main {
 
   .row-details div:last-child {
     margin-bottom: 0;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .pagination-controls button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
   }
 }

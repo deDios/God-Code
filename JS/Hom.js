@@ -499,7 +499,7 @@ function initMisCursosToggle() {
   });
 }
 
-// carga de recursos principal 
+// carga de recursos principal
 async function loadRecursos(usuarioId) {
   try {
     const data = await fetchInscripciones(usuarioId);
@@ -534,3 +534,87 @@ document.addEventListener("DOMContentLoaded", async () => {
   initModalPerfil();
   disableLinks();
 });
+
+
+
+// Renderizado de filas en Mobile
+function renderRecursosRowsMobile(lista) {
+  const container = document.getElementById("recursos-list-mobile");
+  container.innerHTML = "";
+  lista.forEach((item) => {
+    //crear las filas
+    const row = document.createElement("div");
+    row.className = "table-row-mobile";
+
+    // boton de toggle
+    const btn = document.createElement("button");
+    btn.className = "row-toggle";
+    btn.innerHTML = `
+      <span class="col-nombre">${item.nombre_curso}</span>
+      <svg class="icon-chevron" viewBox="0 0 24 24" width="20" height="20">
+        <path d="M9 6l6 6-6 6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    // detalles ocultos (tipo + fecha)
+    const details = document.createElement("div");
+    details.className = "row-details";
+    const fecha = new Date(item.fecha_creacion);
+    const opts = { year: "numeric", month: "long", day: "2-digit" };
+    details.innerHTML = `
+      <div><strong>Tipo:</strong> Curso</div>
+      <div><strong>Fecha:</strong> ${fecha.toLocaleDateString(
+        "es-MX",
+        opts
+      )}</div>
+    `;
+
+    // Toggle expand/collapse
+    btn.addEventListener("click", () => {
+      row.classList.toggle("expanded");
+    });
+
+    row.append(btn, details);
+    container.appendChild(row);
+  });
+}
+
+// paginacion de Mobile
+function renderPaginationMobile(totalPages) {
+  const ctrl = document.getElementById("pagination-mobile");
+  ctrl.innerHTML = "";
+
+  const prev = document.createElement("button");
+  prev.textContent = "← Anterior";
+  prev.disabled = currentPage === 1;
+  prev.addEventListener("click", () => renderPage(currentPage - 1));
+  ctrl.appendChild(prev);
+
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement("button");
+    btn.textContent = p;
+    if (p === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => renderPage(p));
+    ctrl.appendChild(btn);
+  }
+
+  const next = document.createElement("button");
+  next.textContent = "Siguiente →";
+  next.disabled = currentPage === totalPages;
+  next.addEventListener("click", () => renderPage(currentPage + 1));
+  ctrl.appendChild(next);
+}
+
+function renderPage(page) {
+  currentPage = page;
+  const start = (page - 1) * itemsPerPage;
+  const slice = recursosData.slice(start, start + itemsPerPage);
+
+  // Desktop
+  renderRecursosRows(slice);
+  renderPagination(Math.ceil(recursosData.length / itemsPerPage));
+
+  // Mobile
+  renderRecursosRowsMobile(slice);
+  renderPaginationMobile(Math.ceil(recursosData.length / itemsPerPage));
+}

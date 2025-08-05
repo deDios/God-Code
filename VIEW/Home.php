@@ -282,10 +282,25 @@
                 <!-- Paginacion -->
                 <div id="pagination-controls" class="pagination-controls"></div>
             </section>
+
+
+            <!-- solamente mobile esta es la tabla de 1 columna y col desplegables para mobile -->
+            <section class="recursos-box mobile-only">
+                <h2>Recursos</h2>
+                <div class="recursos-table-mobile">
+                    <div class="table-header">
+                        <div class="col-nombre">Nombre</div>
+                    </div>
+                    <div class="table-body" id="recursos-list-mobile">
+                        <!-- las col se colocaran aca con el js -->
+                    </div>
+                </div>
+                <div id="pagination-mobile" class="pagination-controls"></div>
+            </section>
         </section>
 
 
-        
+
     </main>
 
     <!-- Pie de pagina -->
