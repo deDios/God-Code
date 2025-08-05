@@ -38,11 +38,13 @@ async function fetchInscripciones(usuarioId) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ usuario: usuarioId }),
   });
+  if (!res.ok) {
+    throw new Error("No se cargaron inscripciones");
+  }
 
-  if (!res.ok) throw new Error("No se cargaron inscripciones");
   const data = await res.json();
   console.log("fetchInscripciones response:", data);
-  return res.json();
+  return data;
 }
 
 async function fetchUsuario(correo, telefono, estatus) {
