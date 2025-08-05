@@ -525,6 +525,8 @@ body {
 }
 
 /*-------------- paginacion para recursos ----------------------------*/
+
+/*
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -552,6 +554,7 @@ body {
   opacity: .5;
   cursor: not-allowed;
 }
+*/
 
 /*---------------------------- css para MODAL ------------------------------*/
 .modal-overlay {
@@ -1114,13 +1117,6 @@ main {
     padding: 0.75rem 0;
   }
 
-  #pagination-controls {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin: 1rem 0;
-  }
-
   .main-content {
     width: 100%;
     padding: 0 1rem;
@@ -1236,7 +1232,7 @@ main {
     text-align: left;
   }
 
-   .icon-chevron {
+  .icon-chevron {
     transform: rotate(-90deg);
     transition: transform 0.2s ease;
     flex-shrink: 0;
@@ -1279,4 +1275,106 @@ main {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
   }
+}
+
+
+
+
+
+/*------------- controles para la paginacion actualizados*/
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.pagination-controls .page-btn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.pagination-controls .page-btn:hover:not(:disabled) {
+  border-color: #1565c0;
+  color: #1565c0;
+}
+
+.pagination-controls .page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-controls .page-btn.active {
+  background: #1565c0;
+  border-color: #1565c0;
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination-controls .arrow-btn {
+  background: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.pagination-controls .arrow-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-controls .arrow-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+.pagination-controls .arrow-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+
+.pagination-controls .arrow-btn {
+  background: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.pagination-controls .arrow-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.pagination-controls .arrow-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+.pagination-controls .arrow-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

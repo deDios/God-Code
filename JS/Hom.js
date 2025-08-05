@@ -81,7 +81,7 @@ function renderPerfil(usuario) {
   profile.append(avatarCircle, userInfo);
 }
 
-// ---- Render de filas (tabla desktop) ----
+// ---- Render de filas (desktop) ----
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
@@ -121,28 +121,81 @@ function renderRecursosRows(lista) {
   });
 }
 
-// ---- Render de paginación (tabla desktop) ----
+// ---- Render de paginacion (desktop) ----
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";
 
+  // Anterior desktop
   const prev = document.createElement("button");
-  prev.textContent = "← Anterior";
+  prev.className = "arrow-btn";
   prev.disabled = currentPage === 1;
+  prev.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  `;
   prev.addEventListener("click", () => renderPage(currentPage - 1));
   ctrl.appendChild(prev);
 
+  // botones de pagina, el que es un numero
   for (let p = 1; p <= totalPages; p++) {
     const btn = document.createElement("button");
+    btn.className = "page-btn";
     btn.textContent = p;
     if (p === currentPage) btn.classList.add("active");
     btn.addEventListener("click", () => renderPage(p));
     ctrl.appendChild(btn);
   }
 
+  // Siguiente desktop
   const next = document.createElement("button");
-  next.textContent = "Siguiente →";
+  next.className = "arrow-btn";
   next.disabled = currentPage === totalPages;
+  next.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 6l6 6-6 6"/>
+    </svg>
+  `;
+  next.addEventListener("click", () => renderPage(currentPage + 1));
+  ctrl.appendChild(next);
+}
+
+function renderPaginationMobile(totalPages) {
+  const ctrl = document.getElementById("pagination-mobile");
+  ctrl.innerHTML = "";
+
+  // Anterior (mobile)
+  const prev = document.createElement("button");
+  prev.className = "arrow-btn";
+  prev.disabled = currentPage === 1;
+  prev.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  `;
+  prev.addEventListener("click", () => renderPage(currentPage - 1));
+  ctrl.appendChild(prev);
+
+  // botones de página son los que son numeros
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    btn.textContent = p;
+    if (p === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => renderPage(p));
+    ctrl.appendChild(btn);
+  }
+
+  // Siguiente (mobile)
+  const next = document.createElement("button");
+  next.className = "arrow-btn";
+  next.disabled = currentPage === totalPages;
+  next.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 6l6 6-6 6"/>
+    </svg>
+  `;
   next.addEventListener("click", () => renderPage(currentPage + 1));
   ctrl.appendChild(next);
 }
