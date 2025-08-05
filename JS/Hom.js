@@ -5,7 +5,6 @@ const ENDPOINT_USUARIO_FETCH =
 const ENDPOINT_USUARIO_UPDATE =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
 
-
 const itemsPerPage = 6; //esto es la paginacion de momento son 6 objetos por pagina
 let recursosData = [];
 let currentPage = 1; //la pagina por default
@@ -14,7 +13,7 @@ const HEADER_SELECTOR = ".recursos-box .table-header > div";
 const sortState = { column: null, asc: true };
 const comparators = {
   nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
-  tipo: () => 0, 
+  tipo: () => 0,
   fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
 };
 
@@ -148,7 +147,7 @@ function renderPagination(totalPages) {
   ctrl.appendChild(next);
 }
 
-// ---- Render de filas Mobile (accordion) ----
+// ---- Render de filas Mobile ----
 function renderRecursosRowsMobile(lista) {
   const container = document.getElementById("recursos-list-mobile");
   container.innerHTML = "";
@@ -156,17 +155,23 @@ function renderRecursosRowsMobile(lista) {
     const row = document.createElement("div");
     row.className = "table-row-mobile";
 
-    // botón toggle: nombre + flecha
     const btn = document.createElement("button");
     btn.className = "row-toggle";
+    btn.setAttribute("aria-expanded", "false");
     btn.innerHTML = `
-      <span class="col-nombre">${item.nombre_curso}</span>
+      <span class="col-nombre">
+        <span class="icon-recurso">
+          <img src="../ASSETS/Home/recursos/boton3.png" alt="Curso">
+        </span>
+        ${item.nombre_curso}
+      </span>
       <svg class="icon-chevron" viewBox="0 0 24 24" width="20" height="20">
-        <path d="M9 6l6 6-6 6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M9 6l6 6-6 6"
+              stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
       </svg>
     `;
 
-    // detalles escondidos
+    // informacion colapsable
     const details = document.createElement("div");
     details.className = "row-details";
     const fecha = new Date(item.fecha_creacion);
@@ -181,7 +186,8 @@ function renderRecursosRowsMobile(lista) {
 
     // toggle expand/collapse
     btn.addEventListener("click", () => {
-      row.classList.toggle("expanded");
+      const expanded = row.classList.toggle("expanded");
+      btn.setAttribute("aria-expanded", expanded.toString());
     });
 
     row.append(btn, details);
@@ -277,18 +283,21 @@ function actualizarFlechasSorting() {
     const icon = hdr.querySelector(".sort-icon");
     hdr.setAttribute("aria-sort", "none");
     icon.classList.remove("asc", "desc");
-    icon.classList.add("asc");
   });
+
   if (!sortState.column) return;
 
+  // elegimos el header activo
   const idxMap = { nombre: 0, tipo: 1, fecha: 2 };
-  const hdr =
-    document.querySelectorAll(HEADER_SELECTOR)[idxMap[sortState.column]];
-  hdr.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
-  const icon = hdr.querySelector(".sort-icon");
-  if (!sortState.asc) {
-    icon.classList.remove("asc");
-    icon.classList.add("desc");
+  const activeHdr = headers[idxMap[sortState.column]];
+  const activeIcon = activeHdr.querySelector(".sort-icon");
+
+  if (sortState.asc) {
+    activeHdr.setAttribute("aria-sort", "ascending");
+    activeIcon.classList.add("asc"); 
+  } else {
+    activeHdr.setAttribute("aria-sort", "descending");
+    activeIcon.classList.add("desc"); 
   }
 }
 

@@ -1194,8 +1194,20 @@ main {
     display: none;
   }
 
-  .table-row-mobile {
-    border-top: 1px solid #F2E5E6;
+  .recursos-table-mobile .table-header {
+    display: flex;
+    background: #F7F7F7;
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+  }
+
+  .recursos-table-mobile .table-header .col-nombre {
+    flex: 1;
+    justify-content: center;
+    align-items: center;
   }
 
   .table-row-mobile:first-child {
