@@ -229,7 +229,7 @@
         </section>
 
         <!-- contenido -->
-        <section class="main-content">
+        <section class="main-content desktop-only">
             <nav class="main-navbar">
                 <button class="nav-btn">
                     <span class="nav-icon">
@@ -239,19 +239,34 @@
                     </span>
                     Nuevo recurso
                 </button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton1.png"
-                            alt=""></span>Proyectos</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton2.png"
-                            alt=""></span>Coworking</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton3.png"
-                            alt=""></span>Cursos</button>
-                <button class="nav-btn"><span class="nav-icon"><img src="../ASSETS/Home/recursos/boton4.png"
-                            alt=""></span>Cotizar</button>
+                <button class="nav-btn">
+                    <span class="nav-icon">
+                        <img src="../ASSETS/Home/recursos/boton1.png" alt="Proyectos" />
+                    </span>
+                    Proyectos
+                </button>
+                <button class="nav-btn">
+                    <span class="nav-icon">
+                        <img src="../ASSETS/Home/recursos/boton2.png" alt="Coworking" />
+                    </span>
+                    Coworking
+                </button>
+                <button class="nav-btn">
+                    <span class="nav-icon">
+                        <img src="../ASSETS/Home/recursos/boton3.png" alt="Cursos" />
+                    </span>
+                    Cursos
+                </button>
+                <button class="nav-btn">
+                    <span class="nav-icon">
+                        <img src="../ASSETS/Home/recursos/boton4.png" alt="Cotizar" />
+                    </span>
+                    Cotizar
+                </button>
             </nav>
 
-            
-            <!-- desktop version -->
-            <section class="recursos-box desktop-only">
+            <!-- Tabla de Recursos -->
+            <section class="recursos-box">
                 <h2>Recursos</h2>
                 <div class="recursos-table">
                     <div class="table-header">
@@ -259,31 +274,18 @@
                         <div class="col-tipo">Tipo</div>
                         <div class="col-fecha">Fecha de solicitado</div>
                     </div>
-                    <div class="table-body" id="recursos-list-desktop">
-                        <!-- Aquí se insertan las filas desde JS -->
+                    <div class="table-body" id="recursos-list">
+                        <!-- aca se insertan las col desde el js -->
                     </div>
                 </div>
-                <div id="pagination-desktop" class="pagination-controls"></div>
+
+                <!-- Paginacion -->
+                <div id="pagination-controls" class="pagination-controls"></div>
             </section>
-
-
-            <!-- mobile version -->
-            <section class="recursos-box mobile-only">
-                <h2>Recursos</h2>
-                <div class="recursos-table-mobile">
-                    <div class="table-header">
-                        <div class="col-nombre">Nombre</div>
-                        <div class="col-tipo">Tipo</div>
-                        <div class="col-fecha">Fecha de solicitado</div>
-                    </div>
-                    <div class="table-body" id="recursos-list-mobile">
-                        <!-- Aquí se insertan las filas desde JS -->
-                    </div>
-                </div>
-                <div id="pagination-mobile" class="pagination-controls"></div>
-            </section>
-
         </section>
+
+
+        
     </main>
 
     <!-- Pie de pagina -->
