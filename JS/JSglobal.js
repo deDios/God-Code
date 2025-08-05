@@ -289,30 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "/index.php";
     });
   }
-
-  const socialMap = {
-    tiktok: "https://www.tiktok.com/@godcodemx",
-    instagram: "https://www.instagram.com/god_code_mx/",
-    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
-  };
-
-  const socialIcons = document.querySelectorAll(
-    "#header .icon-mobile, #header .circle-icon"
-  );
-
-  socialIcons.forEach((el) => {
-    const img = el.querySelector("img");
-    if (!img) return;
-    const key = img.alt.trim().toLowerCase();
-    const url = socialMap[key];
-    if (!url) return;
-
-    el.style.cursor = "pointer";
-
-    el.addEventListener("click", () => {
-      window.open(url, "_blank", "noopener");
-    });
-  });
+  
 });
 
 //----------------- insertar iconos de redes sociales
