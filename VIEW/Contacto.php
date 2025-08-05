@@ -144,8 +144,8 @@
                 <div class="info-contacto">
                     <h3>Información de Contacto</h3>
                     <div class="bloque-info">
-                        <p><strong>Teléfono:</strong> +52 3333333333</p>
-                        <p><strong>Correo:</strong> godcode@gmail.com</p>
+                        <p><strong>Teléfono:</strong> +52 1 33 1977 4088</p>
+                        <p><strong>Correo:</strong> contacto@godcode.com.mx</p>
                         <p><strong>Horario de atención:</strong><br>Lunes a viernes, de 9:00 a.m. a 6:00 p.m.</p>
                     </div>
 

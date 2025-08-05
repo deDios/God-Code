@@ -719,8 +719,12 @@ footer small {
 }
 
 @media (max-width: 768px) {
-#seccion-innovacion .noticias {
-    display: none;
-   
-}
+    #seccion-innovacion .noticias {
+        display: none;
+
+    }
+
+    #seccion-innovacion .imagen img {
+        display: none;
+    }
 }

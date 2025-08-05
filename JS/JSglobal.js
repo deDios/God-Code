@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     },
     {
-      threshold: 0.2,
+      threshold: 0.2,s
     }
   );
 
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-//notificaciones tipo toast para manejarlas en todas las vistas
+//--------------------------- notificaciones tipo toast para manejarlas en todas las vistas
 (function () {
   if (!document.querySelector(".gc-toast-container")) {
     const contenedor = document.createElement("div");
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => contenedor.removeChild(toast), 400);
     }, duracion);
   };
-})(); //------------------ aca termina el js para las notificaciones.
+})(); //------------------ aca termina el js para las notificaciones
 
 document.addEventListener("DOMContentLoaded", () => {
   const usuarioCookie = document.cookie
@@ -412,3 +412,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+

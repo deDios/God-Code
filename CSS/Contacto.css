@@ -105,3 +105,41 @@ textarea {
     font-size: 0.9rem;
     color: #555;
 }
+
+
+/*-------------- css para tooltips y validadores.*/
+
+.form-tooltip {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background: #ffeaea;
+    color: #d8000c;
+    border: 1px solid #d8000c;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.97em;
+    z-index: 20;
+    white-space: pre-line;
+    min-width: 170px;
+    max-width: 230px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s;
+}
+
+.input-alerta-container.active .form-tooltip {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.input-alerta-container input:focus+.form-tooltip,
+.input-alerta-container input:invalid+.form-tooltip {
+    opacity: 1;
+}
+
+.input-alerta-container input {
+    position: relative;
+    z-index: 1;
+}
