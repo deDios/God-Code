@@ -1,4 +1,4 @@
-const ENDPOINT_INSCRIPCION =
+const ENDPOINT_INSCRIPCIONES =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php";
 const ENDPOINT_USUARIO_FETCH =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
@@ -33,12 +33,15 @@ function getUsuarioFromCookie() {
 
 // ---- Fetch de inscripciones y perfil ----
 async function fetchInscripciones(usuarioId) {
-  const res = await fetch(ENDPOINT_INSCRIPCION, {
+  const res = await fetch(ENDPOINT_INSCRIPCIONES, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ usuario: usuarioId }),
   });
+
   if (!res.ok) throw new Error("No se cargaron inscripciones");
+  const data = await res.json();
+  console.log("fetchInscripciones response:", data);
   return res.json();
 }
 
@@ -246,32 +249,6 @@ function renderRecursosRowsMobile(lista) {
     row.append(btn, details);
     container.appendChild(row);
   });
-}
-
-// ---- Render paginacion para mobile ----
-function renderPaginationMobile(totalPages) {
-  const ctrl = document.getElementById("pagination-mobile");
-  ctrl.innerHTML = "";
-
-  const prev = document.createElement("button");
-  prev.textContent = "← Anterior";
-  prev.disabled = currentPage === 1;
-  prev.addEventListener("click", () => renderPage(currentPage - 1));
-  ctrl.appendChild(prev);
-
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement("button");
-    btn.textContent = p;
-    if (p === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => renderPage(p));
-    ctrl.appendChild(btn);
-  }
-
-  const next = document.createElement("button");
-  next.textContent = "Siguiente →";
-  next.disabled = currentPage === totalPages;
-  next.addEventListener("click", () => renderPage(currentPage + 1));
-  ctrl.appendChild(next);
 }
 
 // ---- Render para la pagina ----
@@ -502,6 +479,7 @@ function initMisCursosToggle() {
     const count = container.children.length;
     const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
     subtitle.textContent = `${baseLabel} (${count})`;
+    console.log("cantidad de cursos", count);
 
     const wrapper = document.createElement("span");
     wrapper.className = "arrow-wrapper";
