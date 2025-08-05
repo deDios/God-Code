@@ -1,3 +1,4 @@
+// ---- ENDPOINTS ----
 const ENDPOINT_INSCRIPCIONES =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php";
 const ENDPOINT_USUARIO_FETCH =
@@ -5,23 +6,23 @@ const ENDPOINT_USUARIO_FETCH =
 const ENDPOINT_USUARIO_UPDATE =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
 
-const itemsPerPage = 6; //esto es la paginacion de momento son 6 objetos por pagina
-let recursosData = [];
-let currentPage = 1; //la pagina por default
+const itemsPerPage = 6; // cuántos recursos por pagina
+let recursosData = []; 
+let currentPage = 1; // página actual de la seccion de mis recursos
 const HEADER_SELECTOR = ".recursos-box .table-header > div";
 
+// ---- Estado de sorting ----
 const sortState = { column: null, asc: true };
 const comparators = {
   nombre: (a, b) => a.nombre_curso.localeCompare(b.nombre_curso),
-  tipo: () => 0,
+  tipo: () => 0, // todos "Curso"
   fecha: (a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion),
 };
 
-// ---- Helpers para cookies / usuario ----
 function getUsuarioFromCookie() {
   const cookie = document.cookie
     .split("; ")
-    .find((row) => row.startsWith("usuario="));
+    .find((r) => r.startsWith("usuario="));
   if (!cookie) return null;
   try {
     return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
@@ -31,22 +32,20 @@ function getUsuarioFromCookie() {
   }
 }
 
-// ---- Fetch de inscripciones y perfil ----
+// trae inscripciones desde el backend
 async function fetchInscripciones(usuarioId) {
   const res = await fetch(ENDPOINT_INSCRIPCIONES, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ usuario: usuarioId }),
   });
-  if (!res.ok) {
-    throw new Error("No se cargaron inscripciones");
-  }
-
+  if (!res.ok) throw new Error("No se cargaron inscripciones");
   const data = await res.json();
   console.log("fetchInscripciones response:", data);
   return data;
 }
 
+// trae datos de usuario
 async function fetchUsuario(correo, telefono, estatus) {
   const res = await fetch(ENDPOINT_USUARIO_FETCH, {
     method: "POST",
@@ -57,10 +56,11 @@ async function fetchUsuario(correo, telefono, estatus) {
   return res.json();
 }
 
-// ---- Render del perfil en la sidebar ----
+//  Render Perfil Sidebar
+
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
-  profile.innerHTML = ""; // limpiamos
+  profile.innerHTML = "";
 
   // avatar
   const avatarCircle = document.createElement("div");
@@ -71,7 +71,7 @@ function renderPerfil(usuario) {
   img.alt = usuario.nombre;
   avatarCircle.appendChild(img);
 
-  // nombre y link de editar
+  // nombre + link editar
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
   const nameDiv = document.createElement("div");
@@ -86,7 +86,8 @@ function renderPerfil(usuario) {
   profile.append(avatarCircle, userInfo);
 }
 
-// ---- Render de filas (desktop) ----
+//  Render Recursos (Desktop)
+
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
@@ -94,7 +95,7 @@ function renderRecursosRows(lista) {
     const row = document.createElement("div");
     row.className = "table-row";
 
-    // columna Nombre + icono
+    // Nombre + icono
     const colNombre = document.createElement("div");
     colNombre.className = "col-nombre";
     const spanIcon = document.createElement("span");
@@ -109,12 +110,12 @@ function renderRecursosRows(lista) {
     link.textContent = item.nombre_curso;
     colNombre.append(spanIcon, link);
 
-    // columna Tipo
+    // Tipo
     const colTipo = document.createElement("div");
     colTipo.className = "col-tipo";
     colTipo.textContent = "Curso";
 
-    // columna Fecha
+    // Fecha
     const colFecha = document.createElement("div");
     colFecha.className = "col-fecha";
     const fecha = new Date(item.fecha_creacion);
@@ -126,86 +127,8 @@ function renderRecursosRows(lista) {
   });
 }
 
-// ---- Render de paginacion (desktop) ----
-function renderPagination(totalPages) {
-  const ctrl = document.getElementById("pagination-controls");
-  ctrl.innerHTML = "";
+//  Render Recursos (acordion mobile)
 
-  // Anterior desktop
-  const prev = document.createElement("button");
-  prev.className = "arrow-btn";
-  prev.disabled = currentPage === 1;
-  prev.innerHTML = `
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M15 18l-6-6 6-6"/>
-    </svg>
-  `;
-  prev.addEventListener("click", () => renderPage(currentPage - 1));
-  ctrl.appendChild(prev);
-
-  // botones de pagina, el que es un numero
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement("button");
-    btn.className = "page-btn";
-    btn.textContent = p;
-    if (p === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => renderPage(p));
-    ctrl.appendChild(btn);
-  }
-
-  // Siguiente desktop
-  const next = document.createElement("button");
-  next.className = "arrow-btn";
-  next.disabled = currentPage === totalPages;
-  next.innerHTML = `
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M9 6l6 6-6 6"/>
-    </svg>
-  `;
-  next.addEventListener("click", () => renderPage(currentPage + 1));
-  ctrl.appendChild(next);
-}
-
-function renderPaginationMobile(totalPages) {
-  const ctrl = document.getElementById("pagination-mobile");
-  ctrl.innerHTML = "";
-
-  // Anterior (mobile)
-  const prev = document.createElement("button");
-  prev.className = "arrow-btn";
-  prev.disabled = currentPage === 1;
-  prev.innerHTML = `
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M15 18l-6-6 6-6"/>
-    </svg>
-  `;
-  prev.addEventListener("click", () => renderPage(currentPage - 1));
-  ctrl.appendChild(prev);
-
-  // botones de página son los que son numeros
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement("button");
-    btn.className = "page-btn";
-    btn.textContent = p;
-    if (p === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => renderPage(p));
-    ctrl.appendChild(btn);
-  }
-
-  // Siguiente (mobile)
-  const next = document.createElement("button");
-  next.className = "arrow-btn";
-  next.disabled = currentPage === totalPages;
-  next.innerHTML = `
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M9 6l6 6-6 6"/>
-    </svg>
-  `;
-  next.addEventListener("click", () => renderPage(currentPage + 1));
-  ctrl.appendChild(next);
-}
-
-// ---- Render de filas Mobile ----
 function renderRecursosRowsMobile(lista) {
   const container = document.getElementById("recursos-list-mobile");
   container.innerHTML = "";
@@ -213,6 +136,7 @@ function renderRecursosRowsMobile(lista) {
     const row = document.createElement("div");
     row.className = "table-row-mobile";
 
+    // Toggle Button
     const btn = document.createElement("button");
     btn.className = "row-toggle";
     btn.setAttribute("aria-expanded", "false");
@@ -224,12 +148,11 @@ function renderRecursosRowsMobile(lista) {
         ${item.nombre_curso}
       </span>
       <svg class="icon-chevron" viewBox="0 0 24 24" width="20" height="20">
-        <path d="M9 6l6 6-6 6"
-              stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M9 6l6 6-6 6" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
       </svg>
     `;
 
-    // informacion colapsable
+    // Detalles sin colapsar
     const details = document.createElement("div");
     details.className = "row-details";
     const fecha = new Date(item.fecha_creacion);
@@ -242,7 +165,7 @@ function renderRecursosRowsMobile(lista) {
       )}</div>
     `;
 
-    // toggle expand/collapse
+    // Expand/Collapse
     btn.addEventListener("click", () => {
       const expanded = row.classList.toggle("expanded");
       btn.setAttribute("aria-expanded", expanded.toString());
@@ -253,41 +176,117 @@ function renderRecursosRowsMobile(lista) {
   });
 }
 
-// ---- Render para la pagina ----
+//  Paginación Desktop
+
+function renderPagination(totalPages) {
+  const ctrl = document.getElementById("pagination-controls");
+  ctrl.innerHTML = "";
+
+  // Anterior
+  const prev = document.createElement("button");
+  prev.className = "arrow-btn";
+  prev.disabled = currentPage === 1;
+  prev.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>`;
+  prev.addEventListener("click", () => renderPage(currentPage - 1));
+  ctrl.appendChild(prev);
+
+  // Números
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    btn.textContent = p;
+    if (p === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => renderPage(p));
+    ctrl.appendChild(btn);
+  }
+
+  // Siguiente 
+  const next = document.createElement("button");
+  next.className = "arrow-btn";
+  next.disabled = currentPage === totalPages;
+  next.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 6l6 6-6 6"/>
+    </svg>`;
+  next.addEventListener("click", () => renderPage(currentPage + 1));
+  ctrl.appendChild(next);
+}
+
+//  Paginación Mobile
+
+function renderPaginationMobile(totalPages) {
+  const ctrl = document.getElementById("pagination-mobile");
+  ctrl.innerHTML = "";
+
+  // Anterior
+  const prev = document.createElement("button");
+  prev.className = "arrow-btn";
+  prev.disabled = currentPage === 1;
+  prev.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>`;
+  prev.addEventListener("click", () => renderPage(currentPage - 1));
+  ctrl.appendChild(prev);
+
+  // Números
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    btn.textContent = p;
+    if (p === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => renderPage(p));
+    ctrl.appendChild(btn);
+  }
+
+  // Siguiente
+  const next = document.createElement("button");
+  next.className = "arrow-btn";
+  next.disabled = currentPage === totalPages;
+  next.innerHTML = `
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 6l6 6-6 6"/>
+    </svg>`;
+  next.addEventListener("click", () => renderPage(currentPage + 1));
+  ctrl.appendChild(next);
+}
+
+//  Render unificado
+
 function renderPage(page) {
   currentPage = page;
   const start = (page - 1) * itemsPerPage;
   const slice = recursosData.slice(start, start + itemsPerPage);
 
-  // Desktop
+  // desktop
   renderRecursosRows(slice);
   renderPagination(Math.ceil(recursosData.length / itemsPerPage));
 
-  // Mobile
+  // mobile
   renderRecursosRowsMobile(slice);
   renderPaginationMobile(Math.ceil(recursosData.length / itemsPerPage));
 }
 
-// ---- Sorting de la tabla desktop ----
+//  Sorting Desktop
+
 function montarSortingRecursos() {
-  const headers = document.querySelectorAll(
-    ".recursos-box .table-header > div"
-  );
+  const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((header) => {
     header.style.cursor = "pointer";
     header.setAttribute("role", "columnheader");
     header.setAttribute("aria-sort", "none");
     header.tabIndex = 0;
 
-    // Si no tiene icono, se inserta
     if (!header.querySelector(".sort-icon")) {
       const icon = document.createElement("span");
       icon.className = "sort-icon asc";
       icon.innerHTML = `
         <svg viewBox="0 0 24 24" width="0.9em" height="0.9em">
           <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
-        </svg>
-      `;
+        </svg>`;
       header.appendChild(icon);
     }
 
@@ -298,10 +297,8 @@ function montarSortingRecursos() {
       else if (header.classList.contains("col-fecha")) colKey = "fecha";
       if (!colKey) return;
 
-      // alternama entre asc/desc
-      if (sortState.column === colKey) {
-        sortState.asc = !sortState.asc;
-      } else {
+      if (sortState.column === colKey) sortState.asc = !sortState.asc;
+      else {
         sortState.column = colKey;
         sortState.asc = false;
       }
@@ -321,19 +318,68 @@ function actualizarFlechasSorting() {
     const hdr = ic.closest("[role=columnheader]");
     hdr && hdr.setAttribute("aria-sort", "none");
   });
-
   if (!sortState.column) return;
 
   const sel = `.recursos-box .col-${sortState.column}`;
   document.querySelectorAll(sel).forEach((hdr) => {
     const icon = hdr.querySelector(".sort-icon");
-    if (!icon) return;
     hdr.setAttribute("aria-sort", sortState.asc ? "ascending" : "descending");
-    icon.classList.add(sortState.asc ? "asc" : "desc");
+    icon && icon.classList.add(sortState.asc ? "asc" : "desc");
   });
 }
 
-// ---- Estados vacíos y error ----
+//  Mis Cursos (Sidebar)
+
+function renderMisCursos(inscripciones) {
+  const conts = {
+    inscritos: document.getElementById("cursos-subscritos"),
+    activos: document.getElementById("cursos-activos"),
+    cancelados: document.getElementById("cursos-cancelados"),
+    terminados: document.getElementById("cursos-terminados"),
+  };
+  Object.values(conts).forEach((c) => (c.innerHTML = ""));
+
+  inscripciones.forEach((ins) => {
+    const a = document.createElement("a");
+    a.className = "curso-card";
+    a.href = `VIEW/Curso.php?id=${ins.curso}`;
+    a.setAttribute("role", "button");
+    a.setAttribute("aria-label", `Ver ${ins.nombre_curso}`);
+
+    const title = document.createElement("div");
+    title.className = "curso-title";
+    title.textContent = ins.nombre_curso;
+
+    const fechaIni = new Date(ins.fecha_creacion);
+    const opts = { day: "2-digit", month: "2-digit", year: "numeric" };
+    const date = document.createElement("div");
+    date.className = "curso-date";
+    date.textContent = `Fecha Inicio: ${fechaIni.toLocaleDateString(
+      "es-ES",
+      opts
+    )}`;
+
+    a.append(title, date);
+    switch (String(ins.estatus)) {
+      case "1":
+        conts.inscritos.appendChild(a);
+        break;
+      case "2":
+        conts.activos.appendChild(a);
+        break;
+      case "3":
+        conts.cancelados.appendChild(a);
+        break;
+      case "4":
+        conts.terminados.appendChild(a);
+        break;
+    }
+    requestAnimationFrame(() => a.classList.add("enter"));
+  });
+}
+
+//  Estados VACÍOS o ERROR
+
 function showEmptyRecursos() {
   document.getElementById("recursos-list").innerHTML = `
     <div class="empty-state">
@@ -354,7 +400,8 @@ function showErrorRecursos(message, retryFn) {
   document.getElementById("retry-recursos").addEventListener("click", retryFn);
 }
 
-// ---- Modal “Administrar perfil” ----
+//  Modal Perfil
+
 let perfilModalIniciado = false;
 function initModalPerfil() {
   if (perfilModalIniciado) return;
@@ -398,19 +445,19 @@ function initModalPerfil() {
     }
   });
 
-  const cerrarPerfilModal = () => {
+  const cerrar = () => {
     modal.classList.remove("active");
     document.body.classList.remove("modal-abierto");
   };
-  closeBtn.addEventListener("click", cerrarPerfilModal);
+  closeBtn.addEventListener("click", cerrar);
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) cerrarPerfilModal();
+    if (e.target === modal) cerrar();
   });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (inp.pass.value !== inp.pass2.value)
-      return gcToast("Las contraseñas no coinciden.", "warning");
+      return gcToast("Contraseñas no coinciden.", "warning");
     const payload = {
       id: usuarioActual.id,
       nombre: inp.nombre.value.trim(),
@@ -439,12 +486,13 @@ function initModalPerfil() {
     } catch {
       gcToast("Error al actualizar perfil.", "error");
     } finally {
-      cerrarPerfilModal();
+      cerrar();
     }
   });
 }
 
-// ---- Deshabilitar enlaces de prueba ----
+//  deshabilitamos links y skeletons
+
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
@@ -455,7 +503,6 @@ function disableLinks() {
   });
 }
 
-// ---- Skeleton loaders ----
 function showSkeletons() {
   const tableBody = document.querySelector(".recursos-table .table-body");
   tableBody.innerHTML = "";
@@ -471,7 +518,8 @@ function showSkeletons() {
   }
 }
 
-// ---- Toggle “Mis cursos” (sidebar) ----
+//  Toggle “Mis cursos” Sidebar el de desktop
+
 function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
@@ -479,18 +527,17 @@ function initMisCursosToggle() {
     if (!subtitle || !container) return;
 
     const count = container.children.length;
-    const baseLabel = subtitle.textContent.trim().replace(/\(\d+\)\s*$/, "");
-    subtitle.textContent = `${baseLabel} (${count})`;
+    subtitle.textContent =
+      subtitle.textContent.replace(/\(\d+\)/, "") + ` (${count})`;
     console.log("cantidad de cursos", count);
 
     const wrapper = document.createElement("span");
     wrapper.className = "arrow-wrapper";
     wrapper.innerHTML = `
-      <svg class="arrow-icon" xmlns="http://www.w3.org/2000/svg"
-           viewBox="0 0 24 24" width="24" height="24">
+      <svg class="arrow-icon" viewBox="0 0 24 24" width="24" height="24">
         <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>
       </svg>`;
-    subtitle.appendChild(wrapper);
+    subtitle.append(wrapper);
 
     subtitle.setAttribute("role", "button");
     subtitle.tabIndex = 0;
@@ -499,11 +546,11 @@ function initMisCursosToggle() {
     container.style.overflow = "hidden";
     container.style.transition = "max-height 0.3s ease";
 
-    const key = `mis-cursos:${container.id}`;
-    let collapsed = localStorage.getItem(key) === "closed";
+    let collapsed =
+      localStorage.getItem(`mis-cursos:${container.id}`) === "closed";
     const svgIcon = wrapper.querySelector(".arrow-icon");
 
-    function applyState() {
+    function apply() {
       if (collapsed) {
         container.style.maxHeight = "0px";
         container.style.display = "none";
@@ -512,45 +559,43 @@ function initMisCursosToggle() {
       } else {
         container.style.display = "flex";
         container.style.flexDirection = "column";
-        container.style.flexWrap = "nowrap";
         container.style.maxHeight = container.scrollHeight + "px";
         subtitle.setAttribute("aria-expanded", "true");
         svgIcon.classList.remove("open");
       }
     }
-    applyState();
+    apply();
 
-    function toggleSection() {
+    subtitle.addEventListener("click", () => {
       collapsed = !collapsed;
-      applyState();
-      localStorage.setItem(key, collapsed ? "closed" : "open");
-    }
-    subtitle.addEventListener("click", toggleSection);
+      apply();
+      localStorage.setItem(
+        `mis-cursos:${container.id}`,
+        collapsed ? "closed" : "open"
+      );
+    });
     subtitle.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        toggleSection();
+        subtitle.click();
       }
     });
   });
 }
 
-// ---- Carga de recursos y arranque ----
+
+
 async function loadRecursos(usuarioId) {
   try {
     const data = await fetchInscripciones(usuarioId);
     if (!Array.isArray(data) || data.length === 0) {
       showEmptyRecursos();
-      console.log("el load recursos no mando nada");
+      console.log("no hay recursos");
       return;
     }
-
     recursosData = data.slice();
-
     renderPage(1);
-
-    renderMisCursos(recursosData);
-
+    renderMisCursos(recursosData); 
     montarSortingRecursos();
     initMisCursosToggle();
   } catch (err) {
@@ -561,13 +606,13 @@ async function loadRecursos(usuarioId) {
   }
 }
 
+
 document.addEventListener("DOMContentLoaded", async () => {
   const usuario = getUsuarioFromCookie();
   if (!usuario) {
     window.location.href = "../VIEW/Login.php";
     return;
   }
-
   renderPerfil(usuario);
   showSkeletons();
   await loadRecursos(usuario.id);
