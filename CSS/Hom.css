@@ -877,7 +877,6 @@ body {
 #cursos-cancelados,
 #cursos-terminados {
   display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
 }
 
@@ -1292,29 +1291,40 @@ main {
 }
 
 .pagination-controls .page-btn {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
+  min-width: 40px;
+  height: 40px;
+  margin: 0 2px;
+  border: none;
   background: #fff;
-  border-radius: 4px;
+  color: #222;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(60, 64, 67, 0.1);
+  font-size: 1.1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.18s cubic-bezier(.4, 0, .2, 1),
+    color 0.18s cubic-bezier(.4, 0, .2, 1),
+    box-shadow 0.18s cubic-bezier(.4, 0, .2, 1),
+    transform 0.18s cubic-bezier(.4, 0, .2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pagination-controls .page-btn:hover:not(:disabled) {
-  border-color: #1565c0;
+  background: #e7f0fe;
   color: #1565c0;
-}
-
-.pagination-controls .page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.09);
+  transform: translateY(-2px) scale(1.07);
 }
 
 .pagination-controls .page-btn.active {
   background: #1565c0;
-  border-color: #1565c0;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(21, 101, 192, 0.17);
+  transform: none;
 }
 
 .pagination-controls .arrow-btn {
