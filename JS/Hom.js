@@ -541,10 +541,16 @@ async function loadRecursos(usuarioId) {
     const data = await fetchInscripciones(usuarioId);
     if (!Array.isArray(data) || data.length === 0) {
       showEmptyRecursos();
+      console.log("el load recursos no mando nada");
       return;
     }
+
     recursosData = data.slice();
+
     renderPage(1);
+
+    renderMisCursos(recursosData);
+
     montarSortingRecursos();
     initMisCursosToggle();
   } catch (err) {
