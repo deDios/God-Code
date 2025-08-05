@@ -414,7 +414,7 @@
     transform: translateY(-50%);
     background: white;
     border: none;
-    padding: 10px;
+    padding: 4px;
     border-radius: 50%;
     cursor: pointer;
     user-select: none;
@@ -428,12 +428,13 @@
 
 .carousel-btn:active {
     background: rgba(0, 0, 0, 0.1);
-    transform: scale(0.95);
+    /*----- no es emergencia pero investigar porque el carrusel no funciona bien con el efecto declick*/
+    /*transform: scale(0.95);*/
 }
 
 .carousel-btn svg {
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     fill: #1a73e8;
     pointer-events: none;
 }

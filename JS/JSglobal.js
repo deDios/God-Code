@@ -235,10 +235,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // "vistaOperativa3.php",
   ];
 
+  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+
+  const socialMarkup = `
+    <div class="social-icons">
+      <div class="icon-mobile"><img src="ASSETS/index/Facebook.png" alt="Facebook" /></div>
+      <div class="icon-mobile"><img src="ASSETS/index/Instagram.png" alt="Instagram" /></div>
+      <div class="icon-mobile"><img src="ASSETS/index/Tiktok.png" alt="TikTok" /></div>
+    </div>
+  `;
+
   const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
   subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
-
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
 
   if (operativeViews.includes(currentPage)) {
     const mk = (label) => {
@@ -251,6 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ${mk("Proyectos")}
       ${mk("Cursos")}
       ${mk("Admin")}
+      ${socialMarkup}
     `;
     subnavs.forEach((nav) => (nav.innerHTML = markup));
   } else {
@@ -262,6 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mega = submenu.querySelector(".megamenu");
     if (mega) {
       mega.classList.remove("show");
+      let link = null;
       for (const ch of submenu.children) {
         if (ch.tagName === "A") {
           link = ch;
@@ -282,6 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // click en el logo
   const logoBtn = document.getElementById("logo-btn");
   if (logoBtn) {
     logoBtn.style.cursor = "pointer";
@@ -290,29 +301,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // los links para las redes sociales
   const socialMap = {
     tiktok: "https://www.tiktok.com/@godcodemx",
     instagram: "https://www.instagram.com/god_code_mx/",
     facebook: "https://www.facebook.com/profile.php?id=61578204608103",
   };
 
-  const socialIcons = document.querySelectorAll(
-    "#header .icon-mobile, #header .circle-icon"
-  );
-
-  socialIcons.forEach((el) => {
-    const img = el.querySelector("img");
-    if (!img) return;
-    const key = img.alt.trim().toLowerCase();
-    const url = socialMap[key];
-    if (!url) return;
-
-    el.style.cursor = "pointer";
-
-    el.addEventListener("click", () => {
-      window.open(url, "_blank", "noopener");
+  setTimeout(() => {
+    const socialIcons = document.querySelectorAll(
+      "#header .icon-mobile, #header .circle-icon"
+    );
+    socialIcons.forEach((el) => {
+      const img = el.querySelector("img");
+      if (!img) return;
+      const key = img.alt.trim().toLowerCase();
+      const url = socialMap[key];
+      if (!url) return;
+      el.style.cursor = "pointer";
+      el.addEventListener("click", () => {
+        window.open(url, "_blank", "noopener");
+      });
     });
-  });
+  }, 0);
 });
 
 //--------------- deshabilitar el href de cotizar

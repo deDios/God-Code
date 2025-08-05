@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cursosContainer = document.getElementById("cursos-container");
 
     const prevBtn = document.querySelector(".carousel-btn.prev");
+    
     const nextBtn = document.querySelector(".carousel-btn.next");
 
     if (!scrollContainer || !cursosContainer || !prevBtn || !nextBtn) return;
