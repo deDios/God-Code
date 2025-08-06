@@ -14,7 +14,7 @@
 
 .contacto-contenedor {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -106,41 +106,57 @@ textarea {
     color: #555;
 }
 
+.input-doble {
+    display: flex;
+    flex-direction: row;
+    gap: 0.8rem;
+    width: 100%;
+}
+
+.input-doble .input-alerta-container {
+    flex: 1 1 0;
+    width: 100%;
+    min-width: 0;
+}
 
 /*-------------- css para tooltips y validadores.*/
 
 .input-alerta-container {
-  position: relative;
-  margin-bottom: 18px;
+    position: relative;
+    margin-bottom: 18px;
 }
+
 .icono-alerta {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2em;
-  color: #e68a19;
-  cursor: pointer;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: #e68a19;
+    cursor: pointer;
 }
+
 .tooltip-alerta {
-  display: none;
-  position: absolute;
-  left: 70%;
-  top: 110%;
-  min-width: 220px;
-  background: #222;
-  color: #fff;
-  font-size: 0.93em;
-  padding: 6px 12px;
-  border-radius: 5px;
-  z-index: 10;
-  white-space: pre-line;
-  box-shadow: 0 3px 18px rgba(0,0,0,0.12);
-  pointer-events: none;
+    display: none;
+    position: absolute;
+    left: 70%;
+    top: 110%;
+    min-width: 220px;
+    background: #222;
+    color: #fff;
+    font-size: 0.93em;
+    padding: 6px 12px;
+    border-radius: 5px;
+    z-index: 10;
+    white-space: pre-line;
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
 }
+
 .input-alerta-container.alerta .tooltip-alerta {
-  display: block;
+    display: block;
 }
+
 .input-alerta-container .icono-alerta.valido {
-  color: #388e3c;
+    color: #388e3c;
 }
