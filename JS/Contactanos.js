@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Configuración global de la longitud máxima del teléfono
+  // Cambia aquí si quieres más o menos dígitos
   const LONGITUD_MAX_TEL = 10;
 
-  // --- Selecciona el formulario y los inputs que quieres validar
   const form = document.querySelector("#contacto form");
   const nombre = form.querySelector("input[placeholder='Nombre']");
   const telefono = form.querySelector("input[placeholder='Teléfono']");
@@ -10,28 +9,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const mensaje = form.querySelector("textarea");
   const btn = form.querySelector("button[type='submit']");
 
-  // --- Envuélvelo en .input-alerta-container y agrega icono/tooltip si no existen
   function prepararInput(input) {
     let container = input.closest('.input-alerta-container');
     if (!container) {
-      // crear el contenedor y mover el input adentro
       container = document.createElement('div');
       container.className = 'input-alerta-container';
       input.parentNode.insertBefore(container, input);
       container.appendChild(input);
     }
 
-    if (!container.querySelector('.icono-alerta')) {
-      const icono = document.createElement('span');
+    let icono = container.querySelector('.icono-alerta');
+    if (!icono) {
+      icono = document.createElement('span');
       icono.className = 'icono-alerta';
       container.appendChild(icono);
     }
 
-    if (!container.querySelector('.tooltip-alerta')) {
-      const tooltip = document.createElement('div');
+    let tooltip = container.querySelector('.tooltip-alerta');
+    if (!tooltip) {
+      tooltip = document.createElement('div');
       tooltip.className = 'tooltip-alerta';
       container.appendChild(tooltip);
     }
+
+    // Limpia listeners previos
+    icono.onmouseenter = null;
+    icono.onmouseleave = null;
+
+    // Tooltip solo aparece con hover en warning
+    icono.addEventListener("mouseenter", function () {
+      if (container.classList.contains("alerta") && icono.textContent === "⚠️") {
+        tooltip.style.display = "block";
+      }
+    });
+    icono.addEventListener("mouseleave", function () {
+      tooltip.style.display = "none";
+    });
+
+    // Por si acaso, oculta el tooltip si no está en warning
+    container.addEventListener("mouseleave", () => {
+      tooltip.style.display = "none";
+    });
+
     return container;
   }
 
@@ -39,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const telCont = prepararInput(telefono);
   const correoCont = prepararInput(correo);
 
-  // --- Validaciones
   function validarTelefono() {
     let val = telefono.value.replace(/\D/g, '');
     if (val.length > LONGITUD_MAX_TEL) val = val.slice(0, LONGITUD_MAX_TEL);
@@ -55,16 +73,19 @@ document.addEventListener("DOMContentLoaded", () => {
       icono.textContent = "⚠️";
       icono.classList.remove("valido");
       tooltip.textContent = "El teléfono debe tener exactamente 10 dígitos numéricos.";
+      tooltip.style.display = "none";
     } else if (valido) {
       telCont.classList.remove("alerta");
       icono.textContent = "✅";
       icono.classList.add("valido");
       tooltip.textContent = "";
+      tooltip.style.display = "none";
     } else {
       telCont.classList.remove("alerta");
       icono.textContent = "";
       icono.classList.remove("valido");
       tooltip.textContent = "";
+      tooltip.style.display = "none";
     }
   }
 
@@ -79,26 +100,25 @@ document.addEventListener("DOMContentLoaded", () => {
       icono.textContent = "⚠️";
       icono.classList.remove("valido");
       tooltip.textContent = "El correo debe tener al menos un @ y un dominio válido.";
+      tooltip.style.display = "none";
     } else if (valido) {
       correoCont.classList.remove("alerta");
       icono.textContent = "✅";
       icono.classList.add("valido");
       tooltip.textContent = "";
+      tooltip.style.display = "none";
     } else {
       correoCont.classList.remove("alerta");
       icono.textContent = "";
       icono.classList.remove("valido");
       tooltip.textContent = "";
+      tooltip.style.display = "none";
     }
   }
 
-  // --- Limita la entrada de teléfono a sólo números y la longitud máxima
   telefono.addEventListener("input", validarTelefono);
-
-  // --- Valida el correo en cada cambio
   correo.addEventListener("input", validarCorreo);
 
-  // --- Al enviar el formulario, chequea validaciones
   form.addEventListener("submit", function (e) {
     validarTelefono();
     validarCorreo();
@@ -133,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         c.querySelector('.icono-alerta').textContent = "";
         c.querySelector('.icono-alerta').classList.remove("valido");
         c.querySelector('.tooltip-alerta').textContent = "";
+        c.querySelector('.tooltip-alerta').style.display = "none";
       });
     }, 1200);
   });
