@@ -14,7 +14,7 @@
 
 .contacto-contenedor {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; 
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -143,3 +143,41 @@ textarea {
     position: relative;
     z-index: 1;
 }
+
+.input-alerta-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-alerta-container input {
+  width: 100%;
+  padding-right: 2.2em;
+  box-sizing: border-box;
+}
+.icono-alerta {
+  position: absolute;
+  right: 0.7em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  z-index: 3;
+  cursor: pointer;
+}
+.icono-alerta.valido { color: #11bb2e; }
+.icono-alerta.alerta { color: #c92c2c; }
+.tooltip-alerta {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0.5em;
+  background: #c92c2c;
+  color: #fff;
+  font-size: 0.95em;
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 10;
+}
+.input-alerta-container.alerta .tooltip-alerta { display: block; }
+.input-alerta-container.alerta input { border: 1.5px solid #c92c2c; }
+.input-alerta-container input:focus + .icono-alerta {}

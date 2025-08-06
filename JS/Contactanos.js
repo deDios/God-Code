@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const MAX_DIGITOS_TELEFONO = 10; //aca deje esta variable para que sea el limite de digitos que puede escribir el usuario
+  const MAX_DIGITOS_TELEFONO = 10; // Cambia aquí si necesitas otro límite
 
   const form = document.querySelector("#contacto form");
   const btn = form.querySelector("button[type='submit']");
@@ -8,126 +8,120 @@ document.addEventListener("DOMContentLoaded", () => {
   const correo = form.querySelector("input[type='email']");
   const mensaje = form.querySelector("textarea");
 
-  function mostrarTooltip(input, mensaje) {
-    let cont = input.closest(".input-alerta-container");
-    if (!cont) return;
-
-    cont.querySelector(".form-tooltip")?.remove();
-
-    const tooltip = document.createElement("div");
-    tooltip.className = "form-tooltip";
-    tooltip.textContent = mensaje;
-    cont.appendChild(tooltip);
-    cont.classList.add("active");
-    setTimeout(() => (tooltip.style.opacity = "1"), 10);
+  // --- Función para envolver y crear spans de alerta y tooltip automáticamente ---
+  function wrapWithAlert(input) {
+    if (input.parentElement.classList.contains('input-alerta-container')) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-alerta-container';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+    // Icono de alerta/validación
+    const icon = document.createElement('span');
+    icon.className = 'icono-alerta';
+    wrapper.appendChild(icon);
+    // Tooltip
+    const tooltip = document.createElement('span');
+    tooltip.className = 'tooltip-alerta';
+    wrapper.appendChild(tooltip);
   }
+  wrapWithAlert(telefono);
+  wrapWithAlert(correo);
 
-  function quitarTooltip(input) {
-    let cont = input.closest(".input-alerta-container");
-    if (!cont) return;
-    cont.querySelector(".form-tooltip")?.remove();
-    cont.classList.remove("active");
-  }
+  // --- Función para mostrar icono y tooltip, asegura que solo haya uno por campo ---
+  function mostrarIcono(input, tipo, mensaje = "") {
+    const cont = input.parentElement;
+    const icono = cont.querySelector(".icono-alerta");
+    const tooltip = cont.querySelector(".tooltip-alerta");
 
-  function validarNombre() {
-    if (!nombre.value.trim()) {
-      mostrarTooltip(nombre, "Por favor ingresa tu nombre.");
-      return false;
+    if (tipo === "ok") {
+      icono.textContent = "✅";
+      icono.classList.add("valido");
+      icono.classList.remove("alerta");
+      tooltip.textContent = "Campo válido.";
+      tooltip.style.display = "none";
+      cont.classList.remove("alerta");
+    } else if (tipo === "warn") {
+      icono.textContent = "⚠️";
+      icono.classList.remove("valido");
+      icono.classList.add("alerta");
+      tooltip.textContent = mensaje;
+      tooltip.style.display = "block";
+      cont.classList.add("alerta");
+    } else {
+      icono.textContent = "";
+      icono.classList.remove("valido", "alerta");
+      tooltip.textContent = "";
+      tooltip.style.display = "none";
+      cont.classList.remove("alerta");
     }
-    quitarTooltip(nombre);
-    return true;
   }
 
+  // --- Validadores ---
   function validarTelefono() {
-    telefono.value = telefono.value
-      .replace(/\D/g, "")
-      .slice(0, MAX_DIGITOS_TELEFONO);
-
-    if (!telefono.value) {
-      mostrarTooltip(telefono, "Ingresa tu número telefónico.");
+    let val = telefono.value.trim();
+    if (!val) {
+      mostrarIcono(telefono, "");
       return false;
     }
-    if (telefono.value.length < MAX_DIGITOS_TELEFONO) {
-      mostrarTooltip(
-        telefono,
-        `El teléfono debe tener ${MAX_DIGITOS_TELEFONO} dígitos.`
-      );
+    if (!/^\d+$/.test(val) || val.length < 10) {
+      mostrarIcono(telefono, "warn", `Teléfono debe ser solo números y mínimo 10 dígitos.`);
       return false;
     }
-    quitarTooltip(telefono);
-    return true;
+    if (val.length > MAX_DIGITOS_TELEFONO) {
+      telefono.value = val.slice(0, MAX_DIGITOS_TELEFONO);
+    }
+    if (val.length === MAX_DIGITOS_TELEFONO) {
+      mostrarIcono(telefono, "ok");
+      return true;
+    }
+    mostrarIcono(telefono, "warn", `Debe tener ${MAX_DIGITOS_TELEFONO} dígitos.`);
+    return false;
   }
 
   function validarCorreo() {
-    if (!correo.value.trim()) {
-      mostrarTooltip(correo, "Ingresa tu correo electrónico.");
+    let val = correo.value.trim();
+    if (!val) {
+      mostrarIcono(correo, "");
       return false;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value)) {
-      mostrarTooltip(correo, "Por favor ingresa un correo válido.");
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    if (!emailOk) {
+      mostrarIcono(correo, "warn", "Coloca un correo válido.");
       return false;
     }
-    quitarTooltip(correo);
+    mostrarIcono(correo, "ok");
     return true;
   }
 
-  function validarMensaje() {
-    if (!mensaje.value.trim()) {
-      mostrarTooltip(mensaje, "Cuéntanos brevemente en qué podemos ayudarte.");
-      return false;
-    }
-    quitarTooltip(mensaje);
-    return true;
-  }
+  // --- Eventos de input en tiempo real ---
+  telefono.addEventListener("input", validarTelefono);
+  correo.addEventListener("input", validarCorreo);
+  telefono.addEventListener("blur", validarTelefono);
+  correo.addEventListener("blur", validarCorreo);
 
-  [nombre, telefono, correo, mensaje].forEach((input) => {
-    input.addEventListener("input", () => {
-      if (input === telefono) validarTelefono();
-      else if (input === correo) validarCorreo();
-      else if (input === nombre) validarNombre();
-      else if (input === mensaje) validarMensaje();
-      bloquearBtnSiHayErrores();
-    });
-    input.addEventListener("blur", () => quitarTooltip(input));
-  });
-
-  function bloquearBtnSiHayErrores() {
-    const valid =
-      validarNombre() &&
-      validarTelefono() &&
-      validarCorreo() &&
-      validarMensaje();
-    btn.disabled = !valid;
-    return valid;
-  }
-
+  // --- Submit del formulario ---
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    let okTelefono = validarTelefono();
+    let okCorreo = validarCorreo();
+    let okNombre = nombre.value.trim().length > 0;
+    let okMensaje = mensaje.value.trim().length > 0;
 
-    if (!bloquearBtnSiHayErrores()) {
-      gcToast("Revisa los campos marcados.", "warning");
+    if (!okNombre || !okTelefono || !okCorreo || !okMensaje) {
+      gcToast("Por favor completa todos los campos correctamente.", "warning");
       return;
     }
 
     btn.disabled = true;
     btn.textContent = "Enviando...";
 
-    setTimeout(() => {
-      gcToast(
-        "Tu mensaje ha sido enviado con éxito. ¡Gracias por contactarnos!",
-        "exito",
-        6000
-      );
-      form.reset();
-      [nombre, telefono, correo, mensaje].forEach(quitarTooltip);
-      btn.disabled = false;
-      btn.textContent = "Enviar";
-    }, 900); 
-  });
+    // Aquí iría el fetch si vas a enviar info a backend
 
-  telefono.addEventListener("paste", (e) => {
-    setTimeout(() => validarTelefono(), 5);
+    gcToast("Tu mensaje ha sido enviado con éxito. ¡Gracias por contactarnos!", "exito", 6000);
+    form.reset();
+    mostrarIcono(telefono, "");
+    mostrarIcono(correo, "");
+    btn.disabled = false;
+    btn.textContent = "Enviar";
   });
-
-  bloquearBtnSiHayErrores();
 });
