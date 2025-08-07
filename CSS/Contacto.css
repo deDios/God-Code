@@ -139,7 +139,7 @@ textarea {
 .tooltip-alerta {
     display: none;
     position: absolute;
-    left: 70%;
+    left: 10%;
     top: 110%;
     min-width: 220px;
     background: #222;
@@ -190,7 +190,7 @@ textarea {
     .tooltip-alerta {
         left: 50% !important;
         top: 105%;
-        transform: translateX(-80%) !important;
+        transform: translateX(-10%) !important;
         min-width: 160px;
         max-width: 90vw;
         font-size: 1em;

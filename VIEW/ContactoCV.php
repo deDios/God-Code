@@ -155,12 +155,16 @@
                         </div>
 
                         <div class="input-doble">
-                            <input type="tel" placeholder="Teléfono" required />
-                            <select required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="#">Administrativo</option>
-                                <option value="#">Programación</option>
-                            </select>
+                            <div class="input-alerta-container">
+                                <input type="tel" placeholder="Teléfono" required />
+                            </div>
+                            <div class="input-alerta-container">
+                                <select required>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="#">Administrativo</option>
+                                    <option value="#">Programación</option>
+                                </select>
+                            </div>
                         </div>
 
                         <textarea placeholder="Háblanos sobre ti"></textarea>
