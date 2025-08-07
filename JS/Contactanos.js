@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const mensaje = form.querySelector("textarea");
   const btn = form.querySelector("button[type='submit']");
 
-  function prepararInput(input) {
+  // --- Crea wrappers para los campos que lo necesiten ---
+  function wrapInput(input) {
     let container = input.closest('.input-alerta-container');
     if (!container) {
       container = document.createElement('div');
@@ -17,111 +18,76 @@ document.addEventListener("DOMContentLoaded", () => {
       input.parentNode.insertBefore(container, input);
       container.appendChild(input);
     }
-
     let icono = container.querySelector('.icono-alerta');
     if (!icono) {
       icono = document.createElement('span');
       icono.className = 'icono-alerta';
+      icono.tabIndex = 0; // para accesibilidad
       container.appendChild(icono);
     }
-
-    let tooltip = container.querySelector('.tooltip-alerta');
-    if (!tooltip) {
-      tooltip = document.createElement('div');
-      tooltip.className = 'tooltip-alerta';
-      container.appendChild(tooltip);
-    }
-
-    // Limpia listeners previos
-    icono.onmouseenter = null;
-    icono.onmouseleave = null;
-
-    // Tooltip solo aparece con hover en warning
-    icono.addEventListener("mouseenter", function () {
-      if (container.classList.contains("alerta") && icono.textContent === "⚠️") {
-        tooltip.style.display = "block";
-      }
-    });
-    icono.addEventListener("mouseleave", function () {
-      tooltip.style.display = "none";
-    });
-
-    // Por si acaso, oculta el tooltip si no está en warning
-    container.addEventListener("mouseleave", () => {
-      tooltip.style.display = "none";
-    });
-
-    return container;
+    return { container, icono };
   }
 
-  // --- Prepara campos
-  const telCont = prepararInput(telefono);
-  const correoCont = prepararInput(correo);
+  const { container: telCont, icono: telIcono } = wrapInput(telefono);
+  const { container: correoCont, icono: correoIcono } = wrapInput(correo);
 
-  function validarTelefono() {
+  // ---- TOOLTIP ----
+  function setIcon(input, icon, tooltipText = "", isValid = false) {
+    const { container, icono } = wrapInput(input);
+    icono.innerHTML = icon + (tooltipText ? `<span class="tooltip-alerta">${tooltipText}</span>` : "");
+    icono.classList.toggle("valido", isValid);
+    if (tooltipText) {
+      container.classList.add("alerta");
+    } else {
+      container.classList.remove("alerta");
+    }
+    // Tooltip solo aparece cuando hay mensaje y hover
+    // (El CSS ya lo controla)
+  }
+
+  function limpiarIcono(input) {
+    const { container, icono } = wrapInput(input);
+    icono.innerHTML = "";
+    icono.classList.remove("valido");
+    container.classList.remove("alerta");
+  }
+
+  // --- Validaciones en input ---
+  telefono.addEventListener("input", function () {
     let val = telefono.value.replace(/\D/g, '');
     if (val.length > LONGITUD_MAX_TEL) val = val.slice(0, LONGITUD_MAX_TEL);
     telefono.value = val;
 
-    const icono = telCont.querySelector('.icono-alerta');
-    const tooltip = telCont.querySelector('.tooltip-alerta');
-
-    let valido = /^\d{10}$/.test(val);
-
-    if (!valido && val.length > 0) {
-      telCont.classList.add("alerta");
-      icono.textContent = "⚠️";
-      icono.classList.remove("valido");
-      tooltip.textContent = "El teléfono debe tener exactamente 10 dígitos numéricos.";
-      tooltip.style.display = "none";
-    } else if (valido) {
-      telCont.classList.remove("alerta");
-      icono.textContent = "✅";
-      icono.classList.add("valido");
-      tooltip.textContent = "";
-      tooltip.style.display = "none";
-    } else {
-      telCont.classList.remove("alerta");
-      icono.textContent = "";
-      icono.classList.remove("valido");
-      tooltip.textContent = "";
-      tooltip.style.display = "none";
+    if (val.length === 0) {
+      limpiarIcono(telefono);
+      return;
     }
-  }
 
-  function validarCorreo() {
+    if (!/^\d{10}$/.test(val)) {
+      setIcon(telefono, "⚠️", "El teléfono debe tener exactamente 10 dígitos numéricos.", false);
+    } else {
+      setIcon(telefono, "✅", "", true);
+    }
+  });
+
+  correo.addEventListener("input", function () {
     const valor = correo.value.trim();
-    const icono = correoCont.querySelector('.icono-alerta');
-    const tooltip = correoCont.querySelector('.tooltip-alerta');
-    let valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
-
-    if (!valido && valor.length > 0) {
-      correoCont.classList.add("alerta");
-      icono.textContent = "⚠️";
-      icono.classList.remove("valido");
-      tooltip.textContent = "El correo debe tener al menos un @ y un dominio válido.";
-      tooltip.style.display = "none";
-    } else if (valido) {
-      correoCont.classList.remove("alerta");
-      icono.textContent = "✅";
-      icono.classList.add("valido");
-      tooltip.textContent = "";
-      tooltip.style.display = "none";
-    } else {
-      correoCont.classList.remove("alerta");
-      icono.textContent = "";
-      icono.classList.remove("valido");
-      tooltip.textContent = "";
-      tooltip.style.display = "none";
+    if (valor.length === 0) {
+      limpiarIcono(correo);
+      return;
     }
-  }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+      setIcon(correo, "⚠️", "El correo debe tener al menos un @ y un dominio válido.", false);
+    } else {
+      setIcon(correo, "✅", "", true);
+    }
+  });
 
-  telefono.addEventListener("input", validarTelefono);
-  correo.addEventListener("input", validarCorreo);
-
+  // --- Validar al enviar ---
   form.addEventListener("submit", function (e) {
-    validarTelefono();
-    validarCorreo();
+    // Forzar validación por si no han tocado campos
+    telefono.dispatchEvent(new Event("input"));
+    correo.dispatchEvent(new Event("input"));
 
     const hayErrores = form.querySelectorAll('.input-alerta-container.alerta').length > 0;
     if (
@@ -147,14 +113,14 @@ document.addEventListener("DOMContentLoaded", () => {
       form.reset();
       btn.disabled = false;
       btn.textContent = "Enviar";
-      // Limpia validaciones visuales
-      [telCont, correoCont].forEach(c => {
-        c.classList.remove("alerta");
-        c.querySelector('.icono-alerta').textContent = "";
-        c.querySelector('.icono-alerta').classList.remove("valido");
-        c.querySelector('.tooltip-alerta').textContent = "";
-        c.querySelector('.tooltip-alerta').style.display = "none";
-      });
+      limpiarIcono(telefono);
+      limpiarIcono(correo);
     }, 1200);
+  });
+
+  // --- Accesibilidad: limpiar al resetear el form
+  form.addEventListener("reset", () => {
+    limpiarIcono(telefono);
+    limpiarIcono(correo);
   });
 });
