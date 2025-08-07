@@ -679,7 +679,11 @@ footer small {
         padding: 0rem 2rem;
     }
 
-    /*    .btn-explorar {
-        display: none !important;
-    }*/
+    .btn-explorar-mobile {
+        display: inline-block;
+    }
+}
+
+.btn-explorar-mobile {
+    display: none !important;
 }

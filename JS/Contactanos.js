@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Cambia aquí si quieres más o menos dígitos
+  // Configura longitud máxima de teléfono
   const LONGITUD_MAX_TEL = 10;
 
+  // Elementos del formulario
   const form = document.querySelector("#contacto form");
   const nombre = form.querySelector("input[placeholder='Nombre']");
   const telefono = form.querySelector("input[placeholder='Teléfono']");
@@ -9,52 +10,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const mensaje = form.querySelector("textarea");
   const btn = form.querySelector("button[type='submit']");
 
-  // --- Crea wrappers para los campos que lo necesiten ---
-  function wrapInput(input) {
-    let container = input.closest('.input-alerta-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.className = 'input-alerta-container';
-      input.parentNode.insertBefore(container, input);
-      container.appendChild(input);
+  function asegurarContenedor(input) {
+    let parent = input.parentElement;
+    if (!parent.classList.contains("input-alerta-container")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "input-alerta-container";
+      parent.replaceChild(wrapper, input);
+      wrapper.appendChild(input);
     }
-    let icono = container.querySelector('.icono-alerta');
-    if (!icono) {
-      icono = document.createElement('span');
-      icono.className = 'icono-alerta';
-      icono.tabIndex = 0; // para accesibilidad
-      container.appendChild(icono);
-    }
-    return { container, icono };
   }
-
-  const { container: telCont, icono: telIcono } = wrapInput(telefono);
-  const { container: correoCont, icono: correoIcono } = wrapInput(correo);
-
-  // ---- TOOLTIP ----
-  function setIcon(input, icon, tooltipText = "", isValid = false) {
-    const { container, icono } = wrapInput(input);
-    icono.innerHTML = icon + (tooltipText ? `<span class="tooltip-alerta">${tooltipText}</span>` : "");
-    icono.classList.toggle("valido", isValid);
-    if (tooltipText) {
-      container.classList.add("alerta");
-    } else {
-      container.classList.remove("alerta");
-    }
-    // Tooltip solo aparece cuando hay mensaje y hover
-    // (El CSS ya lo controla)
-  }
+  [telefono, correo].forEach((input) => asegurarContenedor(input));
 
   function limpiarIcono(input) {
-    const { container, icono } = wrapInput(input);
-    icono.innerHTML = "";
-    icono.classList.remove("valido");
-    container.classList.remove("alerta");
+    const cont = input.parentElement;
+    cont
+      .querySelectorAll(".icono-alerta, .tooltip-alerta")
+      .forEach((el) => el.remove());
+    cont.classList.remove("alerta");
   }
 
-  // --- Validaciones en input ---
+  function mostrarIconoConTooltip(input, tipo, mensajeTooltip = "") {
+    limpiarIcono(input);
+    const cont = input.parentElement;
+    let icono = document.createElement("span");
+    icono.className = "icono-alerta";
+    icono.textContent = tipo === "valido" ? "✅" : "⚠️";
+    icono.tabIndex = 0;
+    cont.appendChild(icono);
+
+    if (tipo === "warning" && mensajeTooltip) {
+      let tooltip = document.createElement("span");
+      tooltip.className = "tooltip-alerta";
+      tooltip.textContent = mensajeTooltip;
+      cont.appendChild(tooltip);
+      cont.classList.add("alerta");
+    } else {
+      cont.classList.remove("alerta");
+    }
+    icono.classList.toggle("valido", tipo === "valido");
+    icono.style.display = input.value.trim() ? "inline-block" : "none";
+  }
+
+  // Validaciones en input
   telefono.addEventListener("input", function () {
-    let val = telefono.value.replace(/\D/g, '');
+    let val = telefono.value.replace(/\D/g, "");
     if (val.length > LONGITUD_MAX_TEL) val = val.slice(0, LONGITUD_MAX_TEL);
     telefono.value = val;
 
@@ -64,9 +63,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!/^\d{10}$/.test(val)) {
-      setIcon(telefono, "⚠️", "El teléfono debe tener exactamente 10 dígitos numéricos.", false);
+      mostrarIconoConTooltip(
+        telefono,
+        "warning",
+        "El teléfono debe tener exactamente 10 dígitos numéricos."
+      );
     } else {
-      setIcon(telefono, "✅", "", true);
+      mostrarIconoConTooltip(telefono, "valido");
     }
   });
 
@@ -77,19 +80,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
-      setIcon(correo, "⚠️", "El correo debe tener al menos un @ y un dominio válido.", false);
+      mostrarIconoConTooltip(
+        correo,
+        "warning",
+        "El correo debe tener al menos un @ y un dominio válido."
+      );
     } else {
-      setIcon(correo, "✅", "", true);
+      mostrarIconoConTooltip(correo, "valido");
     }
   });
 
-  // --- Validar al enviar ---
+  [telefono, correo].forEach((input) => {
+    input.addEventListener("blur", () => {
+      if (!input.value.trim()) limpiarIcono(input);
+    });
+  });
+
   form.addEventListener("submit", function (e) {
-    // Forzar validación por si no han tocado campos
     telefono.dispatchEvent(new Event("input"));
     correo.dispatchEvent(new Event("input"));
 
-    const hayErrores = form.querySelectorAll('.input-alerta-container.alerta').length > 0;
+    const hayErrores =
+      form.querySelectorAll(".input-alerta-container.alerta").length > 0;
     if (
       !nombre.value.trim() ||
       !telefono.value.match(/^\d{10}$/) ||
@@ -111,14 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
         6000
       );
       form.reset();
-      btn.disabled = false;
-      btn.textContent = "Enviar";
       limpiarIcono(telefono);
       limpiarIcono(correo);
+      btn.disabled = false;
+      btn.textContent = "Enviar";
     }, 1200);
   });
 
-  // --- Accesibilidad: limpiar al resetear el form
   form.addEventListener("reset", () => {
     limpiarIcono(telefono);
     limpiarIcono(correo);

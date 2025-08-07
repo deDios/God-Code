@@ -190,7 +190,7 @@ textarea {
     .tooltip-alerta {
         left: 50% !important;
         top: 105%;
-        transform: translateX(-50%) !important;
+        transform: translateX(-80%) !important;
         min-width: 160px;
         max-width: 90vw;
         font-size: 1em;
@@ -199,5 +199,9 @@ textarea {
         margin-top: 7px;
         z-index: 99;
         white-space: normal;
+    }
+
+    .input-doble {
+        flex-direction: column;
     }
 }

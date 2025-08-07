@@ -171,7 +171,7 @@
                         <input type="text" placeholder="Nombre" required>
 
                         <div class="input-doble">
-                            <input type="text" placeholder="Teléfono" required>
+                            <input type="tel" placeholder="Teléfono" required>
                             <input type="email" placeholder="Correo electrónico" required>
                         </div>
 
