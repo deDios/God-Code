@@ -181,31 +181,24 @@ textarea {
 .input-alerta-container input,
 .input-alerta-container select,
 .input-alerta-container textarea {
-    width: 100%;
-    /* Mantén tu padding/fondo base aquí si lo necesitas */
-    padding-right: 2.2rem;
-    /* deja espacio para el icono */
+    flex: 1;
 }
 
 .icono-alerta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.27rem;
+    font-size: 1.3rem;
+    margin-left: 0.4rem;
     cursor: pointer;
-    z-index: 2;
+    position: relative;
+    user-select: none;
+    color: #ffb300;
     background: transparent;
-    color: #e09c1b;
-    /* color warning */
-    transition: color 0.2s;
 }
 
 .icono-alerta.valido {
-    color: #37b24d;
+    color: #3bb868;
 }
 
 .icono-alerta .tooltiptext {
@@ -213,24 +206,41 @@ textarea {
     opacity: 0;
     width: max-content;
     min-width: 180px;
-    background: #333;
+    max-width: 260px;
+    background-color: #222;
     color: #fff;
     text-align: left;
-    border-radius: 5px;
-    padding: 8px 12px;
+    border-radius: 6px;
+    padding: 10px 15px;
     position: absolute;
-    z-index: 15;
+    z-index: 20;
+    bottom: 150%;
     left: 50%;
-    top: 130%;
     transform: translateX(-50%);
-    font-size: 0.93rem;
+    font-size: 0.98rem;
+    line-height: 1.4;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
     pointer-events: none;
-    transition: opacity 0.2s, visibility 0.2s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    transition: opacity 0.18s;
 }
 
-.icono-alerta:hover .tooltiptext {
+.icono-alerta:hover .tooltiptext,
+.icono-alerta:focus .tooltiptext {
     visibility: visible;
     opacity: 1;
-    pointer-events: auto;
+}
+
+.input-alerta-container .icono-alerta {
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .icono-alerta .tooltiptext {
+        left: 0;
+        right: auto;
+        transform: none;
+        font-size: 0.93rem;
+        min-width: 120px;
+        padding: 7px 10px;
+    }
 }
