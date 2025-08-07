@@ -179,9 +179,12 @@ textarea {
 }
 
 .input-alerta-container input,
-.input-alerta-container select {
-    flex: 1;
+.input-alerta-container select,
+.input-alerta-container textarea {
     width: 100%;
+    /* Mantén tu padding/fondo base aquí si lo necesitas */
+    padding-right: 2.2rem;
+    /* deja espacio para el icono */
 }
 
 .icono-alerta {
@@ -189,22 +192,23 @@ textarea {
     align-items: center;
     justify-content: center;
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.25rem;
+    font-size: 1.27rem;
     cursor: pointer;
     z-index: 2;
-    color: #e09c1b;
     background: transparent;
+    color: #e09c1b;
+    /* color warning */
     transition: color 0.2s;
 }
 
 .icono-alerta.valido {
-    color: #4caf50;
+    color: #37b24d;
 }
 
-.input-alerta-container .icono-alerta .tooltiptext {
+.icono-alerta .tooltiptext {
     visibility: hidden;
     opacity: 0;
     width: max-content;
@@ -217,34 +221,16 @@ textarea {
     position: absolute;
     z-index: 15;
     left: 50%;
-    top: 135%;
+    top: 130%;
     transform: translateX(-50%);
     font-size: 0.93rem;
     pointer-events: none;
     transition: opacity 0.2s, visibility 0.2s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.11);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 .icono-alerta:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
-}
-
-.input-alerta-container.alerta input,
-.input-alerta-container.alerta select {
-    border: 1.5px solid #e09c1b !important;
-    background: #fffbea !important;
-}
-
-.input-alerta-container input,
-.input-alerta-container select {
-    border: 1.5px solid #eee;
-    background: #eee;
-    padding-right: 2.5rem;
-    box-sizing: border-box;
-}
-
-.input-alerta-container .icono-alerta.valido {
-    color: #37b24d;
 }
