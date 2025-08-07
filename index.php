@@ -142,7 +142,7 @@
                 </p>
                 <div class="botones">
                     <a href="#" class="btn btn-primary">Descrubre GodCode 360°</a>
-                    <a href="VIEW/Servicios.php" class="btn btn-outline">Explore el conjunto
+                    <a href="VIEW/Servicios.php" class="btn btn-outline btn-explorar">Explore el conjunto
                         de soluciones</a>
                     <a href="VIEW/ProductosMobile.php" class="btn btn-outline btn-explorar-Mobile">Explore el conjunto
                         de soluciones Mobile</a>

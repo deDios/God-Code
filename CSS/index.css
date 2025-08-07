@@ -682,6 +682,10 @@ footer small {
     .btn-explorar-mobile {
         display: inline-block;
     }
+
+    .btn-explorar {
+        display: none !important;
+    }
 }
 
 .btn-explorar-mobile {

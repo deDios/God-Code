@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Configura longitud máxima de teléfono
   const LONGITUD_MAX_TEL = 10;
 
-  // Elementos del formulario
   const form = document.querySelector("#contacto form");
   const nombre = form.querySelector("input[placeholder='Nombre']");
   const telefono = form.querySelector("input[placeholder='Teléfono']");
@@ -23,35 +21,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function limpiarIcono(input) {
     const cont = input.parentElement;
-    cont
-      .querySelectorAll(".icono-alerta, .tooltip-alerta")
-      .forEach((el) => el.remove());
+    cont.querySelectorAll(".icono-alerta").forEach((el) => el.remove());
     cont.classList.remove("alerta");
   }
 
   function mostrarIconoConTooltip(input, tipo, mensajeTooltip = "") {
     limpiarIcono(input);
     const cont = input.parentElement;
+
     let icono = document.createElement("span");
     icono.className = "icono-alerta";
     icono.textContent = tipo === "valido" ? "✅" : "⚠️";
     icono.tabIndex = 0;
-    cont.appendChild(icono);
 
     if (tipo === "warning" && mensajeTooltip) {
       let tooltip = document.createElement("span");
       tooltip.className = "tooltip-alerta";
       tooltip.textContent = mensajeTooltip;
-      cont.appendChild(tooltip);
+      icono.appendChild(tooltip);
       cont.classList.add("alerta");
     } else {
       cont.classList.remove("alerta");
     }
+
     icono.classList.toggle("valido", tipo === "valido");
     icono.style.display = input.value.trim() ? "inline-block" : "none";
+
+    cont.appendChild(icono);
   }
 
-  // Validaciones en input
   telefono.addEventListener("input", function () {
     let val = telefono.value.replace(/\D/g, "");
     if (val.length > LONGITUD_MAX_TEL) val = val.slice(0, LONGITUD_MAX_TEL);
@@ -113,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       gcToast("Por favor completa todos los campos correctamente.", "warning");
       return false;
     }
+
     btn.disabled = true;
     btn.textContent = "Enviando...";
 
