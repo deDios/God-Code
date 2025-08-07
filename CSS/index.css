@@ -715,6 +715,10 @@ footer small {
     }
 
     .btn-explorar {
-        display: none;
+        display: none !important;
+    }
+
+    #seccion-innovacion {
+        padding: 0rem 2rem;
     }
 }

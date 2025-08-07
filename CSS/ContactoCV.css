@@ -258,7 +258,7 @@ textarea {
         top: 110%;
         transform: translateX(-80%) !important;
         margin-top: 8px;
-        min-width: 160px;
+        min-width: 280px;
         max-width: 92vw;
         font-size: 0.98em;
         padding: 8px 12px;
