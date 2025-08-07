@@ -690,7 +690,6 @@ checkboxCuenta.addEventListener("change", () => {
       input.removeEventListener("keydown", onEnterBuscar);
     }
   });
-    limpiarFormulario();
 });
 
 buscarBtn.addEventListener("click", buscarCuentaExistente);
