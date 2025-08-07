@@ -680,6 +680,7 @@ window.addEventListener("keydown", (e) => {
 });
 
 checkboxCuenta.addEventListener("change", () => {
+  limpiarFormulario();
   const modoCuenta = checkboxCuenta.checked;
   toggleFormularios(modoCuenta);
 
