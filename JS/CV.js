@@ -1,156 +1,144 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Configuración
+  const MAX_DIGITOS_TEL = 10;
+
+  // Selecciona los inputs relevantes
   const form = document.querySelector("#trabaja-con-nosotros form");
-  const btn = form.querySelector("button[type='submit']");
   const nombre = form.querySelector("input[placeholder='Nombre completo']");
   const correo = form.querySelector("input[type='email']");
   const telefono = form.querySelector("input[type='tel']");
   const puesto = form.querySelector("select");
   const mensaje = form.querySelector("textarea");
-  const archivo = form.querySelector("#cv-file");
+  const btn = form.querySelector("button[type='submit']");
 
-  const MAX_DIGITOS_TELEFONO = 10;
+  // Función para envolver el input en .input-alerta-container si no existe
+  function asegurarContenedor(input) {
+    let parent = input.parentElement;
+    if (!parent.classList.contains("input-alerta-container")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "input-alerta-container";
+      parent.replaceChild(wrapper, input);
+      wrapper.appendChild(input);
+    }
+  }
 
-  // Para que solo valide tras el primer input
-  let touched = {
-    nombre: false,
-    correo: false,
-    telefono: false
-  };
+  [nombre, correo, telefono].forEach(input => asegurarContenedor(input));
 
-  // Helper para iconos/tooltip
-  function setAlerta(input, msg, esValido = false) {
-    const container = input.closest(".input-alerta-container") || wrapInput(input);
-    let icono = container.querySelector(".icono-alerta");
+  // Función para crear el icono y tooltip
+  function mostrarIcono(input, tipo, mensajeTooltip) {
+    const cont = input.parentElement;
+    let icono = cont.querySelector('.icono-alerta');
     if (!icono) {
-      icono = document.createElement("span");
-      icono.className = "icono-alerta";
-      container.appendChild(icono);
+      icono = document.createElement('span');
+      icono.className = 'icono-alerta';
+      icono.tabIndex = 0;
+      cont.appendChild(icono);
     }
-
-    // Solo muestra icono si hay algo escrito (touched)
-    if (!input.value.trim()) {
-      icono.textContent = "";
-      icono.classList.remove("valido");
-      icono.title = "";
-      icono.innerHTML = "";
-      return;
-    }
-
-    if (esValido) {
-      icono.textContent = "✅";
-      icono.classList.add("valido");
-      icono.title = "Campo válido";
-      icono.innerHTML = "✅";
-    } else if (msg) {
-      icono.classList.remove("valido");
-      icono.innerHTML = `&#9888;<span class="tooltiptext">${msg}</span>`;
-      icono.title = "";
+    icono.innerHTML = (tipo === "valido" ? "✅" : "⚠️") +
+      `<span class="tooltip-alerta">${mensajeTooltip || ""}</span>`;
+    icono.classList.toggle('valido', tipo === "valido");
+    // Solo mostrar tooltip en warning, no en valido
+    if (tipo !== "valido") {
+      cont.classList.add("alerta");
     } else {
-      icono.textContent = "";
-      icono.classList.remove("valido");
-      icono.title = "";
-      icono.innerHTML = "";
+      cont.classList.remove("alerta");
     }
+    // Accesibilidad: oculta el icono si el campo está vacío
+    icono.style.display = input.value.trim() ? "inline-block" : "none";
   }
 
-  // Auto-wrap para asegurar la estructura
-  function wrapInput(input) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "input-alerta-container";
-    input.parentNode.insertBefore(wrapper, input);
-    wrapper.appendChild(input);
-    return wrapper;
+  function limpiarIcono(input) {
+    const cont = input.parentElement;
+    const icono = cont.querySelector('.icono-alerta');
+    if (icono) icono.remove();
+    cont.classList.remove("alerta");
   }
 
-  // --- Validadores ---
+  // Validaciones individuales
   function validarNombre() {
-    if (!touched.nombre) return;
-    const val = nombre.value.trim();
-    if (val.length === 0) {
-      setAlerta(nombre, "Por favor ingresa tu nombre.");
+    if (!nombre.value.trim()) {
+      mostrarIcono(nombre, "warning", "El nombre es obligatorio.");
       return false;
     }
-    setAlerta(nombre, "", true);
+    mostrarIcono(nombre, "valido", "Campo válido");
     return true;
   }
 
   function validarCorreo() {
-    if (!touched.correo) return;
-    const val = correo.value.trim();
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(val)) {
-      setAlerta(correo, "El correo debe tener al menos un @ y un dominio válido.");
+    const valor = correo.value.trim();
+    if (!valor) {
+      mostrarIcono(correo, "warning", "El correo es obligatorio.");
       return false;
     }
-    setAlerta(correo, "", true);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+      mostrarIcono(correo, "warning", "El correo debe tener al menos un @ y un dominio válido.");
+      return false;
+    }
+    mostrarIcono(correo, "valido", "Campo válido");
     return true;
   }
 
   function validarTelefono() {
-    if (!touched.telefono) return;
-    const val = telefono.value.replace(/\D/g, "");
-    if (val.length !== MAX_DIGITOS_TELEFONO) {
-      setAlerta(telefono, `El teléfono debe tener exactamente ${MAX_DIGITOS_TELEFONO} dígitos numéricos.`);
+    let valor = telefono.value.replace(/\D/g, "");
+    telefono.value = valor.slice(0, MAX_DIGITOS_TEL); // Limita la longitud
+    if (!valor) {
+      mostrarIcono(telefono, "warning", "El teléfono es obligatorio.");
       return false;
     }
-    setAlerta(telefono, "", true);
+    if (valor.length !== MAX_DIGITOS_TEL) {
+      mostrarIcono(telefono, "warning", `El teléfono debe tener exactamente ${MAX_DIGITOS_TEL} dígitos numéricos.`);
+      return false;
+    }
+    mostrarIcono(telefono, "valido", "Campo válido");
     return true;
   }
 
-  // Limitar el input de teléfono
-  telefono.addEventListener("input", () => {
-    telefono.value = telefono.value.replace(/\D/g, "").slice(0, MAX_DIGITOS_TELEFONO);
-    touched.telefono = true;
-    validarTelefono();
+  function validarPuesto() {
+    if (!puesto.value) {
+      puesto.classList.add("input-error");
+      return false;
+    }
+    puesto.classList.remove("input-error");
+    return true;
+  }
+
+  // Listeners en tiempo real (solo evalúa si el usuario ha escrito algo)
+  nombre.addEventListener("input", validarNombre);
+  correo.addEventListener("input", validarCorreo);
+  telefono.addEventListener("input", validarTelefono);
+
+  // Limpia iconos al perder foco si está vacío
+  [nombre, correo, telefono].forEach(input => {
+    input.addEventListener("blur", () => {
+      if (!input.value.trim()) limpiarIcono(input);
+    });
   });
 
-  nombre.addEventListener("input", () => {
-    touched.nombre = true;
-    validarNombre();
-  });
-
-  correo.addEventListener("input", () => {
-    touched.correo = true;
-    validarCorreo();
-  });
-
-  // --- Submit ---
-  form.addEventListener("submit", async (e) => {
+  // Validación al enviar
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
-    btn.disabled = true;
-    btn.textContent = "Enviando...";
-
-    // Marca todos como tocados
-    touched.nombre = true;
-    touched.correo = true;
-    touched.telefono = true;
-
-    const valido =
-      validarNombre() &
-      validarCorreo() &
-      validarTelefono() &
-      puesto.value;
+    let valido = true;
+    if (!validarNombre()) valido = false;
+    if (!validarCorreo()) valido = false;
+    if (!validarTelefono()) valido = false;
+    if (!validarPuesto()) valido = false;
 
     if (!valido) {
-      window.gcToast?.("Por favor completa todos los campos obligatorios.", "warning");
+      gcToast("Por favor completa todos los campos obligatorios.", "warning");
       btn.disabled = false;
       btn.textContent = "Enviar";
       return;
     }
 
-    // Aquí iría el fetch real
-    window.gcToast?.("Formulario enviado con éxito. ¡Gracias por postularte!", "exito", 6000);
-    form.reset();
-
-    // Reinicia iconos tras reset (sin mostrar iconos en vacíos)
-    touched = { nombre: false, correo: false, telefono: false };
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+    // Simula éxito
     setTimeout(() => {
-      setAlerta(nombre, "");
-      setAlerta(correo, "");
-      setAlerta(telefono, "");
-    }, 100);
-
-    btn.disabled = false;
-    btn.textContent = "Enviar";
+      gcToast("Formulario enviado con éxito. ¡Gracias por postularte!", "exito", 6000);
+      form.reset();
+      [nombre, correo, telefono].forEach(input => limpiarIcono(input));
+      btn.disabled = false;
+      btn.textContent = "Enviar";
+    }, 1200);
   });
 });

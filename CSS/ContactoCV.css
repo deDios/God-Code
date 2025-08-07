@@ -174,7 +174,6 @@ textarea {
 .input-alerta-container {
     position: relative;
     margin-bottom: 18px;
-    /* Para que el icono se posicione bien relativo al input */
 }
 
 .icono-alerta {
@@ -182,54 +181,59 @@ textarea {
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.25em;
+    font-size: 1.2em;
     color: #e68a19;
     cursor: pointer;
     background: transparent;
+    border: none;
+    padding: 0;
+    display: inline-block;
     z-index: 3;
-    display: flex;
-    align-items: center;
-    user-select: none;
-    /* No se selecciona el icono */
 }
 
 .icono-alerta.valido {
     color: #388e3c;
-    /* Verde para el check de validación */
 }
 
-/* Tooltip oculto por defecto */
 .tooltip-alerta {
     display: none;
     position: absolute;
-    left: 50%;
-    top: 120%;
-    min-width: 180px;
-    max-width: 260px;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(14px);
+    min-width: 220px;
     background: #222;
     color: #fff;
-    font-size: 0.97em;
-    padding: 8px 13px;
-    border-radius: 6px;
-    z-index: 20;
+    font-size: 0.93em;
+    padding: 6px 12px;
+    border-radius: 5px;
+    z-index: 10;
     white-space: pre-line;
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.16s;
 }
 
-/* Mostrar el tooltip SOLO cuando el mouse está encima del icono */
 .icono-alerta:hover .tooltip-alerta,
 .icono-alerta:focus .tooltip-alerta {
     display: block;
-    opacity: 1;
-    pointer-events: auto;
 }
 
-/* Opcional: más padding para que los inputs no se sobrepongan al icono */
+.input-alerta-container .icono-alerta {
+    transition: color 0.2s;
+}
+
+/* Input padding para que el texto no se monte en el icono */
 .input-alerta-container input,
-.input-alerta-container textarea {
-    padding-right: 2.2em !important;
-    /* Ajusta este valor si el icono se ve encima del texto */
+.input-alerta-container select {
+    padding-right: 2.4em !important;
+}
+
+/* Para .input-doble en dos columnas */
+.input-doble {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 18px;
+}
+.input-doble .input-alerta-container {
+    flex: 1;
 }
