@@ -45,20 +45,6 @@ header.scrolled .top-bar {
     opacity: 0;
 }
 
-.subnav {
-    position: fixed;
-    top: 74px;
-    left: 0;
-    right: 0;
-    background-color: #f1f1f1;
-    display: flex;
-    justify-content: space-around;
-    padding: 0.5rem 1rem;
-    z-index: 1000;
-    white-space: nowrap;
-    transition: all 0.4s ease-in-out;
-}
-
 .subnav a {
     text-decoration: none;
     color: #444;
@@ -725,6 +711,10 @@ footer small {
     }
 
     #seccion-innovacion .imagen img {
+        display: none;
+    }
+
+    .btn-explorar {
         display: none;
     }
 }

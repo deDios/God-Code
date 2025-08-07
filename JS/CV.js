@@ -1,17 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Configuración
-  const MAX_DIGITOS_TEL = 10;
+  const MAX_DIGITOS_TEL = 10; //el limite de caracteres para el input de telefono
 
-  // Selecciona los inputs relevantes
+  // Seleccion de los inputs
   const form = document.querySelector("#trabaja-con-nosotros form");
-  const nombre = form.querySelector("input[placeholder='Nombre completo']");
   const correo = form.querySelector("input[type='email']");
   const telefono = form.querySelector("input[type='tel']");
-  const puesto = form.querySelector("select");
-  const mensaje = form.querySelector("textarea");
   const btn = form.querySelector("button[type='submit']");
+  const puesto = form.querySelector("select");
 
-  // Función para envolver el input en .input-alerta-container si no existe
   function asegurarContenedor(input) {
     let parent = input.parentElement;
     if (!parent.classList.contains("input-alerta-container")) {
@@ -22,9 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  [nombre, correo, telefono].forEach(input => asegurarContenedor(input));
+  [correo, telefono].forEach(input => asegurarContenedor(input));
 
-  // Función para crear el icono y tooltip
   function mostrarIcono(input, tipo, mensajeTooltip) {
     const cont = input.parentElement;
     let icono = cont.querySelector('.icono-alerta');
@@ -37,13 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
     icono.innerHTML = (tipo === "valido" ? "✅" : "⚠️") +
       `<span class="tooltip-alerta">${mensajeTooltip || ""}</span>`;
     icono.classList.toggle('valido', tipo === "valido");
-    // Solo mostrar tooltip en warning, no en valido
     if (tipo !== "valido") {
       cont.classList.add("alerta");
     } else {
       cont.classList.remove("alerta");
     }
-    // Accesibilidad: oculta el icono si el campo está vacío
     icono.style.display = input.value.trim() ? "inline-block" : "none";
   }
 
@@ -55,15 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Validaciones individuales
-  function validarNombre() {
-    if (!nombre.value.trim()) {
-      mostrarIcono(nombre, "warning", "El nombre es obligatorio.");
-      return false;
-    }
-    mostrarIcono(nombre, "valido", "Campo válido");
-    return true;
-  }
-
   function validarCorreo() {
     const valor = correo.value.trim();
     if (!valor) {
@@ -93,35 +77,21 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-  function validarPuesto() {
-    if (!puesto.value) {
-      puesto.classList.add("input-error");
-      return false;
-    }
-    puesto.classList.remove("input-error");
-    return true;
-  }
-
-  // Listeners en tiempo real (solo evalúa si el usuario ha escrito algo)
-  nombre.addEventListener("input", validarNombre);
   correo.addEventListener("input", validarCorreo);
   telefono.addEventListener("input", validarTelefono);
 
-  // Limpia iconos al perder foco si está vacío
-  [nombre, correo, telefono].forEach(input => {
+  [correo, telefono].forEach(input => {
     input.addEventListener("blur", () => {
       if (!input.value.trim()) limpiarIcono(input);
     });
   });
 
-  // Validación al enviar
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     let valido = true;
-    if (!validarNombre()) valido = false;
     if (!validarCorreo()) valido = false;
     if (!validarTelefono()) valido = false;
-    if (!validarPuesto()) valido = false;
+    if (!puesto.value) valido = false;
 
     if (!valido) {
       gcToast("Por favor completa todos los campos obligatorios.", "warning");
@@ -132,11 +102,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.disabled = true;
     btn.textContent = "Enviando...";
-    // Simula éxito
+    // mensaje de que se mando el CV 
     setTimeout(() => {
       gcToast("Formulario enviado con éxito. ¡Gracias por postularte!", "exito", 6000);
       form.reset();
-      [nombre, correo, telefono].forEach(input => limpiarIcono(input));
+      [correo, telefono].forEach(input => limpiarIcono(input));
       btn.disabled = false;
       btn.textContent = "Enviar";
     }, 1200);

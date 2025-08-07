@@ -160,3 +160,30 @@ textarea {
 .input-alerta-container .icono-alerta.valido {
     color: #388e3c;
 }
+
+@media (max-width: 768px) {
+  .input-alerta-container {
+    margin-bottom: 15px;
+  }
+
+  .icono-alerta {
+    right: 9px;
+    font-size: 1.15em;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .tooltip-alerta {
+    left: 0;
+    top: 105%;
+    transform: none;
+    min-width: 160px;
+    max-width: 90vw;
+    font-size: 1em;
+    padding: 7px 11px;
+    border-radius: 6px;
+    margin-top: 7px;
+    z-index: 99;
+    white-space: normal;
+  }
+}

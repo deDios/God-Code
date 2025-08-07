@@ -234,6 +234,37 @@ textarea {
     gap: 1rem;
     margin-bottom: 18px;
 }
+
 .input-doble .input-alerta-container {
     flex: 1;
+}
+
+
+@media (max-width: 768px) {
+
+    .input-alerta-container input,
+    .input-alerta-container select {
+        padding-right: 2.2em !important;
+        font-size: 1em;
+    }
+
+    .icono-alerta {
+        right: 10px;
+        font-size: 1.18em;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .tooltip-alerta {
+        left: 0;
+        top: 100%;
+        transform: none;
+        margin-top: 8px;
+        min-width: 180px;
+        max-width: 92vw;
+        font-size: 0.98em;
+        padding: 8px 12px;
+        white-space: normal;
+        z-index: 99;
+    }
 }
