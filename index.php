@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GodCode</title>
-    <link rel="stylesheet" href="/CSS/plantilla.css">
     <link rel="stylesheet" href="CSS/index.css">
+    <link rel="stylesheet" href="/CSS/plantilla.css">
 </head>
 
 <body>
@@ -27,8 +27,7 @@
                 </div>
                 <!-- Icono de usuario para login en vista mobile -->
                 <div class="user-icon-mobile" onclick="window.location.href='VIEW/Login.php'">
-                    <img src="ASSETS/usuario/usuarioImg/img_user1.png"
-                        alt="Usuario" />
+                    <img src="ASSETS/usuario/usuarioImg/img_user1.png" alt="Usuario" />
                 </div>
             </div>
         </div>
