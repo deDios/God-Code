@@ -438,7 +438,6 @@ const toggleFormularios = (mostrarLogin) => {
   camposLogin.classList.toggle("mostrar", mostrarLogin);
   cursoNombreInput.value = nombreCursoGlobal;
   if (!mostrarLogin && !camposBloqueadosPorCuenta) desbloquearCampos();
-  limpiarFormulario();
 };
 
 // Limpiar formulario
