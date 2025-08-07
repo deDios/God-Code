@@ -222,13 +222,11 @@ textarea {
     transition: color 0.2s;
 }
 
-/* Input padding para que el texto no se monte en el icono */
 .input-alerta-container input,
 .input-alerta-container select {
     padding-right: 2.4em !important;
 }
 
-/* Para .input-doble en dos columnas */
 .input-doble {
     display: flex;
     gap: 1rem;
@@ -258,7 +256,7 @@ textarea {
     .tooltip-alerta {
         left: 50% !important;
         top: 110%;
-        transform: translateX(-50%) !important;
+        transform: translateX(-80%) !important;
         margin-top: 8px;
         min-width: 160px;
         max-width: 92vw;
@@ -267,5 +265,17 @@ textarea {
         white-space: normal;
         z-index: 99;
         text-align: left;
+    }
+
+    .input-doble {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+
+    .input-doble input,
+    .input-doble select {
+        min-width: 0;
+        width: 100%;
+        flex: none;
     }
 }
