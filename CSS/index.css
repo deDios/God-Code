@@ -45,45 +45,6 @@ header.scrolled .top-bar {
     opacity: 0;
 }
 
-.subnav a {
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 8px 12px;
-}
-
-header.scrolled .subnav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #0a61d0;
-}
-
-.logo-icon {
-    height: 40px;
-    width: auto;
-    margin-right: 8px;
-    vertical-align: middle;
-}
-
-.user-icon img {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    cursor: pointer;
-    align-items: center;
-    gap: 10px;
-}
-
 .btn-primary {
     background-color: #0a61d0;
     color: white;
