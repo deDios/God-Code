@@ -511,12 +511,12 @@ const buscarCuentaExistente = async () => {
       gcToast("Cuenta encontrada correctamente.", "exito");
       llenarFormulario(data[0], true);
       bloquearCampos(true, true);
-      checkboxCuenta.disabled = true;
+      //checkboxCuenta.disabled = true;
     } else {
       gcToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
       desbloquearCampos();
-      checkboxCuenta.disabled = false;
+      //checkboxCuenta.disabled = false;
     }
   } catch (err) {
     gcToast("Error al consultar la cuenta.", "error");
