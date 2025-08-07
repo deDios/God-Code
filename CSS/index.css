@@ -675,11 +675,11 @@ footer small {
         display: none;
     }
 
-    .btn-explorar {
-        display: none !important;
-    }
-
     #seccion-innovacion {
         padding: 0rem 2rem;
     }
+
+    /*    .btn-explorar {
+        display: none !important;
+    }*/
 }

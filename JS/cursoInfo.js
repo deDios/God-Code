@@ -416,7 +416,7 @@ const abrirModal = () => {
         llenarFormulario(datos, true);
         bloquearCampos(true, true);
         checkboxCuenta.checked = false;
-        checkboxCuenta.disabled = true;
+        //checkboxCuenta.disabled = true;
         toggleFormularios(false);
       }
     } catch (e) {}
@@ -476,7 +476,7 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
   buscarBtn.disabled = bloquear;
   btnSubmit.disabled = false;
   btnSubmit.classList.remove("disabled");
-  if (bloquearToggle) checkboxCuenta.disabled = true;
+  //if (bloquearToggle) checkboxCuenta.disabled = true;
   camposBloqueadosPorCuenta = bloquear;
 }
 

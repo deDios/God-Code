@@ -191,7 +191,7 @@
 
             <!-- Industrias -->
             <div class="card-producto">
-                <a href="../VIEW/ServicioEducativo.php" class="card-body-producto">
+                <a href="../VIEW/IndustriaEducacion.php" class="card-body-producto">
                     <img src="../ASSETS/ProductosPopUp/Educacion.png" alt="Educación">
                     <h3>Educación</h3>
                     <p>Impulsa el conocimiento con propuestas educativas innovadoras, inclusivas y de calidad. Formamos

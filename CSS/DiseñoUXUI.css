@@ -184,6 +184,11 @@
     .uxui-texto {
         text-align: center;
     }
+
+    /* para qutar los botones en android porque se veian raros*/
+    .ventajas-uxui__btn {
+        display: none !important;
+    }
 }
 
 #ventajas-uxui .ventajas-uxui__carousel {
