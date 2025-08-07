@@ -680,7 +680,6 @@ window.addEventListener("keydown", (e) => {
 });
 
 checkboxCuenta.addEventListener("change", () => {
-  limpiarFormulario();
   const modoCuenta = checkboxCuenta.checked;
   toggleFormularios(modoCuenta);
 
@@ -691,6 +690,7 @@ checkboxCuenta.addEventListener("change", () => {
       input.removeEventListener("keydown", onEnterBuscar);
     }
   });
+    limpiarFormulario();
 });
 
 buscarBtn.addEventListener("click", buscarCuentaExistente);
