@@ -173,74 +173,58 @@ textarea {
 
 .input-alerta-container {
     position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.input-alerta-container input,
-.input-alerta-container select,
-.input-alerta-container textarea {
-    flex: 1;
+    margin-bottom: 18px;
 }
 
 .icono-alerta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    margin-left: 0.4rem;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    color: #e68a19;
     cursor: pointer;
-    position: relative;
-    user-select: none;
-    color: #ffb300;
     background: transparent;
+    user-select: none;
+    z-index: 2;
 }
 
 .icono-alerta.valido {
-    color: #3bb868;
+    color: #388e3c;
 }
 
-.icono-alerta .tooltiptext {
-    visibility: hidden;
-    opacity: 0;
-    width: max-content;
+.tooltip-alerta {
+    display: none;
+    position: absolute;
+    left: 65%;
+    top: 120%;
     min-width: 180px;
     max-width: 260px;
-    background-color: #222;
+    background: #222;
     color: #fff;
-    text-align: left;
+    font-size: 0.95em;
+    padding: 8px 13px;
     border-radius: 6px;
-    padding: 10px 15px;
-    position: absolute;
     z-index: 20;
-    bottom: 150%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.98rem;
-    line-height: 1.4;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+    white-space: pre-line;
+    box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
     pointer-events: none;
+    opacity: 0;
     transition: opacity 0.18s;
 }
 
-.icono-alerta:hover .tooltiptext,
-.icono-alerta:focus .tooltiptext {
-    visibility: visible;
+.icono-alerta:hover .tooltip-alerta,
+.icono-alerta:focus .tooltip-alerta {
+    display: block;
     opacity: 1;
-}
-
-.input-alerta-container .icono-alerta {
-    flex-shrink: 0;
+    pointer-events: auto;
 }
 
 @media (max-width: 600px) {
-    .icono-alerta .tooltiptext {
+    .tooltip-alerta {
         left: 0;
-        right: auto;
-        transform: none;
-        font-size: 0.93rem;
         min-width: 120px;
-        padding: 7px 10px;
+        padding: 6px 7px;
+        font-size: 0.92em;
     }
 }
