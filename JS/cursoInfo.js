@@ -438,6 +438,7 @@ const toggleFormularios = (mostrarLogin) => {
   camposLogin.classList.toggle("mostrar", mostrarLogin);
   cursoNombreInput.value = nombreCursoGlobal;
   if (!mostrarLogin && !camposBloqueadosPorCuenta) desbloquearCampos();
+  limpiarFormulario();
 };
 
 // Limpiar formulario
@@ -516,7 +517,7 @@ const buscarCuentaExistente = async () => {
       gcToast("No encontramos tu cuenta.", "warning");
       limpiarFormulario();
       desbloquearCampos();
-      //checkboxCuenta.disabled = false;
+      checkboxCuenta.disabled = false;
     }
   } catch (err) {
     gcToast("Error al consultar la cuenta.", "error");
