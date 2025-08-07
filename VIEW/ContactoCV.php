@@ -150,7 +150,9 @@
 
                     <form>
                         <div class="input-doble">
-                            <input type="text" placeholder="Nombre completo" required />
+                            <div class="input-alerta-container">
+                                <input type="text" placeholder="Nombre completo" required />
+                            </div>
                             <input type="email" placeholder="Correo electrónico" required />
                         </div>
 
