@@ -860,7 +860,7 @@
     }
 
     #noticia-comentarios .comentarios-box {
-        max-height: none;
+        max-height: 800px;
         padding: 1rem 0.8rem;
     }
 

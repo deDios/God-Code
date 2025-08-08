@@ -92,7 +92,7 @@
     width: 100%;
     max-width: 800px;
     scroll-snap-type: x mandatory;
-    touch-action: pan-x;
+    /*touch-action: pan-x;*/
 }
 
 #ventajas-nube .ventaja {

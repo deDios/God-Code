@@ -112,7 +112,7 @@
             </div>
 
             <div class="nav-item mobile-only">
-                <a href="../VIEW/ProductosMobile.php" class="btn-contacto active">Productos</a>
+                <a href="../VIEW/ProductosMobile.php" class="btn-contacto">Productos</a>
             </div>
 
             <a href="../VIEW/Nosotros.php">Nosotros</a>
