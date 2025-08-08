@@ -665,6 +665,10 @@ footer small {
     padding-bottom: 8px;
 }
 
+.btn-explorar-Mobile {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
     #seccion-innovacion .noticias {
         display: none;
@@ -680,14 +684,10 @@ footer small {
     }
 
     .btn-explorar-Mobile {
-        display: flex;
+        display: flex !important;
     }
 
     .btn-explorar {
         display: none !important;
     }
-}
-
-.btn-explorar-Mobile {
-    display: none !important;
 }
