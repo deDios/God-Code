@@ -145,7 +145,7 @@
             <div class="contacto-contenedor">
                 <div class="formulario-contacto">
                     <p>
-                        Completa el siguiente formulario o envía tu CV a <strong>reclutamientogodcode@gmail.com</strong>
+                        Completa el siguiente formulario o envía tu CV a <strong>contacto@godcode.com.mx</strong>
                     </p>
 
                     <form>

@@ -18,20 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  [correo, telefono].forEach(input => asegurarContenedor(input));
+  [correo, telefono].forEach((input) => asegurarContenedor(input));
 
   function mostrarIcono(input, tipo, mensajeTooltip) {
     const cont = input.parentElement;
-    let icono = cont.querySelector('.icono-alerta');
+    let icono = cont.querySelector(".icono-alerta");
     if (!icono) {
-      icono = document.createElement('span');
-      icono.className = 'icono-alerta';
+      icono = document.createElement("span");
+      icono.className = "icono-alerta";
       icono.tabIndex = 0;
       cont.appendChild(icono);
     }
-    icono.innerHTML = (tipo === "valido" ? "✅" : "⚠️") +
+    icono.innerHTML =
+      (tipo === "valido" ? "✅" : "⚠️") +
       `<span class="tooltip-alerta">${mensajeTooltip || ""}</span>`;
-    icono.classList.toggle('valido', tipo === "valido");
+    icono.classList.toggle("valido", tipo === "valido");
     if (tipo !== "valido") {
       cont.classList.add("alerta");
     } else {
@@ -42,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function limpiarIcono(input) {
     const cont = input.parentElement;
-    const icono = cont.querySelector('.icono-alerta');
+    const icono = cont.querySelector(".icono-alerta");
     if (icono) icono.remove();
     cont.classList.remove("alerta");
   }
@@ -55,7 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
-      mostrarIcono(correo, "warning", "El correo debe tener al menos un @ y un dominio válido.");
+      mostrarIcono(
+        correo,
+        "warning",
+        "El correo debe tener al menos un @ y un dominio válido."
+      );
       return false;
     }
     mostrarIcono(correo, "valido", "Campo válido");
@@ -64,13 +69,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function validarTelefono() {
     let valor = telefono.value.replace(/\D/g, "");
-    telefono.value = valor.slice(0, MAX_DIGITOS_TEL); // Limita la longitud
+    valor = valor.slice(0, MAX_DIGITOS_TEL); 
+    telefono.value = valor; 
     if (!valor) {
       mostrarIcono(telefono, "warning", "El teléfono es obligatorio.");
       return false;
     }
     if (valor.length !== MAX_DIGITOS_TEL) {
-      mostrarIcono(telefono, "warning", `El teléfono debe tener exactamente ${MAX_DIGITOS_TEL} dígitos numéricos.`);
+      mostrarIcono(
+        telefono,
+        "warning",
+        `El teléfono debe tener exactamente ${MAX_DIGITOS_TEL} dígitos numéricos.`
+      );
       return false;
     }
     mostrarIcono(telefono, "valido", "Campo válido");
@@ -80,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
   correo.addEventListener("input", validarCorreo);
   telefono.addEventListener("input", validarTelefono);
 
-  [correo, telefono].forEach(input => {
+  [correo, telefono].forEach((input) => {
     input.addEventListener("blur", () => {
       if (!input.value.trim()) limpiarIcono(input);
     });
@@ -102,11 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.disabled = true;
     btn.textContent = "Enviando...";
-    // mensaje de que se mando el CV 
+    // mensaje de que se mando el CV
     setTimeout(() => {
-      gcToast("Formulario enviado con éxito. ¡Gracias por postularte!", "exito", 6000);
+      gcToast(
+        "Formulario enviado con éxito. ¡Gracias por postularte!",
+        "exito",
+        6000
+      );
       form.reset();
-      [correo, telefono].forEach(input => limpiarIcono(input));
+      [correo, telefono].forEach((input) => limpiarIcono(input));
       btn.disabled = false;
       btn.textContent = "Enviar";
     }, 1200);
