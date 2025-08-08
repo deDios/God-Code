@@ -145,7 +145,7 @@
                     <a href="VIEW/Servicios.php" class="btn btn-outline btn-explorar">Explore el conjunto
                         de soluciones</a>
                     <a href="VIEW/ProductosMobile.php" class="btn btn-outline btn-explorar-Mobile">Explore el conjunto
-                        de soluciones Mobile</a>
+                        de soluciones</a>
                 </div>
             </div>
 

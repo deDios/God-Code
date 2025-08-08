@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function limpiarIcono(input) {
     const cont = input.parentElement;
     cont.querySelectorAll(".icono-alerta").forEach((el) => el.remove());
+    // También eliminamos tooltips flotantes del body
+    document
+      .querySelectorAll(".tooltip-alerta.flotante")
+      .forEach((el) => el.remove());
     cont.classList.remove("alerta");
   }
 
@@ -33,23 +37,49 @@ document.addEventListener("DOMContentLoaded", () => {
     icono.className = "icono-alerta";
     icono.textContent = tipo === "valido" ? "✅" : "⚠️";
     icono.tabIndex = 0;
-
-    if (tipo === "warning" && mensajeTooltip) {
-      let tooltip = document.createElement("span");
-      tooltip.className = "tooltip-alerta";
-      tooltip.textContent = mensajeTooltip;
-      icono.appendChild(tooltip);
-      cont.classList.add("alerta");
-    } else {
-      cont.classList.remove("alerta");
-    }
+    cont.appendChild(icono);
 
     icono.classList.toggle("valido", tipo === "valido");
     icono.style.display = input.value.trim() ? "inline-block" : "none";
 
-    cont.appendChild(icono);
+    if (tipo === "warning" && mensajeTooltip) {
+      cont.classList.add("alerta");
+
+      // Crear tooltip como flotante en body
+      let tooltip = document.createElement("span");
+      tooltip.className = "tooltip-alerta flotante";
+      tooltip.textContent = mensajeTooltip;
+      tooltip.style.position = "absolute";
+      tooltip.style.display = "none";
+      tooltip.style.zIndex = "999999"; // prioridad máxima
+      document.body.appendChild(tooltip);
+
+      // Eventos para mostrar tooltip al pasar sobre el ícono
+      icono.addEventListener("mouseenter", () => {
+        const rect = icono.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top = `${rect.bottom + 6 + window.scrollY}px`;
+        tooltip.style.display = "block";
+      });
+
+      icono.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
+
+      icono.addEventListener("focus", () => {
+        const rect = icono.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top = `${rect.bottom + 6 + window.scrollY}px`;
+        tooltip.style.display = "block";
+      });
+
+      icono.addEventListener("blur", () => {
+        tooltip.style.display = "none";
+      });
+    }
   }
 
+  // Validaciones en input
   telefono.addEventListener("input", function () {
     let val = telefono.value.replace(/\D/g, "");
     if (val.length > LONGITUD_MAX_TEL) val = val.slice(0, LONGITUD_MAX_TEL);
@@ -111,7 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
       gcToast("Por favor completa todos los campos correctamente.", "warning");
       return false;
     }
-
     btn.disabled = true;
     btn.textContent = "Enviando...";
 
