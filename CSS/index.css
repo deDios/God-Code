@@ -679,8 +679,8 @@ footer small {
         padding: 0rem 2rem;
     }
 
-    .btn-explorar-mobile {
-        display: inline-block;
+    .btn-explorar-Mobile {
+        display: flex;
     }
 
     .btn-explorar {
@@ -688,6 +688,6 @@ footer small {
     }
 }
 
-.btn-explorar-mobile {
+.btn-explorar-Mobile {
     display: none !important;
 }
