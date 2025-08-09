@@ -638,7 +638,7 @@
     const devBtn = document.createElement("button");
     devBtn.className = "btn";
     devBtn.id = "btn-dev";
-    devBtn.textContent = state.devMode ? "Modo dev: ON" : "Modo dev: OFF";
+    devBtn.textContent = state.devMode ? "Modo desarrollador: ON" : "Modo desarrollador: OFF";
     devBtn.onclick = () => {
       state.devMode = !state.devMode;
       devBtn.textContent = `Modo dev: ${state.devMode ? "ON" : "OFF"}`;
