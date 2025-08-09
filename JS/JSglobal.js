@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
   const operativeViews = [
     "home.php",
-    // "vistaOperativa2.php",
+    "admin.php",
     // "vistaOperativa3.php",
   ];
   const currentPage = window.location.pathname.split("/").pop().toLowerCase();
