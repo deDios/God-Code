@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>GodCode</title>
     <link rel="stylesheet" href="../../CSS/plantilla.css" />
     <link rel="stylesheet" href="../../CSS/admin/admin.css" />
@@ -13,7 +13,6 @@
     <!-- Tope de pagina -->
     <header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
-        <!-- Barra social móvil (solo visible en pantallas pequeñas) -->
         <div class="social-bar-mobile">
             <div class="social-icons">
                 <div class="icon-mobile">
@@ -132,41 +131,21 @@
                 </div>
             </div>
         </div>
+        
     </header>
 
 
     <main id="home-main" class="gc-dash">
-
-        <!-- Header / título del módulo -->
-        <div class="module-header">
-            <div class="module-title" id="mod-title">
-                Cursos
-            </div>
-            <div class="toolbar">
-                <div class="search">
-                    <input type="search" id="search-input" placeholder="Buscar...">
-                </div>
-                <button class="btn btn-primary" id="btn-nuevo">Nuevo</button>
-            </div>
-        </div>
 
         <!-- Sidebar -->
         <section id="sidebar" class="sidebar">
             <div class="mis-cursos">
                 <h3>Menú</h3>
                 <div class="cursos-seccion">
-                    <div class="cursos-list">
-                        <div class="cursos-subtitulo">Cursos y noticias</div>
-                        <div id="cursos-subscritos"></div>
-                    </div>
-                    <div class="cursos-list">
-                        <div class="cursos-subtitulo">Contactos y reclutamiento</div>
-                        <div id="cursos-activos"></div>
-                    </div>
-                    <div class="cursos-list">
-                        <div class="cursos-subtitulo">Administrar usuarios</div>
-                        <div id="cursos-cancelados"></div>
-                    </div>
+                    <button class="cursos-subtitulo admin-nav" data-route="#/cursos">Cursos y noticias</button>
+                    <button class="cursos-subtitulo admin-nav" data-route="#/usuarios">Contactos y
+                        reclutamiento</button>
+                    <button class="cursos-subtitulo admin-nav" data-route="#/usuarios">Administrar usuarios</button>
                 </div>
             </div>
         </section>
@@ -174,7 +153,19 @@
         <!-- Contenido principal -->
         <section class="main-content">
 
-            <!-- Tabla de recursos Desktop -->
+            <!-- Encabezado del módulo (coincide con admin.js) -->
+            <header class="dash-toolbar">
+                <div class="left">
+                    <h2 id="mod-title">Cursos</h2>
+                    <span id="mod-count" class="module-sub">—</span>
+                </div>
+                <div class="right">
+                    <!-- El botón de "Modo dev" se inyecta aquí por JS -->
+                    <button id="btn-refresh" class="btn blue">Refrescar</button>
+                </div>
+            </header>
+
+            <!-- Tabla Desktop -->
             <section class="recursos-box desktop-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table">
@@ -184,14 +175,13 @@
                         <div class="col-fecha">Fecha</div>
                     </div>
                     <div class="table-body" id="recursos-list">
-                        <!-- Filas generadas por JS -->
+                        <!-- filas por JS -->
                     </div>
                 </div>
-                <!-- Paginación -->
                 <div id="pagination-controls" class="pagination-controls"></div>
             </section>
 
-            <!-- Tabla de recursos Mobile -->
+            <!-- Tabla Mobile  -->
             <section class="recursos-box mobile-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table-mobile">
@@ -199,17 +189,13 @@
                         <div class="col-nombre">Nombre</div>
                     </div>
                     <div class="table-body" id="recursos-list-mobile">
-                        <!-- Filas generadas por JS -->
+                        <!-- filas por JS -->
                     </div>
                 </div>
-                <!-- Paginación -->
                 <div id="pagination-mobile" class="pagination-controls"></div>
             </section>
 
         </section>
-
-
-
     </main>
 
 
@@ -240,7 +226,7 @@
         </div>
     </aside>
     <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
-    
+
     <script src="../../JS/JSglobal.js"></script>
     <script src="../../JS/admin/admin.js"></script>
 
