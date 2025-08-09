@@ -238,9 +238,10 @@
         </div>
     </footer>
 
+    <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
     <script src="../../JS/JSglobal.js"></script>
     <script src="../../JS/admin/admin.js"></script>
-
+    
 </body>
 
 </html>
