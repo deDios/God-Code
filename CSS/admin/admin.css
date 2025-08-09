@@ -412,7 +412,6 @@ body {
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------*/
-
 .gc-dash {
     --gc-blue: #1565c0;
     --gc-blue-2: #0a57c6;
@@ -564,17 +563,27 @@ body {
     }
 }
 
+/* ================= Drawer ================= */
 .drawer.gc-dash {
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     width: min(640px, 100%);
+    height: 100dvh;
     background: #fff;
     box-shadow: -10px 0 30px rgba(0, 0, 0, .12);
     transform: translateX(100%);
     transition: transform .25s ease;
     z-index: 10000;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+@supports not (height: 100dvh) {
+    .drawer.gc-dash {
+        height: 100vh;
+    }
+
 }
 
 /* estado visible */
@@ -603,6 +612,7 @@ body {
     padding: 16px 18px;
     overflow: auto;
     max-height: calc(100% - 64px);
+    overscroll-behavior: contain;
 }
 
 .drawer.gc-dash .field {
@@ -622,6 +632,14 @@ body {
     color: #333;
 }
 
+.gc-dash .drawer-body pre.value {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+/* botón cerrar */
 #drawer-close.btn {
     border: none;
     padding: .6rem .9rem;
@@ -638,6 +656,10 @@ body {
     .drawer.gc-dash {
         width: 100%;
     }
+
+    .gc-dash .toolbar input[type="search"] {
+        min-width: 160px;
+    }
 }
 
 .gc-dash-overlay {
@@ -648,6 +670,7 @@ body {
     pointer-events: none;
     transition: opacity .2s ease;
     z-index: 9999;
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .gc-dash-overlay.open {
@@ -655,7 +678,6 @@ body {
     pointer-events: auto;
 }
 
-/* menu */
 .gc-dash .row-actions {
     margin-left: auto;
     display: flex;
@@ -675,7 +697,6 @@ body {
     color: #000;
 }
 
-/* acordeon mobile – detalles */
 .gc-dash .mobile-meta {
     display: flex;
     flex-wrap: wrap;
@@ -683,8 +704,10 @@ body {
     margin: .35rem 0;
 }
 
-@media (max-width: 768px) {
-    .gc-dash .toolbar input[type="search"] {
-        min-width: 160px;
-    }
+.gc-dash .row-toggle {
+    min-height: 48px;
+}
+
+.gc-dash .icon-chevron {
+    padding: 8px;
 }
