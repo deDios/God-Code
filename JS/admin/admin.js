@@ -1,6 +1,4 @@
-/* ===== GC DASHBOARD BETA (JS) ===== */
 (() => {
-  // Android viewport fallback (por si el navegador no soporta dvh)
   const setVH = () => {
     document.documentElement.style.setProperty(
       "--vh",
@@ -10,7 +8,7 @@
   setVH();
   window.addEventListener("resize", setVH);
 
-  // Endpoints (POST JSON)
+  // ENDPOINTS
   const API = {
     cursos:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
@@ -75,7 +73,7 @@
     return map;
   }
 
-  // Router
+  // router
   function setRoute(route) {
     if (!route) route = "#/cursos";
     if (route !== state.route) {
@@ -100,7 +98,7 @@
     loadCursos();
   }
 
-  // Skeletons
+  // skeletons
   function showSkeletons() {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -114,7 +112,7 @@
     }
   }
 
-  // Render lista + mobile
+  // render lista + mobile
   function renderList(rows, config) {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -141,7 +139,7 @@
       rows.length === 1 ? "elemento" : "elementos"
     }`;
 
-    // Eventos de filas
+    // eventos de filas
     qsa("#recursos-list .table-row").forEach((el) => {
       el.addEventListener("click", () =>
         openDrawer(
@@ -211,7 +209,7 @@
     if (state.route.startsWith("#/usuarios")) return drawUsuarios();
   }
 
-  // ====== Cursos ======
+  // ----- cursos -----
   async function loadCursos() {
     qs("#mod-title").textContent = "Cursos";
     qs(".recursos-box.desktop-only .table-header .col-tipo").textContent =
@@ -305,7 +303,7 @@
     });
   }
 
-  // ====== Noticias ======
+  // ----- noticias ----
   async function loadNoticias() {
     qs("#mod-title").textContent = "Noticias";
     qs(".recursos-box.desktop-only .table-header .col-tipo").textContent =
@@ -379,7 +377,7 @@
     });
   }
 
-  // ====== Usuarios ======
+  // ---- usuarios ----
   async function loadUsuarios() {
     qs("#mod-title").textContent = "Usuarios";
     qs(".recursos-box.desktop-only .table-header .col-tipo").textContent =
@@ -462,14 +460,13 @@
     });
   }
 
-  // ===== Drawer =====
+  // ---- drawer ----
   function openDrawer(title, bodyHTML) {
-    // si usas overlay:
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.add("open");
 
     let drawer = qs("#gc-drawer");
-    if (!drawer) return; // asume que ya existe en tu HTML como en tu ejemplo
+    if (!drawer) return; 
     qs("#drawer-title").textContent = title || "Detalle";
     qs("#drawer-body").innerHTML = bodyHTML || "";
     drawer.classList.add("open");
@@ -485,7 +482,7 @@
     drawer.setAttribute("aria-hidden", "true");
   }
 
-  // ===== Helpers de UI =====
+  // ---- helpers de UI ----
   function escapeHTML(str) {
     return String(str ?? "").replace(
       /[&<>'"]/g,
@@ -555,7 +552,7 @@
     return `<span class="chip">${escapeHTML(tipoContactoText(t))}</span>`;
   }
 
-  // Drawer Dev Mode (render ALL fields + JSON)
+  // drawer dev Mode
   function renderAllFields(obj, extras = {}) {
     const merged = { ...obj, ...extras };
     const entries = Object.entries(merged);
@@ -630,11 +627,11 @@
 
   // UI init
   function bindUI() {
-    // Sidebar → router
+    // Sidebar al router
     qsa(".admin-dash .admin-nav").forEach((btn) =>
       btn.addEventListener("click", () => setRoute(btn.dataset.route))
     );
-    // Dev toggle
+    // dev toggle por si quieres ver los datos que se mandan al post
     const devBtn = document.createElement("button");
     devBtn.className = "btn";
     devBtn.id = "btn-dev";
