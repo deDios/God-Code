@@ -239,7 +239,7 @@
     </footer>
 
     <script src="../../JS/JSglobal.js"></script>
-    <script src=""></script>
+    <script src="../../JS/admin/admin.js"></script>
 
 </body>
 
