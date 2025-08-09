@@ -137,51 +137,44 @@
 
     <main id="home-main" class="gc-dash">
 
-        <!-- sidebar -->
+        <!-- Header / título del módulo -->
+        <div class="module-header">
+            <div class="module-title" id="mod-title">
+                Cursos
+            </div>
+            <div class="toolbar">
+                <div class="search">
+                    <input type="search" id="search-input" placeholder="Buscar...">
+                </div>
+                <button class="btn btn-primary" id="btn-nuevo">Nuevo</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
         <section id="sidebar" class="sidebar">
             <div class="mis-cursos">
-                <h3>Administracion</h3>
+                <h3>Menú</h3>
                 <div class="cursos-seccion">
                     <div class="cursos-list">
-                        <div class="cursos-subtitulo">
-                            <button class="row-btn" data-route="#/cursos" title="Ver cursos y noticias">Cursos y
-                                noticias</button>
-                        </div>
+                        <div class="cursos-subtitulo">Cursos y noticias</div>
                         <div id="cursos-subscritos"></div>
                     </div>
                     <div class="cursos-list">
-                        <div class="cursos-subtitulo">
-                            <button class="row-btn" data-route="#/usuarios" title="Contactos y reclutamiento">Contactos
-                                y reclutamiento</button>
-                        </div>
+                        <div class="cursos-subtitulo">Contactos y reclutamiento</div>
                         <div id="cursos-activos"></div>
                     </div>
                     <div class="cursos-list">
-                        <div class="cursos-subtitulo">
-                            <button class="row-btn" data-route="#/usuarios" title="Administrar usuarios">Administrar
-                                usuarios</button>
-                        </div>
+                        <div class="cursos-subtitulo">Administrar usuarios</div>
                         <div id="cursos-cancelados"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- contenido principal -->
+        <!-- Contenido principal -->
         <section class="main-content">
-            <div class="module-header">
-                <div>
-                    <div class="module-title" id="module-title">Cursos</div>
-                    <div class="module-sub" id="module-sub">Cargando…</div>
-                </div>
-                <div class="toolbar">
-                    <input id="q" type="search" placeholder="Buscar…" />
-                    <button id="btn-new" class="btn btn-primary">Nuevo</button>
-                    <button id="btn-refresh" class="btn">Refrescar</button>
-                </div>
-            </div>
 
-            <!-- Tabla Desktop -->
+            <!-- Tabla de recursos Desktop -->
             <section class="recursos-box desktop-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table">
@@ -191,13 +184,14 @@
                         <div class="col-fecha">Fecha</div>
                     </div>
                     <div class="table-body" id="recursos-list">
-                        <!-- rows via JS -->
+                        <!-- Filas generadas por JS -->
                     </div>
                 </div>
+                <!-- Paginación -->
                 <div id="pagination-controls" class="pagination-controls"></div>
             </section>
 
-            <!-- Tabla Mobile (acordeones parecidos a los que se usaron el home) -->
+            <!-- Tabla de recursos Mobile -->
             <section class="recursos-box mobile-only">
                 <h2>Recursos</h2>
                 <div class="recursos-table-mobile">
@@ -205,24 +199,19 @@
                         <div class="col-nombre">Nombre</div>
                     </div>
                     <div class="table-body" id="recursos-list-mobile">
-                        <!-- rows via JS -->
+                        <!-- Filas generadas por JS -->
                     </div>
                 </div>
+                <!-- Paginación -->
                 <div id="pagination-mobile" class="pagination-controls"></div>
             </section>
+
         </section>
+
+
+
     </main>
 
-    <!-- Drawer de detalle -->
-    <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-title">Detalle</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-close">Cerrar</button>
-            </div>
-        </div>
-        <div class="drawer-body" id="drawer-body"></div>
-    </aside>
 
     <!-- Pie de pagina -->
     <footer>
@@ -238,10 +227,23 @@
         </div>
     </footer>
 
+    <!-- Drawer -->
+    <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawer-title"></div>
+            <div class="drawer-actions">
+                <button class="btn" id="drawer-close">Cerrar</button>
+            </div>
+        </div>
+        <div class="drawer-body" id="drawer-body">
+            <!-- Contenido dinámico -->
+        </div>
+    </aside>
     <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
+    
     <script src="../../JS/JSglobal.js"></script>
     <script src="../../JS/admin/admin.js"></script>
-    
+
 </body>
 
 </html>
