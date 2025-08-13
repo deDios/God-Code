@@ -196,15 +196,16 @@
 
                     <div class="tt-meta">
                         <span class="tt-title">Cursos:</span>
-                        <span id="mod-count">—</span>
+                        <span id="mod-count" aria-live="polite">—</span>
                         <span class="tt-sep">·</span>
                         <span class="tt-title">Estado:</span>
-                        <!-- El JS actualizará este chip según el filtro/endpoint -->
+                        <!-- el JS actualizará este chip según el filtro/endpoint -->
                         <span id="tt-status" class="badge-activo">Activo</span>
-                        <!-- Para inactivo: <span id="tt-status" class="badge-inactivo">Inactivo</span> -->
+                        <!-- para inactivo: <span id="tt-status" class="badge-inactivo">Inactivo</span> -->
                     </div>
                 </div>
                 <div class="right">
+                    <!-- El botón de "Modo desarrollador" se inyecta aquí por JS -->
                     <button id="btn-add" class="btn blue" aria-label="Crear nuevo">+</button>
                     <button id="btn-refresh" class="btn">Refrescar</button>
                 </div>
@@ -212,7 +213,7 @@
 
             <!-- Tabla Desktop -->
             <section class="recursos-box desktop-only">
-                <div class="recursos-table" role="table" aria-label="Listado de cursos">
+                <div class="recursos-table" role="table" aria-label="Listado">
                     <div class="table-header" role="rowgroup">
                         <div class="col-nombre" role="columnheader">Nombre</div>
                         <div class="col-tutor" role="columnheader">Tutor</div>
@@ -226,7 +227,7 @@
                 <div id="pagination-controls" class="pagination-controls"></div>
             </section>
 
-            <!-- Tabla Mobile  -->
+            <!-- Tabla Mobile -->
             <section class="recursos-box mobile-only">
                 <div class="recursos-table-mobile">
                     <div class="table-header">
@@ -241,21 +242,6 @@
 
         </section>
     </main>
-
-
-    <!-- Pie de pagina -->
-    <footer>
-        <div>
-            <strong>Contacto</strong>
-            <small>Teléfono: 33 3333 3333</small>
-            <small>Ubicación: Ixtlahuacán de los membrillos</small>
-        </div>
-        <div>
-            <strong>Horarios de servicio</strong>
-            <small>Lunes a Viernes</small>
-            <small>De 9:00AM a 8:00PM</small>
-        </div>
-    </footer>
 
     <!-- Drawer -->
     <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">
