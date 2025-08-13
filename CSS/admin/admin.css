@@ -1232,6 +1232,7 @@ body {
     background-color: #d4edda;
     border-radius: 0.25rem;
     text-align: center;
+    white-space: nowrap;
 }
 
 .badge-inactivo {
@@ -1243,4 +1244,22 @@ body {
     background-color: #f8d7da;
     border-radius: 0.25rem;
     text-align: center;
+    white-space: nowrap;
+}
+
+.gc-dash .recursos-table .col-status {
+    flex: 0 0 110px;
+    text-align: center;
+}
+
+.gc-dash #recursos-list .table-row .col-status {
+    flex: 0 0 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gc-dash .row-details strong {
+    display: inline-block;
+    min-width: 70px;
 }

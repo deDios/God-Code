@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>GodCode</title>
     <link rel="stylesheet" href="../../CSS/plantilla.css" />
     <link rel="stylesheet" href="../../CSS/admin/admin.css" />
@@ -187,28 +187,39 @@
         <!-- Contenido principal -->
         <section class="main-content">
 
+            <!-- Toolbar superior -->
             <header class="dash-toolbar">
                 <div class="left">
-                    <h2 id="mod-title">Cursos</h2>
-                    <span id="mod-count" class="module-sub">—</span>
+                    <div class="searchbox">
+                        <input id="search-input" type="search" placeholder="Buscar" autocomplete="off" />
+                    </div>
+
+                    <div class="tt-meta">
+                        <span class="tt-title">Cursos:</span>
+                        <span id="mod-count">—</span>
+                        <span class="tt-sep">·</span>
+                        <span class="tt-title">Estado:</span>
+                        <!-- El JS actualizará este chip según el filtro/endpoint -->
+                        <span id="tt-status" class="badge-activo">Activo</span>
+                        <!-- Para inactivo: <span id="tt-status" class="badge-inactivo">Inactivo</span> -->
+                    </div>
                 </div>
                 <div class="right">
-                    <!-- El boton de "Modo desarrollador" se inyecta aquí con el JS -->
-                    <button id="btn-refresh" class="btn blue">Refrescar</button>
+                    <button id="btn-add" class="btn blue" aria-label="Crear nuevo">+</button>
+                    <button id="btn-refresh" class="btn">Refrescar</button>
                 </div>
             </header>
 
             <!-- Tabla Desktop -->
             <section class="recursos-box desktop-only">
-                <h2>Recursos</h2>
-                <div class="recursos-table">
-                    <div class="table-header">
-                        <div class="col-nombre">Nombre</div>
-                        <div class="col-tipo">Tipo</div>
-                        <div class="col-fecha">Fecha</div>
-                        <div class="col-fecha">Fecha</div>
+                <div class="recursos-table" role="table" aria-label="Listado de cursos">
+                    <div class="table-header" role="rowgroup">
+                        <div class="col-nombre" role="columnheader">Nombre</div>
+                        <div class="col-tutor" role="columnheader">Tutor</div>
+                        <div class="col-fecha" role="columnheader">Fecha de inicio</div>
+                        <div class="col-status" role="columnheader">Status</div>
                     </div>
-                    <div class="table-body" id="recursos-list">
+                    <div class="table-body" id="recursos-list" role="rowgroup">
                         <!-- filas por JS -->
                     </div>
                 </div>
@@ -217,7 +228,6 @@
 
             <!-- Tabla Mobile  -->
             <section class="recursos-box mobile-only">
-                <h2>Recursos</h2>
                 <div class="recursos-table-mobile">
                     <div class="table-header">
                         <div class="col-nombre">Nombre</div>
@@ -250,13 +260,13 @@
     <!-- Drawer -->
     <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">
         <div class="drawer-header">
-            <div class="drawer-title" id="drawer-title"></div>
+            <div class="drawer-title" id="drawer-title">Detalle</div>
             <div class="drawer-actions">
                 <button class="btn" id="drawer-close">Cerrar</button>
             </div>
         </div>
         <div class="drawer-body" id="drawer-body">
-            <!-- Contenido dinámico -->
+            <!-- contenido dinámico -->
         </div>
     </aside>
     <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
