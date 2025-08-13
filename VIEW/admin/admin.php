@@ -131,36 +131,69 @@
                 </div>
             </div>
         </div>
-        
+
     </header>
 
 
     <main id="home-main" class="gc-dash">
 
         <!-- Sidebar -->
-        <section id="sidebar" class="sidebar">
-            <div class="mis-cursos">
-                <h3>Menú</h3>
-                <div class="cursos-seccion">
-                    <button class="cursos-subtitulo admin-nav" data-route="#/cursos">Cursos y noticias</button>
-                    <button class="cursos-subtitulo admin-nav" data-route="#/usuarios">Contactos y
-                        reclutamiento</button>
-                    <button class="cursos-subtitulo admin-nav" data-route="#/usuarios">Administrar usuarios</button>
-                </div>
+        <nav class="gc-side" aria-label="Configuración y administración">
+            <h3 class="side-title">Configuración y<br>Administración</h3>
+
+            <div class="nav-group">
+                <div class="group-label">Cursos y Noticias</div>
+
+                <a class="nav-item" href="#/cursos" data-route="#/cursos" aria-current="page">
+                    <span class="icon"><img src="icons/cursos.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Cursos</span>
+                </a>
+
+                <a class="nav-item" href="#/noticias" data-route="#/noticias">
+                    <span class="icon"><img src="icons/noticias.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Noticias</span>
+                </a>
             </div>
-        </section>
+
+            <div class="nav-group">
+                <div class="group-label">Contacto y reclutamiento</div>
+
+                <a class="nav-item" href="#/contacto" data-route="#/contacto">
+                    <span class="icon"><img src="icons/contacto.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Contacto</span>
+                </a>
+
+                <a class="nav-item" href="#/reclutamiento" data-route="#/reclutamiento">
+                    <span class="icon"><img src="icons/reclutamiento.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Reclutamiento</span>
+                </a>
+            </div>
+
+            <div class="nav-group">
+                <div class="group-label">Usuarios y cuentas</div>
+
+                <a class="nav-item" href="#/usuarios" data-route="#/usuarios">
+                    <span class="icon"><img src="icons/usuarios.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Usuarios</span>
+                </a>
+
+                <a class="nav-item" href="#/cuentas" data-route="#/cuentas">
+                    <span class="icon"><img src="icons/cuentas.svg" alt="" aria-hidden="true"></span>
+                    <span class="label">Cuentas</span>
+                </a>
+            </div>
+        </nav>
 
         <!-- Contenido principal -->
         <section class="main-content">
 
-            <!-- Encabezado del módulo (coincide con admin.js) -->
             <header class="dash-toolbar">
                 <div class="left">
                     <h2 id="mod-title">Cursos</h2>
                     <span id="mod-count" class="module-sub">—</span>
                 </div>
                 <div class="right">
-                    <!-- El botón de "Modo dev" se inyecta aquí por JS -->
+                    <!-- El boton de "Modo desarrollador" se inyecta aquí con el JS -->
                     <button id="btn-refresh" class="btn blue">Refrescar</button>
                 </div>
             </header>
@@ -172,6 +205,7 @@
                     <div class="table-header">
                         <div class="col-nombre">Nombre</div>
                         <div class="col-tipo">Tipo</div>
+                        <div class="col-fecha">Fecha</div>
                         <div class="col-fecha">Fecha</div>
                     </div>
                     <div class="table-body" id="recursos-list">

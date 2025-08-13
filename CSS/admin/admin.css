@@ -542,6 +542,276 @@ body {
     box-shadow: inset 0 0 0 2px rgba(21, 101, 192, .12);
 }
 
+/* Paleta base */
+.gc-dash {
+    --gc-blue: #1565c0;
+    --gc-blue-2: #0a57c6;
+    --gc-border: #e2e2e2;
+    --gc-text: #222;
+    --gc-soft: #667085;
+    --gc-bg: #fafafa;
+    --gc-panel: #fff;
+}
+
+/* Contenedor lateral */
+.gc-side {
+    width: 260px;
+    flex: 0 0 260px;
+    background: var(--gc-panel);
+    border-right: 1px solid var(--gc-border);
+    padding: 16px 14px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: auto;
+}
+
+@supports not (height:100dvh) {
+    .gc-side {
+        height: 100vh;
+    }
+}
+
+.gc-side .side-title {
+    margin: 0 0 12px;
+    line-height: 1.2;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.gc-side .nav-group {
+    margin: 10px 0 18px;
+}
+
+.gc-side .group-label {
+    font-weight: 700;
+    color: #0f172a;
+    margin: 8px 8px;
+}
+
+.gc-side .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: .55rem .6rem;
+    margin: 6px 4px;
+    border-radius: 8px;
+    color: #111827;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: .15s ease;
+}
+
+.gc-side .nav-item:hover {
+    background: #eef4ff;
+    border-color: #d6e2ff;
+    color: var(--gc-blue-2);
+}
+
+.gc-side .nav-item.is-active,
+.gc-side .nav-item[aria-current="page"] {
+    background: #eaf2ff;
+    border-color: #c7dafc;
+    color: var(--gc-blue);
+    box-shadow: inset 0 0 0 2px rgba(21, 101, 192, .09);
+}
+
+.gc-side .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .9;
+    flex: 0 0 18px;
+}
+
+.gc-side .nav-item .icon img,
+.gc-side .nav-item .icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.gc-side .nav-item .label {
+    font-weight: 600;
+}
+
+/* Mobile: sidebar horizontal si lo necesitas */
+@media (max-width: 900px) {
+    .gc-side {
+        position: static;
+        height: auto;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--gc-border);
+    }
+
+    .gc-side .nav-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        align-items: center;
+    }
+
+    .gc-side .group-label {
+        width: 100%;
+        margin: 6px 4px 0;
+    }
+
+    .gc-side .nav-item {
+        margin: 2px 0;
+    }
+}
+
+/*------------------------------------------------------ parche para el sidebar, recuerda eliminar el css desactualizado -*/
+
+.gc-dash {
+    --gc-blue: #1565c0;
+    --gc-blue-2: #0a57c6;
+    --gc-border: #e2e2e2;
+    --gc-text: #222;
+    --gc-soft: #667085;
+    --gc-bg: #fafafa;
+    --gc-panel: #fff;
+}
+
+.gc-side {
+    width: 260px;
+    flex: 0 0 260px;
+    background: var(--gc-panel);
+    border-right: 1px solid var(--gc-border);
+    padding: 16px 14px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: auto;
+}
+
+@supports not (height:100dvh) {
+    .gc-side {
+        height: 100vh;
+    }
+}
+
+.gc-side .side-title {
+    margin: 0 0 12px;
+    line-height: 1.2;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.gc-side .nav-group {
+    margin: 10px 0 18px;
+}
+
+.gc-side .group-label {
+    font-weight: 700;
+    color: #0f172a;
+    margin: 8px 8px;
+}
+
+.gc-side .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: .55rem .6rem;
+    margin: 6px 4px;
+    border-radius: 8px;
+    color: #111827;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: .15s ease;
+}
+
+.gc-side .nav-item:hover {
+    background: #eef4ff;
+    border-color: #d6e2ff;
+    color: var(--gc-blue-2);
+}
+
+.gc-side .nav-item.is-active,
+.gc-side .nav-item[aria-current="page"] {
+    background: #eaf2ff;
+    border-color: #c7dafc;
+    color: var(--gc-blue);
+    box-shadow: inset 0 0 0 2px rgba(21, 101, 192, .09);
+}
+
+.gc-side .nav-item .icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .9;
+    flex: 0 0 18px;
+}
+
+.gc-side .nav-item .icon img,
+.gc-side .nav-item .icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.gc-side .nav-item .label {
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .gc-side {
+        position: static;
+        height: auto;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--gc-border);
+    }
+
+    .gc-side .nav-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        align-items: center;
+    }
+
+    .gc-side .group-label {
+        width: 100%;
+        margin: 6px 4px 0;
+    }
+
+    .gc-side .nav-item {
+        margin: 2px 0;
+    }
+}
+
+/* etiquetas para los estados de los cursos en este caso activo o inactivo */
+.chip-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: .16rem .48rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    border: 1px solid;
+    line-height: 1;
+}
+
+.chip-estado.activo {
+    color: #2e7d32;
+    background: #e8f5e9;
+    border-color: #c8e6c9;
+}
+
+.chip-estado.inactivo {
+    color: #c62828;
+    background: #fdecea;
+    border-color: #f5c2c7;
+}
+
+
 /* ---------------- tabla en Desktop ---------------- */
 .gc-dash .recursos-box {
     padding: 22px 38px 0;

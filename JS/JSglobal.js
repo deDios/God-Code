@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // botones inhabilitados del subnav
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => { 
   const operativeViews = [
     "home.php",
     "vistaoperativa2.php",

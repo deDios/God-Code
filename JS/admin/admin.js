@@ -84,18 +84,36 @@
   }
   window.addEventListener("hashchange", onRouteChange);
 
+  function setRoute(hash) {
+    if (location.hash !== hash) location.hash = hash;
+  }
+
   function onRouteChange() {
-    state.route = window.location.hash || "#/cursos";
+    const hash = window.location.hash || "#/cursos";
+    state.route = hash;
     state.page = 1;
 
-    qsa(".admin-dash .admin-nav").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.route === state.route);
+    document
+      .querySelectorAll(".gc-dash .admin-nav, .admin-nav")
+      .forEach((btn) => {
+        const target = btn.dataset.route || btn.getAttribute("href");
+        btn.classList.toggle("active", target === hash);
+      });
+
+    document.querySelectorAll(".gc-side .nav-item").forEach((a) => {
+      const isActive = a.getAttribute("href") === hash;
+      a.classList.toggle("is-active", isActive);
+      a.setAttribute("aria-current", isActive ? "page" : "false");
     });
 
-    if (state.route.startsWith("#/cursos")) return loadCursos();
-    if (state.route.startsWith("#/noticias")) return loadNoticias();
-    if (state.route.startsWith("#/usuarios")) return loadUsuarios();
-    loadCursos();
+    if (hash.startsWith("#/cursos")) return loadCursos();
+    if (hash.startsWith("#/noticias")) return loadNoticias();
+    if (hash.startsWith("#/usuarios")) return loadUsuarios();
+    if (hash.startsWith("#/contacto")) return loadContacto?.();
+    if (hash.startsWith("#/reclutamiento")) return loadReclutamiento?.();
+    if (hash.startsWith("#/cuentas")) return loadCuentas?.();
+
+    setRoute("#/cursos");
   }
 
   // skeletons
@@ -266,7 +284,7 @@
             <div class="col-nombre">
               ${escapeHTML(it.nombre)} <span class="chip">${escapeHTML(
         it.prioridad_nombre
-      )}</span>
+      )}</span> 
             </div>
             <span class="icon-chevron">›</span>
           </button>
@@ -466,7 +484,7 @@
     if (overlay) overlay.classList.add("open");
 
     let drawer = qs("#gc-drawer");
-    if (!drawer) return; 
+    if (!drawer) return;
     qs("#drawer-title").textContent = title || "Detalle";
     qs("#drawer-body").innerHTML = bodyHTML || "";
     drawer.classList.add("open");
@@ -635,7 +653,9 @@
     const devBtn = document.createElement("button");
     devBtn.className = "btn";
     devBtn.id = "btn-dev";
-    devBtn.textContent = state.devMode ? "Modo desarrollador: ON" : "Modo desarrollador: OFF";
+    devBtn.textContent = state.devMode
+      ? "Modo desarrollador: ON"
+      : "Modo desarrollador: OFF";
     devBtn.onclick = () => {
       state.devMode = !state.devMode;
       devBtn.textContent = `Modo dev: ${state.devMode ? "ON" : "OFF"}`;
