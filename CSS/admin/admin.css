@@ -687,6 +687,7 @@ body {
     top: 0;
     height: 100dvh;
     overflow: auto;
+    padding-top: 3rem;
 }
 
 @supports not (height:100dvh) {
