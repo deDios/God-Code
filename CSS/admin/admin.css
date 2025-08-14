@@ -278,3 +278,103 @@ html,body{margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:
   color:#fff;
   border-color:#b4232c;
 }
+
+.gc-dash .dash-toolbar .searchbox input[type="search"] {
+  appearance: none;
+  border: 1px solid var(--gc-border);
+  background: #fff;
+  border-radius: 999px;
+  padding: .55rem .9rem;
+  min-width: 220px;
+  outline: none;
+}
+.gc-dash .dash-toolbar .searchbox input[type="search"]:focus {
+  border-color: #c7dafc;
+  box-shadow: 0 0 0 3px rgba(21,101,192,.12);
+}
+
+.gc-dash .tt-meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35rem;
+  color: var(--gc-soft);
+  font-size: .95rem;
+  margin-left: .75rem;
+}
+.gc-dash .tt-meta .tt-title {
+  color: #111827;
+  font-weight: 700;
+}
+.gc-dash .tt-meta .tt-sep {
+  color: #98a2b3;
+}
+
+/* ===== Botón "Crear" con menú ===== */
+.gc-dash .create-wrap {
+  position: relative;
+  display: inline-block;
+}
+.gc-dash .create-wrap .btn.blue svg {
+  pointer-events: none;
+  transform: translateY(1px);
+}
+
+.gc-dash .menu[hidden] { display: none !important; }
+.gc-dash .menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid var(--gc-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(16,24,40,.12);
+  padding: 6px;
+  z-index: 5;
+}
+.gc-dash .menu .menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: .55rem .7rem;
+  cursor: pointer;
+  font-size: .95rem;
+  color: #111827;
+}
+.gc-dash .menu .menu-item:hover,
+.gc-dash .menu .menu-item:focus {
+  background: #eef4ff;
+  outline: none;
+}
+
+
+.badge-activo,
+.badge-inactivo {
+  line-height: 1;
+  padding: 0.28em 0.7em;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gc-dash .btn:focus-visible,
+.gc-dash .menu .menu-item:focus-visible,
+.gc-dash .gc-side .nav-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(21,101,192,.18);
+  border-color: #c7dafc;
+}
+
+@media (max-width: 780px) {
+  .gc-dash .dash-toolbar .left {
+    flex-wrap: wrap;
+    gap: .5rem .75rem;
+  }
+  .gc-dash .dash-toolbar .searchbox input[type="search"] {
+    min-width: 160px;
+  }
+}

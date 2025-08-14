@@ -278,7 +278,7 @@
         _all: c,
       }));
 
-      // Toolbar chip de estado
+      // Toolbar badges de estado
       const ttStatus = qs("#tt-status");
       if (ttStatus) {
         ttStatus.textContent = "Activos";
@@ -357,8 +357,8 @@
   }
   function badgePrecio(precio) {
     return Number(precio) === 0
-      ? `<span class="chip green">Gratuito</span>`
-      : `<span class="chip amber">Con costo</span>`;
+      ? `<span class="badge-inactivo">Gratuito</span>`
+      : `<span class="badge-inactivo">Con costo</span>`;
   }
 
   // =================== NOTICIAS ===================
