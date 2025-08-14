@@ -194,17 +194,31 @@
                         <input id="search-input" type="search" placeholder="Buscar" autocomplete="off" />
                     </div>
 
-                    <div class="tt-meta">
-                        <span class="tt-title">Cursos:</span>
-                        <span id="mod-count" aria-live="polite">—</span>
+                    <div class="tt-meta" aria-live="polite">
+                        <span class="tt-title" id="mod-title">Cursos</span>:
+                        <span id="mod-count">—</span>
                         <span class="tt-sep">·</span>
                         <span class="tt-title">Estado:</span>
-                        <span id="tt-status" class="badge-activo">Activo</span>
+                        <!-- badges -->
+                        <span id="tt-status" class="badge-activo">Activos</span>
                     </div>
                 </div>
+
                 <div class="right">
-                    <!-- el boton desarrollador se coloca mediante js aca -->
-                    <button id="btn-add" class="btn blue" aria-label="Crear nuevo">+</button>
+                    <div class="create-wrap">
+                        <button id="btn-add" class="btn blue" type="button" aria-haspopup="true" aria-expanded="false">
+                            Crear
+                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"
+                                style="margin-left:.25rem">
+                                <path d="M7 10l5 5 5-5H7z"></path>
+                            </svg>
+                        </button>
+                        <!-- menu -->
+                        <div id="create-menu" class="menu" hidden>
+                            <button class="menu-item" data-action="crear-curso" type="button">Nuevo curso</button>
+                            <button class="menu-item" data-action="crear-noticia" type="button">Nueva noticia</button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -239,6 +253,7 @@
 
         </section>
     </main>
+
 
 
     <!-- Drawer -->

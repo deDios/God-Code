@@ -251,3 +251,30 @@ html,body{margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:
 .chip-cost.free{ background:#e8f5e9; color:#2e7d32; border-color:#c8e6c9;}
 .chip-cost.paid{ background:#fff8e1; color:#8a6d3b; border-color:#ffecb3;}
 .chip-cost.subs{ background:#eef2ff; color:#1e3a8a; border-color:#c7d2fe;}
+
+.drawer-actions-row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap:12px;
+  margin-top:16px;
+  padding-top:12px;
+  border-top:1px solid #eceff1;
+}
+.drawer-actions-row .row-right{
+  display:flex; gap:8px; align-items:center;
+}
+.btn.danger{
+  background:#fff;
+  border:1px solid #f3c0c4;
+  color:#b4232c;
+}
+.btn.danger:hover{
+  background:#fff5f6;
+  border-color:#eea5aa;
+}
+.btn.danger.confirm{
+  background:#b4232c;
+  color:#fff;
+  border-color:#b4232c;
+}
