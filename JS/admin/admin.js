@@ -64,19 +64,24 @@
     return map;
   }
 
-  // Comentarios por noticia (comentarios + respuestas), con caché 5 min
   async function getCommentsCount(noticiaId) {
-    const cached = state.commentsCache.get(noticiaId);
-    if (cached && Date.now() - cached.ts < 5 * 60 * 1000) return cached.total;
+    try {
+      if (!noticiaId) return 0;
+      const body = { noticia_id: Number(noticiaId), estatus: 1 };
+      const res = await postJSON(API.comentarios, body);
 
-    const arr = await postJSON(API.comentariosNoticia, { noticia_id: noticiaId, estatus: 1 });
-    let total = 0;
-    for (const c of arr) {
-      total += 1;
-      if (Array.isArray(c.respuestas)) total += c.respuestas.length;
+      if (!Array.isArray(res)) return 0;
+
+      let total = 0;
+      for (const c of res) {
+        total += 1;
+        if (Array.isArray(c.respuestas)) total += c.respuestas.length;
+      }
+      return total;
+    } catch (e) {
+      console.warn("getCommentsCount fallback 0:", e);
+      return 0;
     }
-    state.commentsCache.set(noticiaId, { total, ts: Date.now() });
-    return total;
   }
 
   // -------- Router --------
@@ -358,61 +363,51 @@
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
 
-    // Encabezados para Noticias:
-    // Nombre -> Título, Tutor -> Comentarios, Fecha -> Publicación, Status -> Status
+    // Encabezados para: Título | Fecha de publicación | Comentarios | Status
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const hNombre = hdr.querySelector(".col-nombre");
-      const hTutor = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      const hTutor = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo"); // la reutilizamos
       const hFecha = hdr.querySelector(".col-fecha");
       let hStatus = hdr.querySelector(".col-status");
 
       if (hNombre) hNombre.textContent = "Título";
-      if (hTutor) { hTutor.classList.add("col-tutor"); hTutor.textContent = "Comentarios"; }
-      if (hFecha) hFecha.textContent = "Publicación";
-      if (!hStatus) {
-        const div = document.createElement("div");
-        div.className = "col-status";
-        div.setAttribute("role", "columnheader");
-        div.textContent = "Status";
-        hdr.appendChild(div);
-      } else {
-        hStatus.textContent = "Status";
-      }
-    }
-
-    // Chip toolbar “Estado”
-    const ttStatus = qs("#tt-status");
-    if (ttStatus) {
-      ttStatus.textContent = "Activas";
-      ttStatus.classList.remove("badge-inactivo");
-      ttStatus.classList.add("badge-activo");
+      if (hTutor) { hTutor.textContent = "Comentarios"; hTutor.classList.add("col-tutor"); }
+      if (hFecha) hFecha.textContent = "Fecha de publicación";
+      if (hStatus) hStatus.textContent = "Status";
     }
 
     showSkeletons();
     try {
       const raw = await postJSON(API.noticias, { estatus: 1 });
-      state.raw = raw;
-      state.data = raw.map((n) => ({
-        id: n.id,
-        titulo: n.titulo,
-        fecha: n.fecha_creacion,
-        estatus: Number(n.estatus),
-        _all: n,
-      }));
 
-      // Precalcular comentarios para todas las noticias visibles (en paralelo)
-      const ids = state.data.map((n) => n.id);
-      const counts = await Promise.all(
-        ids.map(async (id) => ({ id, total: await getCommentsCount(id) }))
+      // Enriquecemos con # de comentarios (protegido)
+      const rows = await Promise.all(
+        (Array.isArray(raw) ? raw : []).map(async (n) => {
+          const comentarios = await getCommentsCount(n.id);
+          return {
+            id: n.id,
+            titulo: n.titulo,
+            fecha: n.fecha_creacion,
+            estatus: Number(n.estatus),
+            comentarios,
+            _all: n
+          };
+        })
       );
-      state.commentsCount = counts.reduce((acc, { id, total }) => {
-        acc[id] = total;
-        return acc;
-      }, {});
+
+      state.raw = raw;
+      state.data = rows;
+
+      const ttStatus = qs("#tt-status");
+      if (ttStatus) {
+        ttStatus.textContent = "Activas";
+        ttStatus.classList.remove("badge-inactivo");
+        ttStatus.classList.add("badge-activo");
+      }
 
       drawNoticias();
-      toast("Noticias cargadas", "exito", 1400);
+      toast("Noticias cargadas", "exito", 1600);
     } catch (err) {
       const list = qs("#recursos-list");
       if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
@@ -427,26 +422,26 @@
     const rows = state.data;
     renderList(rows, {
       desktopRow: (it) => `
-        <div class="table-row" data-id="${it.id}" data-type="noticia">
-          <div class="col-nombre">
-            <span>${escapeHTML(it.titulo)}</span> ${chipStatus(it.estatus)}
-          </div>
-          <div class="col-tutor">${Number(state.commentsCount[it.id] || 0)}</div>
-          <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">${badgePublicacion(it.estatus)}</div>
-        </div>`,
+      <div class="table-row" data-id="${it.id}" data-type="noticia">
+        <div class="col-nombre">
+          <span>${escapeHTML(it.titulo)}</span> ${chipStatus(it.estatus)}
+        </div>
+        <div class="col-tutor">${it.comentarios ?? 0}</div>
+        <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
+        <div class="col-status">${Number(it.estatus) === 1 ? "Activa" : "Inactiva"}</div>
+      </div>`,
       mobileRow: (it) => `
-        <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
-          <button class="row-toggle">
-            <div class="col-nombre">${escapeHTML(it.titulo)} ${chipStatus(it.estatus)}</div>
-            <span class="icon-chevron">›</span>
-          </button>
-          <div class="row-details">
-            <div><strong>Publicación:</strong> ${fmtDateTime(it.fecha)}</div>
-            <div><strong>Comentarios:</strong> ${Number(state.commentsCount[it.id] || 0)}</div>
-            <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
-          </div>
-        </div>`,
+      <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
+        <button class="row-toggle">
+          <div class="col-nombre">${escapeHTML(it.titulo)} ${chipStatus(it.estatus)}</div>
+          <span class="icon-chevron">›</span>
+        </button>
+        <div class="row-details">
+          <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
+          <div><strong>Comentarios:</strong> ${it.comentarios ?? 0}</div>
+          <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
+        </div>
+      </div>`,
       drawerTitle: (d) => {
         const item = state.data.find((x) => String(x.id) === d.id);
         return item ? `Noticia · ${item.titulo}` : "Noticia";
@@ -455,16 +450,16 @@
         const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
         return state.devMode
-          ? renderAllFields(n, { comentarios: Number(state.commentsCount[n.id] || 0) })
+          ? renderAllFields(n, { comentarios: state.data.find((x) => String(x.id) === d.id)?.comentarios ?? 0 })
           : `
-            ${pair("Título", n.titulo)}
-            ${pair("Estado", statusText(n.estatus))}
-            ${pair("Fecha de publicación", fmtDateTime(n.fecha_creacion))}
-            ${pair("Comentarios", Number(state.commentsCount[n.id] || 0))}
-            ${pair("Descripción (uno)", n.desc_uno)}
-            ${pair("Descripción (dos)", n.desc_dos)}
-            ${pair("Creado por", n.creado_por)}
-          `;
+        ${pair("Título", n.titulo)}
+        ${pair("Estado", statusText(n.estatus))}
+        ${pair("Fecha creación", fmtDateTime(n.fecha_creacion))}
+        ${pair("Comentarios", String(state.data.find((x) => String(x.id) === d.id)?.comentarios ?? 0))}
+        ${pair("Descripción (uno)", n.desc_uno)}
+        ${pair("Descripción (dos)", n.desc_dos)}
+        ${pair("Creado por", n.creado_por)}
+      `;
       },
     });
   }
