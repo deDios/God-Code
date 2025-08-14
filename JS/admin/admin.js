@@ -357,8 +357,8 @@
   }
   function badgePrecio(precio) {
     return Number(precio) === 0
-      ? `<span class="badge-inactivo">Gratuito</span>`
-      : `<span class="badge-inactivo">Con costo</span>`;
+      ? `<span class="badge-neutral">Gratuito</span>`
+      : `<span class="badge-neutral">Con costo</span>`;
   }
 
   // =================== NOTICIAS ===================
@@ -551,7 +551,7 @@
       try {
         await softDelete(type, item.id);   // visual: quita de la lista actual
         closeDrawer();
-        toast("Elemento eliminado (estatus = 0).", "exito", 2000);
+        toast("Elemento eliminado.", "exito", 2000);
       } catch (e) {
         console.error(e);
         toast("No se pudo eliminar.", "error");
@@ -567,7 +567,7 @@
       btnEdit.addEventListener("click", () => {
         // Aquí puedes activar tu modo edición cuando definas el flujo
         // (inputs, botones guardar/cancelar, etc.). De momento, visual.
-        toast("Editar (visual) — pendiente de endpoint.", "warning", 1800);
+        toast("Funcion pendiente", "warning", 1800);
       });
     }
   }

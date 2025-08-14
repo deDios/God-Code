@@ -194,31 +194,30 @@
                         <input id="search-input" type="search" placeholder="Buscar" autocomplete="off" />
                     </div>
 
-                    <div class="tt-meta" aria-live="polite">
-                        <span class="tt-title" id="mod-title">Cursos</span>:
-                        <span id="mod-count">—</span>
+                    <div class="tt-meta">
+                        <span class="tt-title">Cursos:</span>
+                        <span id="mod-count" aria-live="polite">—</span>
                         <span class="tt-sep">·</span>
                         <span class="tt-title">Estado:</span>
-                        <!-- badges -->
-                        <span id="tt-status" class="badge-activo">Activos</span>
+                        <span id="tt-status" class="badge-activo">Activo</span>
                     </div>
                 </div>
-
                 <div class="right">
-                    <div class="create-wrap">
-                        <button id="btn-add" class="btn blue" type="button" aria-haspopup="true" aria-expanded="false">
-                            Crear
-                            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"
-                                style="margin-left:.25rem">
-                                <path d="M7 10l5 5 5-5H7z"></path>
-                            </svg>
-                        </button>
-                        <!-- menu -->
-                        <div id="create-menu" class="menu" hidden>
-                            <button class="menu-item" data-action="crear-curso" type="button">Nuevo curso</button>
-                            <button class="menu-item" data-action="crear-noticia" type="button">Nueva noticia</button>
-                        </div>
-                    </div>
+                    <!-- boton nuevo recurso -->
+                    <button id="btn-add" class="btn-icon" title="Crear nuevo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                        </svg>
+                    </button>
+                    <!-- boton para modo desarrollador -->
+                    <button id="btn-devmode" class="btn-icon" title="Modo desarrollador">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path d="M4 4h16v16H4V4zm2 3v2h1.5L5 13h2l2-4v-.5L7.5 7H6zm5 8v2h7v-2h-7z" />
+                        </svg>
+                    </button>
+                    <button id="btn-refresh" class="btn">Refrescar</button>
                 </div>
             </header>
 
@@ -253,6 +252,7 @@
 
         </section>
     </main>
+
 
 
 
