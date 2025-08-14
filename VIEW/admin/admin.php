@@ -199,15 +199,12 @@
                         <span id="mod-count" aria-live="polite">—</span>
                         <span class="tt-sep">·</span>
                         <span class="tt-title">Estado:</span>
-                        <!-- el JS actualizará este chip según el filtro/endpoint -->
                         <span id="tt-status" class="badge-activo">Activo</span>
-                        <!-- para inactivo: <span id="tt-status" class="badge-inactivo">Inactivo</span> -->
                     </div>
                 </div>
                 <div class="right">
-                    <!-- El botón de "Modo desarrollador" se inyecta aquí por JS -->
+                    <!-- el boton desarrollador se coloca mediante js aca -->
                     <button id="btn-add" class="btn blue" aria-label="Crear nuevo">+</button>
-                    <button id="btn-refresh" class="btn">Refrescar</button>
                 </div>
             </header>
 
@@ -242,6 +239,7 @@
 
         </section>
     </main>
+
 
     <!-- Drawer -->
     <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">

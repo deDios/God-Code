@@ -1,19 +1,21 @@
 (() => {
+  // -------- Ajuste de viewport (móvil) --------
   const setVH = () => {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   };
   setVH();
   window.addEventListener("resize", setVH);
 
-  // ENDPOINTS
+  // -------- ENDPOINTS --------
   const API = {
     cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
     noticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
     tutores: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
-    usuarios: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php",
     prioridad: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+    comentariosNoticia: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
   };
 
+  // -------- Estado global --------
   const state = {
     route: "#/cursos",
     page: 1,
@@ -22,16 +24,16 @@
     raw: [],
     tutorsMap: null,
     prioMap: null,
-    devMode: true,
+    devMode: JSON.parse(localStorage.getItem("gc_devMode") || "true"),
+    commentsCache: new Map(), // noticiaId -> { total, ts }
+    commentsCount: {}, // noticiaId -> total (para render rápido)
   };
 
-  // Utils
-  const toast = (msg, tipo = "exito", dur = 3000) => {
-    if (window.gcToast) window.gcToast(msg, tipo, dur);
-    else console.log(`[${tipo}] ${msg}`);
-  };
+  // -------- Utils --------
   const qs = (s) => document.querySelector(s);
   const qsa = (s) => Array.from(document.querySelectorAll(s));
+  const toast = (msg, tipo = "exito", dur = 2500) =>
+    window.gcToast ? window.gcToast(msg, tipo, dur) : console.log(`[${tipo}] ${msg}`);
 
   async function postJSON(url, body) {
     const res = await fetch(url, {
@@ -62,26 +64,36 @@
     return map;
   }
 
-  // Router
+  // Comentarios por noticia (comentarios + respuestas), con caché 5 min
+  async function getCommentsCount(noticiaId) {
+    const cached = state.commentsCache.get(noticiaId);
+    if (cached && Date.now() - cached.ts < 5 * 60 * 1000) return cached.total;
+
+    const arr = await postJSON(API.comentariosNoticia, { noticia_id: noticiaId, estatus: 1 });
+    let total = 0;
+    for (const c of arr) {
+      total += 1;
+      if (Array.isArray(c.respuestas)) total += c.respuestas.length;
+    }
+    state.commentsCache.set(noticiaId, { total, ts: Date.now() });
+    return total;
+  }
+
+  // -------- Router --------
+  window.addEventListener("hashchange", onRouteChange);
+
   function setRoute(hash) {
     const target = hash || "#/cursos";
     if (location.hash !== target) location.hash = target;
     else onRouteChange();
   }
-  window.addEventListener("hashchange", onRouteChange);
 
   function onRouteChange() {
     const hash = window.location.hash || "#/cursos";
     state.route = hash;
     state.page = 1;
 
-    // Antiguos botones con .admin-nav (si existieran)
-    qsa(".gc-dash .admin-nav, .admin-nav").forEach((btn) => {
-      const target = btn.dataset.route || btn.getAttribute("href");
-      btn.classList.toggle("active", target === hash);
-    });
-
-    // Sidebar nuevo
+    // Sidebar activo
     qsa(".gc-side .nav-item").forEach((a) => {
       const isActive = a.getAttribute("href") === hash;
       a.classList.toggle("is-active", isActive);
@@ -90,41 +102,38 @@
 
     if (hash.startsWith("#/cursos")) return loadCursos();
     if (hash.startsWith("#/noticias")) return loadNoticias();
-    if (hash.startsWith("#/usuarios")) return loadUsuarios();
-    if (hash.startsWith("#/contacto")) return loadContacto?.();
-    if (hash.startsWith("#/reclutamiento")) return loadReclutamiento?.();
-    if (hash.startsWith("#/cuentas")) return loadCuentas?.();
 
     setRoute("#/cursos");
   }
 
-  // Skeletons
+  // -------- Skeletons --------
   function showSkeletons() {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
-    if (d) d.innerHTML = "";
-    if (m) m.innerHTML = "";
-    const target = d || m;
-    if (!target) return;
+    if (!d || !m) return;
+    d.innerHTML = "";
+    m.innerHTML = "";
     for (let i = 0; i < 5; i++) {
-      target.insertAdjacentHTML(
+      d.insertAdjacentHTML(
         "beforeend",
         `<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>`
       );
     }
   }
 
+  // -------- Render genérico --------
   function renderList(rows, config) {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
-    if (d) d.innerHTML = "";
-    if (m) m.innerHTML = "";
+    if (!d || !m) return;
+
+    d.innerHTML = "";
+    m.innerHTML = "";
 
     if (!rows.length) {
-      if (d) d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
-      if (m) m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
-      const countEl = qs("#mod-count");
-      if (countEl) countEl.textContent = "0 resultados";
+      d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+      m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+      qs("#mod-count") && (qs("#mod-count").textContent = "0 elementos");
       renderPagination(0);
       return;
     }
@@ -133,26 +142,21 @@
     const pageRows = rows.slice(start, start + state.pageSize);
 
     pageRows.forEach((item) => {
-      if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
-      if (m) m.insertAdjacentHTML("beforeend", config.mobileRow(item));
+      d.insertAdjacentHTML("beforeend", config.desktopRow(item));
+      m.insertAdjacentHTML("beforeend", config.mobileRow(item));
     });
 
-    const countEl = qs("#mod-count");
-    if (countEl) countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"}`;
+    qs("#mod-count") &&
+      (qs("#mod-count").textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"}`);
 
-    // eventos de filas
+    // Eventos de filas
     qsa("#recursos-list .table-row").forEach((el) => {
       el.addEventListener("click", () =>
-        openDrawer(
-          config.drawerTitle(el.dataset),
-          config.drawerBody(el.dataset)
-        )
+        openDrawer(config.drawerTitle(el.dataset), config.drawerBody(el.dataset))
       );
     });
     qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
-      el.addEventListener("click", () =>
-        el.closest(".table-row-mobile").classList.toggle("expanded")
-      );
+      el.addEventListener("click", () => el.closest(".table-row-mobile").classList.toggle("expanded"));
     });
     qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -177,14 +181,21 @@
       prev.className = "arrow-btn";
       prev.textContent = "‹";
       prev.disabled = state.page === 1;
-      prev.onclick = () => { state.page = Math.max(1, state.page - 1); refreshCurrent(); };
+      prev.onclick = () => {
+        state.page = Math.max(1, state.page - 1);
+        refreshCurrent();
+      };
       cont.appendChild(prev);
 
-      for (let p = 1; p <= totalPages && p <= 7; p++) {
+      const maxButtons = 7;
+      for (let p = 1; p <= totalPages && p <= maxButtons; p++) {
         const b = document.createElement("button");
         b.className = "page-btn" + (p === state.page ? " active" : "");
         b.textContent = p;
-        b.onclick = () => { state.page = p; refreshCurrent(); };
+        b.onclick = () => {
+          state.page = p;
+          refreshCurrent();
+        };
         cont.appendChild(b);
       }
 
@@ -192,7 +203,10 @@
       next.className = "arrow-btn";
       next.textContent = "›";
       next.disabled = state.page === totalPages;
-      next.onclick = () => { state.page = Math.min(totalPages, state.page + 1); refreshCurrent(); };
+      next.onclick = () => {
+        state.page = Math.min(totalPages, state.page + 1);
+        refreshCurrent();
+      };
       cont.appendChild(next);
     });
   }
@@ -200,14 +214,14 @@
   function refreshCurrent() {
     if (state.route.startsWith("#/cursos")) return drawCursos();
     if (state.route.startsWith("#/noticias")) return drawNoticias();
-    if (state.route.startsWith("#/usuarios")) return drawUsuarios();
   }
 
-  // CURSOS
+  // ===================== CURSOS =====================
   async function loadCursos() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
 
+    // Encabezados
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const hNombre = hdr.querySelector(".col-nombre");
@@ -219,7 +233,6 @@
       if (hTutor) { hTutor.classList.add("col-tutor"); hTutor.textContent = "Tutor"; }
       if (hFecha) hFecha.textContent = "Fecha de inicio";
       if (!hStatus) {
-        // si aún no existe la columna status por alguna razón legacy, la añadimos
         const div = document.createElement("div");
         div.className = "col-status";
         div.setAttribute("role", "columnheader");
@@ -228,6 +241,14 @@
       } else {
         hStatus.textContent = "Status";
       }
+    }
+
+    // Chip toolbar “Estado”
+    const ttStatus = qs("#tt-status");
+    if (ttStatus) {
+      ttStatus.textContent = "Activo";
+      ttStatus.classList.remove("badge-inactivo");
+      ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
@@ -245,23 +266,15 @@
         tutor: tmap[c.tutor] || `Tutor #${c.tutor}`,
         prioridad_id: c.prioridad,
         prioridad_nombre: pmap[c.prioridad] || `#${c.prioridad}`,
-        precio: c.precio,
+        precio: Number(c.precio || 0),
         certificado: !!c.certificado,
         fecha: c.fecha_inicio,
         estatus: Number(c.estatus),
         _all: c,
       }));
 
-      // Actualizar chip de toolbar (Estado)
-      const ttStatus = qs("#tt-status");
-      if (ttStatus) {
-        ttStatus.textContent = "Activo";
-        ttStatus.classList.remove("badge-inactivo");
-        ttStatus.classList.add("badge-activo");
-      }
-
       drawCursos();
-      toast("Cursos cargados", "exito", 1600);
+      toast("Cursos cargados", "exito", 1400);
     } catch (err) {
       const list = qs("#recursos-list");
       if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
@@ -275,15 +288,21 @@
   function drawCursos() {
     const rows = state.data;
     renderList(rows, {
-      desktopRow: (it) => `
+      desktopRow: (it) => {
+        const costoBadge = it.precio === 0
+          ? `<span class="chip green">Gratuito</span>`
+          : `<span class="chip amber">Con costo</span>`;
+        return `
         <div class="table-row" data-id="${it.id}" data-type="curso">
           <div class="col-nombre">
             <span>${escapeHTML(it.nombre)}</span>
+            ${costoBadge}
           </div>
           <div class="col-tutor">${escapeHTML(it.tutor)}</div>
           <div class="col-fecha">${fmtDate(it.fecha)}</div>
           <div class="col-status">${badgeCurso(it.estatus)}</div>
-        </div>`,
+        </div>`;
+      },
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
           <button class="row-toggle">
@@ -315,7 +334,7 @@
           ${pair("Tutor", item.tutor)}
           ${pair("Prioridad", item.prioridad_nombre)}
           ${pair("Fecha inicio", fmtDate(c.fecha_inicio))}
-          ${pair("Precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio))}
+          ${pair("Precio", c.precio == 0 ? "Gratuito" : fmtMoney(c.precio))}
           ${pair("Certificado", c.certificado ? "Sí" : "No")}
           ${pair("Estatus", textCursoStatus(Number(c.estatus)))}
           ${pair("Descripción breve", c.descripcion_breve)}
@@ -334,23 +353,40 @@
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
 
-  // NOTICIAS
+  // ===================== NOTICIAS =====================
   async function loadNoticias() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
 
-    // Encabezados en noticias
+    // Encabezados para Noticias:
+    // Nombre -> Título, Tutor -> Comentarios, Fecha -> Publicación, Status -> Status
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const hNombre = hdr.querySelector(".col-nombre");
-      const hTipo = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      const hTutor = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const hFecha = hdr.querySelector(".col-fecha");
       let hStatus = hdr.querySelector(".col-status");
 
       if (hNombre) hNombre.textContent = "Título";
-      if (hTipo) { hTipo.textContent = "Estado"; hTipo.classList.add("col-tipo"); }
-      if (hFecha) hFecha.textContent = "Creada";
-      if (hStatus) hStatus.textContent = "—";
+      if (hTutor) { hTutor.classList.add("col-tutor"); hTutor.textContent = "Comentarios"; }
+      if (hFecha) hFecha.textContent = "Publicación";
+      if (!hStatus) {
+        const div = document.createElement("div");
+        div.className = "col-status";
+        div.setAttribute("role", "columnheader");
+        div.textContent = "Status";
+        hdr.appendChild(div);
+      } else {
+        hStatus.textContent = "Status";
+      }
+    }
+
+    // Chip toolbar “Estado”
+    const ttStatus = qs("#tt-status");
+    if (ttStatus) {
+      ttStatus.textContent = "Activas";
+      ttStatus.classList.remove("badge-inactivo");
+      ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
@@ -364,15 +400,19 @@
         estatus: Number(n.estatus),
         _all: n,
       }));
-      // Toolbar status (para noticias usamos "Publicada")
-      const ttStatus = qs("#tt-status");
-      if (ttStatus) {
-        ttStatus.textContent = "Activas";
-        ttStatus.classList.remove("badge-inactivo");
-        ttStatus.classList.add("badge-activo");
-      }
+
+      // Precalcular comentarios para todas las noticias visibles (en paralelo)
+      const ids = state.data.map((n) => n.id);
+      const counts = await Promise.all(
+        ids.map(async (id) => ({ id, total: await getCommentsCount(id) }))
+      );
+      state.commentsCount = counts.reduce((acc, { id, total }) => {
+        acc[id] = total;
+        return acc;
+      }, {});
+
       drawNoticias();
-      toast("Noticias cargadas", "exito", 1600);
+      toast("Noticias cargadas", "exito", 1400);
     } catch (err) {
       const list = qs("#recursos-list");
       if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
@@ -391,8 +431,9 @@
           <div class="col-nombre">
             <span>${escapeHTML(it.titulo)}</span> ${chipStatus(it.estatus)}
           </div>
-          <div class="col-tipo">${statusText(it.estatus)}</div>
+          <div class="col-tutor">${Number(state.commentsCount[it.id] || 0)}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
+          <div class="col-status">${badgePublicacion(it.estatus)}</div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -401,7 +442,8 @@
             <span class="icon-chevron">›</span>
           </button>
           <div class="row-details">
-            <div><strong>Creada:</strong> ${fmtDateTime(it.fecha)}</div>
+            <div><strong>Publicación:</strong> ${fmtDateTime(it.fecha)}</div>
+            <div><strong>Comentarios:</strong> ${Number(state.commentsCount[it.id] || 0)}</div>
             <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
           </div>
         </div>`,
@@ -413,15 +455,16 @@
         const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
         return state.devMode
-          ? renderAllFields(n)
+          ? renderAllFields(n, { comentarios: Number(state.commentsCount[n.id] || 0) })
           : `
-          ${pair("Título", n.titulo)}
-          ${pair("Estado", statusText(n.estatus))}
-          ${pair("Fecha creación", fmtDateTime(n.fecha_creacion))}
-          ${pair("Descripción (uno)", n.desc_uno)}
-          ${pair("Descripción (dos)", n.desc_dos)}
-          ${pair("Creado por", n.creado_por)}
-        `;
+            ${pair("Título", n.titulo)}
+            ${pair("Estado", statusText(n.estatus))}
+            ${pair("Fecha de publicación", fmtDateTime(n.fecha_creacion))}
+            ${pair("Comentarios", Number(state.commentsCount[n.id] || 0))}
+            ${pair("Descripción (uno)", n.desc_uno)}
+            ${pair("Descripción (dos)", n.desc_dos)}
+            ${pair("Creado por", n.creado_por)}
+          `;
       },
     });
   }
@@ -431,125 +474,16 @@
       ? `<span class="chip green">Publicada</span>`
       : `<span class="chip gray">Inactiva</span>`;
   }
+  function badgePublicacion(estatus) {
+    return Number(estatus) === 1
+      ? `<span class="badge-activo">Activa</span>`
+      : `<span class="badge-inactivo">Inactiva</span>`;
+  }
   function statusText(e) {
     return Number(e) === 1 ? "Publicada" : "Inactiva";
   }
 
-  // USUARIOS
-  async function loadUsuarios() {
-    const title = qs("#mod-title");
-    if (title) title.textContent = "Usuarios";
-
-    const hdr = qs(".recursos-box.desktop-only .table-header");
-    if (hdr) {
-      const hNombre = hdr.querySelector(".col-nombre");
-      const hTipo = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
-      const hFecha = hdr.querySelector(".col-fecha");
-      let hStatus = hdr.querySelector(".col-status");
-
-      if (hNombre) hNombre.textContent = "Nombre";
-      if (hTipo) { hTipo.textContent = "Tipo de contacto"; hTipo.classList.add("col-tipo"); }
-      if (hFecha) hFecha.textContent = "Creado";
-      if (hStatus) hStatus.textContent = "—";
-    }
-
-    showSkeletons();
-    try {
-      const raw = await postJSON(API.usuarios, { estatus: "1" });
-      state.raw = raw;
-      state.data = raw.map((u) => ({
-        id: u.id,
-        nombre: u.nombre,
-        correo: u.correo,
-        telefono: u.telefono,
-        tipo_contacto: Number(u.tipo_contacto || 0),
-        estatus: Number(u.estatus || 0),
-        fecha: u.fecha_creacion,
-        _all: u,
-      }));
-
-      const ttStatus = qs("#tt-status");
-      if (ttStatus) {
-        ttStatus.textContent = "Activos";
-        ttStatus.classList.remove("badge-inactivo");
-        ttStatus.classList.add("badge-activo");
-      }
-
-      drawUsuarios();
-      toast("Usuarios cargados", "exito", 1600);
-    } catch (err) {
-      const list = qs("#recursos-list");
-      if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar usuarios</div>`;
-      const m = qs("#recursos-list-mobile");
-      if (m) m.innerHTML = "";
-      toast("No se pudieron cargar usuarios", "error");
-      console.error(err);
-    }
-  }
-
-  function drawUsuarios() {
-    const rows = state.data;
-    renderList(rows, {
-      desktopRow: (it) => `
-        <div class="table-row" data-id="${it.id}" data-type="usuario">
-          <div class="col-nombre">
-            <span>${escapeHTML(it.nombre)}</span> ${chipUserStatus(it.estatus)}
-          </div>
-          <div class="col-tipo">${chipTipoContacto(it.tipo_contacto)}</div>
-          <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-        </div>`,
-      mobileRow: (it) => `
-        <div class="table-row-mobile" data-id="${it.id}" data-type="usuario">
-          <button class="row-toggle">
-            <div class="col-nombre">${escapeHTML(it.nombre)} ${chipUserStatus(it.estatus)}</div>
-            <span class="icon-chevron">›</span>
-          </button>
-          <div class="row-details">
-            <div><strong>Correo:</strong> ${escapeHTML(it.correo)}</div>
-            <div><strong>Teléfono:</strong> ${escapeHTML(it.telefono)}</div>
-            <div><strong>Preferencia:</strong> ${tipoContactoText(it.tipo_contacto)}</div>
-            <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
-          </div>
-        </div>`,
-      drawerTitle: (d) => {
-        const item = state.data.find((x) => String(x.id) === d.id);
-        return item ? `Usuario · ${item.nombre}` : "Usuario";
-      },
-      drawerBody: (d) => {
-        const u = state.data.find((x) => String(x.id) === d.id)?._all;
-        if (!u) return "<p>No encontrado.</p>";
-        return state.devMode
-          ? renderAllFields(u)
-          : `
-          ${pair("Nombre", u.nombre)}
-          ${pair("Correo", u.correo)}
-          ${pair("Teléfono", u.telefono)}
-          ${pair("Tipo de contacto", tipoContactoText(Number(u.tipo_contacto)))}
-          ${pair("Estatus", u.estatus == "1" ? "Activo" : "Inactivo")}
-          ${pair("Fecha de nacimiento", u.fecha_nacimiento || "-")}
-          ${pair("Creado", fmtDateTime(u.fecha_creacion))}
-          ${pair("Última modif", u.fecha_modif || "-")}
-        `;
-      },
-    });
-  }
-
-  function chipUserStatus(s) {
-    return Number(s) === 1
-      ? `<span class="chip green">Activo</span>`
-      : `<span class="chip gray">Inactivo</span>`;
-  }
-  function tipoContactoText(t) {
-    if (t === 1) return "Teléfono";
-    if (t === 2) return "Correo";
-    if (t === 3) return "Ambos";
-    return "-";
-  }
-  function chipTipoContacto(t) {
-    return `<span class="chip">${escapeHTML(tipoContactoText(Number(t)))}</span>`;
-  }
-
-  // Drawer
+  // ===================== Drawer =====================
   function openDrawer(title, bodyHTML) {
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.add("open");
@@ -573,7 +507,51 @@
     drawer.setAttribute("aria-hidden", "true");
   }
 
+  function escapeHTML(str) {
+    return String(str ?? "").replace(
+      /[&<>'"]/g,
+      (s) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      }[s])
+    );
+  }
+  function fmtDate(d) {
+    if (!d) return "-";
+    try {
+      const [y, m, day] = d.split("-");
+      return `${day}/${m}/${y}`;
+    } catch {
+      return d;
+    }
+  }
+  function fmtDateTime(dt) {
+    if (!dt) return "-";
+    try {
+      const [date, time] = dt.split(" ");
+      return `${fmtDate(date)} ${time || ""}`.trim();
+    } catch {
+      return dt;
+    }
+  }
+  function fmtMoney(n) {
+    try {
+      return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+    } catch {
+      return `$${n}`;
+    }
+  }
+  function pair(label, val) {
+    return `<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${escapeHTML(
+      val ?? "-"
+    )}</div></div>`;
+  }
 
+  // Modo dev (imprime todos los campos + JSON)
   function renderAllFields(obj, extras = {}) {
     const merged = { ...obj, ...extras };
     const entries = Object.entries(merged);
@@ -612,7 +590,9 @@
     if (typeof v === "number") return String(v);
     if (typeof v === "string") {
       if (/^\d{4}-\d{2}-\d{2}( .+)?$/.test(v))
-        return `<code>${escapeHTML(v)}</code> <span style="color:#666">(${escapeHTML(fmtDateTime(v) || fmtDate(v))})</span>`;
+        return `<code>${escapeHTML(v)}</code> <span style="color:#666">(${escapeHTML(
+          fmtDateTime(v) || fmtDate(v)
+        )})</span>`;
       const long = v.length > 220;
       const short = escapeHTML(v.slice(0, 220)) + (long ? "…" : "");
       if (!long) return short;
@@ -631,71 +611,41 @@
       return `<span id="${id}">${short}</span> <button class="btn" id="${id}_btn" data-expanded="0">ver más</button>`;
     }
     try {
-      return `<pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">${escapeHTML(JSON.stringify(v, null, 2))}</pre>`;
+      return `<pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">${escapeHTML(
+        JSON.stringify(v, null, 2)
+      )}</pre>`;
     } catch {
       return escapeHTML(String(v));
     }
   }
 
-
-  function escapeHTML(str) {
-    return String(str ?? "").replace(/[&<>'"]/g, (s) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-    }[s]));
-  }
-  function fmtDate(d) {
-    if (!d) return "-";
-    try {
-      const [y, m, day] = d.split("-");
-      return `${day}/${m}/${y}`;
-    } catch { return d; }
-  }
-  function fmtDateTime(dt) {
-    if (!dt) return "-";
-    try {
-      const [date, time] = dt.split(" ");
-      return `${fmtDate(date)} ${time || ""}`.trim();
-    } catch { return dt; }
-  }
-  function fmtMoney(n) {
-    try {
-      return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
-    } catch { return `$${n}`; }
-  }
-  function pair(label, val) {
-    return `<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${escapeHTML(val ?? "-")}</div></div>`;
-  }
-
-
   function bindUI() {
-    // Soporte para botones antiguos (si existen)
-    qsa(".admin-dash .admin-nav").forEach((btn) =>
-      btn.addEventListener("click", () => setRoute(btn.dataset.route))
-    );
+    // Botón "+" (placeholder)
+    const addBtn = qs("#btn-add");
+    if (addBtn) addBtn.addEventListener("click", () => toast("Acción crear (WIP)", "warning"));
 
-    // Botón de modo dev
+    // boton de desarrollador, no deberia estorbar
     const devBtn = document.createElement("button");
     devBtn.className = "btn";
     devBtn.id = "btn-dev";
     devBtn.textContent = state.devMode ? "Modo desarrollador: ON" : "Modo desarrollador: OFF";
     devBtn.onclick = () => {
       state.devMode = !state.devMode;
+      localStorage.setItem("gc_devMode", JSON.stringify(state.devMode));
       devBtn.textContent = `Modo desarrollador: ${state.devMode ? "ON" : "OFF"}`;
+      toast(`Modo dev ${state.devMode ? "activado" : "desactivado"}`, "exito", 1200);
     };
     const right = qs(".dash-toolbar .right");
     if (right) right.prepend(devBtn);
 
-    // Refresh
-    const refresh = qs("#btn-refresh");
-    if (refresh) refresh.addEventListener("click", () => refreshCurrent());
-
-    // Drawer close
+    // Cerrar drawer
     const drawerClose = qs("#drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
     const overlay = qs("#gc-dash-overlay");
-    if (overlay) overlay.addEventListener("click", (e) => {
-      if (e.target.id === "gc-dash-overlay") closeDrawer();
-    });
+    if (overlay)
+      overlay.addEventListener("click", (e) => {
+        if (e.target.id === "gc-dash-overlay") closeDrawer();
+      });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
