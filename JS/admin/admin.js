@@ -765,98 +765,68 @@
 
   // ---------- toolbar / botones ----------
   function bindUI() {
-    // botón add (+): abre drawer en modo create
-    const bAdd = qs("#btn-add");
-    if (bAdd) bAdd.addEventListener("click", async () => {
-      // si estamos en cursos, creamos curso; si no, solo aviso
-      if (!state.route.startsWith("#/cursos")) {
-        toast("Solo disponible en Cursos por ahora", "warning");
-        return;
-      }
-      // aseguramos catálogos para selects
-      await Promise.all([getTutorsMap(), getPrioridadMap()]);
-      state.currentDrawer = { type: "curso", id: null, mode: "create" };
-      openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
+    document.querySelectorAll(".admin-dash .admin-nav").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const route = btn.dataset.route || btn.getAttribute("href");
+        if (route) {
+          if (location.hash !== route) location.hash = route;
+          else onRouteChange();
+        }
+      });
     });
 
-    // botón devmode (ícono): alterna modo y refresca/rehidrata drawer si abierto
-    const bDev = qs("#btn-devmode");
-    if (bDev) bDev.addEventListener("click", () => {
-      state.devMode = !state.devMode;
-      // visual on/off del botón
-      bDev.classList.toggle("is-on", state.devMode);
-      const tip = bDev.querySelector(".dev-tip");
-      if (tip) tip.textContent = state.devMode ? "Dev ON" : "Dev OFF";
+    const oldDevBtn = document.getElementById("btn-dev");
+    if (oldDevBtn) oldDevBtn.remove();
 
-      // si el drawer está abierto y es curso, re-render para mostrar/ocultar controles
-      if (qs("#gc-drawer").classList.contains("open") && state.currentDrawer?.type === "curso") {
-        const id = state.currentDrawer.id ? String(state.currentDrawer.id) : "";
-        // si estaba en view y devMode ON, dejamos view (editar solo si le dan al botón Editar)
-        qs("#drawer-body").innerHTML = renderCursoDrawer({ id });
-      }
-    });
+    const devToggle = document.getElementById("btn-dev-toggle");
+    if (devToggle) {
+      devToggle.addEventListener("click", () => {
+        // Alterna el modo desarrollador
+        state.devMode = !state.devMode;
 
-    // cerrar drawer
-    const drawerClose = qs("#drawer-close");
-    if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
-    const overlay = qs("#gc-dash-overlay");
-    if (overlay) overlay.addEventListener("click", (e) => {
-      if (e.target.id === "gc-dash-overlay") closeDrawer();
-    });
+        applyDevModeUI();
 
-    // búsqueda rápida (filtra por nombre/título)
-    const sbox = qs("#search-input");
-    if (sbox) {
-      sbox.addEventListener("input", () => {
-        const term = sbox.value.trim().toLowerCase();
-        const base = state.raw || [];
-        if (state.route.startsWith("#/cursos")) {
-          const tmap = state.tutorsMap || {};
-          const pmap = state.prioMap || {};
-          state.data = (Array.isArray(base) ? base : [])
-            .filter(c =>
-              !term ||
-              String(c.nombre).toLowerCase().includes(term) ||
-              String(tmap[c.tutor] || "").toLowerCase().includes(term)
-            )
-            .map(c => ({
-              id: c.id,
-              nombre: c.nombre,
-              tutor: tmap[c.tutor] || `Tutor #${c.tutor}`,
-              tutor_id: c.tutor,
-              prioridad_id: c.prioridad,
-              prioridad_nombre: pmap[c.prioridad] || `#${c.prioridad}`,
-              precio: c.precio,
-              certificado: !!c.certificado,
-              fecha: c.fecha_inicio,
-              estatus: Number(c.estatus),
-              _all: c,
-            }));
-          drawCursos();
-        } else if (state.route.startsWith("#/noticias")) {
-          state.data = (Array.isArray(base) ? base : [])
-            .filter(n => !term || String(n.titulo).toLowerCase().includes(term))
-            .map(n => {
-              const found = (state.data || []).find(x => x.id === n.id);
-              return {
-                id: n.id,
-                titulo: n.titulo,
-                fecha: n.fecha_creacion,
-                estatus: Number(n.estatus),
-                comentarios: found?.comentarios ?? 0,
-                _all: n,
-              };
-            });
-          drawNoticias();
+        const drawer = document.getElementById("gc-drawer");
+        if (drawer && drawer.classList.contains("open")) {
+          typeof initDrawerControls === "function" && initDrawerControls();
+
+          const form = drawer.querySelector("[data-editable='true']");
+          if (form) {
+            const enable = !!state.devMode && form.classList.contains("editing");
+            form.querySelectorAll("input, select, textarea, button[data-role='editor-only']")
+              .forEach(el => el.disabled = !enable);
+          }
         }
       });
     }
+
+    // Cerrar drawer
+    const drawerClose = document.getElementById("drawer-close");
+    if (drawerClose) {
+      drawerClose.addEventListener("click", closeDrawer);
+    }
+
+    const overlay = document.getElementById("gc-dash-overlay");
+    if (overlay) {
+      overlay.addEventListener("click", (e) => {
+        if (e.target.id === "gc-dash-overlay") closeDrawer();
+      });
+    }
+
+    applyDevModeUI();
+  }
+
+  function applyDevModeUI() {
+    const btn = document.getElementById("btn-dev-toggle");
+    if (!btn) return;
+    btn.classList.toggle("is-active", state.devMode);
+    btn.setAttribute("aria-pressed", String(!!state.devMode));
+    btn.title = `Modo desarrollador (${state.devMode ? "ON" : "OFF"})`;
   }
 
   // ---- init
   document.addEventListener("DOMContentLoaded", async () => {
     bindUI();
-    // precarga catálogos (para que el drawer no tarde)
     try { await Promise.all([getTutorsMap(), getPrioridadMap()]); } catch { }
     if (!window.location.hash) window.location.hash = "#/cursos";
     onRouteChange();

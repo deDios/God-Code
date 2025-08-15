@@ -205,17 +205,17 @@
                 </div>
 
                 <div class="right">
-                    <!-- Botón modo desarrollador (SVG toggle) -->
-                    <button id="btn-devmode" class="icon-btn" type="button" aria-label="Modo desarrollador"
-                        aria-pressed="false" title="Modo desarrollador: OFF">
-                        <!-- Icono </> limpio -->
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5" stroke="currentColor"
-                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <!-- Botón modo desarrollador -->
+                    <button id="btn-dev-toggle" class="icon-btn" aria-pressed="false" title="Modo desarrollador (OFF)">
+                        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                            <path d="M8.5 7 4 12l4.5 5M15.5 7 20 12l-4.5 5M13 6l-2 12" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
+                        <span class="sr-only">Modo desarrollador</span>
+                        <span class="status-dot" aria-hidden="true"></span>
                     </button>
 
-                    <!-- Botón crear (+) estilo Google -->
+                    <!-- Boton crear  -->
                     <button id="btn-add" class="icon-btn blue" type="button" aria-label="Crear nuevo" title="Crear">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
