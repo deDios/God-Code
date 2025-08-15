@@ -321,84 +321,90 @@
     const isEdit = mode === "edit";
     const isView = mode === "view";
 
-    const c = isCreate
-      ? getEmptyCourse()
-      : (item ? item._all : null);
-
-    // por si no hay item (raro pero pasa)
+    const c = isCreate ? getEmptyCourse() : (item ? item._all : null);
     if (!c) return "<p>No encontrado.</p>";
 
-    // selects de tutores/prioridad
+    // opciones selects (usa mapas cacheados)
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
 
-    // controles de edición (solo visibles en devMode)
-    const controlsRow = state.devMode ? `
+    // barra de acciones
+    let controlsRow = "";
+    if (isCreate) {
+      controlsRow = `
+      <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+        <button class="btn" id="btn-cancel">Cancelar</button>
+        <button class="btn blue" id="btn-save">Guardar</button>
+      </div>
+    `;
+    } else if (state.devMode) {
+      controlsRow = `
       <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
         ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
-        ${isEdit || isCreate ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
-        ${isEdit || isCreate ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
+        ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
+        ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
         ${!isCreate ? `<button class="btn" id="btn-delete" data-step="1">Eliminar</button>` : ""}
       </div>
-    ` : "";
+    `;
+    }
 
-    // campos: si estamos en view -> texto; si edit/create -> inputs
-    const field = (label, key, value, inputHTML) => {
-      return `
-        <div class="field">
-          <div class="label">${escapeHTML(label)}</div>
-          <div class="value">
-            ${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}
-          </div>
-        </div>
-      `;
-    };
-
-    // inputs simples
+    // helpers de inputs inline
     const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
     const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
     const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
     const inCheck = (id, val) => `<label style="display:inline-flex;align-items:center;gap:.5rem;"><input id="${id}" type="checkbox" ${Number(val) ? 'checked' : ''}/> <span>Sí</span></label>`;
     const inSelect = (id, opts) => `<select id="${id}">${opts}</select>`;
-    const inTextarea = (id, val, rows = 5) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+    const inTA = (id, val, rows = 5) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
-    // layout final
+    const field = (label, key, value, inputHTML) => `
+    <div class="field">
+      <div class="label">${escapeHTML(label)}</div>
+      <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
+    </div>
+  `;
+
+    // layout del cuerpo
     const html = `
-      ${controlsRow}
-      ${field("Nombre", "nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
-      ${field("Tutor", "tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSelect("f_tutor", tutorOptions))}
-      ${field("Fecha inicio", "fecha_inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
-      ${field("Precio", "precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio), inNum("f_precio", c.precio ?? 0))}
-      ${field("Certificado", "certificado", Number(c.certificado) ? "Sí" : "No", inCheck("f_certificado", c.certificado))}
-      ${field("Prioridad", "prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSelect("f_prioridad", prioOptions))}
-      ${field("Estatus", "estatus", Number(c.estatus) === 1 ? "Activo" : "Inactivo", inSelect("f_estatus",
-      `<option value="1" ${Number(c.estatus) === 1 ? 'selected' : ''}>Activo</option>
-         <option value="0" ${Number(c.estatus) === 0 ? 'selected' : ''}>Inactivo</option>`))}
-      ${field("Descripción breve", "descripcion_breve", c.descripcion_breve, inTextarea("f_desc_breve", c.descripcion_breve, 3))}
-      ${field("Descripción media", "descripcion_media", c.descripcion_media, inTextarea("f_desc_media", c.descripcion_media, 4))}
-      ${state.devMode ? `
-        <details style="margin-top:10px;">
-          <summary>Campos extendidos</summary>
-          ${field("Descripción completa", "descripcion_curso", c.descripcion_curso, inTextarea("f_desc_curso", c.descripcion_curso, 6))}
-          ${field("Actividades", "actividades", c.actividades, inNum("f_actividades", c.actividades ?? 0))}
-          ${field("Tipo evaluación", "tipo_evaluacion", c.tipo_evaluacion, inNum("f_tipo_eval", c.tipo_evaluacion ?? 1))}
-          ${field("Calendario", "calendario", c.calendario, inNum("f_calendario", c.calendario ?? 1))}
-          ${field("Dirigido", "dirigido", c.dirigido, inTextarea("f_dirigido", c.dirigido, 3))}
-          ${field("Competencias", "competencias", c.competencias, inTextarea("f_competencias", c.competencias, 3))}
-          ${field("Horas", "horas", c.horas, inNum("f_horas", c.horas ?? 0))}
-          ${field("Categoría", "categoria", c.categoria, inNum("f_categoria", c.categoria ?? 1))}
-          ${field("Creado por", "creado_por", c.creado_por, inNum("f_creado_por", c.creado_por ?? 1))}
-        </details>
-      `: ""}
+    ${controlsRow}
+    ${field("Nombre", "nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
+    ${field("Tutor", "tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSelect("f_tutor", tutorOptions))}
+    ${field("Fecha inicio", "fecha_inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+    ${field("Precio", "precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio), inNum("f_precio", c.precio ?? 0))}
+    ${field("Certificado", "certificado", Number(c.certificado) ? "Sí" : "No", inCheck("f_certificado", c.certificado))}
+    ${field("Prioridad", "prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSelect("f_prioridad", prioOptions))}
+    ${field("Estatus", "estatus", Number(c.estatus) === 1 ? "Activo" : "Inactivo",
+      inSelect("f_estatus", `
+        <option value="1" ${Number(c.estatus) === 1 ? 'selected' : ''}>Activo</option>
+        <option value="0" ${Number(c.estatus) === 0 ? 'selected' : ''}>Inactivo</option>
+      `)
+    )}
+    ${field("Descripción breve", "descripcion_breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
+    ${field("Descripción media", "descripcion_media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
 
-      ${state.devMode ? `
-        <div style="margin-top:16px;">
-          <div class="label" style="margin-bottom:6px;">JSON</div>
-          <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${escapeHTML(JSON.stringify(c, null, 2))}</pre>
-        </div>` : ""}
-    `;
+    ${state.devMode ? `
+      <details style="margin-top:10px;">
+        <summary>Campos extendidos</summary>
+        ${field("Descripción completa", "descripcion_curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))}
+        ${field("Actividades", "actividades", c.actividades, inNum("f_actividades", c.actividades ?? 0))}
+        ${field("Tipo evaluación", "tipo_evaluacion", c.tipo_evaluacion, inNum("f_tipo_eval", c.tipo_evaluacion ?? 1))}
+        ${field("Calendario", "calendario", c.calendario, inNum("f_calendario", c.calendario ?? 1))}
+        ${field("Dirigido", "dirigido", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
+        ${field("Competencias", "competencias", c.competencias, inTA("f_competencias", c.competencias, 3))}
+        ${field("Horas", "horas", c.horas, inNum("f_horas", c.horas ?? 0))}
+        ${field("Categoría", "categoria", c.categoria, inNum("f_categoria", c.categoria ?? 1))}
+        ${field("Creado por", "creado_por", c.creado_por, inNum("f_creado_por", c.creado_por ?? 1))}
+      </details>
+    `: ""}
 
-    // setea títulos y estado de drawer
+    ${state.devMode ? `
+      <div style="margin-top:16px;">
+        <div class="label" style="margin-bottom:6px;">JSON</div>
+        <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${escapeHTML(JSON.stringify(c, null, 2))}</pre>
+      </div>
+    ` : ""}
+  `;
+
+    // título y estado del drawer
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
@@ -410,9 +416,9 @@
       state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
     }
 
-    // al final, enlazamos eventos
+    // engancha eventos de acciones y bloquea/habilita inputs según modo
     setTimeout(() => {
-      // crea/edita guarda
+      // Guardar (create / edit)
       const bSave = qs("#btn-save");
       if (bSave) bSave.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -425,29 +431,27 @@
         }
       });
 
-      // editar
+      // Editar -> pasa a modo edición
       const bEdit = qs("#btn-edit");
       if (bEdit) bEdit.addEventListener("click", (e) => {
         e.stopPropagation();
-        // cambia a modo edición (sin cerrar el drawer)
         state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
-        // volvemos a pintar el drawer en modo edit
         qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
       });
 
-      // cancelar
+      // Cancelar
       const bCancel = qs("#btn-cancel");
       if (bCancel) bCancel.addEventListener("click", (e) => {
         e.stopPropagation();
-        // descarta cambios y vuelve a modo view (o cierra si era create)
-        if (isCreate) closeDrawer();
-        else {
+        if (isCreate) {
+          closeDrawer();
+        } else {
           state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
           qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
         }
       });
 
-      // eliminar con paso confirm
+      // Eliminar con confirm de dos pasos
       const bDel = qs("#btn-delete");
       if (bDel) bDel.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -463,21 +467,19 @@
           }, 4000);
           return;
         }
-        // paso 2: soft-delete (estatus 0) usando update
         try {
           await softDeleteCurso(item);
           toast("Curso eliminado (inactivo)", "exito");
           closeDrawer();
-          await loadCursos(); // refresca lista
+          await loadCursos();
         } catch (err) {
           console.error(err);
           toast("No se pudo eliminar", "error");
         }
       });
 
-      // deshabilitar inputs si no es edit/create
-      if (isView) disableDrawerInputs(true);
-      else disableDrawerInputs(false);
+      // habilita/deshabilita inputs según modo
+      disableDrawerInputs(!(isEdit || isCreate));
     }, 0);
 
     return html;
@@ -822,6 +824,24 @@
     btn.classList.toggle("is-active", state.devMode);
     btn.setAttribute("aria-pressed", String(!!state.devMode));
     btn.title = `Modo desarrollador (${state.devMode ? "ON" : "OFF"})`;
+  }
+
+  async function openCreateCurso() {
+    try {
+      await Promise.all([getTutorsMap(), getPrioridadMap()]);
+
+      state.currentDrawer = { type: "curso", id: null, mode: "create" };
+
+      openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
+    } catch (e) {
+      console.error(e);
+      toast("No se pudo abrir el formulario", "error");
+    }
+  }
+
+  const addBtn = document.getElementById("btn-add");
+  if (addBtn) {
+    addBtn.addEventListener("click", openCreateCurso);
   }
 
   // ---- init
