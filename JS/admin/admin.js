@@ -1,21 +1,23 @@
 (() => {
-  // Ajuste viewport unidades móviles
+  // ---- util para vh en móviles
   const setVH = () => {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   };
   setVH();
   window.addEventListener("resize", setVH);
 
-  // ENDPOINTS
+  // ---- ENDPOINTS
   const API = {
     cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+    iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
+    uCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
     noticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
+    comentarios: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
     tutores: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
     prioridad: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
-    comments: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
   };
 
-  // Estado global
+  // ---- estado global
   const state = {
     route: "#/cursos",
     page: 1,
@@ -24,32 +26,31 @@
     raw: [],
     tutorsMap: null,
     prioMap: null,
-    devMode: true, // muestra TODOS los campos en el drawer + JSON
+    devMode: false, // lo maneja el botón de la toolbar
+    currentDrawer: null, // {type:'curso'|'noticia', id:number|null, mode:'view'|'edit'|'create'}
   };
 
-  // Utils
-  const toast = (msg, tipo = "exito", dur = 3000) => {
-    if (window.gcToast) window.gcToast(msg, tipo, dur);
-    else console.log(`[${tipo}] ${msg}`);
-  };
-  const qs = (s) => document.querySelector(s);
-  const qsa = (s) => Array.from(document.querySelectorAll(s));
+  // ---- helpers cortos
+  const qs = (s, r = document) => r.querySelector(s);
+  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const toast = (msg, tipo = "exito", dur = 2500) => (window.gcToast ? window.gcToast(msg, tipo, dur) : console.log(`[${tipo}] ${msg}`));
 
   async function postJSON(url, body) {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body || {}),
+      body: JSON.stringify(body || {})
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   }
 
+  // ---- catálogos (cache 30min)
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000) return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((t) => (map[t.id] = t.nombre));
+    (Array.isArray(arr) ? arr : []).forEach(t => map[t.id] = t.nombre);
     map._ts = Date.now();
     state.tutorsMap = map;
     return map;
@@ -58,30 +59,13 @@
     if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000) return state.prioMap;
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((p) => (map[p.id] = p.nombre));
+    (Array.isArray(arr) ? arr : []).forEach(p => map[p.id] = p.nombre);
     map._ts = Date.now();
     state.prioMap = map;
     return map;
   }
 
-  // --- Comentarios de noticias: total (incluye respuestas) ---
-  async function getCommentsCount(noticiaId) {
-    try {
-      const res = await postJSON(API.comments, { noticia_id: Number(noticiaId), estatus: 1 });
-      if (!Array.isArray(res)) return 0;
-      let total = 0;
-      for (const c of res) {
-        total += 1;
-        if (Array.isArray(c.respuestas)) total += c.respuestas.length;
-      }
-      return total;
-    } catch (e) {
-      console.warn("Comments error:", e);
-      return 0;
-    }
-  }
-
-  // Router
+  // ---- router básico
   function setRoute(hash) {
     const target = hash || "#/cursos";
     if (location.hash !== target) location.hash = target;
@@ -94,40 +78,22 @@
     state.route = hash;
     state.page = 1;
 
-    // Sidebar nuevo
-    qsa(".gc-side .nav-item").forEach((a) => {
+    // activa item del sidebar
+    qsa(".gc-side .nav-item").forEach(a => {
       const isActive = a.getAttribute("href") === hash;
       a.classList.toggle("is-active", isActive);
       a.setAttribute("aria-current", isActive ? "page" : "false");
     });
 
+    // cambia columnas según módulo
     if (hash.startsWith("#/cursos")) return loadCursos();
     if (hash.startsWith("#/noticias")) return loadNoticias();
-    // Rutas aún no implementadas (sin romper)
-    if (hash.startsWith("#/contacto")) return notReady("Contacto");
-    if (hash.startsWith("#/reclutamiento")) return notReady("Reclutamiento");
-    if (hash.startsWith("#/cuentas")) return notReady("Cuentas");
 
+    // default
     setRoute("#/cursos");
   }
-  function notReady(name) {
-    state.data = [];
-    renderList([], {
-      desktopRow: () => "",
-      mobileRow: () => "",
-      drawerTitle: () => name,
-      drawerBody: () => `<p>Sección en preparación.</p>`,
-    });
-    const title = qs("#mod-title");
-    if (title) title.textContent = name;
-    const ttStatus = qs("#tt-status");
-    if (ttStatus) {
-      ttStatus.textContent = "—";
-      ttStatus.classList.remove("badge-activo", "badge-inactivo");
-    }
-  }
 
-  // Skeletons
+  // ---- skeletons rápidos
   function showSkeletons() {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -143,7 +109,7 @@
     }
   }
 
-  // Render de lista (desktop + mobile)
+  // ---- render de listas (desktop + mobile)
   function renderList(rows, config) {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -162,7 +128,7 @@
     const start = (state.page - 1) * state.pageSize;
     const pageRows = rows.slice(start, start + state.pageSize);
 
-    pageRows.forEach((item) => {
+    pageRows.forEach(item => {
       if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
       if (m) m.insertAdjacentHTML("beforeend", config.mobileRow(item));
     });
@@ -170,27 +136,22 @@
     const countEl = qs("#mod-count");
     if (countEl) countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"}`;
 
-    // eventos de filas (desktop)
-    qsa("#recursos-list .table-row").forEach((el) => {
+    // clicks desktop -> drawer
+    qsa("#recursos-list .table-row").forEach(el => {
       el.addEventListener("click", () => {
         const data = el.dataset;
-        const item = state.data.find((x) => String(x.id) === data.id);
-        openDrawer(config.drawerTitle(data), config.drawerBody(data), { item, type: data.type });
+        openDrawer(config.drawerTitle(data), config.drawerBody(data));
       });
     });
-    // mobile: expand + drawer
-    qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
-      el.addEventListener("click", () =>
-        el.closest(".table-row-mobile").classList.toggle("expanded")
-      );
+    // acordeón mobile
+    qsa("#recursos-list-mobile .row-toggle").forEach(el => {
+      el.addEventListener("click", () => el.closest(".table-row-mobile").classList.toggle("expanded"));
     });
-    qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
+    qsa("#recursos-list-mobile .open-drawer").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const container = btn.closest(".table-row-mobile");
-        const data = container.dataset;
-        const item = state.data.find((x) => String(x.id) === data.id);
-        openDrawer(config.drawerTitle(data), config.drawerBody(data), { item, type: data.type });
+        const data = btn.closest(".table-row-mobile").dataset;
+        openDrawer(config.drawerTitle(data), config.drawerBody(data));
       });
     });
 
@@ -200,7 +161,7 @@
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
     const conts = [qs("#pagination-controls"), qs("#pagination-mobile")];
-    conts.forEach((cont) => {
+    conts.forEach(cont => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -228,73 +189,78 @@
       cont.appendChild(next);
     });
   }
+
   function refreshCurrent() {
     if (state.route.startsWith("#/cursos")) return drawCursos();
     if (state.route.startsWith("#/noticias")) return drawNoticias();
   }
 
-  // =================== CURSOS ===================
+  // ---------- CURSOS ----------
   async function loadCursos() {
+    // header de columnas
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
 
-    // Encabezados
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
-      const hNombre = hdr.querySelector(".col-nombre");
-      const hTutor = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
-      const hFecha = hdr.querySelector(".col-fecha");
-      let hStatus = hdr.querySelector(".col-status");
+      const c1 = hdr.querySelector(".col-nombre");
+      const c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      const c3 = hdr.querySelector(".col-fecha");
+      let c4 = hdr.querySelector(".col-status");
+      if (c1) c1.textContent = "Nombre";
+      if (c2) { c2.textContent = "Tutor"; c2.classList.add("col-tutor"); }
+      if (c3) c3.textContent = "Fecha de inicio";
+      if (!c4) {
+        c4 = document.createElement("div");
+        c4.className = "col-status";
+        c4.setAttribute("role", "columnheader");
+        c4.textContent = "Status";
+        hdr.appendChild(c4);
+      } else c4.textContent = "Status";
+    }
 
-      if (hNombre) hNombre.textContent = "Nombre";
-      if (hTutor) { hTutor.classList.add("col-tutor"); hTutor.textContent = "Tutor"; }
-      if (hFecha) hFecha.textContent = "Fecha de inicio";
-      if (!hStatus) {
-        const div = document.createElement("div");
-        div.className = "col-status";
-        div.setAttribute("role", "columnheader");
-        div.textContent = "Status";
-        hdr.appendChild(div);
-      } else {
-        hStatus.textContent = "Status";
-      }
+    // meta de barra
+    const tt = qs(".tt-title");
+    if (tt) tt.textContent = "Cursos:";
+    const ttStatus = qs("#tt-status");
+    if (ttStatus) {
+      ttStatus.textContent = "Activo";
+      ttStatus.classList.remove("badge-inactivo");
+      ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
     try {
-      const [raw, tmap] = await Promise.all([
+      const [raw, tmap, pmap] = await Promise.all([
         postJSON(API.cursos, { estatus: 1 }),
         getTutorsMap(),
+        getPrioridadMap(),
       ]);
 
-      state.raw = Array.isArray(raw) ? raw : [];
-      state.data = state.raw.map((c) => ({
+      state.raw = raw;
+      state.data = (Array.isArray(raw) ? raw : []).map(c => ({
         id: c.id,
         nombre: c.nombre,
         tutor: tmap[c.tutor] || `Tutor #${c.tutor}`,
-        precio: Number(c.precio || 0),
+        tutor_id: c.tutor,
+        prioridad_id: c.prioridad,
+        prioridad_nombre: pmap[c.prioridad] || `#${c.prioridad}`,
+        precio: c.precio,
+        certificado: !!c.certificado,
         fecha: c.fecha_inicio,
         estatus: Number(c.estatus),
         _all: c,
       }));
 
-      // Toolbar badges de estado
-      const ttStatus = qs("#tt-status");
-      if (ttStatus) {
-        ttStatus.textContent = "Activos";
-        ttStatus.classList.remove("badge-inactivo");
-        ttStatus.classList.add("badge-activo");
-      }
-
       drawCursos();
-      toast("Cursos cargados", "exito", 1600);
+      // toast("Cursos cargados","exito",1400); // si quieres feedback
     } catch (err) {
       const list = qs("#recursos-list");
       if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
-      toast("No se pudieron cargar cursos", "error");
       console.error(err);
+      toast("No se pudieron cargar cursos", "error");
     }
   }
 
@@ -304,7 +270,7 @@
       desktopRow: (it) => `
         <div class="table-row" data-id="${it.id}" data-type="curso">
           <div class="col-nombre">
-            <span>${escapeHTML(it.nombre)}</span>
+            <span class="name-text">${escapeHTML(it.nombre)}</span>
             ${badgePrecio(it.precio)}
           </div>
           <div class="col-tutor">${escapeHTML(it.tutor)}</div>
@@ -325,28 +291,19 @@
           </div>
         </div>`,
       drawerTitle: (d) => {
-        const item = state.data.find((x) => String(x.id) === d.id);
+        const item = state.data.find(x => String(x.id) === d.id);
         return item ? `Curso · ${item.nombre}` : "Curso";
       },
-      drawerBody: (d) => {
-        const item = state.data.find((x) => String(x.id) === d.id);
-        if (!item) return "<p>No encontrado.</p>";
-        if (state.devMode) {
-          return renderAllFields(item._all);
-        }
-        const c = item._all;
-        return `
-          ${pair("Tutor", item.tutor)}
-          ${pair("Fecha inicio", fmtDate(c.fecha_inicio))}
-          ${pair("Precio", item.precio === 0 ? "Gratuito" : fmtMoney(item.precio))}
-          ${pair("Estatus", textCursoStatus(Number(c.estatus)))}
-          ${pair("Descripción breve", c.descripcion_breve)}
-          ${pair("Descripción", c.descripcion_media)}
-        `;
-      },
+      drawerBody: (d) => renderCursoDrawer(d),
     });
   }
 
+  // badges de precio y status (usa tus clases .badge-*)
+  function badgePrecio(precio) {
+    return Number(precio) === 0
+      ? `<span class="badge-neutral">Gratuito</span>`
+      : `<span class="badge-neutral">Con costo</span>`;
+  }
   function badgeCurso(estatus) {
     return Number(estatus) === 1
       ? `<span class="badge-activo">Activo</span>`
@@ -355,48 +312,320 @@
   function textCursoStatus(estatus) {
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
-  function badgePrecio(precio) {
-    return Number(precio) === 0
-      ? `<span class="badge-neutral">Gratuito</span>`
-      : `<span class="badge-neutral">Con costo</span>`;
+
+  // render del drawer de curso (view/edit/create)
+  function renderCursoDrawer(dataset) {
+    const item = state.data.find(x => String(x.id) === dataset.id);
+    const mode = state.currentDrawer?.mode || "view";
+    const isCreate = mode === "create";
+    const isEdit = mode === "edit";
+    const isView = mode === "view";
+
+    const c = isCreate
+      ? getEmptyCourse()
+      : (item ? item._all : null);
+
+    // por si no hay item (raro pero pasa)
+    if (!c) return "<p>No encontrado.</p>";
+
+    // selects de tutores/prioridad
+    const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
+    const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
+
+    // controles de edición (solo visibles en devMode)
+    const controlsRow = state.devMode ? `
+      <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+        ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
+        ${isEdit || isCreate ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
+        ${isEdit || isCreate ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
+        ${!isCreate ? `<button class="btn" id="btn-delete" data-step="1">Eliminar</button>` : ""}
+      </div>
+    ` : "";
+
+    // campos: si estamos en view -> texto; si edit/create -> inputs
+    const field = (label, key, value, inputHTML) => {
+      return `
+        <div class="field">
+          <div class="label">${escapeHTML(label)}</div>
+          <div class="value">
+            ${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}
+          </div>
+        </div>
+      `;
+    };
+
+    // inputs simples
+    const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
+    const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
+    const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+    const inCheck = (id, val) => `<label style="display:inline-flex;align-items:center;gap:.5rem;"><input id="${id}" type="checkbox" ${Number(val) ? 'checked' : ''}/> <span>Sí</span></label>`;
+    const inSelect = (id, opts) => `<select id="${id}">${opts}</select>`;
+    const inTextarea = (id, val, rows = 5) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+
+    // layout final
+    const html = `
+      ${controlsRow}
+      ${field("Nombre", "nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
+      ${field("Tutor", "tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSelect("f_tutor", tutorOptions))}
+      ${field("Fecha inicio", "fecha_inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+      ${field("Precio", "precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio), inNum("f_precio", c.precio ?? 0))}
+      ${field("Certificado", "certificado", Number(c.certificado) ? "Sí" : "No", inCheck("f_certificado", c.certificado))}
+      ${field("Prioridad", "prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSelect("f_prioridad", prioOptions))}
+      ${field("Estatus", "estatus", Number(c.estatus) === 1 ? "Activo" : "Inactivo", inSelect("f_estatus",
+      `<option value="1" ${Number(c.estatus) === 1 ? 'selected' : ''}>Activo</option>
+         <option value="0" ${Number(c.estatus) === 0 ? 'selected' : ''}>Inactivo</option>`))}
+      ${field("Descripción breve", "descripcion_breve", c.descripcion_breve, inTextarea("f_desc_breve", c.descripcion_breve, 3))}
+      ${field("Descripción media", "descripcion_media", c.descripcion_media, inTextarea("f_desc_media", c.descripcion_media, 4))}
+      ${state.devMode ? `
+        <details style="margin-top:10px;">
+          <summary>Campos extendidos</summary>
+          ${field("Descripción completa", "descripcion_curso", c.descripcion_curso, inTextarea("f_desc_curso", c.descripcion_curso, 6))}
+          ${field("Actividades", "actividades", c.actividades, inNum("f_actividades", c.actividades ?? 0))}
+          ${field("Tipo evaluación", "tipo_evaluacion", c.tipo_evaluacion, inNum("f_tipo_eval", c.tipo_evaluacion ?? 1))}
+          ${field("Calendario", "calendario", c.calendario, inNum("f_calendario", c.calendario ?? 1))}
+          ${field("Dirigido", "dirigido", c.dirigido, inTextarea("f_dirigido", c.dirigido, 3))}
+          ${field("Competencias", "competencias", c.competencias, inTextarea("f_competencias", c.competencias, 3))}
+          ${field("Horas", "horas", c.horas, inNum("f_horas", c.horas ?? 0))}
+          ${field("Categoría", "categoria", c.categoria, inNum("f_categoria", c.categoria ?? 1))}
+          ${field("Creado por", "creado_por", c.creado_por, inNum("f_creado_por", c.creado_por ?? 1))}
+        </details>
+      `: ""}
+
+      ${state.devMode ? `
+        <div style="margin-top:16px;">
+          <div class="label" style="margin-bottom:6px;">JSON</div>
+          <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${escapeHTML(JSON.stringify(c, null, 2))}</pre>
+        </div>` : ""}
+    `;
+
+    // setea títulos y estado de drawer
+    if (isCreate) {
+      qs("#drawer-title").textContent = "Curso · Crear";
+      state.currentDrawer = { type: "curso", id: null, mode: "create" };
+    } else if (isEdit) {
+      qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""} (edición)`;
+      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+    } else {
+      qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""}`;
+      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+    }
+
+    // al final, enlazamos eventos
+    setTimeout(() => {
+      // crea/edita guarda
+      const bSave = qs("#btn-save");
+      if (bSave) bSave.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          if (isCreate) await saveNewCurso();
+          else await saveUpdateCurso(item);
+        } catch (err) {
+          console.error(err);
+          toast("Error al guardar", "error");
+        }
+      });
+
+      // editar
+      const bEdit = qs("#btn-edit");
+      if (bEdit) bEdit.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // cambia a modo edición (sin cerrar el drawer)
+        state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+        // volvemos a pintar el drawer en modo edit
+        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+      });
+
+      // cancelar
+      const bCancel = qs("#btn-cancel");
+      if (bCancel) bCancel.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // descarta cambios y vuelve a modo view (o cierra si era create)
+        if (isCreate) closeDrawer();
+        else {
+          state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+        }
+      });
+
+      // eliminar con paso confirm
+      const bDel = qs("#btn-delete");
+      if (bDel) bDel.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const step = bDel.dataset.step || "1";
+        if (step === "1") {
+          bDel.textContent = "Confirmar";
+          bDel.dataset.step = "2";
+          setTimeout(() => {
+            if (bDel.dataset.step === "2") {
+              bDel.textContent = "Eliminar";
+              bDel.dataset.step = "1";
+            }
+          }, 4000);
+          return;
+        }
+        // paso 2: soft-delete (estatus 0) usando update
+        try {
+          await softDeleteCurso(item);
+          toast("Curso eliminado (inactivo)", "exito");
+          closeDrawer();
+          await loadCursos(); // refresca lista
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo eliminar", "error");
+        }
+      });
+
+      // deshabilitar inputs si no es edit/create
+      if (isView) disableDrawerInputs(true);
+      else disableDrawerInputs(false);
+    }, 0);
+
+    return html;
   }
 
-  // =================== NOTICIAS ===================
+  // bloquea/desbloquea inputs del drawer
+  function disableDrawerInputs(disabled) {
+    qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => {
+      el.disabled = disabled;
+    });
+  }
+
+  // curso vacío para crear
+  function getEmptyCourse() {
+    return {
+      nombre: "",
+      descripcion_breve: "",
+      descripcion_curso: "",
+      descripcion_media: "",
+      actividades: 1,
+      tipo_evaluacion: 1,
+      calendario: 1,
+      certificado: 0,
+      dirigido: "",
+      competencias: "",
+      tutor: "",
+      horas: 0,
+      precio: 0,
+      estatus: 1,
+      creado_por: 1,
+      fecha_inicio: "",
+      categoria: 1,
+      prioridad: 1
+    };
+  }
+
+  // option builder a partir de mapas
+  function mapToOptions(map, selectedId) {
+    const pairs = Object.entries(map || {});
+    // filtra la propiedad de timestamp si existe
+    const clean = pairs.filter(([k]) => k !== "_ts");
+    if (!clean.length) return `<option value="">—</option>`;
+    return clean.map(([id, name]) => `<option value="${escapeAttr(id)}" ${String(selectedId) === String(id) ? "selected" : ""}>${escapeHTML(name)}</option>`).join("");
+  }
+
+  // build payload desde el drawer
+  function readCursoForm(existingId = null) {
+    const read = (id) => qs(`#${id}`)?.value ?? "";
+    const readNum = (id, def = 0) => Number(qs(`#${id}`)?.value ?? def);
+    const readChk = (id) => qs(`#${id}`)?.checked ? 1 : 0;
+
+    const payload = {
+      nombre: read("f_nombre"),
+      descripcion_breve: qs("#f_desc_breve")?.value ?? "",
+      descripcion_curso: qs("#f_desc_curso")?.value ?? "",
+      descripcion_media: qs("#f_desc_media")?.value ?? "",
+      actividades: readNum("f_actividades", 1),
+      tipo_evaluacion: readNum("f_tipo_eval", 1),
+      calendario: readNum("f_calendario", 1),
+      certificado: readChk("f_certificado"),
+      dirigido: qs("#f_dirigido")?.value ?? "",
+      competencias: qs("#f_competencias")?.value ?? "",
+      tutor: readNum("f_tutor", 0),
+      horas: readNum("f_horas", 0),
+      precio: readNum("f_precio", 0),
+      estatus: readNum("f_estatus", 1),
+      creado_por: readNum("f_creado_por", 1),
+      fecha_inicio: read("f_fecha"),
+      categoria: readNum("f_categoria", 1),
+      prioridad: readNum("f_prioridad", 1),
+    };
+    if (existingId != null) payload.id = Number(existingId);
+    return payload;
+  }
+
+  // guardar nuevo curso (insert)
+  async function saveNewCurso() {
+    const payload = readCursoForm(null);
+
+    // validito lo básico
+    if (!payload.nombre) { toast("Falta el nombre", "warning"); return; }
+    if (!payload.tutor) { toast("Selecciona tutor", "warning"); return; }
+    if (!payload.fecha_inicio) { toast("Fecha de inicio requerida", "warning"); return; }
+
+    await postJSON(API.iCursos, payload);
+    toast("Curso creado", "exito");
+    closeDrawer();
+    await loadCursos();
+  }
+
+  // actualizar curso existente
+  async function saveUpdateCurso(item) {
+    if (!item || !item._all) { toast("Sin item para actualizar", "error"); return; }
+    const payload = readCursoForm(item.id);
+    await postJSON(API.uCursos, payload);
+    toast("Cambios guardados", "exito");
+    // recarga para ver datos actualizados
+    await loadCursos();
+    // reabrimos el drawer en view
+    const re = state.data.find(x => x.id === item.id);
+    if (re) {
+      openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+    }
+  }
+
+  // soft delete (estatus=0) usando el update
+  async function softDeleteCurso(item) {
+    if (!item || !item._all) throw new Error("Item inválido");
+    const base = { ...item._all };
+    base.estatus = 0;
+    // el update espera todos los campos, así que reusamos el original
+    await postJSON(API.uCursos, base);
+  }
+
+  // ---------- NOTICIAS ----------
   async function loadNoticias() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
 
-    // Encabezados en noticias: Título | Comentarios | Publicación | Status
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
-      const hNombre = hdr.querySelector(".col-nombre");
-      const hTipo = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
-      const hFecha = hdr.querySelector(".col-fecha");
-      let hStatus = hdr.querySelector(".col-status");
+      const c1 = hdr.querySelector(".col-nombre");
+      const c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      const c3 = hdr.querySelector(".col-fecha");
+      let c4 = hdr.querySelector(".col-status");
+      if (c1) c1.textContent = "Título";
+      if (c2) { c2.textContent = "Comentarios"; c2.classList.add("col-tipo"); }
+      if (c3) c3.textContent = "Fecha de publicación";
+      if (c4) c4.textContent = "Status";
+    }
 
-      if (hNombre) hNombre.textContent = "Título";
-      if (hTipo) { hTipo.textContent = "Comentarios"; hTipo.classList.add("col-tutor"); }
-      if (hFecha) hFecha.textContent = "Publicación";
-      if (!hStatus) {
-        const div = document.createElement("div");
-        div.className = "col-status";
-        div.setAttribute("role", "columnheader");
-        div.textContent = "Status";
-        hdr.appendChild(div);
-      } else {
-        hStatus.textContent = "Status";
-      }
+    const tt = qs(".tt-title");
+    if (tt) tt.textContent = "Noticias:";
+    const ttStatus = qs("#tt-status");
+    if (ttStatus) {
+      ttStatus.textContent = "Activas";
+      ttStatus.classList.remove("badge-inactivo");
+      ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
     try {
       const raw = await postJSON(API.noticias, { estatus: 1 });
-      const arr = Array.isArray(raw) ? raw : [];
+      const arr = (Array.isArray(raw) ? raw : []);
+      // contamos comentarios (cuidado con spam de requests)
+      const counts = await Promise.all(arr.map(n => getCommentsCount(n.id).catch(() => 0)));
 
-      // Obtener conteo de comentarios por noticia
-      const counts = await Promise.all(arr.map(n => getCommentsCount(n.id)));
-
-      state.raw = arr;
+      state.raw = raw;
       state.data = arr.map((n, i) => ({
         id: n.id,
         titulo: n.titulo,
@@ -406,24 +635,27 @@
         _all: n,
       }));
 
-      // Toolbar status
-      const ttStatus = qs("#tt-status");
-      if (ttStatus) {
-        ttStatus.textContent = "Activas";
-        ttStatus.classList.remove("badge-inactivo");
-        ttStatus.classList.add("badge-activo");
-      }
-
       drawNoticias();
-      toast("Noticias cargadas", "exito", 1600);
     } catch (err) {
       const list = qs("#recursos-list");
       if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
-      toast("No se pudieron cargar noticias", "error");
       console.error(err);
+      toast("No se pudieron cargar noticias", "error");
     }
+  }
+
+  async function getCommentsCount(noticiaId) {
+    const res = await postJSON(API.comentarios, { noticia_id: Number(noticiaId), estatus: 1 });
+    const arr = Array.isArray(res) ? res : [];
+    // suma respuestas anidadas también
+    let total = 0;
+    for (const c of arr) {
+      total += 1;
+      if (Array.isArray(c.respuestas)) total += c.respuestas.length;
+    }
+    return total;
   }
 
   function drawNoticias() {
@@ -432,15 +664,11 @@
       desktopRow: (it) => `
         <div class="table-row" data-id="${it.id}" data-type="noticia">
           <div class="col-nombre">
-            <span>${escapeHTML(it.titulo)}</span>
+            <span class="name-text">${escapeHTML(it.titulo)}</span>
           </div>
           <div class="col-tutor">${it.comentarios}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">
-            ${Number(it.estatus) === 1
-          ? `<span class="badge-activo">Publicada</span>`
-          : `<span class="badge-inactivo">Inactiva</span>`}
-          </div>
+          <div class="col-status">${badgeNoticia(it.estatus)}</div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -450,52 +678,48 @@
           </button>
           <div class="row-details">
             <div><strong>Comentarios:</strong> ${it.comentarios}</div>
-            <div><strong>Publicación:</strong> ${fmtDateTime(it.fecha)}</div>
-            <div><strong>Status:</strong> ${Number(it.estatus) === 1 ? "Publicada" : "Inactiva"}</div>
+            <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
             <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
           </div>
         </div>`,
       drawerTitle: (d) => {
-        const item = state.data.find((x) => String(x.id) === d.id);
+        const item = state.data.find(x => String(x.id) === d.id);
         return item ? `Noticia · ${item.titulo}` : "Noticia";
       },
       drawerBody: (d) => {
-        const n = state.data.find((x) => String(x.id) === d.id)?._all;
+        const n = state.data.find(x => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
-        return state.devMode
-          ? renderAllFields(n)
-          : `
+        // por ahora solo vista (sin CRUD de noticias)
+        return `
           ${pair("Título", n.titulo)}
           ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
-          ${pair("Fecha creación", fmtDateTime(n.fecha_creacion))}
-          ${pair("Descripción (uno)", n.desc_uno)}
-          ${pair("Descripción (dos)", n.desc_dos)}
+          ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
+          ${pair("Descripción (1)", n.desc_uno)}
+          ${pair("Descripción (2)", n.desc_dos)}
           ${pair("Creado por", n.creado_por)}
         `;
       },
     });
   }
 
-  // =================== Drawer ===================
-  function openDrawer(title, bodyHTML, ctx) {
+  function badgeNoticia(estatus) {
+    return Number(estatus) === 1
+      ? `<span class="badge-activo">Publicada</span>`
+      : `<span class="badge-inactivo">Inactiva</span>`;
+  }
+
+  // ---------- DRAWER base ----------
+  function openDrawer(title, bodyHTML) {
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.add("open");
 
     const drawer = qs("#gc-drawer");
     if (!drawer) return;
-
-    const t = qs("#drawer-title");
-    if (t) t.textContent = title || "Detalle";
-    const b = qs("#drawer-body");
-    if (b) b.innerHTML = bodyHTML || "";
-
+    qs("#drawer-title").textContent = title || "Detalle";
+    qs("#drawer-body").innerHTML = bodyHTML || "";
     drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
-
-    // Inyectar acciones (Editar/Borrar visuales)
-    if (ctx && ctx.item) injectDrawerActions(ctx.item, ctx.type);
   }
-
   function closeDrawer() {
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.remove("open");
@@ -504,89 +728,17 @@
     if (!drawer) return;
     drawer.classList.remove("open");
     drawer.setAttribute("aria-hidden", "true");
+    state.currentDrawer = null;
   }
 
-  // Inyecta barra de acciones en el drawer (Editar solo en modo dev)
-  function injectDrawerActions(item, type) {
-    const body = document.querySelector("#drawer-body");
-    if (!body) return;
-
-    const old = body.querySelector(".drawer-actions-row");
-    if (old) old.remove();
-
-    const row = document.createElement("div");
-    row.className = "drawer-actions-row";
-    row.innerHTML = `
-      <div class="row-left"></div>
-      <div class="row-right">
-        ${state.devMode ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
-        <button class="btn danger" id="btn-delete">Borrar</button>
-      </div>
-    `;
-    body.appendChild(row);
-
-    // Borrar -> Confirmar
-    const btnDelete = row.querySelector("#btn-delete");
-    let armed = false;
-    let armTO = null;
-
-    btnDelete.addEventListener("click", async () => {
-      if (!armed) {
-        armed = true;
-        btnDelete.textContent = "Confirmar";
-        btnDelete.classList.add("confirm");
-        armTO = setTimeout(() => {
-          armed = false;
-          btnDelete.textContent = "Borrar";
-          btnDelete.classList.remove("confirm");
-        }, 4000);
-        return;
-      }
-
-      // Confirmado (visual; sin endpoint aún)
-      clearTimeout(armTO);
-      armed = false;
-      btnDelete.disabled = true;
-
-      try {
-        await softDelete(type, item.id);   // visual: quita de la lista actual
-        closeDrawer();
-        toast("Elemento eliminado.", "exito", 2000);
-      } catch (e) {
-        console.error(e);
-        toast("No se pudo eliminar.", "error");
-        btnDelete.disabled = false;
-        btnDelete.textContent = "Borrar";
-        btnDelete.classList.remove("confirm");
-      }
-    });
-
-    // Editar (visual)
-    const btnEdit = row.querySelector("#btn-edit");
-    if (btnEdit) {
-      btnEdit.addEventListener("click", () => {
-        // Aquí puedes activar tu modo edición cuando definas el flujo
-        // (inputs, botones guardar/cancelar, etc.). De momento, visual.
-        toast("Funcion pendiente", "warning", 1800);
-      });
-    }
-  }
-
-  // Soft delete visual (estatus=0 en memoria + refrescar vista)
-  async function softDelete(type, id) {
-    const rawItem = state.raw.find(x => String(x.id) === String(id));
-    if (rawItem) rawItem.estatus = 0;
-
-    // Como las listas cargan solo activos (estatus:1), quitamos de la vista actual
-    state.data = state.data.filter(x => String(x.id) !== String(id));
-    refreshCurrent();
-  }
-
-  // ----- helpers de UI -----
+  // ---------- helpers UI/format ----------
   function escapeHTML(str) {
     return String(str ?? "").replace(/[&<>'"]/g, (s) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-    }[s]));
+    })[s]);
+  }
+  function escapeAttr(str) {
+    return String(str ?? "").replace(/"/g, "&quot;");
   }
   function fmtDate(d) {
     if (!d) return "-";
@@ -611,101 +763,101 @@
     return `<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${escapeHTML(val ?? "-")}</div></div>`;
   }
 
-  // Drawer dev Mode: vista completa + JSON
-  function renderAllFields(obj, extras = {}) {
-    const merged = { ...obj, ...extras };
-    const entries = Object.entries(merged);
-    const html = entries
-      .map(([k, v]) => {
-        const val = formatValue(v);
-        return `<div class="field"><div class="label">${escapeHTML(k)}</div><div class="value">${val}</div></div>`;
-      })
-      .join("");
-
-    const jsonPretty = escapeHTML(JSON.stringify(obj, null, 2));
-    const jsonBlock = `
-      <div style="margin-top:16px;">
-        <div class="label" style="margin-bottom:6px;">JSON</div>
-        <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${jsonPretty}</pre>
-        <button class="btn" id="btn-copy-json">Copiar JSON</button>
-      </div>`;
-    setTimeout(() => {
-      const btn = qs("#btn-copy-json");
-      if (btn)
-        btn.onclick = async () => {
-          try {
-            await navigator.clipboard.writeText(JSON.stringify(obj, null, 2));
-            toast("JSON copiado", "exito", 1500);
-          } catch {
-            toast("No se pudo copiar", "warning");
-          }
-        };
-    }, 0);
-
-    return html + jsonBlock;
-  }
-  function formatValue(v) {
-    if (v === null || v === undefined) return "<em style='color:#777'>null</em>";
-    if (typeof v === "boolean") return v ? "true" : "false";
-    if (typeof v === "number") return String(v);
-    if (typeof v === "string") {
-      if (/^\d{4}-\d{2}-\d{2}( .+)?$/.test(v))
-        return `<code>${escapeHTML(v)}</code> <span style="color:#666">(${escapeHTML(fmtDateTime(v) || fmtDate(v))})</span>`;
-      const long = v.length > 220;
-      const short = escapeHTML(v.slice(0, 220)) + (long ? "…" : "");
-      if (!long) return short;
-      const id = "tx_" + Math.random().toString(36).slice(2);
-      setTimeout(() => {
-        const btn = qs(`#${id}_btn`);
-        if (btn)
-          btn.onclick = () => {
-            const el = qs(`#${id}`);
-            const expanded = btn.dataset.expanded === "1";
-            el.textContent = expanded ? v.slice(0, 220) + "…" : v;
-            btn.textContent = expanded ? "ver más" : "ver menos";
-            btn.dataset.expanded = expanded ? "0" : "1";
-          };
-      }, 0);
-      return `<span id="${id}">${short}</span> <button class="btn" id="${id}_btn" data-expanded="0">ver más</button>`;
-    }
-    try {
-      return `<pre style="white-space:pre-wrap;max-height:200px;overflow:auto;">${escapeHTML(JSON.stringify(v, null, 2))}</pre>`;
-    } catch {
-      return escapeHTML(String(v));
-    }
-  }
-
-  // UI init
+  // ---------- toolbar / botones ----------
   function bindUI() {
-    // Botón de modo dev (inyección en toolbar)
-    const devBtn = document.createElement("button");
-    devBtn.className = "btn";
-    devBtn.id = "btn-dev";
-    devBtn.textContent = state.devMode ? "Modo desarrollador: ON" : "Modo desarrollador: OFF";
-    devBtn.onclick = () => {
+    // botón add (+): abre drawer en modo create
+    const bAdd = qs("#btn-add");
+    if (bAdd) bAdd.addEventListener("click", async () => {
+      // si estamos en cursos, creamos curso; si no, solo aviso
+      if (!state.route.startsWith("#/cursos")) {
+        toast("Solo disponible en Cursos por ahora", "warning");
+        return;
+      }
+      // aseguramos catálogos para selects
+      await Promise.all([getTutorsMap(), getPrioridadMap()]);
+      state.currentDrawer = { type: "curso", id: null, mode: "create" };
+      openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
+    });
+
+    // botón devmode (ícono): alterna modo y refresca/rehidrata drawer si abierto
+    const bDev = qs("#btn-devmode");
+    if (bDev) bDev.addEventListener("click", () => {
       state.devMode = !state.devMode;
-      devBtn.textContent = `Modo desarrollador: ${state.devMode ? "ON" : "OFF"}`;
-      toast(`Modo desarrollador ${state.devMode ? "activado" : "desactivado"}`, "exito", 1200);
-    };
-    const right = qs(".dash-toolbar .right");
-    if (right) right.prepend(devBtn);
+      // visual on/off del botón
+      bDev.classList.toggle("is-on", state.devMode);
+      const tip = bDev.querySelector(".dev-tip");
+      if (tip) tip.textContent = state.devMode ? "Dev ON" : "Dev OFF";
 
-    // Refresh (opcional: si existe)
-    const refresh = qs("#btn-refresh");
-    if (refresh) refresh.addEventListener("click", () => refreshCurrent());
+      // si el drawer está abierto y es curso, re-render para mostrar/ocultar controles
+      if (qs("#gc-drawer").classList.contains("open") && state.currentDrawer?.type === "curso") {
+        const id = state.currentDrawer.id ? String(state.currentDrawer.id) : "";
+        // si estaba en view y devMode ON, dejamos view (editar solo si le dan al botón Editar)
+        qs("#drawer-body").innerHTML = renderCursoDrawer({ id });
+      }
+    });
 
-    // Drawer close
+    // cerrar drawer
     const drawerClose = qs("#drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
     const overlay = qs("#gc-dash-overlay");
-    if (overlay)
-      overlay.addEventListener("click", (e) => {
-        if (e.target.id === "gc-dash-overlay") closeDrawer();
+    if (overlay) overlay.addEventListener("click", (e) => {
+      if (e.target.id === "gc-dash-overlay") closeDrawer();
+    });
+
+    // búsqueda rápida (filtra por nombre/título)
+    const sbox = qs("#search-input");
+    if (sbox) {
+      sbox.addEventListener("input", () => {
+        const term = sbox.value.trim().toLowerCase();
+        const base = state.raw || [];
+        if (state.route.startsWith("#/cursos")) {
+          const tmap = state.tutorsMap || {};
+          const pmap = state.prioMap || {};
+          state.data = (Array.isArray(base) ? base : [])
+            .filter(c =>
+              !term ||
+              String(c.nombre).toLowerCase().includes(term) ||
+              String(tmap[c.tutor] || "").toLowerCase().includes(term)
+            )
+            .map(c => ({
+              id: c.id,
+              nombre: c.nombre,
+              tutor: tmap[c.tutor] || `Tutor #${c.tutor}`,
+              tutor_id: c.tutor,
+              prioridad_id: c.prioridad,
+              prioridad_nombre: pmap[c.prioridad] || `#${c.prioridad}`,
+              precio: c.precio,
+              certificado: !!c.certificado,
+              fecha: c.fecha_inicio,
+              estatus: Number(c.estatus),
+              _all: c,
+            }));
+          drawCursos();
+        } else if (state.route.startsWith("#/noticias")) {
+          state.data = (Array.isArray(base) ? base : [])
+            .filter(n => !term || String(n.titulo).toLowerCase().includes(term))
+            .map(n => {
+              const found = (state.data || []).find(x => x.id === n.id);
+              return {
+                id: n.id,
+                titulo: n.titulo,
+                fecha: n.fecha_creacion,
+                estatus: Number(n.estatus),
+                comentarios: found?.comentarios ?? 0,
+                _all: n,
+              };
+            });
+          drawNoticias();
+        }
       });
+    }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  // ---- init
+  document.addEventListener("DOMContentLoaded", async () => {
     bindUI();
+    // precarga catálogos (para que el drawer no tarde)
+    try { await Promise.all([getTutorsMap(), getPrioridadMap()]); } catch { }
     if (!window.location.hash) window.location.hash = "#/cursos";
     onRouteChange();
   });

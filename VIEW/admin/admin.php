@@ -199,25 +199,29 @@
                         <span id="mod-count" aria-live="polite">—</span>
                         <span class="tt-sep">·</span>
                         <span class="tt-title">Estado:</span>
+                        <!-- se actualiza por JS según el filtro/endpoint -->
                         <span id="tt-status" class="badge-activo">Activo</span>
                     </div>
                 </div>
+
                 <div class="right">
-                    <!-- boton nuevo recurso -->
-                    <button id="btn-add" class="btn-icon" title="Crear nuevo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            viewBox="0 0 24 24">
-                            <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                    <!-- Botón modo desarrollador (SVG toggle) -->
+                    <button id="btn-devmode" class="icon-btn" type="button" aria-label="Modo desarrollador"
+                        aria-pressed="false" title="Modo desarrollador: OFF">
+                        <!-- Icono </> limpio -->
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </button>
-                    <!-- boton para modo desarrollador -->
-                    <button id="btn-devmode" class="btn-icon" title="Modo desarrollador">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            viewBox="0 0 24 24">
-                            <path d="M4 4h16v16H4V4zm2 3v2h1.5L5 13h2l2-4v-.5L7.5 7H6zm5 8v2h7v-2h-7z" />
+
+                    <!-- Botón crear (+) estilo Google -->
+                    <button id="btn-add" class="icon-btn blue" type="button" aria-label="Crear nuevo" title="Crear">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                     </button>
-                    <button id="btn-refresh" class="btn">Refrescar</button>
                 </div>
             </header>
 
@@ -252,7 +256,6 @@
 
         </section>
     </main>
-
 
 
 
