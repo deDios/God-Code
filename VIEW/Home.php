@@ -140,6 +140,7 @@
             <div class="user-profile">
                 <div class="avatar-circle">
                     <img src="../ASSETS/usuario/usuarioImg/img_user1.png" alt="avatar" id="avatar-img" />
+                    <input type="file" id="avatar-input" accept="image/png, image/jpeg" style="display:none" />
                 </div>
                 <div class="user-info">
                     <div id="user-name">Luis Enrique Godcode</div>

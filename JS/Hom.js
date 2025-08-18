@@ -618,4 +618,74 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadRecursos(usuario.id);
   initModalPerfil();
   disableLinks();
+
+  // --- Avatar upload ---
+  const AVATAR_ENDPOINT = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_avatar.php"; 
+  const USUARIO_ID = usuario.id; 
+
+  // Inyectamos input file oculto
+  let avatarInput = document.getElementById("avatar-input");
+  if (!avatarInput) {
+    avatarInput = document.createElement("input");
+    avatarInput.type = "file";
+    avatarInput.id = "avatar-input";
+    avatarInput.style.display = "none";
+    document.body.appendChild(avatarInput);
+  }
+
+  const avatarImg = document.getElementById("avatar-img");
+  if (avatarImg && avatarInput) {
+    avatarImg.style.cursor = "pointer";
+
+    avatarImg.addEventListener("click", () => avatarInput.click());
+
+    avatarInput.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      // Validar formato
+      const validTypes = ["image/jpeg", "image/png"];
+      if (!validTypes.includes(file.type)) {
+        alert("Formato no permitido. Solo JPG o PNG.");
+        avatarInput.value = "";
+        return;
+      }
+
+      // Validar tamaño (máx. 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("La imagen excede 2MB.");
+        avatarInput.value = "";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("usuario_id", USUARIO_ID);
+      formData.append("avatar", file);
+
+      try {
+        const resp = await fetch(AVATAR_ENDPOINT, {
+          method: "POST",
+          body: formData,
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+
+        if (data.url) {
+          avatarImg.src = data.url + "?t=" + Date.now(); 
+        } else {
+          alert("Imagen actualizada, pero no se recibió URL.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al subir la imagen. Intenta de nuevo.");
+      } finally {
+        avatarInput.value = "";
+      }
+    });
+  }
 });
+
