@@ -1,341 +1,427 @@
-//------------------------------------------------------------js global-----------------------------------------------------
+//------------------------------------------------------------ js global -----------------------------------------------------
+(() => {
+  if (window.__gcGlobalInit) return;
+  window.__gcGlobalInit = true;
 
-// Mini helper para vh en móviles (evita saltos raros al abrir teclado)
-(function setVH() {
-  const apply = () =>
-    document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
-  apply();
-  window.addEventListener("resize", apply);
-})();
+  // -------------------- helpers de paths --------------------
+  const PATHS = window.GC_PATHS || {
+    ASSETS: "/ASSETS",
+    VIEWS: "/VIEW",
+    ROUTES: { home: "/VIEW/Home.php", login: "/VIEW/Login.php" },
+    DEFAULT_AVATAR: "/ASSETS/usuario/usuarioImg/img_user1.png",
+  };
 
-document.addEventListener("DOMContentLoaded", () => {
-  const animados = document.querySelectorAll(".animado");
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add("visible");
-          io.unobserve(e.target);
-        }
-      });
-    },
-    { threshold: 0.2 }
+  const abs = (p) => new URL(p, window.location.origin).pathname;
+  const join = (...parts) =>
+    parts
+      .filter(Boolean)
+      .map((s, i) =>
+        i === 0 ? s.replace(/\/+$/g, "") : s.replace(/^\/+|\/+$/g, "")
+      )
+      .join("/")
+      .replace(/\/{2,}/g, "/");
+
+  const asset = (sub) => abs(join(PATHS.ASSETS, sub));
+  const view = (sub) => abs(join(PATHS.VIEWS, sub));
+  const routeHome = PATHS.ROUTES?.home
+    ? abs(PATHS.ROUTES.home)
+    : view("Home.php");
+  const routeLogin = PATHS.ROUTES?.login
+    ? abs(PATHS.ROUTES.login)
+    : view("Login.php");
+  const DEFAULT_AVATAR = abs(
+    PATHS.DEFAULT_AVATAR || "/ASSETS/usuario/usuarioImg/img_user1.png"
   );
-  animados.forEach((el) => io.observe(el));
-});
 
-// ---- menú hamburguesa mobile
-function toggleMenu() {
-  const menu = document.getElementById("mobile-menu");
-  menu?.classList.toggle("show");
-}
+  const applyVH = () =>
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.innerHeight * 0.01}px`
+    );
+  applyVH();
+  window.addEventListener("resize", applyVH);
 
-// ---- header sticky
-document.addEventListener("DOMContentLoaded", () => {
-  const header = document.getElementById("header");
-  if (!header) return;
-  const onScroll = () => {
-    if (window.scrollY > 50) header.classList.add("scrolled");
-    else header.classList.remove("scrolled");
+  // -------------------- animaciones de aparición (.animado) --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const animados = document.querySelectorAll(".animado");
+    if (!animados.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    animados.forEach((el) => io.observe(el));
+  });
+
+  // -------------------- menu hamburguesa --------------------
+  window.toggleMenu = function toggleMenu() {
+    const menu = document.getElementById("mobile-menu");
+    if (menu) menu.classList.toggle("show");
   };
-  onScroll();
-  window.addEventListener("scroll", onScroll);
-});
 
-// --------------------------- toasts globales (gcToast)
-(function () {
-  if (!document.querySelector(".gc-toast-container")) {
-    const cont = document.createElement("div");
-    cont.className = "gc-toast-container";
-    document.body.appendChild(cont);
-  }
-  // uso: gcToast("Listo", "exito" | "error" | "warning", 5000)
-  window.gcToast = function (mensaje, tipo = "exito", duracion = 5000) {
-    const cont = document.querySelector(".gc-toast-container");
-    if (!cont) return;
+  // -------------------- header sticky --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("header");
+    if (!header) return;
+    const onScroll = () =>
+      window.scrollY > 50
+        ? header.classList.add("scrolled")
+        : header.classList.remove("scrolled");
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  });
 
-    const toast = document.createElement("div");
-    toast.className = `gc-toast ${tipo}`;
-    toast.textContent = mensaje;
-
-    cont.appendChild(toast);
-    setTimeout(() => toast.classList.add("mostrar"), 10);
-
-    setTimeout(() => {
-      toast.classList.remove("mostrar");
-      setTimeout(() => cont.removeChild(toast), 400);
-    }, duracion);
-  };
-})();
-
-// --------------------------------- Topbar
-document.addEventListener("DOMContentLoaded", () => {
-  // helpers chiquitos
-  const getUsuarioFromCookie = () => {
-    try {
-      const m = document.cookie.match(/(?:^|;\s*)usuario=([^;]+)/);
-      return m ? JSON.parse(decodeURIComponent(m[1])) : {};
-    } catch {
-      return {};
+  // --------------------------- toasts globales ---------------------------
+  (function ensureToastContainer() {
+    if (!document.querySelector(".gc-toast-container")) {
+      const cont = document.createElement("div");
+      cont.className = "gc-toast-container";
+      document.body.appendChild(cont);
     }
-  };
-  const verificarImagen = (src, cb) => {
-    const img = new Image();
-    img.onload = () => cb(src);
-    img.onerror = () => cb("../ASSETS/usuario/usuarioImg/img_user1.png");
-    img.src = src;
-  };
+    window.gcToast = function (mensaje, tipo = "exito", duracion = 5000) {
+      const cont = document.querySelector(".gc-toast-container");
+      if (!cont) return;
+      const toast = document.createElement("div");
+      toast.className = `gc-toast ${tipo}`;
+      toast.textContent = mensaje;
+      cont.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("mostrar"));
+      setTimeout(() => {
+        toast.classList.remove("mostrar");
+        setTimeout(() => toast.remove(), 400);
+      }, duracion);
+    };
+  })();
 
-  // refs del topbar
-  const actionsDesktop = document.querySelector(".actions");
-  const btnRegistrarse = actionsDesktop?.querySelector(".btn-primary");
-  const userIconDesktop = actionsDesktop?.querySelector(".user-icon");
-  const socialIconsContainer = document.querySelector(".social-icons");
-
-  // user cookie
-  const datos = getUsuarioFromCookie();
-  const email = datos.correo || "Usuario";
-  const id = datos.id || "1";
-  const avatarUrlCookie = datos.avatarUrl || ""; // si subió avatar, el endpoint devolvió url y la guardamos en cookie
-  const rutaLegacy = `../ASSETS/usuario/usuarioImg/img_user${id}.png`;
-  const fallback = "../ASSETS/usuario/usuarioImg/img_user1.png";
-
-  // --- Desktop: muestra avatar real si existe
-  if (actionsDesktop) {
-    btnRegistrarse?.remove();
-    userIconDesktop?.remove();
-
-    const setDesktopUI = (rutaFinal) => {
-      const nuevo = document.createElement("div");
-      nuevo.className = "user-icon";
-      nuevo.innerHTML = `
-        <span class="user-email">${email}</span>
-        <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
-        <div class="dropdown-menu" id="user-dropdown">
-          <ul>
-            <li onclick="window.location.href='../VIEW/Home.php'">
-              <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
-            </li>
-            <li id="logout-btn" onclick="window.location.href='../VIEW/Login.php'">
-              <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
-            </li>
-          </ul>
-        </div>
-      `;
-      actionsDesktop.appendChild(nuevo);
-      actionsDesktop.classList.add("mostrar");
-
-      const dd = nuevo.querySelector("#user-dropdown");
-      nuevo.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dd.classList.toggle("active");
-      });
-      document.addEventListener("click", () => dd.classList.remove("active"));
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") dd.classList.remove("active");
-      });
-
-      const btnLogout = nuevo.querySelector("#logout-btn");
-      btnLogout?.addEventListener("click", () => {
-        document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        sessionStorage.removeItem("bienvenidaMostrada");
-      });
+  // -------------------- Topbar (avatar, dropdown, mobile icon) --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const getUsuarioFromCookie = () => {
+      try {
+        const m = document.cookie.match(/(?:^|;\s*)usuario=([^;]+)/);
+        return m ? JSON.parse(decodeURIComponent(m[1])) : {};
+      } catch {
+        return {};
+      }
     };
 
-    if (!sessionStorage.getItem("bienvenidaMostrada") && (datos.nombre || datos.correo)) {
-      window.gcToast?.(`Bienvenido, ${datos.nombre || "usuario"}`, "exito");
-      sessionStorage.setItem("bienvenidaMostrada", "true");
-    }
+    // verifica la imagen si no hay nada coloca el default
+    const verificarImagen = (src, cb) => {
+      const img = new Image();
+      img.onload = () => cb(src);
+      img.onerror = () => cb(DEFAULT_AVATAR);
+      img.src = src;
+    };
 
-    if (avatarUrlCookie) {
-      // pruebo avatarUrl; si truena, pruebo legacy
-      verificarImagen(avatarUrlCookie + "?t=" + Date.now(), (urlOk1) => {
-        if (urlOk1.includes("img_user1.png")) {
-          verificarImagen(rutaLegacy, (urlOk2) => setDesktopUI(urlOk2));
+    // refs del topbar (version desktop)
+    const actions = document.querySelector(".actions");
+    if (actions) {
+      // limpieza
+      actions.querySelector(".user-icon")?.remove();
+
+      // boton de registrarse
+      const btnPrimary = actions.querySelector(".btn-primary");
+      const usuario = getUsuarioFromCookie();
+      const isLogged = !!(usuario?.correo || usuario?.nombre);
+
+      if (isLogged && btnPrimary) btnPrimary.remove();
+
+      // datos base
+      const email = usuario.correo || "Usuario";
+      const id = usuario.id || "1";
+      const avatarUrlCookie = usuario.avatarUrl || usuario.avatar || ""; // normalizamos
+      const legacyById = asset(`usuario/usuarioImg/img_user${id}.png`);
+
+      const buildDesktop = (rutaFinal) => {
+        const wrap = document.createElement("div");
+        wrap.className = "user-icon";
+        wrap.setAttribute("role", "button");
+        wrap.setAttribute("tabindex", "0");
+        wrap.setAttribute("aria-haspopup", "true");
+        wrap.setAttribute("aria-expanded", "false");
+        wrap.innerHTML = `
+          <span class="user-email">${email}</span>
+          <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
+          <div class="dropdown-menu" id="user-dropdown" role="menu" aria-hidden="true">
+            <ul>
+              <li role="menuitem" tabindex="-1">
+                <img src="${asset(
+                  "usuario/usuarioSubmenu/homebtn.png"
+                )}" alt="" aria-hidden="true" />
+                Ir a Home
+              </li>
+              <li id="logout-btn" role="menuitem" tabindex="-1">
+                <img src="${asset(
+                  "usuario/usuarioSubmenu/logoutbtn.png"
+                )}" alt="" aria-hidden="true" />
+                Logout
+              </li>
+            </ul>
+          </div>
+        `;
+        actions.appendChild(wrap);
+        actions.classList.add("mostrar");
+
+        const dd = wrap.querySelector("#user-dropdown");
+        const open = (flag) => {
+          dd.classList.toggle("active", flag);
+          dd.setAttribute("aria-hidden", String(!flag));
+          wrap.setAttribute("aria-expanded", String(!!flag));
+        };
+
+        const toggle = (e) => {
+          e?.stopPropagation();
+          open(!dd.classList.contains("active"));
+        };
+
+        wrap.addEventListener("click", toggle);
+        wrap.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggle(e);
+          }
+          if (e.key === "Escape") open(false);
+        });
+        document.addEventListener("click", () => open(false));
+
+        // acciones del menu
+        dd.querySelector("li:nth-child(1)")?.addEventListener("click", () => {
+          window.location.href = routeHome;
+        });
+        dd.querySelector("#logout-btn")?.addEventListener("click", () => {
+          document.cookie =
+            "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+          sessionStorage.removeItem("bienvenidaMostrada");
+          window.location.href = routeLogin;
+        });
+      };
+
+      // bienvenida (solamente es un mensaje de toast)
+      if (isLogged && !sessionStorage.getItem("bienvenidaMostrada")) {
+        window.gcToast?.(`Bienvenido, ${usuario.nombre || "usuario"}`, "exito");
+        sessionStorage.setItem("bienvenidaMostrada", "true");
+      }
+
+      if (isLogged) {
+        if (avatarUrlCookie) {
+          verificarImagen(avatarUrlCookie + "?t=" + Date.now(), (url1) => {
+            if (url1 === DEFAULT_AVATAR)
+              verificarImagen(legacyById, buildDesktop);
+            else buildDesktop(url1);
+          });
         } else {
-          setDesktopUI(urlOk1);
+          verificarImagen(legacyById, buildDesktop);
         }
-      });
-    } else {
-      verificarImagen(rutaLegacy, (urlOk) => setDesktopUI(urlOk));
+      } else {
+        // no logueado = redirige al login.php
+        const loginIcon = document.createElement("div");
+        loginIcon.className = "user-icon";
+        loginIcon.innerHTML = `
+          <img src="${DEFAULT_AVATAR}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+        `;
+        loginIcon.addEventListener(
+          "click",
+          () => (window.location.href = routeLogin)
+        );
+        actions.appendChild(loginIcon);
+        actions.classList.add("mostrar");
+      }
     }
-  }
 
-  // --- Header mobile (este se manteine igual, osea con la img por default)
-  if (socialIconsContainer) {
-    socialIconsContainer.querySelector(".user-icon-mobile")?.remove();
+    // header mobile el cual tiene la imagen de default
+    const socialIconsContainer = document.querySelector(".social-icons");
+    if (socialIconsContainer) {
+      socialIconsContainer.querySelector(".user-icon-mobile")?.remove();
 
-    const nuevoMob = document.createElement("div");
-    nuevoMob.className = "user-icon-mobile";
-    nuevoMob.innerHTML = `<img src="${fallback}" alt="Perfil" title="Perfil" />`;
-    socialIconsContainer.appendChild(nuevoMob);
+      const mob = document.createElement("div");
+      mob.className = "user-icon-mobile";
+      mob.innerHTML = `<img src="${DEFAULT_AVATAR}" alt="Perfil" title="Perfil" />`;
+      socialIconsContainer.appendChild(mob);
 
-    const dropdownMobile = document.createElement("div");
-    dropdownMobile.className = "dropdown-menu mobile";
-    dropdownMobile.id = "user-dropdown-mobile";
-    dropdownMobile.innerHTML = `
-      <ul>
-        <li onclick="window.location.href='../VIEW/Home.php'">
-          <img src="../ASSETS/usuario/usuarioSubmenu/homebtn.png" alt="home" /> Ir a Home
-        </li>
-        <li id="logout-btn-mobile">
-          <img src="../ASSETS/usuario/usuarioSubmenu/logoutbtn.png" alt="logout" /> Logout
-        </li>
-      </ul>
-    `;
-    document.body.appendChild(dropdownMobile);
+      // pequeño dropdown (home/logout) en mobile
+      const dropdownMobileId = "user-dropdown-mobile";
+      document.getElementById(dropdownMobileId)?.remove();
 
-    nuevoMob.querySelector("img").addEventListener("click", (e) => {
-      e.stopPropagation();
-      const rect = nuevoMob.getBoundingClientRect();
-      dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
-      dropdownMobile.style.left = `${rect.right - 180}px`;
-      dropdownMobile.classList.toggle("active");
-    });
-
-    document.addEventListener("click", () => dropdownMobile.classList.remove("active"));
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") dropdownMobile.classList.remove("active");
-    });
-
-    dropdownMobile.querySelector("#logout-btn-mobile")?.addEventListener("click", () => {
-      document.cookie = "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      sessionStorage.removeItem("bienvenidaMostrada");
-      window.location.href = "../VIEW/Login.php";
-    });
-  }
-
-  // Usuario NO logueado (desktop)
-  if (!datos || (!datos.correo && !datos.nombre)) {
-    if (actionsDesktop) {
-      actionsDesktop.querySelector(".user-icon")?.remove();
-      const iconoLogin = document.createElement("div");
-      iconoLogin.className = "user-icon";
-      iconoLogin.innerHTML = `
-        <img src="${fallback}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+      const dropdownMobile = document.createElement("div");
+      dropdownMobile.className = "dropdown-menu mobile";
+      dropdownMobile.id = dropdownMobileId;
+      dropdownMobile.innerHTML = `
+        <ul>
+          <li>
+            <img src="${asset(
+              "usuario/usuarioSubmenu/homebtn.png"
+            )}" alt="" aria-hidden="true" />
+            Ir a Home
+          </li>
+          <li id="logout-btn-mobile">
+            <img src="${asset(
+              "usuario/usuarioSubmenu/logoutbtn.png"
+            )}" alt="" aria-hidden="true" />
+            Logout
+          </li>
+        </ul>
       `;
-      iconoLogin.addEventListener("click", () => (window.location.href = "../VIEW/Login.php"));
-      actionsDesktop.appendChild(iconoLogin);
-      actionsDesktop.classList.add("mostrar");
+      document.body.appendChild(dropdownMobile);
+
+      mob.querySelector("img")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const rect = mob.getBoundingClientRect();
+        dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
+        dropdownMobile.style.left = `${Math.max(8, rect.right - 180)}px`;
+        dropdownMobile.classList.toggle("active");
+      });
+
+      document.addEventListener("click", () =>
+        dropdownMobile.classList.remove("active")
+      );
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") dropdownMobile.classList.remove("active");
+      });
+
+      dropdownMobile
+        .querySelector("#logout-btn-mobile")
+        ?.addEventListener("click", () => {
+          document.cookie =
+            "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+          sessionStorage.removeItem("bienvenidaMostrada");
+          window.location.href = routeLogin;
+        });
     }
-  }
+  });
 
-  console.log("Topbar listo: desktop usa avatar real si existe; header mobile siempre default.");
-});
+  // -------------------- subnav --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const operativeViews = ["home.php", "admin.php"].map((s) =>
+      s.toLowerCase()
+    );
+    const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+    const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
+    subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
 
-// --------------------------------- Subnav dinámico + megamenu + social + logo
-document.addEventListener("DOMContentLoaded", () => {
-  
-  const operativeViews = ["home.php", "admin.php"];
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
-  const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-  
-  subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
-
-  const socialMarkup = `
-    <div class="social-icons">
-      <div class="circle-icon"><img src="../ASSETS/index/Facebook.png" alt="Facebook" /></div>
-      <div class="circle-icon"><img src="../ASSETS/index/Instagram.png" alt="Instagram" /></div>
-      <div class="circle-icon"><img src="../ASSETS/index/Tiktok.png" alt="TikTok" /></div>
-    </div>
-  `;
-
-  if (operativeViews.includes(currentPage)) {
-    const mk = (label) => {
-      const slug = label.toLowerCase() + ".php";
-      const active = slug === currentPage ? "active" : "";
-      return `<a href="${slug}" class="${active}">${label}</a>`;
-    };
-    const markup = `
-      ${mk("Home")}
-      ${mk("Proyectos")}
-      ${mk("Cursos")}
-      ${mk("Admin")}
-      ${socialMarkup}
+    const socialMarkup = `
+      <div class="social-icons">
+        <div class="circle-icon"><img src="${asset(
+          "index/Facebook.png"
+        )}" alt="Facebook" /></div>
+        <div class="circle-icon"><img src="${asset(
+          "index/Instagram.png"
+        )}" alt="Instagram" /></div>
+        <div class="circle-icon"><img src="${asset(
+          "index/Tiktok.png"
+        )}" alt="TikTok" /></div>
+      </div>
     `;
-    subnavs.forEach((nav) => (nav.innerHTML = markup));
-  } else {
-    subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
-  }
 
-  // megamenu Productos
-  const submenu = document.getElementById("submenu-productos");
-  if (submenu) {
-    const mega = submenu.querySelector(".megamenu");
-    if (mega) {
-      mega.classList.remove("show");
-      const link = [...submenu.children].find((c) => c.tagName === "A");
-      if (link) {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          mega.classList.toggle("show");
+    if (operativeViews.includes(currentPage)) {
+      const mk = (label) => {
+        const slug = `/${label.toLowerCase()}.php`;
+        const active =
+          slug === window.location.pathname.toLowerCase() ? "active" : "";
+        return `<a href="${abs(slug)}" class="${active}">${label}</a>`;
+      };
+      const markup = `${mk("Home")}${mk("Proyectos")}${mk("Cursos")}${mk(
+        "Admin"
+      )}${socialMarkup}`;
+      subnavs.forEach((nav) => (nav.innerHTML = markup));
+    } else {
+      subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
+    }
+
+    // megamenu Productos
+    const submenu = document.getElementById("submenu-productos");
+    if (submenu) {
+      const mega = submenu.querySelector(".megamenu");
+      if (mega) {
+        mega.classList.remove("show");
+        const link = [...submenu.children].find((c) => c.tagName === "A");
+        if (link) {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            mega.classList.toggle("show");
+          });
+        }
+        document.addEventListener("click", (e) => {
+          if (!submenu.contains(e.target)) mega.classList.remove("show");
         });
       }
-      document.addEventListener("click", (e) => {
-        if (!submenu.contains(e.target)) mega.classList.remove("show");
-      });
     }
-  }
 
-  // logo a index
-  const logoBtn = document.getElementById("logo-btn");
-  if (logoBtn) {
-    logoBtn.style.cursor = "pointer";
-    logoBtn.addEventListener("click", () => (window.location.href = "/index.php"));
-  }
+    // logo redirige a index
+    const logoBtn = document.getElementById("logo-btn");
+    if (logoBtn) {
+      logoBtn.style.cursor = "pointer";
+      logoBtn.addEventListener(
+        "click",
+        () => (window.location.href = "/index.php")
+      );
+    }
 
-  // enlaces a redes
-  const socialMap = {
-    tiktok: "https://www.tiktok.com/@godcodemx",
-    instagram: "https://www.instagram.com/god_code_mx/",
-    facebook: "https://www.facebook.com/profile.php?id=61578204608103",
-  };
-  const socialIcons = document.querySelectorAll("#header .icon-mobile, #header .circle-icon");
-  socialIcons.forEach((el) => {
-    const img = el.querySelector("img") || el;
-    if (!img) return;
-    const key = (img.alt || "").trim().toLowerCase();
-    const url = socialMap[key];
-    if (!url) return;
-    el.style.cursor = "pointer";
-    el.addEventListener("click", (e) => {
-      e.stopPropagation();
-      window.open(url, "_blank", "noopener");
+    // redes sociales
+    const socialMap = {
+      tiktok: "https://www.tiktok.com/@godcodemx",
+      instagram: "https://www.instagram.com/god_code_mx/",
+      facebook: "https://www.facebook.com/profile.php?id=61578204608103",
+    };
+    const socialIcons = document.querySelectorAll(
+      "#header .icon-mobile, #header .circle-icon"
+    );
+    socialIcons.forEach((el) => {
+      const img = el.querySelector("img") || el;
+      const key = (img.alt || "").trim().toLowerCase();
+      const url = socialMap[key];
+      if (!url) return;
+      el.style.cursor = "pointer";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.open(url, "_blank", "noopener");
+      });
     });
   });
-});
 
-// --------------------------------- Cotizar deshabilitado 
-document.addEventListener("DOMContentLoaded", () => {
-  const cotizarBtn = document.querySelector(".actions .btn-outline");
-  if (cotizarBtn) {
+  // -------------------- cotizar deshabilitado --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const cotizarBtn = document.querySelector(".actions .btn-outline");
+    if (!cotizarBtn) return;
     cotizarBtn.removeAttribute("onclick");
     cotizarBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      gcToast("Función deshabilitada", "warning", 4000);
-    });
-  }
-});
-
-// --------------------------------- Botones del subnav deshabilitados en vistas demo
-document.addEventListener("DOMContentLoaded", () => {
-  const operativeViews = ["home.php", "vistaoperativa2.php", "vistaoperativa3.php"];
-  const currentPage = window.location.pathname.split("/").pop().toLowerCase();
-  if (!operativeViews.includes(currentPage)) return;
-
-  const deshabilitados = ["Proyectos", "Cursos", "Admin"];
-  deshabilitados.forEach((nombre) => {
-    const btn = Array.from(document.querySelectorAll("#header .subnav a")).find(
-      (a) => a.textContent.trim().toLowerCase() === nombre.toLowerCase()
-    );
-    if (!btn) return;
-    btn.href = "#";
-    btn.dataset.disabled = "true";
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.gcToast ? gcToast("Función deshabilitada", "warning") : alert("Función deshabilitada");
+      window.gcToast
+        ? gcToast("Función deshabilitada", "warning", 4000)
+        : alert("Función deshabilitada");
     });
   });
-});
 
+  // -------------------- Subnav (deshabilita los links de los botones) --------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const operativeViews = [
+      "home.php",
+      "vistaoperativa2.php",
+      "vistaoperativa3.php",
+    ].map((s) => s.toLowerCase());
+    const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+    if (!operativeViews.includes(currentPage)) return;
 
+    const deshabilitados = ["Proyectos", "Cursos", "Admin"];
+    deshabilitados.forEach((nombre) => {
+      const btn = Array.from(
+        document.querySelectorAll("#header .subnav a")
+      ).find(
+        (a) => a.textContent.trim().toLowerCase() === nombre.toLowerCase()
+      );
+      if (!btn) return;
+      btn.href = "#";
+      btn.dataset.disabled = "true";
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.gcToast
+          ? gcToast("Función deshabilitada", "warning")
+          : alert("Función deshabilitada");
+      });
+    });
+  });
+})();
