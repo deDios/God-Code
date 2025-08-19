@@ -33,6 +33,86 @@
     PATHS.DEFAULT_AVATAR || "/ASSETS/usuario/usuarioImg/img_user1.png"
   );
 
+  // -------------------- funcion para obtener el usuario desde la cookie --------------------
+  function getUsuarioFromCookie() {
+    try {
+      const m = document.cookie.match(/(?:^|;\s*)usuario=([^;]+)/);
+      return m ? JSON.parse(decodeURIComponent(m[1])) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function setUsuarioCookie(patch) {
+    const prev = getUsuarioFromCookie() || {};
+    const next = { ...prev, ...patch };
+    document.cookie =
+      "usuario=" +
+      encodeURIComponent(JSON.stringify(next)) +
+      "; path=/; max-age=86400; samesite=lax";
+    return next;
+  }
+
+  function withBust(url) {
+    try {
+      const u = new URL(url, window.location.origin);
+      u.searchParams.set("v", Date.now().toString());
+      return u.pathname + "?" + u.searchParams.toString();
+    } catch {
+      return url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
+    }
+  }
+
+  function setAvatarSrc(imgEl, usuario) {
+    const ASSETS_BASE = "/ASSETS/usuario/usuarioImg";
+    const DEFAULT_URL = `${ASSETS_BASE}/img_user1.png`;
+
+    const cookieUrl = usuario?.avatarUrl || usuario?.avatar || null; // normalizamos
+    const id = usuario?.id != null ? String(usuario.id).trim() : null;
+
+    const convenciones = id
+      ? [
+          `${ASSETS_BASE}/user_${id}.jpg`,
+          `${ASSETS_BASE}/user_${id}.png`,
+          `${ASSETS_BASE}/img_user${id}.jpg`,
+          `${ASSETS_BASE}/img_user${id}.png`,
+        ]
+      : [];
+
+    const candidates = [
+      ...(cookieUrl ? [cookieUrl] : []),
+      ...convenciones,
+      DEFAULT_URL,
+    ].map((u) => (u.startsWith("/") ? withBust(u) : u));
+
+    let i = 0;
+    const tryNext = () => {
+      if (i >= candidates.length) {
+        console.warn(
+          "Avatar: no se pudo cargar ninguna candidata.",
+          candidates
+        );
+        return;
+      }
+      const url = candidates[i++];
+      imgEl.onerror = () => {
+        imgEl.onerror = null;
+        setTimeout(() => {
+          imgEl.onerror = tryNext;
+          tryNext();
+        }, 0);
+      };
+      imgEl.onload = () => {
+        imgEl.dataset.srcResolved = url;
+      };
+      imgEl.src = url;
+    };
+
+    imgEl.alt = usuario?.nombre || "Avatar";
+    imgEl.loading = "lazy";
+    tryNext();
+  }
+
   const applyVH = () =>
     document.documentElement.style.setProperty(
       "--vh",
@@ -41,7 +121,7 @@
   applyVH();
   window.addEventListener("resize", applyVH);
 
-  // -------------------- animaciones de aparición (.animado) --------------------
+  // -------------------- animacion (.animado) (de momento solo hay un tipo de animacion)--------------------
   document.addEventListener("DOMContentLoaded", () => {
     const animados = document.querySelectorAll(".animado");
     if (!animados.length) return;
@@ -99,45 +179,25 @@
     };
   })();
 
-  // -------------------- Topbar (avatar, dropdown, mobile icon) --------------------
+  // -------------------- Topbar (avatar, dropdown y mobile icon) --------------------
   document.addEventListener("DOMContentLoaded", () => {
-    const getUsuarioFromCookie = () => {
-      try {
-        const m = document.cookie.match(/(?:^|;\s*)usuario=([^;]+)/);
-        return m ? JSON.parse(decodeURIComponent(m[1])) : {};
-      } catch {
-        return {};
-      }
-    };
-
-    // verifica la imagen si no hay nada coloca el default
-    const verificarImagen = (src, cb) => {
-      const img = new Image();
-      img.onload = () => cb(src);
-      img.onerror = () => cb(DEFAULT_AVATAR);
-      img.src = src;
-    };
+    const usuario = getUsuarioFromCookie();
+    const isLogged = !!(usuario?.correo || usuario?.nombre);
 
     // refs del topbar (version desktop)
     const actions = document.querySelector(".actions");
     if (actions) {
-      // limpieza
+      // limpieza para evitar duplicados
       actions.querySelector(".user-icon")?.remove();
 
-      // boton de registrarse
+      // boton de registrarse (si hay sesion, se elimina)
       const btnPrimary = actions.querySelector(".btn-primary");
-      const usuario = getUsuarioFromCookie();
-      const isLogged = !!(usuario?.correo || usuario?.nombre);
-
       if (isLogged && btnPrimary) btnPrimary.remove();
 
-      // datos base
-      const email = usuario.correo || "Usuario";
-      const id = usuario.id || "1";
-      const avatarUrlCookie = usuario.avatarUrl || usuario.avatar || ""; // normalizamos
-      const legacyById = asset(`usuario/usuarioImg/img_user${id}.png`);
+      const email = usuario?.correo || "Usuario";
 
-      const buildDesktop = (rutaFinal) => {
+      // Construcción del bloque desktop
+      if (isLogged) {
         const wrap = document.createElement("div");
         wrap.className = "user-icon";
         wrap.setAttribute("role", "button");
@@ -146,7 +206,7 @@
         wrap.setAttribute("aria-expanded", "false");
         wrap.innerHTML = `
           <span class="user-email">${email}</span>
-          <img src="${rutaFinal}" alt="Perfil" title="Perfil" class="img-perfil" />
+          <img alt="Perfil" title="Perfil" class="img-perfil" />
           <div class="dropdown-menu" id="user-dropdown" role="menu" aria-hidden="true">
             <ul>
               <li role="menuitem" tabindex="-1">
@@ -167,13 +227,16 @@
         actions.appendChild(wrap);
         actions.classList.add("mostrar");
 
+        const img = wrap.querySelector("img.img-perfil");
+        if (img) setAvatarSrc(img, usuario);
+
+        // dropdown
         const dd = wrap.querySelector("#user-dropdown");
         const open = (flag) => {
           dd.classList.toggle("active", flag);
           dd.setAttribute("aria-hidden", String(!flag));
           wrap.setAttribute("aria-expanded", String(!!flag));
         };
-
         const toggle = (e) => {
           e?.stopPropagation();
           open(!dd.classList.contains("active"));
@@ -199,30 +262,23 @@
           sessionStorage.removeItem("bienvenidaMostrada");
           window.location.href = routeLogin;
         });
-      };
 
-      // bienvenida (solamente es un mensaje de toast)
-      if (isLogged && !sessionStorage.getItem("bienvenidaMostrada")) {
-        window.gcToast?.(`Bienvenido, ${usuario.nombre || "usuario"}`, "exito");
-        sessionStorage.setItem("bienvenidaMostrada", "true");
-      }
-
-      if (isLogged) {
-        if (avatarUrlCookie) {
-          verificarImagen(avatarUrlCookie + "?t=" + Date.now(), (url1) => {
-            if (url1 === DEFAULT_AVATAR)
-              verificarImagen(legacyById, buildDesktop);
-            else buildDesktop(url1);
-          });
-        } else {
-          verificarImagen(legacyById, buildDesktop);
+        // bienvenida (una vez por sesion)
+        if (!sessionStorage.getItem("bienvenidaMostrada")) {
+          window.gcToast?.(
+            `Bienvenido, ${usuario.nombre || "usuario"}`,
+            "exito"
+          );
+          sessionStorage.setItem("bienvenidaMostrada", "true");
         }
       } else {
-        // no logueado = redirige al login.php
+        // no logueado = un solo icono que redirige a login
         const loginIcon = document.createElement("div");
         loginIcon.className = "user-icon";
         loginIcon.innerHTML = `
-          <img src="${DEFAULT_AVATAR}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+          <img src="${withBust(
+            DEFAULT_AVATAR
+          )}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
         `;
         loginIcon.addEventListener(
           "click",
@@ -233,64 +289,76 @@
       }
     }
 
-    // header mobile el cual tiene la imagen de default
+    // header mobile
     const socialIconsContainer = document.querySelector(".social-icons");
     if (socialIconsContainer) {
       socialIconsContainer.querySelector(".user-icon-mobile")?.remove();
 
       const mob = document.createElement("div");
       mob.className = "user-icon-mobile";
-      mob.innerHTML = `<img src="${DEFAULT_AVATAR}" alt="Perfil" title="Perfil" />`;
+      mob.innerHTML = `<img alt="Perfil" title="Perfil" />`;
       socialIconsContainer.appendChild(mob);
 
-      // pequeño dropdown (home/logout) en mobile
-      const dropdownMobileId = "user-dropdown-mobile";
-      document.getElementById(dropdownMobileId)?.remove();
+      const mobImg = mob.querySelector("img");
+      if (isLogged) {
+        // pinta avatar en mobile
+        if (mobImg) setAvatarSrc(mobImg, usuario);
 
-      const dropdownMobile = document.createElement("div");
-      dropdownMobile.className = "dropdown-menu mobile";
-      dropdownMobile.id = dropdownMobileId;
-      dropdownMobile.innerHTML = `
-        <ul>
-          <li>
-            <img src="${asset(
-              "usuario/usuarioSubmenu/homebtn.png"
-            )}" alt="" aria-hidden="true" />
-            Ir a Home
-          </li>
-          <li id="logout-btn-mobile">
-            <img src="${asset(
-              "usuario/usuarioSubmenu/logoutbtn.png"
-            )}" alt="" aria-hidden="true" />
-            Logout
-          </li>
-        </ul>
-      `;
-      document.body.appendChild(dropdownMobile);
+        const dropdownMobileId = "user-dropdown-mobile";
+        document.getElementById(dropdownMobileId)?.remove();
 
-      mob.querySelector("img")?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const rect = mob.getBoundingClientRect();
-        dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
-        dropdownMobile.style.left = `${Math.max(8, rect.right - 180)}px`;
-        dropdownMobile.classList.toggle("active");
-      });
+        const dropdownMobile = document.createElement("div");
+        dropdownMobile.className = "dropdown-menu mobile";
+        dropdownMobile.id = dropdownMobileId;
+        dropdownMobile.innerHTML = `
+          <ul>
+            <li>
+              <img src="${asset(
+                "usuario/usuarioSubmenu/homebtn.png"
+              )}" alt="" aria-hidden="true" />
+              Ir a Home
+            </li>
+            <li id="logout-btn-mobile">
+              <img src="${asset(
+                "usuario/usuarioSubmenu/logoutbtn.png"
+              )}" alt="" aria-hidden="true" />
+              Logout
+            </li>
+          </ul>
+        `;
+        document.body.appendChild(dropdownMobile);
 
-      document.addEventListener("click", () =>
-        dropdownMobile.classList.remove("active")
-      );
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") dropdownMobile.classList.remove("active");
-      });
-
-      dropdownMobile
-        .querySelector("#logout-btn-mobile")
-        ?.addEventListener("click", () => {
-          document.cookie =
-            "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-          sessionStorage.removeItem("bienvenidaMostrada");
-          window.location.href = routeLogin;
+        mobImg?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const rect = mob.getBoundingClientRect();
+          dropdownMobile.style.top = `${rect.bottom + window.scrollY}px`;
+          dropdownMobile.style.left = `${Math.max(8, rect.right - 180)}px`;
+          dropdownMobile.classList.toggle("active");
         });
+
+        document.addEventListener("click", () =>
+          dropdownMobile.classList.remove("active")
+        );
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") dropdownMobile.classList.remove("active");
+        });
+
+        dropdownMobile
+          .querySelector("#logout-btn-mobile")
+          ?.addEventListener("click", () => {
+            document.cookie =
+              "usuario=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            sessionStorage.removeItem("bienvenidaMostrada");
+            window.location.href = routeLogin;
+          });
+      } else {
+        // no logeado = mostrar default y enviar a login
+        if (mobImg) mobImg.src = withBust(DEFAULT_AVATAR);
+        mob.addEventListener(
+          "click",
+          () => (window.location.href = routeLogin)
+        );
+      }
     }
   });
 
