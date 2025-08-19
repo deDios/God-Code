@@ -58,21 +58,47 @@ async function fetchUsuario(correo, telefono, estatus) {
   return res.json();
 }
 
+function setAvatarSrc(imgEl, usuario) {
+  const DEFAULT_SRC = "../ASSETS/usuario/usuarioImg/img_user1.png";
+  const rootBase = "/ASSETS/usuario/usuarioImg";
+  const bust = () => "?t=" + Date.now();
+
+  const cookieUrl = usuario.avatarUrl ? usuario.avatarUrl : null;
+
+  // Primero intentamos user_{id}.*, luego img_user{id}.*
+  const jpgUser = `${rootBase}/user_${usuario.id}.jpg`;
+  const pngUser = `${rootBase}/user_${usuario.id}.png`;
+  const jpgImg  = `${rootBase}/img_user${usuario.id}.jpg`;
+  const pngImg  = `${rootBase}/img_user${usuario.id}.png`;
+
+  const candidates = [];
+  if (cookieUrl) candidates.push(cookieUrl);
+  candidates.push(jpgUser, pngUser, jpgImg, pngImg, DEFAULT_SRC);
+
+  let idx = 0;
+  const tryNext = () => {
+    if (idx >= candidates.length) return;
+    const url = candidates[idx++];
+    // Añadimos cache-bust si es una ruta absoluta de /ASSETS/
+    imgEl.src = url.startsWith("/ASSETS/") ? url + bust() : url;
+  };
+
+  imgEl.onerror = () => tryNext();
+  tryNext();
+}
+
 //  Render Perfil Sidebar
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
 
-  // avatar
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
   const img = document.createElement("img");
   img.id = "avatar-img";
-  img.src = usuario.avatarUrl || "../ASSETS/usuario/usuarioImg/img_user1.png";
   img.alt = usuario.nombre;
   avatarCircle.appendChild(img);
 
-  // nombre + link editar
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
   const nameDiv = document.createElement("div");
@@ -85,7 +111,10 @@ function renderPerfil(usuario) {
 
   userInfo.append(nameDiv, editLink);
   profile.append(avatarCircle, userInfo);
+
+  setAvatarSrc(img, usuario);
 }
+
 
 //  Render Recursos (Desktop)
 function renderRecursosRows(lista) {
@@ -540,10 +569,19 @@ function initAvatarUpload(usuarioId) {
       }
 
       if (data.url) {
-        avatarImg.src = data.url + "?t=" + Date.now(); // cache bust
+        avatarImg.src = data.url + "?t=" + Date.now();
+
+        const usuarioCookie = getUsuarioFromCookie() || {};
+        usuarioCookie.avatarUrl = data.url;
+        document.cookie =
+          "usuario=" +
+          encodeURIComponent(JSON.stringify(usuarioCookie)) +
+          "; path=/; max-age=" +
+          86400;
       } else {
         alert("Imagen actualizada, pero no se recibió URL.");
       }
+
     } catch (err) {
       console.error(err);
       alert("Error al subir la imagen. Intenta de nuevo.");
