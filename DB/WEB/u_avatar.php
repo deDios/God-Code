@@ -62,12 +62,12 @@ if (!is_writable($baseDir)) {
 $ext = $allowed[$mime];
 
 // ✅ Versión anterior: user_{ID}.{ext}
-$filename = "user_" . $usuario_id . "." . $ext;
+$filename = "img_user" . $usuario_id . "." . $ext;
 $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
 // Limpiar archivos previos (misma convención pero distinta extensión)
 foreach (["jpg", "png"] as $oldExt) {
-    $old = $baseDir . DIRECTORY_SEPARATOR . "user_" . $usuario_id . "." . $oldExt;
+    $old = $baseDir . DIRECTORY_SEPARATOR . "img_user" . $usuario_id . "." . $oldExt;
     if (file_exists($old) && $old !== $destPath) {
         @unlink($old);
     }
