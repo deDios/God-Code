@@ -5,9 +5,11 @@ const ENDPOINT_USUARIO_FETCH =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
 const ENDPOINT_USUARIO_UPDATE =
   "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
+const ENDPOINT_AVATAR =
+  "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_avatar.php";
 
 const itemsPerPage = 6; // cuántos recursos por pagina
-let recursosData = []; 
+let recursosData = [];
 let currentPage = 1; // página actual de la seccion de mis recursos
 const HEADER_SELECTOR = ".recursos-box .table-header > div";
 
@@ -57,7 +59,6 @@ async function fetchUsuario(correo, telefono, estatus) {
 }
 
 //  Render Perfil Sidebar
-
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
@@ -87,7 +88,6 @@ function renderPerfil(usuario) {
 }
 
 //  Render Recursos (Desktop)
-
 function renderRecursosRows(lista) {
   const container = document.getElementById("recursos-list");
   container.innerHTML = "";
@@ -128,7 +128,6 @@ function renderRecursosRows(lista) {
 }
 
 //  Render Recursos (acordion mobile)
-
 function renderRecursosRowsMobile(lista) {
   const container = document.getElementById("recursos-list-mobile");
   container.innerHTML = "";
@@ -177,7 +176,6 @@ function renderRecursosRowsMobile(lista) {
 }
 
 //  Paginación Desktop
-
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";
@@ -203,7 +201,7 @@ function renderPagination(totalPages) {
     ctrl.appendChild(btn);
   }
 
-  // Siguiente 
+  // Siguiente
   const next = document.createElement("button");
   next.className = "arrow-btn";
   next.disabled = currentPage === totalPages;
@@ -216,7 +214,6 @@ function renderPagination(totalPages) {
 }
 
 //  Paginación Mobile
-
 function renderPaginationMobile(totalPages) {
   const ctrl = document.getElementById("pagination-mobile");
   ctrl.innerHTML = "";
@@ -255,7 +252,6 @@ function renderPaginationMobile(totalPages) {
 }
 
 //  Render unificado
-
 function renderPage(page) {
   currentPage = page;
   const start = (page - 1) * itemsPerPage;
@@ -271,7 +267,6 @@ function renderPage(page) {
 }
 
 //  Sorting Desktop
-
 function montarSortingRecursos() {
   const headers = document.querySelectorAll(HEADER_SELECTOR);
   headers.forEach((header) => {
@@ -329,7 +324,6 @@ function actualizarFlechasSorting() {
 }
 
 //  Mis Cursos (Sidebar)
-
 function renderMisCursos(inscripciones) {
   const conts = {
     inscritos: document.getElementById("cursos-subscritos"),
@@ -379,7 +373,6 @@ function renderMisCursos(inscripciones) {
 }
 
 //  Estados VACÍOS o ERROR
-
 function showEmptyRecursos() {
   document.getElementById("recursos-list").innerHTML = `
     <div class="empty-state">
@@ -401,7 +394,6 @@ function showErrorRecursos(message, retryFn) {
 }
 
 //  Modal Perfil
-
 let perfilModalIniciado = false;
 function initModalPerfil() {
   if (perfilModalIniciado) return;
@@ -483,6 +475,7 @@ function initModalPerfil() {
         "; path=/; max-age=" +
         86400;
       renderPerfil(usuarioCookie);
+      initAvatarUpload(usuarioCookie.id); // re-enganchar avatar tras re-render
     } catch {
       gcToast("Error al actualizar perfil.", "error");
     } finally {
@@ -491,8 +484,76 @@ function initModalPerfil() {
   });
 }
 
-//  deshabilitamos links y skeletons
+// --- Avatar upload (inicialización y handlers) ---
+function initAvatarUpload(usuarioId) {
+  // asegurar input (con accept)
+  let avatarInput = document.getElementById("avatar-input");
+  if (!avatarInput) {
+    avatarInput = document.createElement("input");
+    avatarInput.type = "file";
+    avatarInput.id = "avatar-input";
+    avatarInput.accept = "image/png, image/jpeg";
+    avatarInput.style.display = "none";
+    document.body.appendChild(avatarInput);
+  }
 
+  const avatarImg = document.getElementById("avatar-img");
+  if (!avatarImg) return;
+
+  // set cursor y handlers (reemplazo directo para evitar duplicados)
+  avatarImg.style.cursor = "pointer";
+  avatarImg.onclick = () => avatarInput.click();
+
+  avatarInput.onchange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    // Validar formato
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      alert("Formato no permitido. Solo JPG o PNG.");
+      avatarInput.value = "";
+      return;
+    }
+
+    // Validar tamaño (máx. 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La imagen excede 2MB.");
+      avatarInput.value = "";
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("usuario_id", usuarioId);
+    formData.append("avatar", file);
+
+    try {
+      const resp = await fetch(ENDPOINT_AVATAR, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await resp.json();
+
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      if (data.url) {
+        avatarImg.src = data.url + "?t=" + Date.now(); // cache bust
+      } else {
+        alert("Imagen actualizada, pero no se recibió URL.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al subir la imagen. Intenta de nuevo.");
+    } finally {
+      avatarInput.value = "";
+    }
+  };
+}
+
+//  deshabilitamos links y skeletons
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
@@ -519,7 +580,6 @@ function showSkeletons() {
 }
 
 //  Toggle “Mis cursos” Sidebar el de desktop
-
 function initMisCursosToggle() {
   document.querySelectorAll(".mis-cursos .cursos-list").forEach((listEl) => {
     const subtitle = listEl.querySelector(".cursos-subtitulo");
@@ -583,8 +643,6 @@ function initMisCursosToggle() {
   });
 }
 
-
-
 async function loadRecursos(usuarioId) {
   try {
     const data = await fetchInscripciones(usuarioId);
@@ -595,7 +653,7 @@ async function loadRecursos(usuarioId) {
     }
     recursosData = data.slice();
     renderPage(1);
-    renderMisCursos(recursosData); 
+    renderMisCursos(recursosData);
     montarSortingRecursos();
     initMisCursosToggle();
   } catch (err) {
@@ -606,7 +664,6 @@ async function loadRecursos(usuarioId) {
   }
 }
 
-
 document.addEventListener("DOMContentLoaded", async () => {
   const usuario = getUsuarioFromCookie();
   if (!usuario) {
@@ -614,78 +671,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   renderPerfil(usuario);
+  initAvatarUpload(usuario.id); // engancha avatar al render inicial
   showSkeletons();
   await loadRecursos(usuario.id);
   initModalPerfil();
   disableLinks();
-
-  // --- Avatar upload ---
-  const AVATAR_ENDPOINT = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_avatar.php"; 
-  const USUARIO_ID = usuario.id; 
-
-  // Inyectamos input file oculto
-  let avatarInput = document.getElementById("avatar-input");
-  if (!avatarInput) {
-    avatarInput = document.createElement("input");
-    avatarInput.type = "file";
-    avatarInput.id = "avatar-input";
-    avatarInput.style.display = "none";
-    document.body.appendChild(avatarInput);
-  }
-
-  const avatarImg = document.getElementById("avatar-img");
-  if (avatarImg && avatarInput) {
-    avatarImg.style.cursor = "pointer";
-
-    avatarImg.addEventListener("click", () => avatarInput.click());
-
-    avatarInput.addEventListener("change", async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-
-      // Validar formato
-      const validTypes = ["image/jpeg", "image/png"];
-      if (!validTypes.includes(file.type)) {
-        alert("Formato no permitido. Solo JPG o PNG.");
-        avatarInput.value = "";
-        return;
-      }
-
-      // Validar tamaño (máx. 2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        alert("La imagen excede 2MB.");
-        avatarInput.value = "";
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("usuario_id", USUARIO_ID);
-      formData.append("avatar", file);
-
-      try {
-        const resp = await fetch(AVATAR_ENDPOINT, {
-          method: "POST",
-          body: formData,
-        });
-        const data = await resp.json();
-
-        if (data.error) {
-          alert(data.error);
-          return;
-        }
-
-        if (data.url) {
-          avatarImg.src = data.url + "?t=" + Date.now(); 
-        } else {
-          alert("Imagen actualizada, pero no se recibió URL.");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error al subir la imagen. Intenta de nuevo.");
-      } finally {
-        avatarInput.value = "";
-      }
-    });
-  }
 });
-
