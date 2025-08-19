@@ -199,6 +199,7 @@ body {
     opacity: .6
 }
 
+/*
 .btn {
     display: inline-flex;
     align-items: center;
@@ -210,6 +211,7 @@ body {
     cursor: pointer;
     transition: background .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
+*/
 
 .btn:hover {
     background: #f7faff;

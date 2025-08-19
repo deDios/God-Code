@@ -346,6 +346,13 @@
         });
 
         dropdownMobile
+          .querySelector("li:first-child")
+          ?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            window.location.href = routeHome;
+          });
+
+        dropdownMobile
           .querySelector("#logout-btn-mobile")
           ?.addEventListener("click", () => {
             document.cookie =
