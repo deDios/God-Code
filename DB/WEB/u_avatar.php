@@ -6,14 +6,13 @@ header("Content-Type: application/json");
 
 $path = realpath("/home/site/wwwroot/db/conn/Conexion.php");
 if ($path && file_exists($path)) {
-    include $path; // opcional si luego quieres validar el usuario
+    include $path; // opcional
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["error" => "Método no permitido"]);
     exit;
@@ -23,7 +22,6 @@ if (!isset($_POST['usuario_id'])) {
     echo json_encode(["error" => "Falta 'usuario_id'"]);
     exit;
 }
-
 $usuario_id = (int)$_POST['usuario_id'];
 
 if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
@@ -36,44 +34,48 @@ if (!class_exists('finfo')) {
     echo json_encode(["error" => "Extensión fileinfo no disponible en el servidor"]);
     exit;
 }
-
 $finfo = new finfo(FILEINFO_MIME_TYPE);
 $mime = $finfo->file($_FILES['avatar']['tmp_name']);
 $allowed = ["image/jpeg" => "jpg", "image/png" => "png"];
-
 if (!isset($allowed[$mime])) {
     echo json_encode(["error" => "Formato no permitido. Solo JPG o PNG."]);
     exit;
 }
 
-// (Opcional) validar tamaño máx 2MB
+// (Opcional) tamaño máx 2MB
 if ($_FILES['avatar']['size'] > 2 * 1024 * 1024) {
     echo json_encode(["error" => "La imagen excede 2MB"]);
     exit;
 }
 
-// Directorio de almacenamiento (desde db/web a ASSETS son dos niveles)
+// Directorio de almacenamiento
 $baseDir = realpath(__DIR__ . "/../../ASSETS/usuario/usuarioImg");
 if ($baseDir === false) {
     echo json_encode(["error" => "Directorio de destino no encontrado"]);
     exit;
 }
-
-// Verifica permisos de escritura por si acaso
 if (!is_writable($baseDir)) {
     echo json_encode(["error" => "El directorio de destino no es escribible"]);
     exit;
 }
 
 $ext = $allowed[$mime];
-$filename = "user_" . $usuario_id . "." . $ext;
+
+// ✅ NUEVO patrón de nombre: img_user{ID}.{ext}
+$filename = "img_user" . $usuario_id . "." . $ext;
 $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
-// Limpia versiones anteriores con otra extensión
-foreach (["jpg", "png"] as $oldExt) {
-    $old = $baseDir . DIRECTORY_SEPARATOR . "img_user" . $usuario_id . "." . $oldExt;
-    if (file_exists($old) && $old !== $destPath) {
-        @unlink($old);
+// Limpiar archivos previos (ambos patrones y ambas extensiones)
+$patterns = [
+    "user_" . $usuario_id . ".jpg",
+    "user_" . $usuario_id . ".png",
+    "img_user" . $usuario_id . ".jpg",
+    "img_user" . $usuario_id . ".png",
+];
+foreach ($patterns as $p) {
+    $full = $baseDir . DIRECTORY_SEPARATOR . $p;
+    if (file_exists($full) && $full !== $destPath) {
+        @unlink($full);
     }
 }
 
@@ -83,7 +85,7 @@ if (!move_uploaded_file($_FILES['avatar']['tmp_name'], $destPath)) {
     exit;
 }
 
-// Construir URL pública (ajústala si sirves estáticos desde otro path/dominio)
+// URL pública
 $publicBase = "/ASSETS/usuario/usuarioImg";
 $url = $publicBase . "/" . $filename;
 
