@@ -61,21 +61,15 @@ if (!is_writable($baseDir)) {
 
 $ext = $allowed[$mime];
 
-// ✅ NUEVO patrón de nombre: img_user{ID}.{ext}
-$filename = "img_user" . $usuario_id . "." . $ext;
+// ✅ Versión anterior: user_{ID}.{ext}
+$filename = "user_" . $usuario_id . "." . $ext;
 $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
-// Limpiar archivos previos (ambos patrones y ambas extensiones)
-$patterns = [
-    "user_" . $usuario_id . ".jpg",
-    "user_" . $usuario_id . ".png",
-    "img_user" . $usuario_id . ".jpg",
-    "img_user" . $usuario_id . ".png",
-];
-foreach ($patterns as $p) {
-    $full = $baseDir . DIRECTORY_SEPARATOR . $p;
-    if (file_exists($full) && $full !== $destPath) {
-        @unlink($full);
+// Limpiar archivos previos (misma convención pero distinta extensión)
+foreach (["jpg", "png"] as $oldExt) {
+    $old = $baseDir . DIRECTORY_SEPARATOR . "user_" . $usuario_id . "." . $oldExt;
+    if (file_exists($old) && $old !== $destPath) {
+        @unlink($old);
     }
 }
 
