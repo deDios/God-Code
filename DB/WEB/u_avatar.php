@@ -71,7 +71,7 @@ $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
 // Limpia versiones anteriores con otra extensión
 foreach (["jpg", "png"] as $oldExt) {
-    $old = $baseDir . DIRECTORY_SEPARATOR . "user_" . $usuario_id . "." . $oldExt;
+    $old = $baseDir . DIRECTORY_SEPARATOR . "img_user" . $usuario_id . "." . $oldExt;
     if (file_exists($old) && $old !== $destPath) {
         @unlink($old);
     }

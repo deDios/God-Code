@@ -486,7 +486,6 @@ function initModalPerfil() {
 
 // --- Avatar upload (inicialización y handlers) ---
 function initAvatarUpload(usuarioId) {
-  // asegurar input (con accept)
   let avatarInput = document.getElementById("avatar-input");
   if (!avatarInput) {
     avatarInput = document.createElement("input");
@@ -508,7 +507,6 @@ function initAvatarUpload(usuarioId) {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    // Validar formato
     const validTypes = ["image/jpeg", "image/png"];
     if (!validTypes.includes(file.type)) {
       alert("Formato no permitido. Solo JPG o PNG.");
@@ -540,7 +538,7 @@ function initAvatarUpload(usuarioId) {
       }
 
       if (data.url) {
-        avatarImg.src = data.url + "?t=" + Date.now(); // cache bust
+        avatarImg.src = data.url + "?t=" + Date.now(); 
       } else {
         alert("Imagen actualizada, pero no se recibió URL.");
       }
@@ -671,7 +669,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   renderPerfil(usuario);
-  initAvatarUpload(usuario.id); // engancha avatar al render inicial
+  initAvatarUpload(usuario.id); 
   showSkeletons();
   await loadRecursos(usuario.id);
   initModalPerfil();
