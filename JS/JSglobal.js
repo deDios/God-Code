@@ -296,14 +296,15 @@
 
       const mob = document.createElement("div");
       mob.className = "user-icon-mobile";
-      mob.innerHTML = `<img alt="Perfil" title="Perfil" />`;
+
+      mob.innerHTML = `<img alt="Perfil" title="Perfil" src="${withBust(
+        DEFAULT_AVATAR
+      )}" />`;
       socialIconsContainer.appendChild(mob);
 
       const mobImg = mob.querySelector("img");
-      if (isLogged) {
-        // pinta avatar en mobile
-        if (mobImg) setAvatarSrc(mobImg, usuario);
 
+      if (isLogged) {
         const dropdownMobileId = "user-dropdown-mobile";
         document.getElementById(dropdownMobileId)?.remove();
 
@@ -311,23 +312,24 @@
         dropdownMobile.className = "dropdown-menu mobile";
         dropdownMobile.id = dropdownMobileId;
         dropdownMobile.innerHTML = `
-          <ul>
-            <li>
-              <img src="${asset(
-                "usuario/usuarioSubmenu/homebtn.png"
-              )}" alt="" aria-hidden="true" />
-              Ir a Home
-            </li>
-            <li id="logout-btn-mobile">
-              <img src="${asset(
-                "usuario/usuarioSubmenu/logoutbtn.png"
-              )}" alt="" aria-hidden="true" />
-              Logout
-            </li>
-          </ul>
-        `;
+      <ul>
+        <li>
+          <img src="${asset(
+            "usuario/usuarioSubmenu/homebtn.png"
+          )}" alt="" aria-hidden="true" />
+          Ir a Home
+        </li>
+        <li id="logout-btn-mobile">
+          <img src="${asset(
+            "usuario/usuarioSubmenu/logoutbtn.png"
+          )}" alt="" aria-hidden="true" />
+          Logout
+        </li>
+      </ul>
+    `;
         document.body.appendChild(dropdownMobile);
 
+        // toggle del dropdown
         mobImg?.addEventListener("click", (e) => {
           e.stopPropagation();
           const rect = mob.getBoundingClientRect();
@@ -352,8 +354,7 @@
             window.location.href = routeLogin;
           });
       } else {
-        // no logeado = mostrar default y enviar a login
-        if (mobImg) mobImg.src = withBust(DEFAULT_AVATAR);
+        // no login =  default y un click lleva a Login
         mob.addEventListener(
           "click",
           () => (window.location.href = routeLogin)
