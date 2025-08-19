@@ -94,13 +94,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 //----------------------- JS para los comentarios
-// V1
-
-
-
-
-
-
 
 
 
@@ -109,6 +102,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const ASSETS_BASE =
+    (window.GC_PATHS && window.GC_PATHS.ASSETS) ||
+    (() => {
+      const p = window.location.pathname;
+      const i = p.toLowerCase().indexOf("/view/");
+      const base = i >= 0 ? p.slice(0, i) : "";
+      return `${base}/ASSETS`;
+    })();
+
+  const AVATAR_DEFAULT = `${ASSETS_BASE}/usuario/usuarioImg/img_user1.png`;
+
+  function getUsuarioDeCookie() {
+    const cookie = document.cookie.split("; ").find((r) => r.startsWith("usuario="));
+    if (!cookie) return null;
+    try {
+      return JSON.parse(decodeURIComponent(cookie.split("=")[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  function probeImage(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(); // cache buster suave
+    });
+  }
+
+  async function resolvePublicAvatar(userId) {
+    if (!userId) return AVATAR_DEFAULT;
+    const jpg = `${ASSETS_BASE}/usuario/usuarioImg/user_${userId}.jpg`;
+    const png = `${ASSETS_BASE}/usuario/usuarioImg/user_${userId}.png`;
+    if (await probeImage(jpg)) return jpg;
+    if (await probeImage(png)) return png;
+    return AVATAR_DEFAULT;
+  }
+
+  async function resolveCurrentUserAvatar() {
+    const u = getUsuarioDeCookie();
+    if (u?.avatarUrl && (await probeImage(u.avatarUrl))) return u.avatarUrl;
+    return resolvePublicAvatar(u?.id);
+  }
+
+  async function setAvatar(imgEl, userId, isCurrentUser = false) {
+    if (!imgEl) return;
+    imgEl.src = AVATAR_DEFAULT; 
+    try {
+      const url = isCurrentUser ? await resolveCurrentUserAvatar() : await resolvePublicAvatar(userId);
+      imgEl.src = url;
+    } catch {
+      imgEl.src = AVATAR_DEFAULT;
+    }
+  }
+
   // -------- Variables y endpoints --------
   const params = new URLSearchParams(window.location.search);
   const noticiaId = parseInt(params.get("id"), 10);
@@ -142,13 +191,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     enviando = false,
     ultimoComentario = "";
 
-  // -------- Helpers --------
-  function getUsuarioDeCookie() {
-    const cookie = document.cookie.split("; ").find(r => r.startsWith("usuario="));
-    if (!cookie) return null;
-    try { return JSON.parse(decodeURIComponent(cookie.split("=")[1])); }
-    catch { return null; }
+  // -------- Usuario actual y avatar en editor --------
+  const usuario = getUsuarioDeCookie();
+  if (usuario) {
+    usuarioId = usuario.id;
+    usuarioNombre = usuario.nombre || "Tú";
+    const img = document.querySelector(".nuevo-comentario-wrapper img");
+    if (img) {
+      if (usuario.avatarUrl) {
+        if (await probeImage(usuario.avatarUrl)) {
+          img.src = usuario.avatarUrl;
+        } else {
+          img.src = await resolvePublicAvatar(usuarioId);
+        }
+      } else {
+        img.src = await resolvePublicAvatar(usuarioId);
+      }
+    }
   }
+
+  // -------- Input & contador --------
+  actualizarEstadoInput();
+  textarea.addEventListener("input", () => {
+    contador.textContent = `${textarea.value.length}/500`;
+    btnEnviar.disabled =
+      !usuarioId ||
+      enviando ||
+      textarea.value.trim().length === 0 ||
+      textarea.value.length > 500;
+    btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
+  });
+  textarea.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !btnEnviar.disabled) {
+      e.preventDefault();
+      btnEnviar.click();
+    }
+  });
 
   function actualizarEstadoInput() {
     if (!usuarioId) {
@@ -164,7 +242,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function esComentarioDuplicado(txt) {
-    const clean = s => s.replace(/\s+/g, " ").trim().toLowerCase();
+    const clean = (s) => s.replace(/\s+/g, " ").trim().toLowerCase();
     return clean(txt) === clean(ultimoComentario);
   }
 
@@ -181,8 +259,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>Error al cargar comentarios.</p>
         <button id="reintentar-cargar" class="btn btn-primary" style="margin-top:10px;">Reintentar</button>
       </div>`;
-    document.getElementById("reintentar-cargar")
-      .onclick = () => cargarComentarios(noticiaId);
+    document.getElementById("reintentar-cargar").onclick = () => cargarComentarios(noticiaId);
   }
 
   function mostrarSkeleton() {
@@ -193,35 +270,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       lista.appendChild(sk);
     }
   }
-
-  // -------- Usuario y avatar --------
-  const usuario = getUsuarioDeCookie();
-  if (usuario) {
-    usuarioId = usuario.id;
-    usuarioNombre = usuario.nombre || "Tú";
-    if (usuario.avatar) {
-      const img = document.querySelector(".nuevo-comentario-wrapper img");
-      if (img) img.src = usuario.avatar;
-    }
-  }
-
-  // -------- Input & contador --------
-  actualizarEstadoInput();
-  textarea.addEventListener("input", () => {
-    contador.textContent = `${textarea.value.length}/500`;
-    btnEnviar.disabled =
-      !usuarioId ||
-      enviando ||
-      textarea.value.trim().length === 0 ||
-      textarea.value.length > 500;
-    btnEnviar.classList.toggle("disabled", btnEnviar.disabled);
-  });
-  textarea.addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey && !btnEnviar.disabled) {
-      e.preventDefault();
-      btnEnviar.click();
-    }
-  });
 
   // -------- Cancelar respuesta --------
   btnCancelar.addEventListener("click", () => {
@@ -266,8 +314,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           usuario_id: usuarioId,
           comentario: texto,
           estatus: 1,
-          ...(respuestaA ? { respuesta_a: respuestaA } : {})
-        })
+          ...(respuestaA ? { respuesta_a: respuestaA } : {}),
+        }),
       });
       const data = await res.json();
       if (data.mensaje?.toLowerCase().includes("registrado")) {
@@ -282,7 +330,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             usuario_nombre: usuarioNombre,
             comentario: texto,
             fecha_creacion: new Date().toISOString(),
-            likes: 0, dislikes: 0, mi_reaccion: null, respuestas: []
+            likes: 0,
+            dislikes: 0,
+            mi_reaccion: null,
+            respuestas: [],
           });
           lista.insertBefore(nodo, lista.firstChild);
           hacerStickyAnim(nodo);
@@ -307,7 +358,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   async function crearNodoInstantaneo(data) {
-    return crearComentarioHTML({ ...data, respuestas: [] });
+    const el = crearComentarioHTML({ ...data, respuestas: [] }, true /*is current user*/);
+    return el;
   }
 
   // -------- Cargar comentarios --------
@@ -320,8 +372,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         body: JSON.stringify({
           noticia_id: id,
           estatus: 1,
-          ...(usuarioId ? { usuario_id: usuarioId } : {})
-        })
+          ...(usuarioId ? { usuario_id: usuarioId } : {}),
+        }),
       });
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) {
@@ -334,7 +386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       lista.innerHTML = "";
       data
         .sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
-        .forEach(c => lista.appendChild(crearComentarioHTML(c)));
+        .forEach((c) => lista.appendChild(crearComentarioHTML(c)));
     } catch {
       mostrarErrorCarga();
       gcToast("Error al cargar comentarios", "error");
@@ -342,9 +394,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // -------- Crear comentario HTML --------
-  function crearComentarioHTML(data) {
+  function crearComentarioHTML(data, isCurrentUser = false) {
     const idToNombre = {};
-    (data.respuestas || []).forEach(r => idToNombre[r.id] = r.usuario_nombre);
+    (data.respuestas || []).forEach((r) => (idToNombre[r.id] = r.usuario_nombre));
 
     const div = document.createElement("div");
     div.className = "comentario";
@@ -353,51 +405,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     const likeOn = data.mi_reaccion === "like";
     const disOn = data.mi_reaccion === "dislike";
 
-    div.innerHTML = ''
-      + '<div class="comentario-usuario">'
-      + '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">'
-      + '</div>'
-      + '<div class="comentario-contenido">'
-      + '<div class="comentario-meta">'
-      + '<strong>' + data.usuario_nombre + '</strong>'
-      + '<span>' + tiempoRelativo(data.fecha_creacion) + '</span>'
-      + '</div>'
-      + '<p class="comentario-texto">' + data.comentario + '</p>'
-      + '<div class="comentario-interacciones">'
-      + '<div class="reaccion like' + (likeOn ? ' liked' : '') + '" '
-      + 'data-id="' + data.id + '" data-tipo="like" role="button" tabindex="0" aria-label="Like">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">'
-      + '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 '
-      + '7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14 '
-      + 'l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>'
-      + '</svg>'
-      + '<span class="cantidad">' + data.likes + '</span>'
-      + '</div>'
-      + '<div class="reaccion dislike' + (disOn ? ' disliked' : '') + '" '
-      + 'data-id="' + data.id + '" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">'
-      + '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">'
-      + '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09 '
-      + 'c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06 '
-      + 'l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>'
-      + '</svg>'
-      + '<span class="cantidad">' + data.dislikes + '</span>'
-      + '</div>'
-      + '<a href="#" class="accion" role="button" tabindex="0">Responder</a>'
-      + '</div>'
-      + (
-        (data.respuestas && data.respuestas.length)
-          ? '<div class="comentario-respuestas">'
-          + '<a href="#" class="ver-respuestas" role="button" tabindex="0">'
-          + '<svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">'
-          + '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>'
-          + '</svg>'
-          + 'Ver ' + data.respuestas.length + ' respuesta(s)'
-          + '</a>'
-          + '</div>'
-          : ''
-      )
-      + '</div>';
+    div.innerHTML =
+      '<div class="comentario-usuario">' +
+      `<img class="avatar" src="${AVATAR_DEFAULT}" alt="Avatar usuario">` + // se actualizará async
+      "</div>" +
+      '<div class="comentario-contenido">' +
+      '<div class="comentario-meta">' +
+      `<strong>${escapeHTML(data.usuario_nombre)}</strong>` +
+      `<span>${tiempoRelativo(data.fecha_creacion)}</span>` +
+      "</div>" +
+      `<p class="comentario-texto">${escapeHTML(data.comentario)}</p>` +
+      '<div class="comentario-interacciones">' +
+      `<div class="reaccion like${likeOn ? " liked" : ""}" data-id="${data.id}" data-tipo="like" role="button" tabindex="0" aria-label="Like">` +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>' +
+      "</svg>" +
+      `<span class="cantidad">${Number(data.likes) || 0}</span>` +
+      "</div>" +
+      `<div class="reaccion dislike${disOn ? " disliked" : ""}" data-id="${data.id}" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">` +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>' +
+      "</svg>" +
+      `<span class="cantidad">${Number(data.dislikes) || 0}</span>` +
+      "</div>" +
+      '<a href="#" class="accion" role="button" tabindex="0">Responder</a>' +
+      "</div>" +
+      (data.respuestas && data.respuestas.length
+        ? '<div class="comentario-respuestas">' +
+        '<a href="#" class="ver-respuestas" role="button" tabindex="0">' +
+        '<svg class="flecha" viewBox="0 0 24 24" width="16" height="16" fill="#1a73e8">' +
+        '<path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/>' +
+        "</svg>" +
+        `Ver ${data.respuestas.length} respuesta(s)` +
+        "</a>" +
+        "</div>"
+        : "") +
+      "</div>";
 
+    // set avatar async (si es tu comentario instantáneo, respeta tu cookie)
+    const img = div.querySelector(".comentario-usuario .avatar");
+    setAvatar(img, data.usuario_id, isCurrentUser && usuarioId === data.usuario_id);
 
     // subrespuestas
     if (data.respuestas?.length) {
@@ -406,7 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       sub.style.display = "none";
       data.respuestas
         .sort((a, b) => new Date(a.fecha_creacion) - new Date(b.fecha_creacion))
-        .forEach(r => sub.appendChild(crearRespuestaHTML(r, idToNombre)));
+        .forEach((r) => sub.appendChild(crearRespuestaHTML(r, idToNombre)));
       div.appendChild(sub);
     }
 
@@ -415,10 +462,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // -------- Crear respuesta HTML --------
   function crearRespuestaHTML(r, idToNombre) {
-    // Si la respuesta es a otra subrespuesta, añadimos @usuario al inicio
-    const prefijo = (r.respuesta_a && idToNombre[r.respuesta_a])
-      ? `<span class="mencion-usuario">@${idToNombre[r.respuesta_a]}</span> `
-      : "";
+    const prefijo =
+      r.respuesta_a && idToNombre[r.respuesta_a]
+        ? `<span class="mencion-usuario">@${escapeHTML(idToNombre[r.respuesta_a])}</span> `
+        : "";
 
     const likeOn = r.mi_reaccion === "like";
     const disOn = r.mi_reaccion === "dislike";
@@ -428,37 +475,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     div.dataset.comentarioId = r.id;
 
     div.innerHTML =
-      '' +
       '<div class="comentario-usuario">' +
-      '<img src="../ASSETS/noticia/usuario_icon_1.png" alt="Avatar usuario">' +
-      '</div>' +
-
+      `<img class="avatar" src="${AVATAR_DEFAULT}" alt="Avatar usuario">` +
+      "</div>" +
       '<div class="comentario-contenido">' +
       '<div class="comentario-meta">' +
-      '<strong>' + r.usuario_nombre + '</strong>' +
-      '<span>' + tiempoRelativo(r.fecha_creacion) + '</span>' +
-      '</div>' +
-      '<p class="comentario-texto">' + prefijo + r.comentario + '</p>' +
+      `<strong>${escapeHTML(r.usuario_nombre)}</strong>` +
+      `<span>${tiempoRelativo(r.fecha_creacion)}</span>` +
+      "</div>" +
+      `<p class="comentario-texto">${prefijo}${escapeHTML(r.comentario)}</p>` +
       '<div class="comentario-interacciones">' +
-      '<div class="reaccion like' + (likeOn ? ' liked' : '') + '" ' +
-      'data-id="' + r.id + '" data-tipo="like" ' +
-      'role="button" tabindex="0" aria-label="Like">' +
+      `<div class="reaccion like${likeOn ? " liked" : ""}" data-id="${r.id}" data-tipo="like" role="button" tabindex="0" aria-label="Like">` +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">' +
       '<path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v9c0 1.1.9 2 2 2h9c.78 0 1.48-.45 1.83-1.14l3.02-7.05c.1-.23.15-.47.15-.72V10z"/>' +
-      '</svg>' +
-      '<span class="cantidad">' + r.likes + '</span>' +
-      '</div>' +
-      '<div class="reaccion dislike' + (disOn ? ' disliked' : '') + '" ' +
-      'data-id="' + r.id + '" data-tipo="dislike" ' +
-      'role="button" tabindex="0" aria-label="Dislike">' +
+      "</svg>" +
+      `<span class="cantidad">${Number(r.likes) || 0}</span>` +
+      "</div>" +
+      `<div class="reaccion dislike${disOn ? " disliked" : ""}" data-id="${r.id}" data-tipo="dislike" role="button" tabindex="0" aria-label="Dislike">` +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">' +
       '<path d="M15 3H6c-.78 0-1.48.45-1.83 1.14L1.15 11.2c-.1.23-.15.47-.15.72v1.09c0 1.1.9 2 2 2h6.31l-.95 4.57c0 .41.17-.79.44-1.06l1.12 1.12 6.59-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2z"/>' +
-      '</svg>' +
-      '<span class="cantidad">' + r.dislikes + '</span>' +
-      '</div>' +
+      "</svg>" +
+      `<span class="cantidad">${Number(r.dislikes) || 0}</span>` +
+      "</div>" +
       '<a href="#" class="accion" role="button" tabindex="0">Responder</a>' +
-      '</div>' +
-      '</div>';
+      "</div>" +
+      "</div>";
+
+    // avatar async para respuesta
+    const img = div.querySelector(".comentario-usuario .avatar");
+    setAvatar(img, r.usuario_id, false);
 
     return div;
   }
@@ -472,22 +517,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         body: JSON.stringify({
           noticia_id: noticiaId,
           estatus: 1,
-          ...(usuarioId ? { usuario_id: usuarioId } : {})
-        })
+          ...(usuarioId ? { usuario_id: usuarioId } : {}),
+        }),
       });
       const data = await res.json();
       let found = null;
       for (const c of data) {
-        if (c.id == id) { found = c; break; }
+        if (c.id == id) {
+          found = c;
+          break;
+        }
         if (c.respuestas) {
-          const sub = c.respuestas.find(r => r.id == id);
-          if (sub) { found = sub; break; }
+          const sub = c.respuestas.find((r) => r.id == id);
+          if (sub) {
+            found = sub;
+            break;
+          }
         }
       }
       if (!found) return;
-      const nuevo = found.respuesta_a == null
-        ? crearComentarioHTML(found)
-        : crearRespuestaHTML(found, {});
+      const nuevo =
+        found.respuesta_a == null ? crearComentarioHTML(found) : crearRespuestaHTML(found, {});
       viejo.replaceWith(nuevo);
     } catch {
       cargarComentarios(noticiaId);
@@ -506,10 +556,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `Hace ${Math.floor(diff / 31536000)} año(s)`;
   }
 
+  // -------- Escapes mínimos --------
+  function escapeHTML(str) {
+    return String(str ?? "").replace(/[&<>'"]/g, (s) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[s]));
+  }
+
   // -------- Manejo de clicks por delegación --------
   lista.addEventListener("click", handleComentarioAction);
-  // permitir enter/space en elementos role=button
-  document.addEventListener("keydown", e => {
+  // accesibilidad: enter/space en role=button
+  document.addEventListener("keydown", (e) => {
     if ((e.key === "Enter" || e.key === " ") && e.target.getAttribute("role") === "button") {
       e.preventDefault();
       e.target.click();
@@ -569,12 +624,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       likeBtn.style.pointerEvents = disBtn.style.pointerEvents = "none";
       try {
-        // si cambio de uno a otro, primero quito
+        // si estoy cambiando de like->dislike o viceversa, primero quito
         if ((tipo === "like" && prevDis) || (tipo === "dislike" && prevLike)) {
           await fetch(endpointQuitarReaccion, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ comentario_id: cid, usuario_id: usuarioId })
+            body: JSON.stringify({ comentario_id: cid, usuario_id: usuarioId }),
           });
         }
         let url, body;
@@ -588,12 +643,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const resp = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         });
         const jd = await resp.json();
-        if (url === endpointReaccion && jd.mensaje.toLowerCase().includes("registrada")) {
+        if (url === endpointReaccion && jd.mensaje?.toLowerCase().includes("registrada")) {
           gcToast(`¡Gracias por tu ${tipo}!`, "exito");
-        } else if (url === endpointQuitarReaccion && jd.mensaje.toLowerCase().includes("eliminada")) {
+        } else if (url === endpointQuitarReaccion && jd.mensaje?.toLowerCase().includes("eliminada")) {
           gcToast("Reacción eliminada.", "exito");
         } else {
           gcToast(jd.mensaje || "Error al reaccionar", "warning");
