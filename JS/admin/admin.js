@@ -358,7 +358,7 @@
     });
   }
 
-  // badges de precio y status (usa tus clases .badge-*)
+  // badges de precio y status
   function badgePrecio(precio) {
     return Number(precio) === 0
       ? `<span class="badge-neutral">Gratuito</span>`
@@ -384,7 +384,7 @@
     const c = isCreate ? getEmptyCourse() : item ? item._all : null;
     if (!c) return "<p>No encontrado.</p>";
 
-    // opciones selects (usa mapas cacheados)
+    // opciones selects 
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
 
@@ -571,7 +571,7 @@
         : ""
     }
 
-    ${/* ---- MEDIA (Curso: portada read-only) ---- */ ""}
+    ${/* ---- MEDIA (Curso, solo lectura) ---- */ ""}
     <div class="field">
       <div class="label">Imágenes</div>
       <div class="value"><div id="media-curso" data-id="${
@@ -615,7 +615,7 @@
       };
     }
 
-    // engancha eventos de acciones y bloquea/habilita inputs según modo
+    // engancha eventos de acciones y bloquea/habilita inputs segun el modo
     setTimeout(() => {
       // Guardar (create / edit)
       const bSave = qs("#btn-save");
@@ -693,10 +693,10 @@
           }
         });
 
-      // habilita/deshabilita inputs según modo
+      // habilita/deshabilita inputs segun modo
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // ----- Montaje de galería read-only para CURSO -----
+      // ----- Montaje de galerai de imagenes para CURSO -----
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
         const cid = Number(c.id ?? item?.id);
@@ -729,7 +729,7 @@
     });
   }
 
-  // curso vacío para crear
+  // curso vacio para crear
   function getEmptyCourse() {
     return {
       nombre: "",
@@ -753,10 +753,9 @@
     };
   }
 
-  // option builder a partir de mapas
   function mapToOptions(map, selectedId) {
     const pairs = Object.entries(map || {});
-    // filtra la propiedad de timestamp si existe
+    // filtra la propiedad de timestamp si es que existe
     const clean = pairs.filter(([k]) => k !== "_ts");
     if (!clean.length) return `<option value="">—</option>`;
     return clean
@@ -849,7 +848,6 @@
     if (!item || !item._all) throw new Error("Item inválido");
     const base = { ...item._all };
     base.estatus = 0;
-    // el update espera todos los campos, así que reusamos el original
     await postJSON(API.uCursos, base);
   }
 
@@ -887,7 +885,7 @@
     try {
       const raw = await postJSON(API.noticias, { estatus: 1 });
       const arr = Array.isArray(raw) ? raw : [];
-      // contamos comentarios (cuidado con spam de requests)
+      // contar comentarios
       const counts = await Promise.all(
         arr.map((n) => getCommentsCount(n.id).catch(() => 0))
       );
@@ -920,7 +918,6 @@
       estatus: 1,
     });
     const arr = Array.isArray(res) ? res : [];
-    // suma respuestas anidadas también
     let total = 0;
     for (const c of arr) {
       total += 1;
@@ -960,7 +957,7 @@
       drawerBody: (d) => {
         const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
-        // vista + contenedor de imágenes read-only
+        // vista + contenedor de imagenes
         return `
           ${pair("Título", n.titulo)}
           ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
@@ -1069,7 +1066,7 @@
     }
   }
 
-  // placeholder SVG si falta imagen
+  // placeholder por si todavia no hay imagen
   function noImageSvg() {
     return `
   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>

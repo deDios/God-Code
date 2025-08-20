@@ -1388,3 +1388,73 @@ main {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+/*--------------------- parche para agregar el icono de editar al icono grande de usuario*/
+
+
+.user-profile .avatar-circle {
+  position: relative;
+}
+
+.user-profile .avatar-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  color: #444;
+  cursor: pointer;
+}
+
+.user-profile .avatar-edit:hover {
+  background: #fafafa;
+}
+
+@media (max-width: 560px) {
+  .user-profile .avatar-edit {
+    right: 0;
+    bottom: 0;
+    transform: translate(15%, 15%);
+  }
+}
+
+/*------------------------------------ css necesario para el popup de editor de icono de perfil*/
+
+.user-profile .avatar-circle {
+  position: relative;
+}
+
+.user-profile .avatar-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  color: #444;
+  cursor: pointer;
+}
+
+.user-profile .avatar-edit:hover {
+  background: #fafafa;
+}
+
+@media (max-width:560px) {
+  .user-profile .avatar-edit {
+    right: 0;
+    bottom: 0;
+    transform: translate(15%, 15%);
+  }
+}

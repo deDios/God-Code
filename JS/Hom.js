@@ -68,8 +68,8 @@ function setAvatarSrc(imgEl, usuario) {
   // Primero intentamos user_{id}.*, luego img_user{id}.*
   const jpgUser = `${rootBase}/user_${usuario.id}.jpg`;
   const pngUser = `${rootBase}/user_${usuario.id}.png`;
-  const jpgImg  = `${rootBase}/img_user${usuario.id}.jpg`;
-  const pngImg  = `${rootBase}/img_user${usuario.id}.png`;
+  const jpgImg = `${rootBase}/img_user${usuario.id}.jpg`;
+  const pngImg = `${rootBase}/img_user${usuario.id}.png`;
 
   const candidates = [];
   if (cookieUrl) candidates.push(cookieUrl);
@@ -87,23 +87,38 @@ function setAvatarSrc(imgEl, usuario) {
   tryNext();
 }
 
-//  Render Perfil Sidebar
+//  Render Perfil Sidebar (con overlay lápiz)
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
 
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
+
   const img = document.createElement("img");
   img.id = "avatar-img";
-  img.alt = usuario.nombre;
+  img.alt = usuario.nombre || "Foto de perfil";
   avatarCircle.appendChild(img);
+
+  // botón lápiz
+  const editBtn = document.createElement("button");
+  editBtn.type = "button";
+  editBtn.className = "icon-btn avatar-edit";
+  editBtn.setAttribute("aria-label", "Cambiar foto");
+  editBtn.title = "Cambiar foto";
+  editBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z"
+            fill="currentColor"></path>
+    </svg>
+  `;
+  avatarCircle.appendChild(editBtn);
 
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
   const nameDiv = document.createElement("div");
   nameDiv.id = "user-name";
-  nameDiv.textContent = usuario.nombre;
+  nameDiv.textContent = usuario.nombre || "Usuario";
   const editLink = document.createElement("a");
   editLink.className = "edit-profile";
   editLink.href = "#";
@@ -114,7 +129,6 @@ function renderPerfil(usuario) {
 
   setAvatarSrc(img, usuario);
 }
-
 
 //  Render Recursos (Desktop)
 function renderRecursosRows(lista) {
@@ -513,9 +527,332 @@ function initModalPerfil() {
   });
 }
 
-// --- Avatar upload (inicialización y handlers) ---
+/* mini editor de avatar (todavia en pruebas talvez haga un fork de esto para despues implementarlo en el main) */
+
+const EDA_RECENTS_KEY = "eda:recientes:v1";
+
+function canAcceptAvatarFile(file) {
+  const validTypes = ["image/jpeg", "image/png"];
+  if (!file) return { ok: false, msg: "No se recibió archivo." };
+  if (!validTypes.includes(file.type))
+    return { ok: false, msg: "Formato no permitido. Solo JPG o PNG." };
+  if (file.size > 2 * 1024 * 1024)
+    return { ok: false, msg: "La imagen excede 2MB." };
+  return { ok: true };
+}
+
+async function uploadAvatarFile(file, usuarioId) {
+  const v = canAcceptAvatarFile(file);
+  if (!v.ok) {
+    alert(v.msg);
+    return;
+  }
+  const formData = new FormData();
+  formData.append("usuario_id", usuarioId);
+  formData.append("avatar", file);
+
+  try {
+    const resp = await fetch(ENDPOINT_AVATAR, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await resp.json();
+
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    const avatarImg = document.getElementById("avatar-img");
+    if (avatarImg && data.url) {
+      avatarImg.src = data.url + "?t=" + Date.now();
+    }
+
+    const usuarioCookie = getUsuarioFromCookie() || {};
+    if (data.url) {
+      usuarioCookie.avatarUrl = data.url;
+      document.cookie =
+        "usuario=" +
+        encodeURIComponent(JSON.stringify(usuarioCookie)) +
+        "; path=/; max-age=" +
+        86400;
+    }
+    gcToast && gcToast("Avatar actualizado", "exito");
+  } catch (err) {
+    console.error(err);
+    alert("Error al subir la imagen. Intenta de nuevo.");
+  }
+}
+
+function loadAvatarRecents() {
+  try {
+    return JSON.parse(localStorage.getItem(EDA_RECENTS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+function saveAvatarRecents(arr) {
+  try {
+    localStorage.setItem(EDA_RECENTS_KEY, JSON.stringify(arr.slice(0, 8)));
+  } catch {}
+}
+function dataUrlToFile(dataUrl, filename = "avatar.png") {
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1] || "image/png";
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8 = new Uint8Array(n);
+  while (n--) u8[n] = bstr.charCodeAt(n);
+  return new File([u8], filename, { type: mime });
+}
+function fileToDataUrl(file, maxSize = 1024) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.width,
+          h = img.height;
+        const scale = Math.min(1, maxSize / Math.max(w, h));
+        const cw = Math.round(w * scale),
+          ch = Math.round(h * scale);
+        const cvs = document.createElement("canvas");
+        cvs.width = cw;
+        cvs.height = ch;
+        const ctx = cvs.getContext("2d");
+        ctx.drawImage(img, 0, 0, cw, ch);
+        resolve(cvs.toDataURL("image/png", 0.92));
+      };
+      img.onerror = reject;
+      img.src = fr.result;
+    };
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+}
+
+function ensureEditorDom() {
+  let overlay = document.getElementById("eda-overlay");
+  if (overlay) return overlay;
+
+  overlay = document.createElement("div");
+  overlay.className = "eda-overlay";
+  overlay.id = "eda-overlay";
+  overlay.innerHTML = `
+    <div class="eda-modal" role="dialog" aria-modal="true" aria-labelledby="eda-title">
+      <div class="eda-header">
+        <div class="eda-title" id="eda-title">Editar avatar</div>
+        <div class="eda-actions">
+          <button class="btn" id="eda-close">Cerrar</button>
+        </div>
+      </div>
+      <div class="eda-body">
+        <div class="eda-left">
+          <div class="eda-drop" id="eda-drop" aria-label="Zona para arrastrar y soltar imágenes">
+            <div class="eda-drop-cta">
+              <strong>Arrastra una imagen</strong> o <button class="btn btn-outline" id="eda-choose">Elegir archivo</button>
+              <div class="eda-hint">También puedes pegar con <kbd>Ctrl</kbd>+<kbd>V</kbd></div>
+            </div>
+          </div>
+          <div class="eda-preview">
+            <div class="eda-preview-wrap">
+              <img id="eda-preview-img" alt="Vista previa" />
+              <div class="eda-mask" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+        <div class="eda-right">
+          <div class="eda-tools">
+            <button class="btn icon-btn" id="eda-paste-btn" title="Pegar desde portapapeles">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M19 21H5a2 2 0 0 1-2-2V7h4V5a2 2 0 0 1 2-2h2.18A3 3 0 0 1 14 1h0a3 3 0 0 1 2.82 2H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM9 5v2h6V5H9z" fill="currentColor"/></svg>
+              <span>Pegar</span>
+            </button>
+          </div>
+          <div class="eda-recents">
+            <div class="eda-recents-title">Recientes</div>
+            <div class="eda-recents-grid" id="eda-recents-grid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="eda-footer">
+        <div class="eda-hint">Solo JPG o PNG · Máx 2MB</div>
+        <div class="eda-actions">
+          <button class="btn" id="eda-cancel">Cancelar</button>
+          <button class="btn blue" id="eda-save" disabled>Guardar</button>
+        </div>
+      </div>
+      <input type="file" id="eda-file" accept="image/png, image/jpeg" hidden />
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function renderRecentsGrid(root) {
+  const grid = root.querySelector("#eda-recents-grid");
+  if (!grid) return;
+  const arr = loadAvatarRecents();
+  grid.innerHTML = "";
+  if (!arr.length) {
+    grid.innerHTML = `<div class="eda-empty">Sin recientes</div>`;
+    return;
+  }
+  arr.forEach((item, idx) => {
+    const cell = document.createElement("button");
+    cell.className = "eda-recent";
+    cell.title = "Usar este";
+    cell.innerHTML = `<img src="${item.dataUrl}" alt="Avatar reciente ${
+      idx + 1
+    }" />`;
+    cell.dataset.dataUrl = item.dataUrl;
+    grid.appendChild(cell);
+  });
+}
+
+function openEditorDeAvatar({ usuarioId }) {
+  const overlay = ensureEditorDom();
+  const modal = overlay.querySelector(".eda-modal");
+  const fileInput = overlay.querySelector("#eda-file");
+  const drop = overlay.querySelector("#eda-drop");
+  const choose = overlay.querySelector("#eda-choose");
+  const previewImg = overlay.querySelector("#eda-preview-img");
+  const btnSave = overlay.querySelector("#eda-save");
+  const btnCancel = overlay.querySelector("#eda-cancel");
+  const btnClose = overlay.querySelector("#eda-close");
+  const btnPaste = overlay.querySelector("#eda-paste-btn");
+
+  let selectedFile = null;
+  let pasteHandler = null;
+
+  function setSelectedFile(file) {
+    const v = canAcceptAvatarFile(file);
+    if (!v.ok) {
+      alert(v.msg);
+      return;
+    }
+    selectedFile = file;
+    previewImg.src = URL.createObjectURL(file);
+    btnSave.disabled = false;
+  }
+
+  function onPaste(e) {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (const it of items) {
+      if (it.type.startsWith("image/")) {
+        const file = it.getAsFile();
+        if (file) setSelectedFile(file);
+        e.preventDefault();
+        break;
+      }
+    }
+  }
+
+  function close() {
+    overlay.classList.remove("open");
+    btnSave.disabled = true;
+    selectedFile = null;
+    previewImg.removeAttribute("src");
+    // limpia listeners temporales
+    if (pasteHandler) {
+      document.removeEventListener("paste", pasteHandler);
+      pasteHandler = null;
+    }
+  }
+
+  // eventos
+  choose.onclick = () => fileInput.click();
+  fileInput.onchange = () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (f) setSelectedFile(f);
+    fileInput.value = "";
+  };
+
+  drop.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    drop.classList.add("drag");
+  });
+  drop.addEventListener("dragleave", () => drop.classList.remove("drag"));
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.classList.remove("drag");
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) setSelectedFile(f);
+  });
+
+  btnPaste.onclick = async () => {
+    if (navigator.clipboard && navigator.clipboard.read) {
+      try {
+        const items = await navigator.clipboard.read();
+        for (const i of items) {
+          for (const type of i.types) {
+            if (type.startsWith("image/")) {
+              const blob = await i.getType(type);
+              const file = new File([blob], "clipboard.png", {
+                type: blob.type || "image/png",
+              });
+              setSelectedFile(file);
+              return;
+            }
+          }
+        }
+        gcToast && gcToast("No hay imagen en el portapapeles", "warning");
+      } catch (err) {
+        console.warn(err);
+        gcToast &&
+          gcToast("Permiso denegado para leer portapapeles", "warning");
+      }
+    } else {
+      gcToast &&
+        gcToast(
+          "Tu navegador no permite lectura directa; usa Ctrl+V",
+          "warning"
+        );
+    }
+  };
+
+  btnCancel.onclick = close;
+  btnClose.onclick = close;
+  overlay.addEventListener("click", (e) => {
+    if (e.target.id === "eda-overlay") close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (overlay.classList.contains("open") && e.key === "Escape") close();
+  });
+
+  btnSave.onclick = async () => {
+    if (!selectedFile) return;
+    // sube original
+    await uploadAvatarFile(selectedFile, usuarioId);
+
+    // guarda en recientes
+    try {
+      const dataUrl = await fileToDataUrl(selectedFile, 512);
+      const arr = loadAvatarRecents();
+      arr.unshift({ dataUrl, ts: Date.now() });
+      saveAvatarRecents(arr);
+    } catch {}
+    close();
+  };
+
+  // click en recientes
+  renderRecentsGrid(modal);
+  modal.querySelector("#eda-recents-grid")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".eda-recent");
+    if (!btn) return;
+    const du = btn.dataset.dataUrl;
+    if (!du) return;
+    const f = dataUrlToFile(du, "reciente.png");
+    setSelectedFile(f);
+  });
+
+  overlay.classList.add("open");
+  pasteHandler = onPaste;
+  document.addEventListener("paste", pasteHandler);
+}
+
 function initAvatarUpload(usuarioId) {
-  // asegurar input (con accept)
   let avatarInput = document.getElementById("avatar-input");
   if (!avatarInput) {
     avatarInput = document.createElement("input");
@@ -529,69 +866,47 @@ function initAvatarUpload(usuarioId) {
   const avatarImg = document.getElementById("avatar-img");
   if (!avatarImg) return;
 
-  // set cursor y handlers (reemplazo directo para evitar duplicados)
+  // antes al darle click a la imagen se abria el selector de archivos default del explorador (igual por si acaso aqui esta el codigo)
+  // avatarImg.style.cursor = "pointer";
+  // avatarImg.onclick = () => avatarInput.click();
+
+  // Nuevo: abrir el Editor de Avatar al hacer clic en la imagen
   avatarImg.style.cursor = "pointer";
-  avatarImg.onclick = () => avatarInput.click();
+  avatarImg.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openEditorDeAvatar({ usuarioId });
+  };
+
+  // abre el mini editor al darle click al mini icono de lapiz
+  const editBtn = document.querySelector(".avatar-edit");
+  if (editBtn) {
+    const openEd = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openEditorDeAvatar({ usuarioId });
+    };
+    editBtn.addEventListener("click", openEd);
+    editBtn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") openEd(e);
+    });
+  }
 
   avatarInput.onchange = async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
-
-    // Validar formato
-    const validTypes = ["image/jpeg", "image/png"];
-    if (!validTypes.includes(file.type)) {
-      alert("Formato no permitido. Solo JPG o PNG.");
-      avatarInput.value = "";
-      return;
-    }
-
-    // Validar tamaño (máx. 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert("La imagen excede 2MB.");
-      avatarInput.value = "";
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("usuario_id", usuarioId);
-    formData.append("avatar", file);
-
+    await uploadAvatarFile(file, usuarioId);
     try {
-      const resp = await fetch(ENDPOINT_AVATAR, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await resp.json();
-
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
-
-      if (data.url) {
-        avatarImg.src = data.url + "?t=" + Date.now();
-
-        const usuarioCookie = getUsuarioFromCookie() || {};
-        usuarioCookie.avatarUrl = data.url;
-        document.cookie =
-          "usuario=" +
-          encodeURIComponent(JSON.stringify(usuarioCookie)) +
-          "; path=/; max-age=" +
-          86400;
-      } else {
-        alert("Imagen actualizada, pero no se recibió URL.");
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert("Error al subir la imagen. Intenta de nuevo.");
-    } finally {
-      avatarInput.value = "";
-    }
+      const du = await fileToDataUrl(file, 512);
+      const arr = loadAvatarRecents();
+      arr.unshift({ dataUrl: du, ts: Date.now() });
+      saveAvatarRecents(arr);
+    } catch {}
+    avatarInput.value = "";
   };
 }
 
-//  deshabilitamos links y skeletons
+//  deshabilitar links 
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
@@ -709,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   renderPerfil(usuario);
-  initAvatarUpload(usuario.id); // engancha avatar al render inicial
+  initAvatarUpload(usuario.id); 
   showSkeletons();
   await loadRecursos(usuario.id);
   initModalPerfil();
