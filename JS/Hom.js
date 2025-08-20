@@ -667,13 +667,6 @@ function ensureEditorDom() {
           </div>
         </div>
         <div class="eda-right">
-          <div class="eda-tools">
-            <button class="btn icon-btn" id="eda-paste-btn" title="Pegar desde portapapeles">
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                <path d="M19 21H5a2 2 0 0 1-2-2V7h4V5a2 2 0 0 1 2-2h2.18A3 3 0 0 1 14 1h0a3 3 0 0 1 2.82 2H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2zM9 5v2h6V5H9z" fill="currentColor"/></svg>
-              <span>Pegar</span>
-            </button>
-          </div>
           <div class="eda-recents">
             <div class="eda-recents-title">Recientes</div>
             <div class="eda-recents-grid" id="eda-recents-grid"></div>
