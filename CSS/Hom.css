@@ -1803,3 +1803,49 @@ main {
 body.eda-lock {
   overflow: hidden;
 }
+
+/*----------------------- parche extra */
+
+.eda-overlay .eda-preview-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: repeating-linear-gradient(45deg, #fafafa 0 12px, #f4f6f8 12px 24px);
+  border: 1px solid var(--eda-border);
+  border-radius: var(--eda-radius-sm);
+  overflow: hidden;
+  min-height: 260px;
+}
+
+.eda-overlay #eda-preview-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+.eda-overlay .eda-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --eda-mask-size: 86%;
+  background:
+    radial-gradient(circle at center,
+      rgba(0, 0, 0, 0) calc(var(--eda-mask-size) - 1px),
+      rgba(0, 0, 0, .34) var(--eda-mask-size));
+}
+
+.eda-overlay .eda-mask::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mask: radial-gradient(circle at center,
+      transparent calc(var(--eda-mask-size) - 2px),
+      #000 calc(var(--eda-mask-size) - 1px));
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, .85);
+  pointer-events: none;
+}

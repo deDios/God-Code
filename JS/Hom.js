@@ -539,7 +539,7 @@ function canAcceptAvatarFile(file) {
   const validTypes = ["image/jpeg", "image/png"];
   if (!file) return { ok: false, msg: "No se recibió archivo." };
   if (!validTypes.includes(file.type))
-    return { ok: false, msg: "Formato no permitido. Solo JPG o PNG." };
+    return { ok: false, msg: "Formato no permitido. Solo JPG." };
   if (file.size > 2 * 1024 * 1024)
     return { ok: false, msg: "La imagen excede 2MB." };
   return { ok: true };
@@ -680,7 +680,7 @@ function ensureEditorDom() {
         </div>
       </div>
       <div class="eda-footer">
-        <div class="eda-hint">Solo JPG o PNG · Máx 2MB</div>
+        <div class="eda-hint">Solo JPG · Máx 2MB</div>
         <div class="eda-actions">
           <button class="btn" id="eda-cancel">Cancelar</button>
           <button class="btn blue" id="eda-save" disabled>Guardar</button>
