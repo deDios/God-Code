@@ -1109,7 +1109,7 @@
       card.innerHTML = `
         <figure class="media-thumb">
           <img alt="${escapeAttr(label)}" src="${withBust(url)}">
-          <button class="icon-btn media-edit" aria-disabled="true" title="funcion deshabilitada">
+          <button class="icon-btn media-edit" aria-disabled="true">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
                     fill="currentColor"></path>
@@ -1141,7 +1141,6 @@
     container.innerHTML = `
       <div class="media-head">
         <div class="media-title">Imágenes</div>
-        <div class="media-help">Vista previa · Read-only</div>
       </div>
     `;
     container.appendChild(grid);
