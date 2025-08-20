@@ -522,7 +522,7 @@ function initModalPerfil() {
         "; path=/; max-age=" +
         86400;
       renderPerfil(usuarioCookie);
-      initAvatarUpload(usuarioCookie.id); // re-enganchar avatar tras re-render
+      initAvatarUpload(usuarioCookie.id);
     } catch {
       gcToast("Error al actualizar perfil.", "error");
     } finally {
@@ -580,6 +580,7 @@ async function uploadAvatarFile(file, usuarioId) {
         encodeURIComponent(JSON.stringify(usuarioCookie)) +
         "; path=/; max-age=" +
         86400;
+        refreshAvatarEverywhere(data.url);
     }
     gcToast && gcToast("Avatar actualizado", "exito");
   } catch (err) {
@@ -1034,3 +1035,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   initModalPerfil();
   disableLinks();
 });
+
+
+function refreshAvatarEverywhere(url) {
+  const base = url.startsWith("http") ? new URL(url, location.origin).pathname : url;
+  const bust = base + (base.includes("?") ? "&" : "?") + "t=" + Date.now();
+
+  const avatarImg = document.getElementById("avatar-img");
+  if (avatarImg) avatarImg.src = bust;
+
+  document.querySelectorAll(".actions .img-perfil, .user-icon-mobile img").forEach(el => {
+    el.src = bust;
+  });
+
+  setTimeout(() => location.reload(), 350);
+}
