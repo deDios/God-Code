@@ -1460,34 +1460,345 @@ main {
 
 /*------------------------------------ css necesario para el popup de editor de icono de perfil*/
 
-.user-profile .avatar-circle {
-  position: relative;
+.eda-overlay {
+  --eda-surface: #fff;
+  --eda-surface-2: #fafafa;
+  --eda-surface-3: #f6f8fb;
+  --eda-border: #e7e7e7;
+  --eda-border-2: #dcdcdc;
+  --eda-text: #1f1f1f;
+  --eda-muted: #666;
+  --eda-hint: #8a8a8a;
+  --eda-primary: #1a73e8;
+  --eda-primary-2: #1558b0;
+  --eda-focus: #6ea8ff;
+  --eda-shadow-1: 0 1px 2px rgba(0, 0, 0, .08), 0 1px 3px rgba(0, 0, 0, .06);
+  --eda-shadow-2: 0 6px 20px rgba(0, 0, 0, .16);
+  --eda-radius: 16px;
+  --eda-radius-sm: 10px;
+  --eda-z-overlay: 10000;
 }
 
-.user-profile .avatar-edit {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: #fff;
-  border: 1px solid #e2e2e2;
+.eda-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .38);
+  backdrop-filter: saturate(110%) blur(2px);
+  display: none;
+  z-index: var(--eda-z-overlay);
+  animation: edaFade .18s ease-out both;
+}
+
+.eda-overlay.open {
+  display: block;
+}
+
+.eda-overlay .eda-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%) scale(.98);
+  width: clamp(320px, 92vw, 760px);
+  max-height: 86vh;
+  background: var(--eda-surface);
+  border: 1px solid var(--eda-border);
+  border-radius: var(--eda-radius);
+  box-shadow: var(--eda-shadow-2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: calc(var(--eda-z-overlay) + 1);
+  color: var(--eda-text);
+  animation: edaPop .18s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes edaFade {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes edaPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(.96)
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -46%) scale(1)
+  }
+}
+
+.eda-overlay .eda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--eda-border);
+  background: var(--eda-surface);
+}
+
+.eda-overlay .eda-title {
+  font-weight: 700;
+  font-size: 1.06rem;
+  letter-spacing: .2px;
+}
+
+.eda-overlay .eda-header .btn {
+  min-height: 36px;
+}
+
+.eda-overlay .eda-body {
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 16px;
+  overflow: auto;
+  background: var(--eda-surface);
+}
+
+.eda-overlay .eda-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eda-overlay .eda-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eda-overlay .eda-drop {
+  border: 1.5px dashed var(--eda-border-2);
+  border-radius: var(--eda-radius-sm);
+  min-height: 126px;
   display: grid;
   place-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
-  color: #444;
+  padding: 16px;
+  color: #3a3a3a;
+  background: var(--eda-surface-2);
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+  box-shadow: var(--eda-shadow-1);
+}
+
+.eda-overlay .eda-drop:hover {
+  background: #f2f6ff;
+  border-color: #cddfff;
+}
+
+.eda-overlay .eda-drop.drag {
+  background: #eaf2ff;
+  border-color: #8ab6ff;
+  box-shadow: 0 0 0 2px rgba(138, 182, 255, .35) inset, var(--eda-shadow-1);
+}
+
+.eda-overlay .eda-drop-cta {
+  text-align: center;
+  font-size: .95rem;
+}
+
+.eda-overlay .eda-drop-cta strong {
+  font-weight: 600;
+}
+
+.eda-overlay .eda-drop .btn {
+  margin: 0 .25rem;
+}
+
+.eda-overlay .eda-hint {
+  margin-top: 6px;
+  font-size: .85rem;
+  color: var(--eda-hint);
+}
+
+.eda-overlay .eda-hint kbd {
+  font: inherit;
+  background: #f2f2f2;
+  border: 1px solid #e6e6e6;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 0 .35rem;
+  display: inline-block;
+}
+
+.eda-overlay .eda-preview {
+  width: 100%;
+}
+
+.eda-overlay .eda-preview-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: repeating-linear-gradient(45deg, #f8f8f8 0 12px, #f3f3f3 12px 24px);
+  border: 1px solid var(--eda-border);
+  border-radius: var(--eda-radius-sm);
+  overflow: hidden;
+  min-height: 260px;
+}
+
+.eda-overlay #eda-preview-img {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.eda-overlay .eda-mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --eda-mask-size: 72%;
+  background: radial-gradient(circle at center,
+      rgba(0, 0, 0, 0) calc(var(--eda-mask-size) - 1px),
+      rgba(0, 0, 0, .34) var(--eda-mask-size));
+}
+
+.eda-overlay .eda-tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.eda-overlay .eda-tools .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 36px;
+}
+
+.eda-overlay .eda-recents-title {
+  font-weight: 600;
+  font-size: .95rem;
+  margin-bottom: 6px;
+}
+
+.eda-overlay .eda-recents-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.eda-overlay .eda-recent {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1/1;
+  border: 1px solid #ececec;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0;
+  overflow: hidden;
   cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
-.user-profile .avatar-edit:hover {
-  background: #fafafa;
+.eda-overlay .eda-recent:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+  border-color: #dfe6ff;
 }
 
-@media (max-width:560px) {
-  .user-profile .avatar-edit {
-    right: 0;
-    bottom: 0;
-    transform: translate(15%, 15%);
+.eda-overlay .eda-recent img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.eda-overlay .eda-empty {
+  font-size: .9rem;
+  color: #777;
+  padding: 8px 0;
+}
+
+.eda-overlay .eda-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--eda-border);
+}
+
+.eda-overlay .eda-footer .eda-hint {
+  margin: 0;
+  font-size: .88rem;
+  color: var(--eda-muted);
+}
+
+.eda-overlay .eda-footer .btn[disabled] {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.eda-overlay .eda-modal :focus-visible {
+  outline: 2px solid var(--eda-focus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.eda-overlay .btn.blue {
+  background: var(--eda-primary);
+  color: #fff;
+  border: 1px solid var(--eda-primary);
+}
+
+.eda-overlay .btn.blue:hover {
+  background: var(--eda-primary-2);
+  border-color: var(--eda-primary-2);
+}
+
+.eda-overlay .btn.btn-outline {
+  background: #fff;
+  color: var(--eda-primary);
+  border: 1px solid rgba(26, 115, 232, .5);
+}
+
+.eda-overlay .btn.btn-outline:hover {
+  background: #f4f8ff;
+  border-color: var(--eda-primary);
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .eda-overlay .eda-body {
+    grid-template-columns: 1fr;
   }
+
+  .eda-overlay .eda-mask {
+    --eda-mask-size: 80%;
+  }
+}
+
+@media (max-width: 420px) {
+  .eda-overlay .eda-title {
+    font-size: 1rem;
+  }
+
+  .eda-overlay .eda-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eda-overlay .eda-footer .eda-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .eda-overlay .eda-footer .eda-actions .btn {
+    flex: 1;
+  }
+}
+
+body.eda-lock {
+  overflow: hidden;
 }
