@@ -1434,7 +1434,7 @@ main {
 .user-profile .avatar-edit {
   position: absolute;
   right: -6px;
-  bottom: -6px;
+  bottom: 5px;
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -1445,6 +1445,7 @@ main {
   box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
   color: #444;
   cursor: pointer;
+  border-radius: 5rem;
 }
 
 .user-profile .avatar-edit:hover {
