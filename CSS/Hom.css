@@ -1425,6 +1425,39 @@ main {
   }
 }
 
+.user-profile .avatar-shell {
+  position: relative;
+  display: inline-block;
+}
+
+
+.user-profile .avatar-edit {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  color: #444;
+  cursor: pointer;
+}
+
+.user-profile .avatar-edit:hover {
+  background: #fafafa;
+}
+
+@media (max-width:560px) {
+  .user-profile .avatar-edit {
+    right: -2px;
+    bottom: -2px;
+  }
+}
+
 /*------------------------------------ css necesario para el popup de editor de icono de perfil*/
 
 .user-profile .avatar-circle {

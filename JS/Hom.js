@@ -87,10 +87,13 @@ function setAvatarSrc(imgEl, usuario) {
   tryNext();
 }
 
-//  Render Perfil Sidebar (con overlay lápiz)
+//  Render Perfil Sidebar (con boton de editar)
 function renderPerfil(usuario) {
   const profile = document.querySelector(".user-profile");
   profile.innerHTML = "";
+
+  const shell = document.createElement("div");
+  shell.className = "avatar-shell";
 
   const avatarCircle = document.createElement("div");
   avatarCircle.className = "avatar-circle";
@@ -100,7 +103,6 @@ function renderPerfil(usuario) {
   img.alt = usuario.nombre || "Foto de perfil";
   avatarCircle.appendChild(img);
 
-  // botón lápiz
   const editBtn = document.createElement("button");
   editBtn.type = "button";
   editBtn.className = "icon-btn avatar-edit";
@@ -108,11 +110,13 @@ function renderPerfil(usuario) {
   editBtn.title = "Cambiar foto";
   editBtn.innerHTML = `
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z"
-            fill="currentColor"></path>
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z" fill="currentColor"></path>
     </svg>
   `;
-  avatarCircle.appendChild(editBtn);
+
+  // armamos el bloque
+  shell.appendChild(avatarCircle);
+  shell.appendChild(editBtn);
 
   const userInfo = document.createElement("div");
   userInfo.className = "user-info";
@@ -125,7 +129,7 @@ function renderPerfil(usuario) {
   editLink.textContent = "Administrar perfil ›";
 
   userInfo.append(nameDiv, editLink);
-  profile.append(avatarCircle, userInfo);
+  profile.append(shell, userInfo);
 
   setAvatarSrc(img, usuario);
 }
@@ -906,7 +910,7 @@ function initAvatarUpload(usuarioId) {
   };
 }
 
-//  deshabilitar links 
+//  deshabilitar links
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
     el.removeAttribute("href");
@@ -1024,7 +1028,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
   renderPerfil(usuario);
-  initAvatarUpload(usuario.id); 
+  initAvatarUpload(usuario.id);
   showSkeletons();
   await loadRecursos(usuario.id);
   initModalPerfil();
