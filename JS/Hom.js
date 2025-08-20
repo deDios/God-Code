@@ -718,7 +718,6 @@ function openEditorDeAvatar({ usuarioId }) {
   const btnSave = overlay.querySelector("#eda-save");
   const btnCancel = overlay.querySelector("#eda-cancel");
   const btnClose = overlay.querySelector("#eda-close");
-  const btnPaste = overlay.querySelector("#eda-paste-btn");
 
   let selectedFile = null;
   let pasteHandler = null;
@@ -778,37 +777,6 @@ function openEditorDeAvatar({ usuarioId }) {
     const f = e.dataTransfer.files && e.dataTransfer.files[0];
     if (f) setSelectedFile(f);
   });
-
-  btnPaste.onclick = async () => {
-    if (navigator.clipboard && navigator.clipboard.read) {
-      try {
-        const items = await navigator.clipboard.read();
-        for (const i of items) {
-          for (const type of i.types) {
-            if (type.startsWith("image/")) {
-              const blob = await i.getType(type);
-              const file = new File([blob], "clipboard.png", {
-                type: blob.type || "image/png",
-              });
-              setSelectedFile(file);
-              return;
-            }
-          }
-        }
-        gcToast && gcToast("No hay imagen en el portapapeles", "warning");
-      } catch (err) {
-        console.warn(err);
-        gcToast &&
-          gcToast("Permiso denegado para leer portapapeles", "warning");
-      }
-    } else {
-      gcToast &&
-        gcToast(
-          "Tu navegador no permite lectura directa; usa Ctrl+V",
-          "warning"
-        );
-    }
-  };
 
   btnCancel.onclick = close;
   btnClose.onclick = close;
