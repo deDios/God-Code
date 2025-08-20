@@ -582,7 +582,7 @@ async function uploadAvatarFile(file, usuarioId) {
         86400;
         refreshAvatarEverywhere(data.url);
     }
-    gcToast && gcToast("Avatar actualizado", "exito");
+    gcToast && gcToast("Imagen de perfil actualizada", "exito");
   } catch (err) {
     console.error(err);
     alert("Error al subir la imagen. Intenta de nuevo.");
@@ -1048,5 +1048,4 @@ function refreshAvatarEverywhere(url) {
     el.src = bust;
   });
 
-  setTimeout(() => location.reload(), 350);
 }
