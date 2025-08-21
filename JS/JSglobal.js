@@ -7,7 +7,7 @@
   const PATHS = window.GC_PATHS || {
     ASSETS: "/ASSETS",
     VIEWS: "/VIEW",
-    ROUTES: { home: "/VIEW/Home.php", login: "/VIEW/Login.php" },
+    ROUTES: { home: "../VIEW/Home.php", login: "/VIEW/Login.php" },
     DEFAULT_AVATAR: "/ASSETS/usuario/usuarioImg/img_user1.png",
   };
 
