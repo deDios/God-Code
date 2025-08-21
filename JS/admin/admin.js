@@ -503,7 +503,7 @@
         </div>`;
     }
 
-    const html = `
+    let html = `
       ${controlsRow}
 
       ${field("Nombre", "nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
@@ -628,7 +628,7 @@
         }
       }
     }, 0);
-html += devJSONSection(c, "JSON · Curso");
+    html += devJSONSection(c, "JSON · Curso");
     return html;
   }
 
