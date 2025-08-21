@@ -628,7 +628,7 @@
         }
       }
     }, 0);
-
+html += devJSONSection(c, "JSON · Curso");
     return html;
   }
 
@@ -836,6 +836,7 @@
               <div style="margin-top:.25rem;color:#666;font-size:.9rem;">Funciones deshabilitadas</div>
             </div>
           </div>
+          ${devJSONSection(n, "JSON · Noticia")}
         `;
       },
     });
@@ -984,7 +985,18 @@
     return [];
   }
 
-  // === Imágenes read-only (con lápiz deshabilitado) ===
+  function devJSONSection(obj, title = "JSON") {
+  if (!window.state || !state.devMode) return "";
+  const safe = escapeHTML(JSON.stringify(obj ?? {}, null, 2));
+  return `
+    <details class="dev-json" open style="margin-top:16px;">
+      <summary style="cursor:pointer; font-weight:600;">${escapeHTML(title)}</summary>
+      <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
+    </details>
+  `;
+}
+
+  // Imágenes solo lectura de momento
   function mountReadOnlyMedia(opt) {
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
