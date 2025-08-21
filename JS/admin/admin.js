@@ -24,7 +24,7 @@
     actividades: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  // ---- Rol: sólo Admin
+  // ---- ids de usuarios con los permisos de admin
   const ADMIN_IDS = [1, 4, 12, 13];
 
   // ---- Estado global
@@ -71,7 +71,7 @@
     return res.json();
   }
 
-  // ---- Catálogos (cache 30 min)
+  // ---- Catalogos 
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000) return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
