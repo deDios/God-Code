@@ -826,16 +826,6 @@
             <div class="label">Imágenes</div>
             <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
           </div>
-          <div class="field">
-            <div class="label">Acciones</div>
-            <div class="value">
-              <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-                <button class="btn" id="btn-edit-noticia">Editar</button>
-                <button class="btn" id="btn-delete-noticia">Eliminar</button>
-              </div>
-              <div style="margin-top:.25rem;color:#666;font-size:.9rem;">Funciones deshabilitadas</div>
-            </div>
-          </div>
           ${isAdminUser ? jsonSection(n, "JSON · Noticia", "json-noticia", "btn-copy-json-noticia") : ""}
         `;
       },
