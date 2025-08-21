@@ -299,7 +299,6 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            bindDisabledNewsActions();
             if (isAdminUser)
               bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
@@ -1067,20 +1066,6 @@
         `;
       },
     });
-  }
-
-  function bindDisabledNewsActions() {
-    const be = document.getElementById("btn-edit-noticia");
-    const bd = document.getElementById("btn-delete-noticia");
-    [be, bd].forEach(
-      (b) =>
-        b &&
-        b.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          toast("Función deshabilitada", "warning");
-        })
-    );
   }
 
   function badgeNoticia(estatus) {
