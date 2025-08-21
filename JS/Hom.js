@@ -1,12 +1,11 @@
 (() => {
-  // === Ajuste de viewport en móviles (vh real) ===
   const setVH = () => {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   };
   setVH();
   window.addEventListener("resize", setVH);
 
-  // === ENDPOINTS ===
+  // ENDPOINTS 
   const API = {
     cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
     iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
