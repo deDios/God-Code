@@ -1374,6 +1374,7 @@
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
 
+    const editable = isAdminUser && state.currentDrawer?.mode === "edit";
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
     grid.className = "media-grid";
@@ -1382,19 +1383,25 @@
       const label = labels[i] || `Imagen ${i + 1}`;
       const card = document.createElement("div");
       card.className = "media-card";
+
+      const editBtnHTML = editable
+        ? `
+      <button class="icon-btn media-edit" title="Editar imagen">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+        </svg>
+      </button>`
+        : "";
+
       card.innerHTML = `
-        <figure class="media-thumb">
-          <img alt="${escapeAttr(label)}" src="${withBust(url)}">
-          <button class="icon-btn media-edit" title="Editar imagen">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-            </svg>
-          </button>
-        </figure>
-        <div class="media-meta">
-          <div class="media-label">${escapeHTML(label)}</div>
-        </div>
-      `;
+      <figure class="media-thumb">
+        <img alt="${escapeAttr(label)}" src="${withBust(url)}">
+        ${editBtnHTML}
+      </figure>
+      <div class="media-meta">
+        <div class="media-label">${escapeHTML(label)}</div>
+      </div>
+    `;
 
       const img = card.querySelector("img");
       img.onerror = () => {
@@ -1402,96 +1409,119 @@
         img.src = `data:image/svg+xml;utf8,${encodeURIComponent(noImageSvg())}`;
       };
 
-      const btnEdit = card.querySelector(".media-edit");
-      btnEdit.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      if (editable) {
+        const btnEdit = card.querySelector(".media-edit");
+        if (btnEdit) {
+          btnEdit.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
 
-        const isCursoEditable =
-          type === "curso" &&
-          state.currentDrawer?.mode === "edit" &&
-          isAdminUser;
-        if (!isCursoEditable) {
-          toast("Función deshabilitada", "warning");
-          return;
-        }
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/png, image/jpeg";
+            input.style.display = "none";
+            document.body.appendChild(input);
 
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/png, image/jpeg";
-        input.style.display = "none";
-        document.body.appendChild(input);
+            input.addEventListener("change", async () => {
+              const file = input.files && input.files[0];
+              document.body.removeChild(input);
+              if (!file) return;
 
-        input.addEventListener("change", async () => {
-          const file = input.files && input.files[0];
-          document.body.removeChild(input);
-          if (!file) return;
-
-          // Validar imagen (mismo criterio que backend)
-          const v = validarImagen(file, { maxMB: 2 });
-          if (!v.ok) {
-            toast(v.error, "error");
-            return;
-          }
-
-          // Render preview y confirmar subida
-          renderPreviewUI(
-            card,
-            file,
-            async () => {
-              try {
-                const fd = new FormData();
-                fd.append("curso_id", String(id));
-                fd.append("imagen", file);
-
-                const res = await fetch(API_UPLOAD.cursoImg, {
-                  method: "POST",
-                  body: fd,
-                });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const json = await res.json();
-                if (json.error) throw new Error(json.error);
-
-                // actualiza imagen con bust usando la URL del backend (mejor porque puede ser .jpg o .png)
-                if (json.url) {
-                  img.src = withBust(json.url);
-                } else {
-                  // fallback a la ruta conocida
-                  img.src = withBust(url);
-                }
-
-                toast("Imagen actualizada correctamente", "exito");
-              } catch (err) {
-                console.error(err);
-                toast("No se pudo subir la imagen", "error");
+              const v = validarImagen(file, { maxMB: 2 });
+              if (!v.ok) {
+                toast(v.error, "error");
+                return;
               }
-            },
-            () => {
-              // cancelar preview (no hacemos nada especial)
-            }
-          );
-        });
 
-        input.click();
-      });
+              // Preview (cursos y noticias)
+              renderPreviewUI(
+                card,
+                file,
+                async () => {
+                  try {
+                    if (type === "curso") {
+                      // --- CURSO
+                      if (!API_UPLOAD.cursoImg) {
+                        toast(
+                          "Configura API_UPLOAD.cursoImg para habilitar subida",
+                          "warning"
+                        );
+                        return;
+                      }
+                      const fd = new FormData();
+                      fd.append("curso_id", String(id));
+                      fd.append("imagen", file);
+
+                      const res = await fetch(API_UPLOAD.cursoImg, {
+                        method: "POST",
+                        body: fd,
+                      });
+                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                      const json = await res.json();
+                      if (json.error) throw new Error(json.error);
+
+                      img.src = withBust(json.url || url);
+                      toast("Imagen de curso actualizada", "exito");
+                      return;
+                    }
+
+                    if (type === "noticia") {
+                      // --- NOTICIA
+                      if (!API_UPLOAD.noticiaImg) {
+                        toast(
+                          "Configura API_UPLOAD.noticiaImg para habilitar subida",
+                          "warning"
+                        );
+                        return;
+                      }
+                      const pos = i + 1; // 1 ó 2
+                      const fd = new FormData();
+                      fd.append("noticia_id", String(id));
+                      fd.append("pos", String(pos));
+                      fd.append("imagen", file);
+
+                      const res = await fetch(API_UPLOAD.noticiaImg, {
+                        method: "POST",
+                        body: fd,
+                      });
+                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                      const json = await res.json();
+                      if (json.error) throw new Error(json.error);
+
+                      img.src = withBust(json.url || url);
+                      toast(`Imagen ${pos} de noticia actualizada`, "exito");
+                      return;
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    toast("No se pudo subir la imagen", "error");
+                  }
+                },
+                () => {
+                }
+              );
+            });
+
+            input.click();
+          });
+        }
+      }
 
       grid.appendChild(card);
     });
 
     container.innerHTML = `
-      <div class="media-head">
-        <div class="media-title">Imágenes</div>
-        ${
-          type === "curso" &&
-          state.currentDrawer?.mode === "edit" &&
-          isAdminUser
-            ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
-            : `<div class="media-help" style="color:#888;">Solo lectura</div>`
-        }
-      </div>`;
+    <div class="media-head">
+      <div class="media-title">Imágenes</div>
+      ${
+        editable
+          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+      }
+    </div>`;
     container.appendChild(grid);
   }
+  //---------------------------------- fin del bloque destinado para la edicion de imagenes de cursos y noticias
 
   // ---- Toolbar / botones
   function bindUI() {
