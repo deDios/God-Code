@@ -1,11 +1,12 @@
 (() => {
+  // -- Altura dinámica en móviles
   const setVH = () => {
     document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   };
   setVH();
   window.addEventListener("resize", setVH);
 
-  // ENDPOINTS 
+  // ---- ENDPOINTS
   const API = {
     cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
     iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
@@ -23,22 +24,19 @@
     actividades: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  const ADMIN_IDS = [1, 4, 12, 13]; // los ids de admins
+  // ---- Rol: sólo Admin
+  const ADMIN_IDS = [1, 4, 12, 13];
 
-  let currentUser = null;
-  let isAdminUser = false;
-
-  // ---------------- estado global 
+  // ---- Estado global
   const state = {
     route: "#/cursos",
     page: 1,
     pageSize: 10,
     data: [],
     raw: [],
-    devMode: false,
+
     tutorsMap: null,
     prioMap: null,
-
     categoriasMap: null,
     calendarioMap: null,
     tipoEvalMap: null,
@@ -46,7 +44,11 @@
 
     currentDrawer: null, // {type:'curso'|'noticia', id:number|null, mode:'view'|'edit'|'create'}
   };
-  const DEV_ALLOWED_IDS = [1, 13];  // esto solo es para debug
+
+  let currentUser = null;
+  let isAdminUser = false;
+
+  // ---- Helpers cortos
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const toast = (msg, tipo = "exito", dur = 2500) =>
@@ -69,6 +71,7 @@
     return res.json();
   }
 
+  // ---- Catálogos (cache 30 min)
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000) return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
@@ -78,7 +81,6 @@
     state.tutorsMap = map;
     return map;
   }
-
   async function getPrioridadMap() {
     if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000) return state.prioMap;
     const arr = await postJSON(API.prioridad, { estatus: 1 });
@@ -88,7 +90,6 @@
     state.prioMap = map;
     return map;
   }
-
   async function getCategoriasMap() {
     if (state.categoriasMap && Date.now() - state.categoriasMap._ts < 30 * 60 * 1000) return state.categoriasMap;
     const arr = await postJSON(API.categorias, { estatus: 1 });
@@ -98,7 +99,6 @@
     state.categoriasMap = map;
     return map;
   }
-
   async function getCalendarioMap() {
     if (state.calendarioMap && Date.now() - state.calendarioMap._ts < 30 * 60 * 1000) return state.calendarioMap;
     const arr = await postJSON(API.calendario, { estatus: 1 });
@@ -108,7 +108,6 @@
     state.calendarioMap = map;
     return map;
   }
-
   async function getTipoEvalMap() {
     if (state.tipoEvalMap && Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000) return state.tipoEvalMap;
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
@@ -118,7 +117,6 @@
     state.tipoEvalMap = map;
     return map;
   }
-
   async function getActividadesMap() {
     if (state.actividadesMap && Date.now() - state.actividadesMap._ts < 30 * 60 * 1000) return state.actividadesMap;
     const arr = await postJSON(API.actividades, { estatus: 1 });
@@ -129,7 +127,7 @@
     return map;
   }
 
-  // ------------- Restricción de navegación por rol 
+  // ---- Visibilidad por rol
   function isCuentasLink(el) {
     const href = (el.getAttribute("href") || el.dataset.route || "").toLowerCase();
     const txt = (el.textContent || "").toLowerCase();
@@ -137,7 +135,7 @@
   }
 
   function applyAdminVisibility(isAdmin) {
-    // Sidebar: deja solo "Cuentas" si NO es admin
+    // Sidebar: si no es admin, deja sólo "Cuentas"
     qsa(".gc-side .nav-item").forEach(a => {
       if (!isAdmin && !isCuentasLink(a)) {
         (a.closest("li") || a).style.display = "none";
@@ -146,7 +144,7 @@
       }
     });
 
-    // boton "Agregar" (curso) sólo para admin
+    // Botón "Agregar" sólo admin
     const addBtn = qs("#btn-add");
     if (addBtn) addBtn.style.display = isAdmin ? "" : "none";
   }
@@ -160,7 +158,7 @@
     }
   }
 
-
+  // ---- Router
   function setRoute(hash) {
     const target = hash || (isAdminUser ? "#/cursos" : "#/cuentas");
     if (location.hash !== target) location.hash = target;
@@ -187,11 +185,10 @@
     if (hash.startsWith("#/noticias")) return isAdminUser ? loadNoticias() : enforceRouteGuard();
     if (hash.startsWith("#/cuentas")) return drawCuentas();
 
-    // fallback
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
 
-  // === Skeletons rapidos ===
+  // ---- Skeletons
   function showSkeletons() {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -205,7 +202,7 @@
     }
   }
 
-  // === Render de listas (desktop + mobile) ===
+  // ---- Render listas
   function renderList(rows, config) {
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
@@ -232,7 +229,7 @@
     const countEl = qs("#mod-count");
     if (countEl) countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"}`;
 
-    // clicks desktop -> drawer
+    // desktop -> drawer
     qsa("#recursos-list .table-row").forEach(el => {
       el.addEventListener("click", () => {
         const data = el.dataset;
@@ -246,8 +243,8 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            // Acciones inhabilitadas (noticias)
             bindDisabledNewsActions();
+            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
@@ -255,7 +252,9 @@
 
     // acordeón mobile
     qsa("#recursos-list-mobile .row-toggle").forEach(el => {
-      el.addEventListener("click", () => el.closest(".table-row-mobile").classList.toggle("expanded"));
+      el.addEventListener("click", () =>
+        el.closest(".table-row-mobile").classList.toggle("expanded")
+      );
     });
     qsa("#recursos-list-mobile .open-drawer").forEach(btn => {
       btn.addEventListener("click", (e) => {
@@ -272,6 +271,7 @@
               labels: ["Imagen 1", "Imagen 2"],
             });
             bindDisabledNewsActions();
+            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
@@ -318,9 +318,8 @@
     if (state.route.startsWith("#/cuentas")) return drawCuentas();
   }
 
-  // === CURSOS ===
+  // ---------- CURSOS ----------
   async function loadCursos() {
-    // header de columnas
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
 
@@ -342,7 +341,6 @@
       } else c4.textContent = "Status";
     }
 
-    // meta barra
     const tt = qs(".tt-title");
     if (tt) tt.textContent = "Cursos:";
     const ttStatus = qs("#tt-status");
@@ -368,6 +366,7 @@
       state.data = (Array.isArray(raw) ? raw : []).map(c => ({
         id: c.id,
         nombre: c.nombre,
+
         tutor: tmap[c.tutor] || `Tutor #${c.tutor}`,
         tutor_id: c.tutor,
 
@@ -452,7 +451,7 @@
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
 
-  // === Drawer Curso (view/edit/create) ===
+  // ---- Drawer Curso (view/edit/create)
   function renderCursoDrawer(dataset) {
     const item = state.data.find(x => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || "view";
@@ -463,7 +462,7 @@
     const c = isCreate ? getEmptyCourse() : item ? item._all : null;
     if (!c) return "<p>No encontrado.</p>";
 
-    // opciones selects
+    // options
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
     const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
@@ -471,7 +470,7 @@
     const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
     const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
 
-    // helpers de inputs
+    // inputs
     const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
     const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
     const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
@@ -479,13 +478,13 @@
     const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
     const inTA = (id, val, rows = 4) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
-    const field = (label, key, value, inputHTML) => `
+    const field = (label, _key, value, inputHTML) => `
       <div class="field">
         <div class="label">${escapeHTML(label)}</div>
         <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
       </div>`;
 
-    // barra de acciones
+    // acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
@@ -523,15 +522,14 @@
         <div class="label">Imágenes</div>
         <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
       </div>
-
-      ${state.devMode ? `
-        <details style="margin-top:10px;">
-          <summary>JSON</summary>
-          <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${escapeHTML(JSON.stringify(c, null, 2))}</pre>
-        </details>` : ""}
     `;
 
-    // título y estado
+    // JSON (sólo admin)
+    if (isAdminUser) {
+      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
+    }
+
+    // título/estado drawer
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
@@ -543,7 +541,7 @@
       state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
     }
 
-    // engancha eventos post-render
+    // post-render
     setTimeout(() => {
       // Guardar
       const bSave = qs("#btn-save");
@@ -578,7 +576,7 @@
         }
       });
 
-      // Eliminar (confirm 2 pasos)
+      // Eliminar (2 pasos)
       const bDel = qs("#btn-delete");
       if (bDel) bDel.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -605,10 +603,10 @@
         }
       });
 
-      // Habilita/deshabilita inputs según modo
+      // Habilitar/Deshabilitar inputs
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // Galería read-only (Curso)
+      // Galería
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
         const cid = Number(c.id ?? item?.id);
@@ -627,8 +625,11 @@
             </div>`;
         }
       }
+
+      // Copiar JSON (curso)
+      if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
     }, 0);
-    html += devJSONSection(c, "JSON · Curso");
+
     return html;
   }
 
@@ -653,6 +654,7 @@
       calendario: 1,
       tipo_evaluacion: 1,
       actividades: 1,
+      creado_por: Number(currentUser?.id || 0) || 1,
     };
   }
 
@@ -667,24 +669,24 @@
 
   function readCursoForm(existingId = null) {
     const read = (id) => qs(`#${id}`)?.value ?? "";
-    const readNum = (id, def = 0) => Number(qs(`#${id}`)?.value ?? def);
-    const readChk = (id) => (qs(`#${id}`)?.checked ? 1 : 0);
+    const readN = (id, def = 0) => Number(qs(`#${id}`)?.value ?? def);
+    const readCh = (id) => (qs(`#${id}`)?.checked ? 1 : 0);
 
     const payload = {
       nombre: read("f_nombre"),
       descripcion_breve: qs("#f_desc_breve")?.value ?? "",
       descripcion_media: qs("#f_desc_media")?.value ?? "",
-      certificado: readChk("f_certificado"),
-      tutor: readNum("f_tutor", 0),
-      precio: readNum("f_precio", 0),
-      estatus: readNum("f_estatus", 1), // (si en el futuro lo vuelves editable aquí)
+      certificado: readCh("f_certificado"),
+      tutor: readN("f_tutor", 0),
+      precio: readN("f_precio", 0),
+      estatus: 1, // se maneja con soft delete
       fecha_inicio: read("f_fecha"),
-      prioridad: readNum("f_prioridad", 1),
-      categoria: readNum("f_categoria", 1),
-      calendario: readNum("f_calendario", 1),
-      tipo_evaluacion: readNum("f_tipo_eval", 1),
-      actividades: readNum("f_actividades", 1),
-      creado_por: Number(currentUser?.id || 0) || 1, // por si el backend lo requiere
+      prioridad: readN("f_prioridad", 1),
+      categoria: readN("f_categoria", 1),
+      calendario: readN("f_calendario", 1),
+      tipo_evaluacion: readN("f_tipo_eval", 1),
+      actividades: readN("f_actividades", 1),
+      creado_por: Number(currentUser?.id || 0) || 1,
     };
     if (existingId != null) payload.id = Number(existingId);
     return payload;
@@ -692,7 +694,6 @@
 
   async function saveNewCurso() {
     const payload = readCursoForm(null);
-
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
     if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
@@ -715,12 +716,11 @@
 
   async function softDeleteCurso(item) {
     if (!item || !item._all) throw new Error("Item inválido");
-    const base = { ...item._all };
-    base.estatus = 0;
+    const base = { ...item._all, estatus: 0 };
     await postJSON(API.uCursos, base);
   }
 
-  // === NOTICIAS ===
+  // ---------- NOTICIAS ----------
   async function loadNoticias() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
@@ -836,7 +836,7 @@
               <div style="margin-top:.25rem;color:#666;font-size:.9rem;">Funciones deshabilitadas</div>
             </div>
           </div>
-          ${devJSONSection(n, "JSON · Noticia")}
+          ${isAdminUser ? jsonSection(n, "JSON · Noticia", "json-noticia", "btn-copy-json-noticia") : ""}
         `;
       },
     });
@@ -847,7 +847,7 @@
     const bd = document.getElementById("btn-delete-noticia");
     [be, bd].forEach(b => b && b.addEventListener("click", (e) => {
       e.preventDefault(); e.stopPropagation();
-      (window.gcToast ? gcToast : alert)("Función deshabilitada", "warning");
+      toast("Función deshabilitada", "warning");
     }));
   }
 
@@ -857,12 +857,12 @@
       : `<span class="badge-inactivo">Inactiva</span>`;
   }
 
-  // === CUENTAS (placeholder para no-admin) ===
+  // ---------- CUENTAS (para no-admin) ----------
   function drawCuentas() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Cuentas";
 
-    // Encabezados mínimos
+    // Header mínimo
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       hdr.innerHTML = `
@@ -901,7 +901,7 @@
     renderPagination(1);
   }
 
-  // === Drawer base ===
+  // ---------- Drawer base ----------
   function openDrawer(title, bodyHTML) {
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.add("open");
@@ -924,7 +924,7 @@
     state.currentDrawer = null;
   }
 
-  // === Helpers UI/format ===
+  // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
     return String(str ?? "").replace(/[&<>'"]/g, (s) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[s]));
@@ -985,18 +985,58 @@
     return [];
   }
 
-  function devJSONSection(obj, title = "JSON") {
-  if (!window.state || !state.devMode) return "";
-  const safe = escapeHTML(JSON.stringify(obj ?? {}, null, 2));
-  return `
-    <details class="dev-json" open style="margin-top:16px;">
-      <summary style="cursor:pointer; font-weight:600;">${escapeHTML(title)}</summary>
-      <pre class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
-    </details>
-  `;
-}
+  // ---- Sección JSON (con botón copiar)
+  function jsonSection(obj, title, preId, btnId) {
+    const safe = escapeHTML(JSON.stringify(obj ?? {}, null, 2));
+    return `
+      <details class="dev-json" open style="margin-top:16px;">
+        <summary style="cursor:pointer; font-weight:600;">${escapeHTML(title)}</summary>
+        <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+          <button class="btn" id="${btnId}">Copiar JSON</button>
+        </div>
+        <pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
+      </details>
+    `;
+  }
 
-  // Imágenes solo lectura de momento
+  function bindCopyFromPre(preSel, btnSel) {
+    const btn = qs(btnSel);
+    const pre = qs(preSel);
+    if (!btn || !pre) return;
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const text = pre.textContent || "";
+      if (!text) return toast("No hay JSON para copiar", "warning");
+      try {
+        await copyText(text);
+        toast("JSON copiado", "exito");
+      } catch {
+        try {
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          toast("JSON copiado", "exito");
+        } catch {
+          alert("No se pudo copiar");
+        }
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return Promise.reject(new Error("Clipboard API no disponible"));
+  }
+
+  // ---- Imágenes read-only
   function mountReadOnlyMedia(opt) {
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
@@ -1032,7 +1072,7 @@
       card.querySelector(".media-edit")?.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        (window.gcToast ? gcToast : alert)("función deshabilitada", "warning");
+        toast("función deshabilitada", "warning");
       });
 
       grid.appendChild(card);
@@ -1045,7 +1085,7 @@
     container.appendChild(grid);
   }
 
-  // === Toolbar / botones ===
+  // ---- Toolbar / botones
   function bindUI() {
     qsa(".admin-dash .admin-nav").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1057,17 +1097,6 @@
       });
     });
 
-    // Ocultar botón devmode siempre; devmode lo controlamos por lista
-    const devToggle = document.getElementById("btn-dev-toggle");
-    if (devToggle) {
-      devToggle.style.display = "none";
-      // si se dejara visible en algún entorno, esto alternaría el estado
-      devToggle.addEventListener("click", () => {
-        state.devMode = !state.devMode;
-        applyDevModeUI();
-      });
-    }
-
     // Cerrar drawer
     const drawerClose = document.getElementById("drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
@@ -1077,17 +1106,9 @@
       if (e.target.id === "gc-dash-overlay") closeDrawer();
     });
 
-    applyDevModeUI();
-  }
-
-  function applyDevModeUI() {
-    const btn = document.getElementById("btn-dev-toggle");
-    if (btn) {
-      btn.classList.toggle("is-active", state.devMode);
-      btn.setAttribute("aria-pressed", String(!!state.devMode));
-      btn.title = `Modo desarrollador (${state.devMode ? "ON" : "OFF"})`;
-    }
-    document.body.classList.toggle("gc-devmode", state.devMode);
+    // Agregar curso (sólo admin)
+    const addBtn = document.getElementById("btn-add");
+    if (addBtn) addBtn.addEventListener("click", openCreateCurso);
   }
 
   async function openCreateCurso() {
@@ -1096,7 +1117,7 @@
       await Promise.all([
         getTutorsMap(), getPrioridadMap(),
         getCategoriasMap(), getCalendarioMap(),
-        getTipoEvalMap(), getActividadesMap()
+        getTipoEvalMap(), getActividadesMap(),
       ]);
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
       openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
@@ -1106,87 +1127,24 @@
     }
   }
 
-  const addBtn = document.getElementById("btn-add");
-  if (addBtn) addBtn.addEventListener("click", openCreateCurso);
-
-  // === INIT ===
+  // ---- INIT
   document.addEventListener("DOMContentLoaded", async () => {
     currentUser = getUsuarioFromCookie();
     const uid = Number(currentUser?.id || 0);
     isAdminUser = ADMIN_IDS.includes(uid);
 
-    // DevMode por lista (sin botón)
-    state.devMode = DEV_ALLOWED_IDS.includes(uid);
-    applyDevModeUI();
-
     applyAdminVisibility(isAdminUser);
-
     bindUI();
 
     try {
       await Promise.all([
         getTutorsMap(), getPrioridadMap(),
         getCategoriasMap(), getCalendarioMap(),
-        getTipoEvalMap(), getActividadesMap()
+        getTipoEvalMap(), getActividadesMap(),
       ]);
     } catch { }
 
     if (!window.location.hash) window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
-
-
-
-
-
-
-
-  (function () {
-    function safeGetUser() {
-      try {
-        return (window.getUsuarioFromCookie && getUsuarioFromCookie()) || null;
-      } catch { return null; }
-    }
-
-    function disableDevModeForAll() {
-      if (window.state && typeof state === "object") {
-        state.devMode = false;
-      }
-      if (typeof window.applyDevModeUI === "function") {
-        try { window.applyDevModeUI(); } catch { }
-      }
-    }
-
-    function removeDevButton() {
-      const btn = document.getElementById("btn-dev-toggle");
-      if (!btn) return;
-      btn.replaceWith(document.createComment("DevMode oculto"));
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const user = safeGetUser();
-      const uid = Number(user && user.id);
-      const isDev = DEV_ALLOWED_IDS.includes(uid);
-
-      if (!isDev) {
-        disableDevModeForAll();
-        removeDevButton();
-      } else {
-        const btn = document.getElementById("btn-dev-toggle");
-        if (btn) {
-          btn.removeAttribute("hidden");
-          btn.classList.remove("hidden");
-          btn.disabled = false;
-          btn.setAttribute(
-            "aria-pressed",
-            String(!!(window.state && state.devMode))
-          );
-        }
-      }
-    });
-  })();
 })();
-
-
-
-
