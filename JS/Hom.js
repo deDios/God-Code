@@ -1123,4 +1123,59 @@
     if (!window.location.hash) window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
+
+
+
+
+
+
+
+  (function () {
+    function safeGetUser() {
+      try {
+        return (window.getUsuarioFromCookie && getUsuarioFromCookie()) || null;
+      } catch { return null; }
+    }
+
+    function disableDevModeForAll() {
+      if (window.state && typeof state === "object") {
+        state.devMode = false;
+      }
+      if (typeof window.applyDevModeUI === "function") {
+        try { window.applyDevModeUI(); } catch { }
+      }
+    }
+
+    function removeDevButton() {
+      const btn = document.getElementById("btn-dev-toggle");
+      if (!btn) return;
+      btn.replaceWith(document.createComment("DevMode oculto"));
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const user = safeGetUser();
+      const uid = Number(user && user.id);
+      const isDev = DEV_ALLOWED_IDS.includes(uid);
+
+      if (!isDev) {
+        disableDevModeForAll();
+        removeDevButton();
+      } else {
+        const btn = document.getElementById("btn-dev-toggle");
+        if (btn) {
+          btn.removeAttribute("hidden");
+          btn.classList.remove("hidden");
+          btn.disabled = false;
+          btn.setAttribute(
+            "aria-pressed",
+            String(!!(window.state && state.devMode))
+          );
+        }
+      }
+    });
+  })();
 })();
+
+
+
+
