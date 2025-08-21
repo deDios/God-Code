@@ -1,27 +1,46 @@
 (() => {
   // -- Altura dinámica en móviles
   const setVH = () => {
-    document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.innerHeight * 0.01}px`
+    );
   };
   setVH();
   window.addEventListener("resize", setVH);
 
   // ---- ENDPOINTS
   const API = {
-    cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
-    iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
-    uCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
+    cursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+    iCursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
+    uCursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
 
-    noticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
-    comentarios: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
+    noticias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
+    comentarios:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
 
-    tutores: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
-    prioridad: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+    tutores:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
+    prioridad:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
 
-    categorias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
-    calendario: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
-    tipoEval: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
-    actividades: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+    categorias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
+    calendario:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
+    tipoEval:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
+    actividades:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+  };
+
+  // --- subida de imagen de curso (ajusta ruta si ubicas el PHP en otro lado)
+  const API_UPLOAD = {
+    cursoImg: "/db/web/update_curso_img.php",
   };
 
   // ---- ids de usuarios con los permisos de admin
@@ -52,13 +71,18 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const toast = (msg, tipo = "exito", dur = 2500) =>
-    window.gcToast ? window.gcToast(msg, tipo, dur) : console.log(`[${tipo}] ${msg}`);
+    window.gcToast
+      ? window.gcToast(msg, tipo, dur)
+      : console.log(`[${tipo}] ${msg}`);
 
   function getUsuarioFromCookie() {
-    const c = document.cookie.split("; ").find(r => r.startsWith("usuario="));
+    const c = document.cookie.split("; ").find((r) => r.startsWith("usuario="));
     if (!c) return null;
-    try { return JSON.parse(decodeURIComponent(c.split("=")[1])); }
-    catch { return null; }
+    try {
+      return JSON.parse(decodeURIComponent(c.split("=")[1]));
+    } catch {
+      return null;
+    }
   }
 
   async function postJSON(url, body) {
@@ -71,57 +95,75 @@
     return res.json();
   }
 
-  // ---- Catalogos 
+  // ---- Catalogos
   async function getTutorsMap() {
-    if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000) return state.tutorsMap;
+    if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
+      return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(t => map[t.id] = t.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((t) => (map[t.id] = t.nombre));
     map._ts = Date.now();
     state.tutorsMap = map;
     return map;
   }
   async function getPrioridadMap() {
-    if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000) return state.prioMap;
+    if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000)
+      return state.prioMap;
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(p => map[p.id] = p.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((p) => (map[p.id] = p.nombre));
     map._ts = Date.now();
     state.prioMap = map;
     return map;
   }
   async function getCategoriasMap() {
-    if (state.categoriasMap && Date.now() - state.categoriasMap._ts < 30 * 60 * 1000) return state.categoriasMap;
+    if (
+      state.categoriasMap &&
+      Date.now() - state.categoriasMap._ts < 30 * 60 * 1000
+    )
+      return state.categoriasMap;
     const arr = await postJSON(API.categorias, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(c => map[c.id] = c.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.categoriasMap = map;
     return map;
   }
   async function getCalendarioMap() {
-    if (state.calendarioMap && Date.now() - state.calendarioMap._ts < 30 * 60 * 1000) return state.calendarioMap;
+    if (
+      state.calendarioMap &&
+      Date.now() - state.calendarioMap._ts < 30 * 60 * 1000
+    )
+      return state.calendarioMap;
     const arr = await postJSON(API.calendario, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(c => map[c.id] = c.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.calendarioMap = map;
     return map;
   }
   async function getTipoEvalMap() {
-    if (state.tipoEvalMap && Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000) return state.tipoEvalMap;
+    if (
+      state.tipoEvalMap &&
+      Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000
+    )
+      return state.tipoEvalMap;
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(c => map[c.id] = c.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.tipoEvalMap = map;
     return map;
   }
   async function getActividadesMap() {
-    if (state.actividadesMap && Date.now() - state.actividadesMap._ts < 30 * 60 * 1000) return state.actividadesMap;
+    if (
+      state.actividadesMap &&
+      Date.now() - state.actividadesMap._ts < 30 * 60 * 1000
+    )
+      return state.actividadesMap;
     const arr = await postJSON(API.actividades, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(c => map[c.id] = c.nombre);
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.actividadesMap = map;
     return map;
@@ -129,14 +171,18 @@
 
   // ---- Visibilidad por rol
   function isCuentasLink(el) {
-    const href = (el.getAttribute("href") || el.dataset.route || "").toLowerCase();
+    const href = (
+      el.getAttribute("href") ||
+      el.dataset.route ||
+      ""
+    ).toLowerCase();
     const txt = (el.textContent || "").toLowerCase();
     return href.includes("#/cuentas") || txt.includes("cuenta");
   }
 
   function applyAdminVisibility(isAdmin) {
     // Sidebar: si no es admin, deja sólo "Cuentas"
-    qsa(".gc-side .nav-item").forEach(a => {
+    qsa(".gc-side .nav-item").forEach((a) => {
       if (!isAdmin && !isCuentasLink(a)) {
         (a.closest("li") || a).style.display = "none";
         a.setAttribute("tabindex", "-1");
@@ -169,20 +215,23 @@
   function onRouteChange() {
     enforceRouteGuard();
 
-    const hash = window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+    const hash =
+      window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
     state.route = hash;
     state.page = 1;
 
     // activa item del sidebar
-    qsa(".gc-side .nav-item").forEach(a => {
+    qsa(".gc-side .nav-item").forEach((a) => {
       const isActive = a.getAttribute("href") === hash;
       a.classList.toggle("is-active", isActive);
       a.setAttribute("aria-current", isActive ? "page" : "false");
     });
 
     // rutas
-    if (hash.startsWith("#/cursos")) return isAdminUser ? loadCursos() : enforceRouteGuard();
-    if (hash.startsWith("#/noticias")) return isAdminUser ? loadNoticias() : enforceRouteGuard();
+    if (hash.startsWith("#/cursos"))
+      return isAdminUser ? loadCursos() : enforceRouteGuard();
+    if (hash.startsWith("#/noticias"))
+      return isAdminUser ? loadNoticias() : enforceRouteGuard();
     if (hash.startsWith("#/cuentas")) return drawCuentas();
 
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
@@ -197,8 +246,10 @@
     const target = d || m;
     if (!target) return;
     for (let i = 0; i < 5; i++) {
-      target.insertAdjacentHTML("beforeend",
-        `<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>`);
+      target.insertAdjacentHTML(
+        "beforeend",
+        `<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>`
+      );
     }
   }
 
@@ -210,8 +261,10 @@
     if (m) m.innerHTML = "";
 
     if (!rows.length) {
-      if (d) d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
-      if (m) m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+      if (d)
+        d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+      if (m)
+        m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
       const countEl = qs("#mod-count");
       if (countEl) countEl.textContent = "0 resultados";
       renderPagination(0);
@@ -221,16 +274,19 @@
     const start = (state.page - 1) * state.pageSize;
     const pageRows = rows.slice(start, start + state.pageSize);
 
-    pageRows.forEach(item => {
+    pageRows.forEach((item) => {
       if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
       if (m) m.insertAdjacentHTML("beforeend", config.mobileRow(item));
     });
 
     const countEl = qs("#mod-count");
-    if (countEl) countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"}`;
+    if (countEl)
+      countEl.textContent = `${rows.length} ${
+        rows.length === 1 ? "elemento" : "elementos"
+      }`;
 
     // desktop -> drawer
-    qsa("#recursos-list .table-row").forEach(el => {
+    qsa("#recursos-list .table-row").forEach((el) => {
       el.addEventListener("click", () => {
         const data = el.dataset;
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
@@ -244,19 +300,20 @@
               labels: ["Imagen 1", "Imagen 2"],
             });
             bindDisabledNewsActions();
-            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser)
+              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
     });
 
     // acordeón mobile
-    qsa("#recursos-list-mobile .row-toggle").forEach(el => {
+    qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
       el.addEventListener("click", () =>
         el.closest(".table-row-mobile").classList.toggle("expanded")
       );
     });
-    qsa("#recursos-list-mobile .open-drawer").forEach(btn => {
+    qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const data = btn.closest(".table-row-mobile").dataset;
@@ -271,7 +328,8 @@
               labels: ["Imagen 1", "Imagen 2"],
             });
             bindDisabledNewsActions();
-            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser)
+              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
@@ -283,7 +341,7 @@
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
     const conts = [qs("#pagination-controls"), qs("#pagination-mobile")];
-    conts.forEach(cont => {
+    conts.forEach((cont) => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -292,14 +350,20 @@
       prev.className = "arrow-btn";
       prev.textContent = "‹";
       prev.disabled = state.page === 1;
-      prev.onclick = () => { state.page = Math.max(1, state.page - 1); refreshCurrent(); };
+      prev.onclick = () => {
+        state.page = Math.max(1, state.page - 1);
+        refreshCurrent();
+      };
       cont.appendChild(prev);
 
       for (let p = 1; p <= totalPages && p <= 7; p++) {
         const b = document.createElement("button");
         b.className = "page-btn" + (p === state.page ? " active" : "");
         b.textContent = p;
-        b.onclick = () => { state.page = p; refreshCurrent(); };
+        b.onclick = () => {
+          state.page = p;
+          refreshCurrent();
+        };
         cont.appendChild(b);
       }
 
@@ -307,7 +371,10 @@
       next.className = "arrow-btn";
       next.textContent = "›";
       next.disabled = state.page === totalPages;
-      next.onclick = () => { state.page = Math.min(totalPages, state.page + 1); refreshCurrent(); };
+      next.onclick = () => {
+        state.page = Math.min(totalPages, state.page + 1);
+        refreshCurrent();
+      };
       cont.appendChild(next);
     });
   }
@@ -326,11 +393,15 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 =
+        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       let c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Nombre";
-      if (c2) { c2.textContent = "Tutor"; c2.classList.add("col-tutor"); }
+      if (c2) {
+        c2.textContent = "Tutor";
+        c2.classList.add("col-tutor");
+      }
       if (c3) c3.textContent = "Fecha de inicio";
       if (!c4) {
         c4 = document.createElement("div");
@@ -363,7 +434,7 @@
       ]);
 
       state.raw = raw;
-      state.data = (Array.isArray(raw) ? raw : []).map(c => ({
+      state.data = (Array.isArray(raw) ? raw : []).map((c) => ({
         id: c.id,
         nombre: c.nombre,
 
@@ -395,7 +466,8 @@
       drawCursos();
     } catch (err) {
       const list = qs("#recursos-list");
-      if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
+      if (list)
+        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
       console.error(err);
@@ -419,7 +491,9 @@
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
           <button class="row-toggle">
-            <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(it.precio)}</div>
+            <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(
+        it.precio
+      )}</div>
             <span class="icon-chevron">›</span>
           </button>
           <div class="row-details">
@@ -430,7 +504,7 @@
           </div>
         </div>`,
       drawerTitle: (d) => {
-        const item = state.data.find(x => String(x.id) === d.id);
+        const item = state.data.find((x) => String(x.id) === d.id);
         return item ? `Curso · ${item.nombre}` : "Curso";
       },
       drawerBody: (d) => renderCursoDrawer(d),
@@ -453,7 +527,7 @@
 
   // ---- Drawer Curso (view/edit/create)
   function renderCursoDrawer(dataset) {
-    const item = state.data.find(x => String(x.id) === dataset.id);
+    const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || "view";
     const isCreate = mode === "create";
     const isEdit = mode === "edit";
@@ -465,23 +539,48 @@
     // options
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
-    const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
-    const calOptions = mapToOptions(state.calendarioMap, String(c.calendario || ""));
-    const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
-    const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
+    const catOptions = mapToOptions(
+      state.categoriasMap,
+      String(c.categoria || "")
+    );
+    const calOptions = mapToOptions(
+      state.calendarioMap,
+      String(c.calendario || "")
+    );
+    const tipoOptions = mapToOptions(
+      state.tipoEvalMap,
+      String(c.tipo_evaluacion || "")
+    );
+    const actOptions = mapToOptions(
+      state.actividadesMap,
+      String(c.actividades || "")
+    );
 
     // inputs
-    const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
-    const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
-    const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
-    const inCheck = (id, val) => `<label style="display:inline-flex;align-items:center;gap:.5rem;"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
+    const inText = (id, val, ph = "") =>
+      `<input id="${id}" type="text" value="${escapeAttr(
+        val || ""
+      )}" placeholder="${escapeAttr(ph)}" />`;
+    const inNum = (id, val, min = "0") =>
+      `<input id="${id}" type="number" value="${escapeAttr(
+        val ?? ""
+      )}" min="${min}" />`;
+    const inDate = (id, val) =>
+      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+    const inCheck = (id, val) =>
+      `<label style="display:inline-flex;align-items:center;gap:.5rem;"><input id="${id}" type="checkbox" ${
+        Number(val) ? "checked" : ""
+      }/> <span>Sí</span></label>`;
     const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
-    const inTA = (id, val, rows = 4) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+    const inTA = (id, val, rows = 4) =>
+      `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
     const field = (label, _key, value, inputHTML) => `
       <div class="field">
         <div class="label">${escapeHTML(label)}</div>
-        <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
+        <div class="value">${
+          isEdit || isCreate ? inputHTML : escapeHTML(value ?? "-")
+        }</div>
       </div>`;
 
     // acciones
@@ -496,37 +595,116 @@
       controlsRow = `
         <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
           ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
-          ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
-          ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
-          ${!isCreate ? `<button class="btn" id="btn-delete" data-step="1">Eliminar</button>` : ""}
+          ${
+            isEdit
+              ? `<button class="btn" id="btn-cancel">Cancelar</button>`
+              : ""
+          }
+          ${
+            isEdit
+              ? `<button class="btn blue" id="btn-save">Guardar</button>`
+              : ""
+          }
+          ${
+            !isCreate
+              ? `<button class="btn" id="btn-delete" data-step="1">Eliminar</button>`
+              : ""
+          }
         </div>`;
     }
 
     let html = `
       ${controlsRow}
 
-      ${field("Nombre", "nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
-      ${field("Tutor", "tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSel("f_tutor", tutorOptions))}
-      ${field("Fecha inicio", "fecha_inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
-      ${field("Precio", "precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio), inNum("f_precio", c.precio ?? 0))}
-      ${field("Certificado", "certificado", Number(c.certificado) ? "Sí" : "No", inCheck("f_certificado", c.certificado))}
-      ${field("Prioridad", "prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSel("f_prioridad", prioOptions))}
-      ${field("Categoría", "categoria", state.categoriasMap?.[c.categoria] || c.categoria, inSel("f_categoria", catOptions))}
-      ${field("Calendario", "calendario", state.calendarioMap?.[c.calendario] || c.calendario, inSel("f_calendario", calOptions))}
-      ${field("Tipo de evaluación", "tipo_evaluacion", state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))}
-      ${field("Actividades", "actividades", state.actividadesMap?.[c.actividades] || c.actividades, inSel("f_actividades", actOptions))}
-      ${field("Descripción breve", "descripcion_breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
-      ${field("Descripción media", "descripcion_media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
+      ${field(
+        "Nombre",
+        "nombre",
+        c.nombre,
+        inText("f_nombre", c.nombre, "Nombre del curso")
+      )}
+      ${field(
+        "Tutor",
+        "tutor",
+        state.tutorsMap?.[c.tutor] || c.tutor,
+        inSel("f_tutor", tutorOptions)
+      )}
+      ${field(
+        "Fecha inicio",
+        "fecha_inicio",
+        c.fecha_inicio,
+        inDate("f_fecha", c.fecha_inicio)
+      )}
+      ${field(
+        "Precio",
+        "precio",
+        c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
+        inNum("f_precio", c.precio ?? 0)
+      )}
+      ${field(
+        "Certificado",
+        "certificado",
+        Number(c.certificado) ? "Sí" : "No",
+        inCheck("f_certificado", c.certificado)
+      )}
+      ${field(
+        "Prioridad",
+        "prioridad",
+        state.prioMap?.[c.prioridad] || c.prioridad,
+        inSel("f_prioridad", prioOptions)
+      )}
+      ${field(
+        "Categoría",
+        "categoria",
+        state.categoriasMap?.[c.categoria] || c.categoria,
+        inSel("f_categoria", catOptions)
+      )}
+      ${field(
+        "Calendario",
+        "calendario",
+        state.calendarioMap?.[c.calendario] || c.calendario,
+        inSel("f_calendario", calOptions)
+      )}
+      ${field(
+        "Tipo de evaluación",
+        "tipo_evaluacion",
+        state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion,
+        inSel("f_tipo_eval", tipoOptions)
+      )}
+      ${field(
+        "Actividades",
+        "actividades",
+        state.actividadesMap?.[c.actividades] || c.actividades,
+        inSel("f_actividades", actOptions)
+      )}
+      ${field(
+        "Descripción breve",
+        "descripcion_breve",
+        c.descripcion_breve,
+        inTA("f_desc_breve", c.descripcion_breve, 3)
+      )}
+      ${field(
+        "Descripción media",
+        "descripcion_media",
+        c.descripcion_media,
+        inTA("f_desc_media", c.descripcion_media, 4)
+      )}
 
       <div class="field">
         <div class="label">Imágenes</div>
-        <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
+        <div class="value"><div id="media-curso" data-id="${
+          c.id ?? item?.id ?? ""
+        }"></div></div>
       </div>
     `;
 
     // JSON (sólo admin)
     if (isAdminUser) {
-      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
+      html += jsonSection(
+        c,
+        "JSON · Curso",
+        "json-curso",
+        "btn-copy-json-curso"
+      );
     }
 
     // título/estado drawer
@@ -534,74 +712,100 @@
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
     } else if (isEdit) {
-      qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""} (edición)`;
-      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+      qs("#drawer-title").textContent = `Curso · ${
+        item?.nombre || ""
+      } (edición)`;
+      state.currentDrawer = {
+        type: "curso",
+        id: item?.id ?? null,
+        mode: "edit",
+      };
     } else {
       qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""}`;
-      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+      state.currentDrawer = {
+        type: "curso",
+        id: item?.id ?? null,
+        mode: "view",
+      };
     }
 
     // post-render
     setTimeout(() => {
       // Guardar
       const bSave = qs("#btn-save");
-      if (bSave) bSave.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        try {
-          if (isCreate) await saveNewCurso();
-          else await saveUpdateCurso(item);
-        } catch (err) {
-          console.error(err);
-          toast("Error al guardar", "error");
-        }
-      });
+      if (bSave)
+        bSave.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          try {
+            if (isCreate) await saveNewCurso();
+            else await saveUpdateCurso(item);
+          } catch (err) {
+            console.error(err);
+            toast("Error al guardar", "error");
+          }
+        });
 
       // Editar
       const bEdit = qs("#btn-edit");
-      if (bEdit) bEdit.addEventListener("click", (e) => {
-        e.stopPropagation();
-        state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
-        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
-      });
+      if (bEdit)
+        bEdit.addEventListener("click", (e) => {
+          e.stopPropagation();
+          state.currentDrawer = {
+            type: "curso",
+            id: item?.id ?? null,
+            mode: "edit",
+          };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({
+            id: String(item?.id ?? ""),
+          });
+        });
 
       // Cancelar
       const bCancel = qs("#btn-cancel");
-      if (bCancel) bCancel.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (isCreate) {
-          closeDrawer();
-        } else {
-          state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
-          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
-        }
-      });
+      if (bCancel)
+        bCancel.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (isCreate) {
+            closeDrawer();
+          } else {
+            state.currentDrawer = {
+              type: "curso",
+              id: item?.id ?? null,
+              mode: "view",
+            };
+            qs("#drawer-body").innerHTML = renderCursoDrawer({
+              id: String(item?.id ?? ""),
+            });
+          }
+        });
 
       // Eliminar (2 pasos)
       const bDel = qs("#btn-delete");
-      if (bDel) bDel.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const step = bDel.dataset.step || "1";
-        if (step === "1") {
-          bDel.textContent = "Confirmar";
-          bDel.dataset.step = "2";
-          setTimeout(() => {
-            if (bDel.dataset.step === "2") {
-              bDel.textContent = "Eliminar";
-              bDel.dataset.step = "1";
-            }
-          }, 4000);
-          return;
-        }
-        try {
-          await softDeleteCurso(item);
-          toast("Curso eliminado (inactivo)", "exito");
-          closeDrawer();
-          await loadCursos();
-        } catch (err) {
-          console.error(err);
-          toast("No se pudo eliminar", "error");
-        }
-      });
+      if (bDel)
+        bDel.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const step = bDel.dataset.step || "1";
+          if (step === "1") {
+            bDel.textContent = "Confirmar";
+            bDel.dataset.step = "2";
+            setTimeout(() => {
+              if (bDel.dataset.step === "2") {
+                bDel.textContent = "Eliminar";
+                bDel.dataset.step = "1";
+              }
+            }, 4000);
+            return;
+          }
+          try {
+            await softDeleteCurso(item);
+            toast("Curso eliminado (inactivo)", "exito");
+            closeDrawer();
+            await loadCursos();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
 
       // Habilitar/Deshabilitar inputs
       disableDrawerInputs(!(isEdit || isCreate));
@@ -634,7 +838,9 @@
   }
 
   function disableDrawerInputs(disabled) {
-    qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => {
+    qsa(
+      "#drawer-body input, #drawer-body select, #drawer-body textarea"
+    ).forEach((el) => {
       el.disabled = disabled;
     });
   }
@@ -662,9 +868,14 @@
     const pairs = Object.entries(map || {});
     const clean = pairs.filter(([k]) => k !== "_ts");
     if (!clean.length) return `<option value="">—</option>`;
-    return clean.map(([id, name]) =>
-      `<option value="${escapeAttr(id)}" ${String(selectedId) === String(id) ? "selected" : ""}>${escapeHTML(name)}</option>`
-    ).join("");
+    return clean
+      .map(
+        ([id, name]) =>
+          `<option value="${escapeAttr(id)}" ${
+            String(selectedId) === String(id) ? "selected" : ""
+          }>${escapeHTML(name)}</option>`
+      )
+      .join("");
   }
 
   function readCursoForm(existingId = null) {
@@ -696,7 +907,8 @@
     const payload = readCursoForm(null);
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
-    if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
+    if (!payload.fecha_inicio)
+      return toast("Fecha de inicio requerida", "warning");
 
     await postJSON(API.iCursos, payload);
     toast("Curso creado", "exito");
@@ -710,8 +922,12 @@
     await postJSON(API.uCursos, payload);
     toast("Cambios guardados", "exito");
     await loadCursos();
-    const re = state.data.find(x => x.id === item.id);
-    if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+    const re = state.data.find((x) => x.id === item.id);
+    if (re)
+      openDrawer(
+        `Curso · ${re.nombre}`,
+        renderCursoDrawer({ id: String(re.id) })
+      );
   }
 
   async function softDeleteCurso(item) {
@@ -728,11 +944,15 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 =
+        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       const c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Título";
-      if (c2) { c2.textContent = "Comentarios"; c2.classList.add("col-tipo"); }
+      if (c2) {
+        c2.textContent = "Comentarios";
+        c2.classList.add("col-tipo");
+      }
       if (c3) c3.textContent = "Fecha de publicación";
       if (c4) c4.textContent = "Status";
     }
@@ -750,7 +970,9 @@
     try {
       const raw = await postJSON(API.noticias, { estatus: 1 });
       const arr = Array.isArray(raw) ? raw : [];
-      const counts = await Promise.all(arr.map(n => getCommentsCount(n.id).catch(() => 0)));
+      const counts = await Promise.all(
+        arr.map((n) => getCommentsCount(n.id).catch(() => 0))
+      );
 
       state.raw = raw;
       state.data = arr.map((n, i) => ({
@@ -765,7 +987,8 @@
       drawNoticias();
     } catch (err) {
       const list = qs("#recursos-list");
-      if (list) list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
+      if (list)
+        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
       console.error(err);
@@ -774,7 +997,10 @@
   }
 
   async function getCommentsCount(noticiaId) {
-    const res = await postJSON(API.comentarios, { noticia_id: Number(noticiaId), estatus: 1 });
+    const res = await postJSON(API.comentarios, {
+      noticia_id: Number(noticiaId),
+      estatus: 1,
+    });
     const arr = Array.isArray(res) ? res : [];
     let total = 0;
     for (const c of arr) {
@@ -809,11 +1035,11 @@
           </div>
         </div>`,
       drawerTitle: (d) => {
-        const item = state.data.find(x => String(x.id) === d.id);
+        const item = state.data.find((x) => String(x.id) === d.id);
         return item ? `Noticia · ${item.titulo}` : "Noticia";
       },
       drawerBody: (d) => {
-        const n = state.data.find(x => String(x.id) === d.id)?._all;
+        const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
         return `
           ${pair("Título", n.titulo)}
@@ -824,9 +1050,20 @@
           ${pair("Creado por", n.creado_por)}
           <div class="field">
             <div class="label">Imágenes</div>
-            <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
+            <div class="value"><div id="media-noticia" data-id="${
+              n.id
+            }"></div></div>
           </div>
-          ${isAdminUser ? jsonSection(n, "JSON · Noticia", "json-noticia", "btn-copy-json-noticia") : ""}
+          ${
+            isAdminUser
+              ? jsonSection(
+                  n,
+                  "JSON · Noticia",
+                  "json-noticia",
+                  "btn-copy-json-noticia"
+                )
+              : ""
+          }
         `;
       },
     });
@@ -835,10 +1072,15 @@
   function bindDisabledNewsActions() {
     const be = document.getElementById("btn-edit-noticia");
     const bd = document.getElementById("btn-delete-noticia");
-    [be, bd].forEach(b => b && b.addEventListener("click", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      toast("Función deshabilitada", "warning");
-    }));
+    [be, bd].forEach(
+      (b) =>
+        b &&
+        b.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toast("Función deshabilitada", "warning");
+        })
+    );
   }
 
   function badgeNoticia(estatus) {
@@ -847,7 +1089,7 @@
       : `<span class="badge-inactivo">Inactiva</span>`;
   }
 
-  // ---------- CUENTAS (para no-admin) ----------
+  // ---------- CUENTAS ----------
   function drawCuentas() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Cuentas";
@@ -863,12 +1105,14 @@
     // Contenido
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
-    if (d) d.innerHTML = `
+    if (d)
+      d.innerHTML = `
       <div class="table-row">
         <div class="col-nombre">Gestión de cuenta</div>
         <div class="col-fecha">Disponible</div>
       </div>`;
-    if (m) m.innerHTML = `
+    if (m)
+      m.innerHTML = `
       <div class="table-row-mobile expanded">
         <button class="row-toggle">
           <div class="col-nombre">Gestión de cuenta</div>
@@ -916,30 +1160,53 @@
 
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
-    return String(str ?? "").replace(/[&<>'"]/g, (s) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[s]));
+    return String(str ?? "").replace(
+      /[&<>'"]/g,
+      (s) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          '"': "&quot;",
+        }[s])
+    );
   }
   function escapeAttr(str) {
     return String(str ?? "").replace(/"/g, "&quot;");
   }
   function fmtDate(d) {
     if (!d) return "-";
-    try { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; }
-    catch { return d; }
+    try {
+      const [y, m, day] = d.split("-");
+      return `${day}/${m}/${y}`;
+    } catch {
+      return d;
+    }
   }
   function fmtDateTime(dt) {
     if (!dt) return "-";
     try {
       const [date, time] = dt.split(" ");
       return `${fmtDate(date)} ${time || ""}`.trim();
-    } catch { return dt; }
+    } catch {
+      return dt;
+    }
   }
   function fmtMoney(n) {
-    try { return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n); }
-    catch { return `$${n}`; }
+    try {
+      return new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+      }).format(n);
+    } catch {
+      return `$${n}`;
+    }
   }
   function pair(label, val) {
-    return `<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${escapeHTML(val ?? "-")}</div></div>`;
+    return `<div class="field"><div class="label">${escapeHTML(
+      label
+    )}</div><div class="value">${escapeHTML(val ?? "-")}</div></div>`;
   }
 
   function withBust(url) {
@@ -970,17 +1237,21 @@
       ];
     }
     if (type === "curso") {
+      // Nota: el upload devuelve url exacta; aquí usamos una ruta por defecto
+      // para mostrar algo inicial (puede ser PNG). Si no existe, se verá el placeholder.
       return [`/ASSETS/cursos/img${nid}.png`];
     }
     return [];
   }
 
-  // ---- Sección JSON (con botón copiar)
+  // ---- Seccion para mostrar el JSON del recurso
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj ?? {}, null, 2));
     return `
       <details class="dev-json" open style="margin-top:16px;">
-        <summary style="cursor:pointer; font-weight:600;">${escapeHTML(title)}</summary>
+        <summary style="cursor:pointer; font-weight:600;">${escapeHTML(
+          title
+        )}</summary>
         <div style="display:flex;gap:.5rem;margin:.5rem 0;">
           <button class="btn" id="${btnId}">Copiar JSON</button>
         </div>
@@ -1026,7 +1297,79 @@
     return Promise.reject(new Error("Clipboard API no disponible"));
   }
 
-  // ---- Imágenes read-only
+  // ====== Helpers NUEVOS para preview/validación de imágenes (reciclados del flujo de avatar) ======
+  function validarImagen(file, { maxMB = 2 } = {}) {
+    if (!file) return { ok: false, error: "No se seleccionó archivo" };
+    const allowed = ["image/jpeg", "image/png"];
+    if (!allowed.includes(file.type)) {
+      return { ok: false, error: "Formato no permitido. Solo JPG o PNG" };
+    }
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > maxMB) {
+      return { ok: false, error: `La imagen excede ${maxMB}MB` };
+    }
+    return { ok: true };
+  }
+
+  function humanSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  }
+
+  // mini UI de preview encima de la tarjeta (no rompe layout del drawer)
+  function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
+    const old = cardEl.querySelector(".media-preview");
+    if (old) old.remove();
+
+    const url = URL.createObjectURL(file);
+    const box = document.createElement("div");
+    box.className = "media-preview";
+    box.style.cssText = `
+      position:absolute; inset:8px; background:#fff; border:1px solid #ddd;
+      border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.12);
+      display:flex; flex-direction:column; padding:10px; gap:8px; z-index:5;
+    `;
+
+    box.innerHTML = `
+      <div style="font-weight:600;">Vista previa</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <img src="${url}" alt="preview" style="max-width:120px; max-height:80px; object-fit:cover; border:1px solid #eee; border-radius:8px;">
+        <div style="font-size:.9rem; color:#444;">
+          <div><strong>Archivo:</strong> ${file.name}</div>
+          <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
+          <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:4px;">
+        <button class="btn blue" data-act="confirm">Subir</button>
+        <button class="btn" data-act="cancel">Cancelar</button>
+      </div>
+    `;
+
+    box
+      .querySelector('[data-act="confirm"]')
+      .addEventListener("click", async (e) => {
+        e.preventDefault();
+        try {
+          await onConfirm?.();
+        } finally {
+          URL.revokeObjectURL(url);
+          box.remove();
+        }
+      });
+    box.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      onCancel?.();
+      URL.revokeObjectURL(url);
+      box.remove();
+    });
+
+    cardEl.style.position = "relative";
+    cardEl.appendChild(box);
+  }
+
+  // ---- imagenes (lectura y, en cursos+edit, subida)
   function mountReadOnlyMedia(opt) {
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
@@ -1042,7 +1385,7 @@
       card.innerHTML = `
         <figure class="media-thumb">
           <img alt="${escapeAttr(label)}" src="${withBust(url)}">
-          <button class="icon-btn media-edit" aria-disabled="true" title="Editar imagen (deshabilitado)">
+          <button class="icon-btn media-edit" title="Editar imagen">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
               <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
             </svg>
@@ -1059,10 +1402,78 @@
         img.src = `data:image/svg+xml;utf8,${encodeURIComponent(noImageSvg())}`;
       };
 
-      card.querySelector(".media-edit")?.addEventListener("click", (e) => {
+      const btnEdit = card.querySelector(".media-edit");
+      btnEdit.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        toast("función deshabilitada", "warning");
+
+        const isCursoEditable =
+          type === "curso" &&
+          state.currentDrawer?.mode === "edit" &&
+          isAdminUser;
+        if (!isCursoEditable) {
+          toast("Función deshabilitada", "warning");
+          return;
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/png, image/jpeg";
+        input.style.display = "none";
+        document.body.appendChild(input);
+
+        input.addEventListener("change", async () => {
+          const file = input.files && input.files[0];
+          document.body.removeChild(input);
+          if (!file) return;
+
+          // Validar imagen (mismo criterio que backend)
+          const v = validarImagen(file, { maxMB: 2 });
+          if (!v.ok) {
+            toast(v.error, "error");
+            return;
+          }
+
+          // Render preview y confirmar subida
+          renderPreviewUI(
+            card,
+            file,
+            async () => {
+              try {
+                const fd = new FormData();
+                fd.append("curso_id", String(id));
+                fd.append("imagen", file);
+
+                const res = await fetch(API_UPLOAD.cursoImg, {
+                  method: "POST",
+                  body: fd,
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                if (json.error) throw new Error(json.error);
+
+                // actualiza imagen con bust usando la URL del backend (mejor porque puede ser .jpg o .png)
+                if (json.url) {
+                  img.src = withBust(json.url);
+                } else {
+                  // fallback a la ruta conocida
+                  img.src = withBust(url);
+                }
+
+                toast("Imagen actualizada correctamente", "exito");
+              } catch (err) {
+                console.error(err);
+                toast("No se pudo subir la imagen", "error");
+              }
+            },
+            () => {
+              // cancelar preview (no hacemos nada especial)
+            }
+          );
+        });
+
+        input.click();
       });
 
       grid.appendChild(card);
@@ -1071,13 +1482,20 @@
     container.innerHTML = `
       <div class="media-head">
         <div class="media-title">Imágenes</div>
+        ${
+          type === "curso" &&
+          state.currentDrawer?.mode === "edit" &&
+          isAdminUser
+            ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+            : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+        }
       </div>`;
     container.appendChild(grid);
   }
 
   // ---- Toolbar / botones
   function bindUI() {
-    qsa(".admin-dash .admin-nav").forEach(btn => {
+    qsa(".admin-dash .admin-nav").forEach((btn) => {
       btn.addEventListener("click", () => {
         const route = btn.dataset.route || btn.getAttribute("href");
         if (route) {
@@ -1092,11 +1510,12 @@
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
 
     const overlay = document.getElementById("gc-dash-overlay");
-    if (overlay) overlay.addEventListener("click", (e) => {
-      if (e.target.id === "gc-dash-overlay") closeDrawer();
-    });
+    if (overlay)
+      overlay.addEventListener("click", (e) => {
+        if (e.target.id === "gc-dash-overlay") closeDrawer();
+      });
 
-    // Agregar curso (sólo admin)
+    // Agregar curso
     const addBtn = document.getElementById("btn-add");
     if (addBtn) addBtn.addEventListener("click", openCreateCurso);
   }
@@ -1105,9 +1524,12 @@
     if (!isAdminUser) return;
     try {
       await Promise.all([
-        getTutorsMap(), getPrioridadMap(),
-        getCategoriasMap(), getCalendarioMap(),
-        getTipoEvalMap(), getActividadesMap(),
+        getTutorsMap(),
+        getPrioridadMap(),
+        getCategoriasMap(),
+        getCalendarioMap(),
+        getTipoEvalMap(),
+        getActividadesMap(),
       ]);
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
       openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
@@ -1128,13 +1550,17 @@
 
     try {
       await Promise.all([
-        getTutorsMap(), getPrioridadMap(),
-        getCategoriasMap(), getCalendarioMap(),
-        getTipoEvalMap(), getActividadesMap(),
+        getTutorsMap(),
+        getPrioridadMap(),
+        getCategoriasMap(),
+        getCalendarioMap(),
+        getTipoEvalMap(),
+        getActividadesMap(),
       ]);
-    } catch { }
+    } catch {}
 
-    if (!window.location.hash) window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
+    if (!window.location.hash)
+      window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
 })();

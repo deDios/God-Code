@@ -130,9 +130,9 @@
 
             <!-- Columna izquierda -->
             <div class="columna texto">
-                <h1>Tecnología unificada. Experiencias conectadasV9</h1>
+                <h1>Tecnología unificada. Experiencias conectada</h1>
                 <p>
-                    V9En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos
+                    En GodCode impulsamos el desarrollo de tecnologías inteligentes y escalables que integran todos
                     los
                     canales y dispositivos de tu negocio.
                     Desde aplicaciones móviles hasta plataformas web, sistemas de gestión y puntos de contacto físicos,

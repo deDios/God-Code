@@ -424,7 +424,7 @@ function showEmptyRecursos() {
   document.getElementById("recursos-list").innerHTML = `
     <div class="empty-state">
       <p>No solicitaste recursos aún.</p>
-      <button class="btn btn-primary" onclick="location.href='nuevo_recurso.php'">
+      <button class="btn btn-primary" onclick="location.href='../VIEW/Blog.php'">
         Solicitar recurso
       </button>
     </div>`;

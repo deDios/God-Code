@@ -372,37 +372,99 @@
 
   // -------------------- subnav --------------------
   document.addEventListener("DOMContentLoaded", () => {
+    function abs(path) {
+      if (!path) return "/";
+      const p = String(path);
+      if (p.startsWith("http://") || p.startsWith("https://")) return p; // ya es absoluta
+      const clean = "/" + p.replace(/^\/+/, ""); // fuerza raíz
+      return clean;
+    }
+
+    function asset(relPath) {
+      const base = (window.ASSET_BASE || "/assets/").replace(/\/+$/, "") + "/";
+      const rel = String(relPath || "").replace(/^\/+/, "");
+      return abs(base + rel);
+    }
+
+    function getNavLink(key, fallback) {
+      const header = document.getElementById("header");
+      const ds = header ? header.dataset : {};
+      const map = window.NAV_LINKS || {};
+      const dataKey = `link${key[0].toUpperCase()}${key.slice(1)}`; // e.g. linkHome
+      const dsVal = ds && typeof ds[dataKey] === "string" ? ds[dataKey] : null;
+      return abs(dsVal || map[key] || fallback);
+    }
+
+    const setVH = () => {
+      document.documentElement.style.setProperty(
+        "--vh",
+        `${window.innerHeight * 0.01}px`
+      );
+    };
+    setVH();
+    window.addEventListener("resize", setVH);
+
+    // -------------------------------------------------------- Views operativas
     const operativeViews = ["home.php", "admin.php"].map((s) =>
       s.toLowerCase()
     );
-    const currentPage = window.location.pathname.split("/").pop().toLowerCase();
+    const currentPage = (
+      window.location.pathname.split("/").pop() || ""
+    ).toLowerCase();
+
     const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
     subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
 
     const socialMarkup = `
-      <div class="social-icons">
-        <div class="circle-icon"><img src="${asset(
-          "index/Facebook.png"
-        )}" alt="Facebook" /></div>
-        <div class="circle-icon"><img src="${asset(
-          "index/Instagram.png"
-        )}" alt="Instagram" /></div>
-        <div class="circle-icon"><img src="${asset(
-          "index/Tiktok.png"
-        )}" alt="TikTok" /></div>
-      </div>
-    `;
+    <div class="social-icons">
+      <div class="circle-icon"><img src="${asset(
+        "index/Facebook.png"
+      )}" alt="Facebook" /></div>
+      <div class="circle-icon"><img src="${asset(
+        "index/Instagram.png"
+      )}" alt="Instagram" /></div>
+      <div class="circle-icon"><img src="${asset(
+        "index/Tiktok.png"
+      )}" alt="TikTok" /></div>
+    </div>
+  `;
+
+    const LINKS = {
+      home: getNavLink("home", "/home.php"),
+      proyectos: getNavLink("proyectos", "/proyectos.php"),
+      cursos: getNavLink("cursos", "/cursos.php"),
+      admin: getNavLink("admin", "/admin.php"),
+    };
+
+    function isActive(href) {
+      try {
+        const a = document.createElement("a");
+        a.href = href;
+        const navPath = new URL(
+          a.href,
+          window.location.origin
+        ).pathname.toLowerCase();
+        const curPath = window.location.pathname.toLowerCase();
+        return navPath === curPath;
+      } catch {
+        return false;
+      }
+    }
 
     if (operativeViews.includes(currentPage)) {
-      const mk = (label) => {
-        const slug = `/${label.toLowerCase()}.php`;
-        const active =
-          slug === window.location.pathname.toLowerCase() ? "active" : "";
-        return `<a href="${abs(slug)}" class="${active}">${label}</a>`;
+      const mk = (label, href) => {
+        const active = isActive(href) ? "active" : "";
+        return `<a href="${href}" class="${active}">${label}</a>`;
       };
-      const markup = `${mk("Home")}${mk("Proyectos")}${mk("Cursos")}${mk(
-        "Admin"
-      )}${socialMarkup}`;
+
+      const markup = [
+        mk("Home", LINKS.home),
+        mk("Proyectos", LINKS.proyectos),
+        mk("Cursos", LINKS.cursos),
+        mk("Admin", LINKS.admin),
+        socialMarkup,
+      ].join("");
+
       subnavs.forEach((nav) => (nav.innerHTML = markup));
     } else {
       subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
@@ -431,13 +493,12 @@
     const logoBtn = document.getElementById("logo-btn");
     if (logoBtn) {
       logoBtn.style.cursor = "pointer";
-      logoBtn.addEventListener(
-        "click",
-        () => (window.location.href = "/index.php")
-      );
+      logoBtn.addEventListener("click", () => {
+        const to = getNavLink("home", "/index.php");
+        window.location.href = to;
+      });
     }
 
-    // redes sociales
     const socialMap = {
       tiktok: "https://www.tiktok.com/@godcodemx",
       instagram: "https://www.instagram.com/god_code_mx/",
@@ -457,7 +518,7 @@
         window.open(url, "_blank", "noopener");
       });
     });
-  });
+  }); // ------------------------------------- fin del js para para el subnav para las vistas operativas
 
   // -------------------- cotizar deshabilitado --------------------
   document.addEventListener("DOMContentLoaded", () => {
@@ -474,15 +535,13 @@
 
   // -------------------- Subnav (deshabilita los links de los botones) --------------------
   document.addEventListener("DOMContentLoaded", () => {
-    const operativeViews = [
-      "home.php",
-      "vistaoperativa2.php",
-      "vistaoperativa3.php",
-    ].map((s) => s.toLowerCase());
+    const operativeViews = ["home.php", "admin.php", "vistaoperativa3.php"].map(
+      (s) => s.toLowerCase()
+    );
     const currentPage = window.location.pathname.split("/").pop().toLowerCase();
     if (!operativeViews.includes(currentPage)) return;
 
-    const deshabilitados = ["Proyectos", "Cursos", "Admin"];
+    const deshabilitados = ["Proyectos", "Cursos"];
     deshabilitados.forEach((nombre) => {
       const btn = Array.from(
         document.querySelectorAll("#header .subnav a")
