@@ -70,7 +70,7 @@ $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
 // limpiar lo que estaba antes 
 foreach (["jpg", "png"] as $oldExt) {
-    $old = $baseDir . DIRECTORY_SEPARATOR . "curso_" . $curso_id . "." . $oldExt;
+    $old = $baseDir . DIRECTORY_SEPARATOR . "img" . $curso_id . "." . $oldExt;
     if (file_exists($old) && $old !== $destPath) {
         @unlink($old);
     }
