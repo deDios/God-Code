@@ -1292,7 +1292,7 @@
     return Promise.reject(new Error("Clipboard API no disponible"));
   }
 
-  // ====== Helpers NUEVOS para preview/validación de imágenes (reciclados del flujo de avatar) ======
+  //
   function validarImagen(file, { maxMB = 2 } = {}) {
     if (!file) return { ok: false, error: "No se seleccionó archivo" };
     const allowed = ["image/jpeg", "image/png"];
@@ -1312,57 +1312,148 @@
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
   }
 
-  // mini UI de preview encima de la tarjeta (no rompe layout del drawer)
+  //modal para el preview de imagen
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
-    const old = cardEl.querySelector(".media-preview");
-    if (old) old.remove();
-
     const url = URL.createObjectURL(file);
-    const box = document.createElement("div");
-    box.className = "media-preview";
-    box.style.cssText = `
-      position:absolute; inset:8px; background:#fff; border:1px solid #ddd;
-      border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.12);
-      display:flex; flex-direction:column; padding:10px; gap:8px; z-index:5;
-    `;
 
-    box.innerHTML = `
-      <div style="font-weight:600;">Vista previa</div>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <img src="${url}" alt="preview" style="max-width:120px; max-height:80px; object-fit:cover; border:1px solid #eee; border-radius:8px;">
-        <div style="font-size:.9rem; color:#444;">
-          <div><strong>Archivo:</strong> ${file.name}</div>
-          <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
-          <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px; margin-top:4px;">
-        <button class="btn blue" data-act="confirm">Subir</button>
-        <button class="btn" data-act="cancel">Cancelar</button>
-      </div>
-    `;
+    const lockScroll = () => {
+      document.body.style.overflow = "hidden";
+    };
+    const unlockScroll = () => {
+      document.body.style.overflow = "";
+    };
 
-    box
+    const overlay = document.createElement("div");
+    overlay.className = "gc-preview-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.style.cssText = `
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(17, 24, 39, .55);
+    backdrop-filter: saturate(120%) blur(2px);
+  `;
+
+    const modal = document.createElement("div");
+    modal.className = "gc-preview-modal";
+    modal.style.cssText = `
+    background: #fff; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,.25);
+    width: min(920px, 94vw); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+  `;
+
+    const header = document.createElement("div");
+    header.style.cssText = `
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding: 12px 16px; border-bottom:1px solid #eee;
+  `;
+    header.innerHTML = `
+    <div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>
+    <button class="btn" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>
+  `;
+
+    const body = document.createElement("div");
+    body.style.cssText = `
+    display:grid; grid-template-columns: 1fr 280px; gap: 16px;
+    padding: 16px; align-items: start;
+  `;
+
+    const imgWrap = document.createElement("div");
+    imgWrap.style.cssText = `
+    border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa;
+    display:flex; align-items:center; justify-content:center; min-height: 320px; max-height: 60vh;
+  `;
+    imgWrap.innerHTML = `
+    <img src="${url}" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;" />
+  `;
+
+    // panel de detalles
+    const side = document.createElement("div");
+    side.style.cssText = `
+    border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;
+  `;
+    side.innerHTML = `
+    <div style="font-weight:600;">Detalles</div>
+    <div style="font-size:.92rem; color:#444; line-height:1.35;">
+      <div><strong>Archivo:</strong> ${file.name}</div>
+      <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
+      <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
+      <div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
+    </div>
+    <div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn blue" data-act="confirm">Subir</button>
+      <button class="btn" data-act="cancel">Cancelar</button>
+    </div>
+  `;
+
+    const footer = document.createElement("div");
+    footer.style.cssText = `padding: 10px 16px 14px; border-top:1px solid #eee; display:none;`;
+
+    const mql = window.matchMedia("(max-width: 720px)");
+    const applyResponsive = () => {
+      if (mql.matches) {
+        body.style.gridTemplateColumns = "1fr";
+        side.style.borderLeft = "none";
+        side.style.paddingLeft = "0";
+        imgWrap.style.minHeight = "200px";
+      } else {
+        body.style.gridTemplateColumns = "1fr 280px";
+        side.style.borderLeft = "1px dashed #e6e6e6";
+        side.style.paddingLeft = "16px";
+        imgWrap.style.minHeight = "320px";
+      }
+    };
+    mql.addEventListener?.("change", applyResponsive);
+    applyResponsive();
+
+    // compose
+    body.appendChild(imgWrap);
+    body.appendChild(side);
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    lockScroll();
+
+    // events
+    const cleanup = () => {
+      unlockScroll();
+      URL.revokeObjectURL(url);
+      overlay.remove();
+    };
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) cleanup();
+    });
+    header
+      .querySelector('[data-act="close"]')
+      .addEventListener("click", cleanup);
+    document.addEventListener("keydown", onEsc);
+    function onEsc(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        cleanup();
+      }
+    }
+
+    side.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      onCancel?.();
+      cleanup();
+    });
+
+    side
       .querySelector('[data-act="confirm"]')
       .addEventListener("click", async (e) => {
         e.preventDefault();
         try {
           await onConfirm?.();
         } finally {
-          URL.revokeObjectURL(url);
-          box.remove();
+          cleanup();
         }
       });
-    box.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
-      e.preventDefault();
-      onCancel?.();
-      URL.revokeObjectURL(url);
-      box.remove();
-    });
-
-    cardEl.style.position = "relative";
-    cardEl.appendChild(box);
   }
+  // final del js para el modal de preview de imagenes
 
   // ---- imagenes (lectura y, en cursos+edit, subida)
   function mountReadOnlyMedia(opt) {
