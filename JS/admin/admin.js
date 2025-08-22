@@ -1232,7 +1232,6 @@
       ];
     }
     if (type === "curso") {
-      // Nota: el upload devuelve url exacta; aquí usamos una ruta por defecto
       // para mostrar algo inicial (puede ser PNG). Si no existe, se verá el placeholder.
       return [`/ASSETS/cursos/img${nid}.png`];
     }
