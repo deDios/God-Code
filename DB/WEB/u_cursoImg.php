@@ -81,7 +81,7 @@ if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $destPath)) {
     exit;
 }
 
-$publicBase = "/ASSETS/curso/cursoImg";
+$publicBase = "/ASSETS/curso";
 $url = $publicBase . "/" . $filename;
 
 echo json_encode([
