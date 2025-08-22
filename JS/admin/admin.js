@@ -1316,6 +1316,18 @@
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
     const url = URL.createObjectURL(file);
 
+    // --- referencias del drawer para desactivarlo temporalmente
+    const drawer = document.getElementById("gc-drawer");
+    const drawerOverlay = document.getElementById("gc-dash-overlay");
+    const prev = {
+      drawerPE: drawer?.style.pointerEvents,
+      drawerFilter: drawer?.style.filter,
+      drawerZ: drawer?.style.zIndex,
+      overlayZ: drawerOverlay?.style.zIndex,
+      drawerAria: drawer?.getAttribute("aria-hidden"),
+      hadInert: !!drawer?.hasAttribute?.("inert"),
+    };
+
     const lockScroll = () => {
       document.body.style.overflow = "hidden";
     };
@@ -1323,28 +1335,46 @@
       document.body.style.overflow = "";
     };
 
+    // overlay (↑ z-index más alto que el drawer)
     const overlay = document.createElement("div");
     overlay.className = "gc-preview-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.style.cssText = `
-    position: fixed; inset: 0; z-index: 9999;
+    position: fixed; inset: 0;
+    z-index: 99999;                      /* << clave */
     display: flex; align-items: center; justify-content: center;
-    background: rgba(17, 24, 39, .55);
+    background: rgba(17,24,39,.55);
     backdrop-filter: saturate(120%) blur(2px);
   `;
 
+    // --- desactiva el drawer debajo mientras el modal está abierto
+    if (drawer) {
+      drawer.style.pointerEvents = "none";
+      drawer.style.filter = "blur(1px)"; // opcional, solo efecto visual
+      drawer.style.zIndex = "1"; // asegúrate que quede debajo
+      drawer.setAttribute("aria-hidden", "true");
+      // inert evita foco/tab (si el navegador lo soporta)
+      try {
+        drawer.setAttribute("inert", "");
+      } catch {}
+    }
+    if (drawerOverlay) {
+      drawerOverlay.style.zIndex = "2"; // queda muy debajo del modal
+    }
+
+    // modal
     const modal = document.createElement("div");
     modal.className = "gc-preview-modal";
     modal.style.cssText = `
-    background: #fff; border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,.25);
-    width: min(920px, 94vw); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+    background:#fff; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,.25);
+    width:min(920px,94vw); max-height:90vh; overflow:hidden; display:flex; flex-direction:column;
   `;
 
     const header = document.createElement("div");
     header.style.cssText = `
     display:flex; align-items:center; justify-content:space-between; gap:8px;
-    padding: 12px 16px; border-bottom:1px solid #eee;
+    padding:12px 16px; border-bottom:1px solid #eee;
   `;
     header.innerHTML = `
     <div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>
@@ -1353,20 +1383,16 @@
 
     const body = document.createElement("div");
     body.style.cssText = `
-    display:grid; grid-template-columns: 1fr 280px; gap: 16px;
-    padding: 16px; align-items: start;
+    display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;
   `;
 
     const imgWrap = document.createElement("div");
     imgWrap.style.cssText = `
     border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa;
-    display:flex; align-items:center; justify-content:center; min-height: 320px; max-height: 60vh;
+    display:flex; align-items:center; justify-content:center; min-height:320px; max-height:60vh;
   `;
-    imgWrap.innerHTML = `
-    <img src="${url}" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;" />
-  `;
+    imgWrap.innerHTML = `<img src="${url}" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
 
-    // panel de detalles
     const side = document.createElement("div");
     side.style.cssText = `
     border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;
@@ -1385,9 +1411,7 @@
     </div>
   `;
 
-    const footer = document.createElement("div");
-    footer.style.cssText = `padding: 10px 16px 14px; border-top:1px solid #eee; display:none;`;
-
+    // responsive
     const mql = window.matchMedia("(max-width: 720px)");
     const applyResponsive = () => {
       if (mql.matches) {
@@ -1405,22 +1429,44 @@
     mql.addEventListener?.("change", applyResponsive);
     applyResponsive();
 
-    // compose
     body.appendChild(imgWrap);
     body.appendChild(side);
     modal.appendChild(header);
     modal.appendChild(body);
-    modal.appendChild(footer);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
     lockScroll();
 
-    // events
     const cleanup = () => {
-      unlockScroll();
+      // restaura drawer
+      if (drawer) {
+        drawer.style.pointerEvents = prev.drawerPE ?? "";
+        drawer.style.filter = prev.drawerFilter ?? "";
+        drawer.style.zIndex = prev.drawerZ ?? "";
+        if (prev.drawerAria != null)
+          drawer.setAttribute("aria-hidden", prev.drawerAria);
+        else drawer.removeAttribute("aria-hidden");
+        if (!prev.hadInert)
+          try {
+            drawer.removeAttribute("inert");
+          } catch {}
+      }
+      if (drawerOverlay) {
+        drawerOverlay.style.zIndex = prev.overlayZ ?? "";
+      }
+      document.body.style.overflow = "";
       URL.revokeObjectURL(url);
       overlay.remove();
+      document.removeEventListener("keydown", onEsc);
     };
+
+    const onEsc = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        cleanup();
+      }
+    };
+    document.addEventListener("keydown", onEsc);
 
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) cleanup();
@@ -1428,20 +1474,11 @@
     header
       .querySelector('[data-act="close"]')
       .addEventListener("click", cleanup);
-    document.addEventListener("keydown", onEsc);
-    function onEsc(e) {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        cleanup();
-      }
-    }
-
     side.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
       e.preventDefault();
       onCancel?.();
       cleanup();
     });
-
     side
       .querySelector('[data-act="confirm"]')
       .addEventListener("click", async (e) => {
@@ -1453,6 +1490,7 @@
         }
       });
   }
+
   // final del js para el modal de preview de imagenes
 
   // ---- imagenes (lectura y, en cursos+edit, subida)
