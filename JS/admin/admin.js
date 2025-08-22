@@ -1,5 +1,4 @@
 (() => {
-  // -- Altura dinámica en móviles
   const setVH = () => {
     document.documentElement.style.setProperty(
       "--vh",
@@ -478,30 +477,30 @@
     const rows = state.data;
     renderList(rows, {
       desktopRow: (it) => `
-        <div class="table-row" data-id="${it.id}" data-type="curso">
-          <div class="col-nombre">
-            <span class="name-text">${escapeHTML(it.nombre)}</span>
-            ${badgePrecio(it.precio)}
-          </div>
-          <div class="col-tutor">${escapeHTML(it.tutor)}</div>
-          <div class="col-fecha">${fmtDate(it.fecha)}</div>
-          <div class="col-status">${badgeCurso(it.estatus)}</div>
-        </div>`,
+      <div class="table-row" data-id="${it.id}" data-type="curso">
+        <div class="col-nombre">
+          <span class="name-text">${escapeHTML(it.nombre)}</span>
+          ${badgePrecio(it.precio)}
+        </div>
+        <div class="col-tutor">${escapeHTML(it.tutor)}</div>
+        <div class="col-fecha">${fmtDate(it.fecha)}</div>
+        <div class="col-status">${badgeCurso(it.estatus)}</div>
+      </div>`,
       mobileRow: (it) => `
-        <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
-          <button class="row-toggle">
-            <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(
+      <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
+        <button class="row-toggle">
+          <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(
         it.precio
       )}</div>
-            <span class="icon-chevron">›</span>
-          </button>
-          <div class="row-details">
-            <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
-            <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
-            <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
-            <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
-          </div>
-        </div>`,
+          <span class="icon-chevron">›</span>
+        </button>
+        <div class="row-details">
+          <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
+          <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
+          <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
+          <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
+        </div>
+      </div>`,
       drawerTitle: (d) => {
         const item = state.data.find((x) => String(x.id) === d.id);
         return item ? `Curso · ${item.nombre}` : "Curso";
@@ -848,9 +847,13 @@
     return {
       nombre: "",
       descripcion_breve: "",
+      descripcion_curso: "",
       descripcion_media: "",
+      dirigido: "",
+      competencias: "",
       certificado: 0,
       tutor: "",
+      horas: 0,
       precio: 0,
       estatus: 1,
       fecha_inicio: "",
@@ -884,12 +887,18 @@
 
     const payload = {
       nombre: read("f_nombre"),
-      descripcion_breve: qs("#f_desc_breve")?.value ?? "",
-      descripcion_media: qs("#f_desc_media")?.value ?? "",
+      descripcion_breve: read("f_desc_breve"),
+      descripcion_curso: read("f_desc_curso"),
+      descripcion_media: read("f_desc_media"),
+      dirigido: read("f_dirigido"),
+      competencias: read("f_competencias"),
+
       certificado: readCh("f_certificado"),
       tutor: readN("f_tutor", 0),
+      horas: readN("f_horas", 0),
+
       precio: readN("f_precio", 0),
-      estatus: 1, // se maneja con soft delete
+      estatus: 1,
       fecha_inicio: read("f_fecha"),
       prioridad: readN("f_prioridad", 1),
       categoria: readN("f_categoria", 1),
