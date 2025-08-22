@@ -39,8 +39,8 @@
 
   // --- subida de imagen de curso (ajusta ruta si ubicas el PHP en otro lado)
   const API_UPLOAD = {
-    cursoImg: "/db/web/update_curso_img.php",
-    // noticiaImg: "/db/web/update_noticia_img.php", // ← descomenta cuando lo tengas listo
+    cursoImg:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
   };
 
   // ---- ids de usuarios con los permisos de admin
