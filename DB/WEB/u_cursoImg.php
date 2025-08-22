@@ -64,8 +64,8 @@ if (!is_writable($baseDir)) {
 
 $ext = $allowed[$mime];
 
-// como va a quedar curso_{ID}.{ext}
-$filename = "curso_" . $curso_id . "." . $ext;
+// como va a quedar img{ID}.{ext}
+$filename = "img" . $curso_id . "." . $ext;
 $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
 // limpiar lo que estaba antes 
