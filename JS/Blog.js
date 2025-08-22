@@ -5,6 +5,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const contenedor = document.querySelector("#blog-godcode .grid-cards");
 
+  function cargarImagenConFallback(imgEl, basePath) {
+    const exts = ["png", "jpg"];
+    let idx = 0;
+
+    function intentar() {
+      if (idx >= exts.length) {
+        imgEl.src = "../ASSETS/noticia/NoticiasImg/noticia_noEncontrada.png";
+        imgEl.onerror = null;
+        return;
+      }
+      imgEl.src = `${basePath}.${exts[idx]}`;
+      imgEl.onerror = () => {
+        idx++;
+        intentar();
+      };
+    }
+    intentar();
+  }
+
   try {
     //ENDPOINT NOTICIAS
     const res = await fetch(endpoint, {
@@ -25,22 +44,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     const noticiasRecientes = data.sort((a, b) => b.id - a.id).slice(0, 3);
 
     // limpia las cards dummy
-    contenedor.innerHTML = "";
+    if (contenedor) contenedor.innerHTML = "";
 
     // inserta las noticias
-    noticiasRecientes.forEach((noticia, index) => {
+    noticiasRecientes.forEach((noticia) => {
       const card = document.createElement("div");
       card.classList.add("card");
 
-      const rutaImagen = `../ASSETS/noticia/NoticiasImg/noticia_img1_${noticia.id}.png`;
+      const img = document.createElement("img");
+      cargarImagenConFallback(
+        img,
+        `../ASSETS/noticia/NoticiasImg/noticia_img1_${noticia.id}`
+      );
+      img.alt = `Imagen noticia ${noticia.id}`;
 
       card.innerHTML = `
-        <img src="${rutaImagen}" alt="Imagen noticia ${noticia.id}">
         <div class="contenido">
           <p>${noticia.titulo}</p>
           <button onclick="abrirNoticia(event, this)" data-id="${noticia.id}">Leer más...</button>
         </div>
       `;
+      card.prepend(img);
 
       contenedor.appendChild(card);
       console.log("Insertada noticia ID:", noticia.id);
@@ -68,6 +92,25 @@ document.addEventListener("DOMContentLoaded", () => {
   let cursosOriginales = [];
   let prioridadesData = [];
 
+  function cargarImagenCurso(imgEl, id) {
+    const exts = ["png", "jpg"];
+    let idx = 0;
+
+    function intentar() {
+      if (idx >= exts.length) {
+        imgEl.src = "../ASSETS/cursos/curso_noEncontrado.png";
+        imgEl.onerror = null;
+        return;
+      }
+      imgEl.src = `../ASSETS/cursos/img${id}.${exts[idx]}`;
+      imgEl.onerror = () => {
+        idx++;
+        intentar();
+      };
+    }
+    intentar();
+  }
+
   fetch(
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
     {
@@ -83,12 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = cat.id;
         option.textContent = cat.nombre;
         categoriaSelect.appendChild(option);
-        console.log(
-          "el id de la categoria es: ",
-          cat.id,
-          " y su nombre es",
-          cat.nombre
-        );
       });
     })
     .catch((err) => console.error("Error al cargar categorías:", err));
@@ -104,17 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((res) => res.json())
     .then((prioridades) => {
       prioridadesData = prioridades;
-      +prioridades
+      prioridades
         .sort((a, b) => a.id - b.id)
         .forEach((item) => {
           const option = document.createElement("option");
           option.value = item.id;
-          console.log(
-            "el id de esta opcion es:",
-            item.id,
-            " y su nombre es:",
-            item.nombre
-          );
           option.textContent = item.nombre;
           explorarSelect.appendChild(option);
         });
@@ -131,8 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
   )
     .then((res) => res.json())
     .then((data) => {
-      cursosOriginales = data;
-      renderizarCursos(data);
+      cursosOriginales = data || [];
+      renderizarCursos(cursosOriginales);
       inicializarCarrusel();
     })
     .catch((err) => console.error("Error al cargar cursos:", err));
@@ -151,48 +182,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const categoriaSeleccionada = categoriaSelect.value;
     const explorarSeleccionado = explorarSelect.value;
 
-    console.log("🚦 aplicarFiltros disparado con:", {
-      categoria: categoriaSeleccionada,
-      prioridad: explorarSeleccionado
-    });
-
     let cursosFiltrados = [...cursosOriginales];
-    console.log("Cursos sin filtrar: ", cursosOriginales.map(c => c.nombre));
 
     if (categoriaSeleccionada) {
       cursosFiltrados = cursosFiltrados.filter(
-        curso => curso.categoria == categoriaSeleccionada
-      );
-      console.log(
-        `filtro de categoria aplicado: (ID=${categoriaSeleccionada}):`,
-        cursosFiltrados.map(c => c.nombre)
+        (curso) => curso.categoria == categoriaSeleccionada
       );
     }
 
     if (explorarSeleccionado) {
-      console.log(
-        "⏭ Antes de filtrar prioridad:",
-        cursosFiltrados.map(c => c.nombre)
-      );
-
       cursosFiltrados = cursosFiltrados.filter(
-        curso => curso.prioridad == explorarSeleccionado
-      );
-
-      const prioridadSeleccionada = prioridadesData.find(
-        p => p.id == explorarSeleccionado
-      );
-      const nombrePrioridad = prioridadSeleccionada
-        ? prioridadSeleccionada.nombre
-        : `(ID=${explorarSeleccionado})`;
-
-      console.log(`prioridad aplicada: "${nombrePrioridad}"`);
-      console.log(
-        "despues de aplicar la prioridad:", cursosFiltrados.map(c => c.nombre)
+        (curso) => curso.prioridad == explorarSeleccionado
       );
     }
 
-    // Finalmente renderizamos
     renderizarCursos(cursosFiltrados);
     inicializarCarrusel();
   }
@@ -205,11 +208,11 @@ document.addEventListener("DOMContentLoaded", () => {
       card.classList.add("card");
 
       const cardLink = document.createElement("a");
-      cardLink.href = `../VIEW/cursoInfo.php?id=${curso.id}`; // redirecciona con el id de lcurso
+      cardLink.href = `../VIEW/cursoInfo.php?id=${curso.id}`; // redirecciona con el id del curso
       cardLink.classList.add("curso-link");
 
       const img = document.createElement("img");
-      img.src = `../ASSETS/cursos/img${curso.id}.png`;
+      cargarImagenCurso(img, curso.id);
       img.alt = curso.nombre;
 
       const contenido = document.createElement("div");
@@ -241,11 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function inicializarCarrusel() {
     const scrollContainer = document.querySelector(".carousel-track-container");
-
     const cursosContainer = document.getElementById("cursos-container");
-
     const prevBtn = document.querySelector(".carousel-btn.prev");
-    
     const nextBtn = document.querySelector(".carousel-btn.next");
 
     if (!scrollContainer || !cursosContainer || !prevBtn || !nextBtn) return;
@@ -255,6 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cardWidth = card.offsetWidth + 24;
 
+    // reenlazar eventos (por si se regeneró el DOM)
     const prevButton = prevBtn.cloneNode(true);
     const nextButton = nextBtn.cloneNode(true);
     prevBtn.parentNode.replaceChild(prevButton, prevBtn);
@@ -262,12 +263,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     prevButton.addEventListener("click", () => {
       scrollContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
-      console.log("click hacia atrás");
     });
 
     nextButton.addEventListener("click", () => {
       scrollContainer.scrollBy({ left: cardWidth, behavior: "smooth" });
-      console.log("click hacia adelante");
     });
 
     if (window.innerWidth <= 768) {
