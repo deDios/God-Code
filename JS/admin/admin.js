@@ -818,6 +818,7 @@
             type: "curso",
             id: cid,
             labels: ["Portada"],
+            editable: isEdit && isAdminUser,
           });
         } else {
           contCurso.innerHTML = `
@@ -1365,13 +1366,20 @@
 
   // ---- imagenes (lectura y, en cursos+edit, subida)
   function mountReadOnlyMedia(opt) {
-    const { container, type, id, labels = [] } = opt;
+    const {
+      container,
+      type,
+      id,
+      labels = [],
+      editable: editableOverride,
+    } = opt;
     if (!container) return;
 
-    // Noticias: editable (admin + modo edición)
-    // Cursos: de momento en solo lectura (no hay endpoint)
+    // PRIORIDAD: lo que mande el caller; si no, usa el estado global
     const editable =
-      isAdminUser && state.currentDrawer?.mode === "edit" && type !== "curso";
+      typeof editableOverride === "boolean"
+        ? editableOverride
+        : isAdminUser && state.currentDrawer?.mode === "edit";
 
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
@@ -1426,35 +1434,47 @@
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
-              if (!v.ok) {
-                toast(v.error, "error");
-                return;
-              }
+              if (!v.ok) return toast(v.error, "error");
 
-              // Preview (noticias y cursos; cursos seguirá solo lectura)
               renderPreviewUI(
                 card,
                 file,
                 async () => {
                   try {
                     if (type === "curso") {
-                      // Cursos: aún sin endpoint
-                      toast(
-                        "Edición de imagen de curso aún no disponible",
-                        "warning"
-                      );
-                      return;
-                    }
-
-                    if (type === "noticia") {
-                      if (!API_UPLOAD.noticiaImg) {
+                      if (!API_UPLOAD?.cursoImg) {
                         toast(
-                          "Configura API_UPLOAD.noticiaImg para habilitar subida",
+                          "Configura API_UPLOAD.cursoImg para habilitar la subida",
                           "warning"
                         );
                         return;
                       }
-                      const pos = i + 1; // 1 ó 2
+                      const fd = new FormData();
+                      fd.append("curso_id", String(id));
+                      fd.append("imagen", file);
+
+                      const res = await fetch(API_UPLOAD.cursoImg, {
+                        method: "POST",
+                        body: fd,
+                      });
+                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                      const json = await res.json();
+                      if (json.error) throw new Error(json.error);
+
+                      img.src = withBust(json.url || url);
+                      toast("Imagen de curso actualizada", "exito");
+                      return;
+                    }
+
+                    if (type === "noticia") {
+                      if (!API_UPLOAD?.noticiaImg) {
+                        toast(
+                          "Configura API_UPLOAD.noticiaImg para habilitar la subida",
+                          "warning"
+                        );
+                        return;
+                      }
+                      const pos = i + 1;
                       const fd = new FormData();
                       fd.append("noticia_id", String(id));
                       fd.append("pos", String(pos));
