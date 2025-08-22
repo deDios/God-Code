@@ -1,7 +1,41 @@
 //--------------- aca termina el js de la pesteña emergente
 let nombreCursoGlobal = "";
 let idCursoGlobal = 0;
-//apartado para recuperar los datos del curso segun su id
+
+(function () {
+  const PLACEHOLDER_CURSO = "../ASSETS/placeholder_curso.png";
+  const PLACEHOLDER_TUTOR = "../ASSETS/tutor/tutor_noEncontrado.png";
+
+  function setImageWithFallback(
+    img,
+    base,
+    exts = ["png", "jpg"],
+    placeholder = PLACEHOLDER_CURSO
+  ) {
+    let attempt = 0;
+    function tryNext() {
+      const ext = exts[attempt++];
+      if (!ext) {
+        img.onerror = null;
+        img.src = placeholder;
+        return;
+      }
+      img.src = `${base}.${ext}`;
+    }
+    img.onerror = tryNext;
+    tryNext();
+  }
+
+  window.__gcImgFallback = {
+    setCourse(img, base) {
+      setImageWithFallback(img, base, ["png", "jpg"], PLACEHOLDER_CURSO);
+    },
+    setTutor(img, base) {
+      setImageWithFallback(img, base, ["png", "jpg"], PLACEHOLDER_TUTOR);
+    },
+  };
+})();
+
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("1. DOM completamente cargado - Iniciando script");
 
@@ -111,8 +145,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementos.titulo.textContent = curso.nombre;
     elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
     elementos.descMedia.innerHTML = formatearTexto(curso.descripcion_media);
-    elementos.imagen.src = `../ASSETS/cursos/img${curso.id}.png`;
-    elementos.imagen.alt = curso.nombre;
+
+    // Imagen principal del curso: fallback png -> jpg -> placeholder (SIN tocar backend)
+    if (elementos.imagen) {
+      const baseCursoImg = `../ASSETS/cursos/img${curso.id}`;
+      window.__gcImgFallback.setCourse(elementos.imagen, baseCursoImg);
+      elementos.imagen.alt = curso.nombre;
+    }
+
     elementos.descripcion.innerHTML = formatearTexto(curso.descripcion_curso);
     elementos.precio.textContent =
       curso.precio == 0
@@ -122,23 +162,25 @@ document.addEventListener("DOMContentLoaded", async () => {
           })}`;
 
     elementos.horas.textContent = `${curso.horas} Horas totales`;
-    elementos.actividades.textContent = actividades.nombre;
-    elementos.evaluacion.textContent = tipoEvaluacion.nombre;
+    elementos.actividades.textContent = actividades?.nombre || "";
+    elementos.evaluacion.textContent = tipoEvaluacion?.nombre || "";
 
     const fechaFormateada = formatearFecha(curso.fecha_inicio);
-    elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${calendario.nombre})`;
+    elementos.calendario.textContent = `Inicia: ${fechaFormateada} (${
+      calendario?.nombre || ""
+    })`;
 
     elementos.certificado.textContent = `Certificado ${
       curso.certificado ? "incluido" : "no incluido"
     }`;
 
     if (tutor) {
-      elementos.tutorImg.src = `../ASSETS/tutor/tutor_${tutor.id}.png`;
-      elementos.tutorImg.alt = "../ASSETS/tutor/tutor_noEncontrado.png";
-      elementos.tutorImg.onerror = function () {
-        console.log("error al cargar imagen de tutor");
-        this.src = "../ASSETS/tutor/tutor_noEncontrado.png";
-      };
+      // Imagen de tutor con fallback png -> jpg -> placeholder
+      if (elementos.tutorImg) {
+        const baseTutorImg = `../ASSETS/tutor/tutor_${tutor.id}`;
+        window.__gcImgFallback.setTutor(elementos.tutorImg, baseTutorImg);
+        elementos.tutorImg.alt = "../ASSETS/tutor/tutor_noEncontrado.png";
+      }
       elementos.tutorNombre.textContent = tutor.nombre;
       elementos.tutorBio.textContent =
         tutor.descripcion || "Experto en su campo";
@@ -163,14 +205,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     if (otrosCursos.length > 0) {
+      // NOTA: injectamos data-img-base y luego conectamos el fallback a cada img
       elementos.otrosCursosContainer.innerHTML = otrosCursos
         .map(
           (curso) => `
       <a href="cursoInfo.php?id=${curso.id}" class="curso-link">
         <div class="card-curso">
-            <img src="../ASSETS/cursos/img${curso.id}.png" alt="${
-            curso.nombre
-          }">
+            <img class="curso-img" data-img-base="../ASSETS/cursos/img${
+              curso.id
+            }" alt="${curso.nombre}">
             <div class="card-contenido">
                 <h4>${curso.nombre}</h4>
                 <p>${curso.descripcion_breve}</p>
@@ -189,6 +232,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     `
         )
         .join("");
+
+      // Conectar fallback png -> jpg -> placeholder a cada imagen inyectada
+      elementos.otrosCursosContainer
+        .querySelectorAll("img.curso-img[data-img-base]")
+        .forEach((img) => {
+          const base = img.getAttribute("data-img-base");
+          window.__gcImgFallback.setCourse(img, base);
+        });
     } else {
       console.log("12. No hay otros cursos de la misma categoría");
       elementos.otrosCursosSection.style.display = "none";
