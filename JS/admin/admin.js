@@ -41,6 +41,7 @@
   // --- subida de imagen de curso (ajusta ruta si ubicas el PHP en otro lado)
   const API_UPLOAD = {
     cursoImg: "/db/web/update_curso_img.php",
+    // noticiaImg: "/db/web/update_noticia_img.php", // ← descomenta cuando lo tengas listo
   };
 
   // ---- ids de usuarios con los permisos de admin
@@ -326,7 +327,6 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            bindDisabledNewsActions();
             if (isAdminUser)
               bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
@@ -1359,7 +1359,11 @@
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
 
-    const editable = isAdminUser && state.currentDrawer?.mode === "edit";
+    // Noticias: editable (admin + modo edición)
+    // Cursos: de momento en solo lectura (no hay endpoint)
+    const editable =
+      isAdminUser && state.currentDrawer?.mode === "edit" && type !== "curso";
+
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
     grid.className = "media-grid";
@@ -1418,40 +1422,22 @@
                 return;
               }
 
-              // Preview (cursos y noticias)
+              // Preview (noticias y cursos; cursos seguirá solo lectura)
               renderPreviewUI(
                 card,
                 file,
                 async () => {
                   try {
                     if (type === "curso") {
-                      // --- CURSO
-                      if (!API_UPLOAD.cursoImg) {
-                        toast(
-                          "Configura API_UPLOAD.cursoImg para habilitar subida",
-                          "warning"
-                        );
-                        return;
-                      }
-                      const fd = new FormData();
-                      fd.append("curso_id", String(id));
-                      fd.append("imagen", file);
-
-                      const res = await fetch(API_UPLOAD.cursoImg, {
-                        method: "POST",
-                        body: fd,
-                      });
-                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                      const json = await res.json();
-                      if (json.error) throw new Error(json.error);
-
-                      img.src = withBust(json.url || url);
-                      toast("Imagen de curso actualizada", "exito");
+                      // Cursos: aún sin endpoint
+                      toast(
+                        "Edición de imagen de curso aún no disponible",
+                        "warning"
+                      );
                       return;
                     }
 
                     if (type === "noticia") {
-                      // --- NOTICIA
                       if (!API_UPLOAD.noticiaImg) {
                         toast(
                           "Configura API_UPLOAD.noticiaImg para habilitar subida",
@@ -1482,8 +1468,7 @@
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                () => {
-                }
+                () => {}
               );
             });
 
