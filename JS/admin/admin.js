@@ -38,9 +38,10 @@
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  // --- subida de imagen de curso (ajusta ruta si ubicas el PHP en otro lado)
+  // --- subida de imágenes (ajusta rutas si cambian)
   const API_UPLOAD = {
     cursoImg: "/db/web/update_curso_img.php",
+    // noticiaImg: "/db/web/update_noticia_img.php", // ← cuando tengas el conn, descomenta y apunta aquí
   };
 
   // ---- ids de usuarios con los permisos de admin
@@ -326,7 +327,6 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            bindDisabledNewsActions();
             if (isAdminUser)
               bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
@@ -865,9 +865,9 @@
 
   function mapToOptions(map, selectedId) {
     const pairs = Object.entries(map || {});
-    const clean = pairs.filter(([k]) => k !== "_ts");
-    if (!clean.length) return `<option value="">—</option>`;
-    return clean
+    theClean = pairs.filter(([k]) => k !== "_ts");
+    if (!theClean.length) return `<option value="">—</option>`;
+    return theClean
       .map(
         ([id, name]) =>
           `<option value="${escapeAttr(id)}" ${
@@ -1222,8 +1222,6 @@
       ];
     }
     if (type === "curso") {
-      // Nota: el upload devuelve url exacta; aquí usamos una ruta por defecto
-      // para mostrar algo inicial (puede ser PNG). Si no existe, se verá el placeholder.
       return [`/ASSETS/cursos/img${nid}.png`];
     }
     return [];
@@ -1282,7 +1280,7 @@
     return Promise.reject(new Error("Clipboard API no disponible"));
   }
 
-  // ====== Helpers NUEVOS para preview/validación de imágenes (reciclados del flujo de avatar) ======
+  // ====== Helpers NUEVOS para preview/validación de imágenes (reciclados del avatar) ======
   function validarImagen(file, { maxMB = 2 } = {}) {
     if (!file) return { ok: false, error: "No se seleccionó archivo" };
     const allowed = ["image/jpeg", "image/png"];
@@ -1354,7 +1352,7 @@
     cardEl.appendChild(box);
   }
 
-  // ---- imagenes (lectura y, en cursos+edit, subida)
+  // ---- imagenes (lectura y, en modo edición, preview + subida)
   function mountReadOnlyMedia(opt) {
     const { container, type, id, labels = [] } = opt;
     if (!container) return;
@@ -1371,22 +1369,22 @@
 
       const editBtnHTML = editable
         ? `
-      <button class="icon-btn media-edit" title="Editar imagen">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-        </svg>
-      </button>`
+        <button class="icon-btn media-edit" title="Editar imagen">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+          </svg>
+        </button>`
         : "";
 
       card.innerHTML = `
-      <figure class="media-thumb">
-        <img alt="${escapeAttr(label)}" src="${withBust(url)}">
-        ${editBtnHTML}
-      </figure>
-      <div class="media-meta">
-        <div class="media-label">${escapeHTML(label)}</div>
-      </div>
-    `;
+        <figure class="media-thumb">
+          <img alt="${escapeAttr(label)}" src="${withBust(url)}">
+          ${editBtnHTML}
+        </figure>
+        <div class="media-meta">
+          <div class="media-label">${escapeHTML(label)}</div>
+        </div>
+      `;
 
       const img = card.querySelector("img");
       img.onerror = () => {
@@ -1418,14 +1416,13 @@
                 return;
               }
 
-              // Preview (cursos y noticias)
+              // Preview común (cursos y noticias)
               renderPreviewUI(
                 card,
                 file,
                 async () => {
                   try {
                     if (type === "curso") {
-                      // --- CURSO
                       if (!API_UPLOAD.cursoImg) {
                         toast(
                           "Configura API_UPLOAD.cursoImg para habilitar subida",
@@ -1451,7 +1448,6 @@
                     }
 
                     if (type === "noticia") {
-                      // --- NOTICIA
                       if (!API_UPLOAD.noticiaImg) {
                         toast(
                           "Configura API_UPLOAD.noticiaImg para habilitar subida",
@@ -1459,7 +1455,7 @@
                         );
                         return;
                       }
-                      const pos = i + 1; // 1 ó 2
+                      const pos = i + 1; // 1 o 2
                       const fd = new FormData();
                       fd.append("noticia_id", String(id));
                       fd.append("pos", String(pos));
@@ -1483,6 +1479,7 @@
                   }
                 },
                 () => {
+                  // cancelar preview
                 }
               );
             });
@@ -1496,17 +1493,16 @@
     });
 
     container.innerHTML = `
-    <div class="media-head">
-      <div class="media-title">Imágenes</div>
-      ${
-        editable
-          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
-          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
-      }
-    </div>`;
+      <div class="media-head">
+        <div class="media-title">Imágenes</div>
+        ${
+          editable
+            ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+            : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+        }
+      </div>`;
     container.appendChild(grid);
   }
-  //---------------------------------- fin del bloque destinado para la edicion de imagenes de cursos y noticias
 
   // ---- Toolbar / botones
   function bindUI() {
@@ -1532,7 +1528,7 @@
 
     // Agregar curso
     const addBtn = document.getElementById("btn-add");
-    if (addBtn) addBtn.addEventListener("click", openCreateCurso);
+    if (addBtn) addEventListener("click", openCreateCurso);
   }
 
   async function openCreateCurso() {
