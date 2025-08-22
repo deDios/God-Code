@@ -141,12 +141,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // cargar curso en DOM
     console.log("9. Actualizando DOM con datos del curso...");
-    elementos.nombre.innerHTML = ``; //este es un espacio vacio para pruebas
+    elementos.nombre.innerHTML = ``; 
     elementos.titulo.textContent = curso.nombre;
     elementos.descCorta.innerHTML = formatearTexto(curso.descripcion_breve);
     elementos.descMedia.innerHTML = formatearTexto(curso.descripcion_media);
 
-    // Imagen principal del curso: fallback png -> jpg -> placeholder (SIN tocar backend)
     if (elementos.imagen) {
       const baseCursoImg = `../ASSETS/cursos/img${curso.id}`;
       window.__gcImgFallback.setCourse(elementos.imagen, baseCursoImg);
@@ -515,7 +514,7 @@ const limpiarFormulario = () => {
   buscarBtn.classList.remove("disabled");
 };
 
-// Bloquear campos de edición
+// Bloquear campos de edicion
 function bloquearCampos(bloquear = true, bloquearToggle = false) {
   document.getElementById("nombre").readOnly = bloquear;
   telefonoInput.readOnly = bloquear;
@@ -531,7 +530,7 @@ function bloquearCampos(bloquear = true, bloquearToggle = false) {
   camposBloqueadosPorCuenta = bloquear;
 }
 
-// Desbloquear campos
+// desbloquear campos
 function desbloquearCampos() {
   camposBloqueadosPorCuenta = false;
   bloquearCampos(false, false);
@@ -631,7 +630,7 @@ function validarMediosContacto() {
   );
 }
 
-// Enviar inscripción
+// Enviar inscripcion
 formInscripcion.addEventListener("submit", async (e) => {
   e.preventDefault();
   btnSubmit.disabled = true;

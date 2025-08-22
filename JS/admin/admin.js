@@ -384,6 +384,7 @@
   }
 
   // ---------- CURSOS ----------
+  // ---------- CURSOS ----------
   async function loadCursos() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
@@ -414,25 +415,35 @@
     if (tt) tt.textContent = "Cursos:";
     const ttStatus = qs("#tt-status");
     if (ttStatus) {
-      ttStatus.textContent = "Activo";
+      // Antes decía "Activo"; ahora mostramos que hay mezcla
+      ttStatus.textContent = "Activos + Inactivos";
       ttStatus.classList.remove("badge-inactivo");
       ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
     try {
-      const [raw, tmap, pmap, cmap, calmap, temap, ammap] = await Promise.all([
-        postJSON(API.cursos, { estatus: 1 }),
-        getTutorsMap(),
-        getPrioridadMap(),
-        getCategoriasMap(),
-        getCalendarioMap(),
-        getTipoEvalMap(),
-        getActividadesMap(),
-      ]);
+      //ahora se mandan a llamar todos los cursos de status 1 y 0 (activos y inactivos)
+      const [activosRaw, inactivosRaw, tmap, pmap, cmap, calmap, temap, ammap] =
+        await Promise.all([
+          postJSON(API.cursos, { estatus: 1 }),
+          postJSON(API.cursos, { estatus: 0 }),
+          getTutorsMap(),
+          getPrioridadMap(),
+          getCategoriasMap(),
+          getCalendarioMap(),
+          getTipoEvalMap(),
+          getActividadesMap(),
+        ]);
+
+      //  aqui se concatenan los activos y luego inactivos quedando estos listados al ultimo
+      const raw = [
+        ...(Array.isArray(activosRaw) ? activosRaw : []),
+        ...(Array.isArray(inactivosRaw) ? inactivosRaw : []),
+      ];
 
       state.raw = raw;
-      state.data = (Array.isArray(raw) ? raw : []).map((c) => ({
+      state.data = raw.map((c) => ({
         id: c.id,
         nombre: c.nombre,
 
@@ -970,20 +981,29 @@
     if (tt) tt.textContent = "Noticias:";
     const ttStatus = qs("#tt-status");
     if (ttStatus) {
-      ttStatus.textContent = "Activas";
+      ttStatus.textContent = "Publicadas + Inactivas";
       ttStatus.classList.remove("badge-inactivo");
       ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
     try {
-      const raw = await postJSON(API.noticias, { estatus: 1 });
-      const arr = Array.isArray(raw) ? raw : [];
+      const [activasRaw, inactivasRaw] = await Promise.all([
+        postJSON(API.noticias, { estatus: 1 }),
+        postJSON(API.noticias, { estatus: 0 }),
+      ]);
+
+      const arr = [
+        ...(Array.isArray(activasRaw) ? activasRaw : []),
+        ...(Array.isArray(inactivasRaw) ? inactivasRaw : []),
+      ];
+
+      // Contar comentarios para cada noticia
       const counts = await Promise.all(
         arr.map((n) => getCommentsCount(n.id).catch(() => 0))
       );
 
-      state.raw = raw;
+      state.raw = arr;
       state.data = arr.map((n, i) => ({
         id: n.id,
         titulo: n.titulo,
