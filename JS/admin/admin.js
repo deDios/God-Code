@@ -37,7 +37,7 @@
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  // --- subida de imagen de curso (ajusta ruta si ubicas el PHP en otro lado)
+  // --- subida de imagen de curso
   const API_UPLOAD = {
     cursoImg:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",

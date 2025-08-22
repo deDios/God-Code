@@ -52,7 +52,7 @@ if ($_FILES['imagen']['size'] > 2 * 1024 * 1024) {
 }
 
 // directirio
-$baseDir = realpath(__DIR__ . "/../../ASSETS/curso/cursoImg");
+$baseDir = realpath(__DIR__ . "/../../ASSETS/cursos");
 if ($baseDir === false) {
     echo json_encode(["error" => "Directorio de destino no encontrado"]);
     exit;
