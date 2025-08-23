@@ -222,7 +222,7 @@ function renderRecursosRowsMobile(lista) {
   });
 }
 
-//  Paginación Desktop
+//  Paginacion Desktop
 function renderPagination(totalPages) {
   const ctrl = document.getElementById("pagination-controls");
   ctrl.innerHTML = "";

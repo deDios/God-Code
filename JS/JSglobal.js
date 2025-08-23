@@ -63,54 +63,79 @@
     }
   }
 
-  function setAvatarSrc(imgEl, usuario) {
-    const ASSETS_BASE = "/ASSETS/usuario/usuarioImg";
-    const DEFAULT_URL = `${ASSETS_BASE}/img_user1.png`;
+  function setImgWithExtFallback(
+    imgEl,
+    bases,
+    { extOrder = ["png", "jpg"], placeholder, cacheBust = true } = {}
+  ) {
+    const isAbsolute = (u) => /^https?:\/\//i.test(u) || u.startsWith("/");
+    const hasExt = (u) => /\.[a-zA-Z0-9]{2,5}(\?|#|$)/.test(u);
 
-    const cookieUrl = usuario?.avatarUrl || usuario?.avatar || null; // normalizamos
-    const id = usuario?.id != null ? String(usuario.id).trim() : null;
+    const queue = [];
+    const baseArr = Array.isArray(bases) ? bases : [bases];
 
-    const convenciones = id
-      ? [
-          `${ASSETS_BASE}/user_${id}.jpg`,
-          `${ASSETS_BASE}/user_${id}.png`,
-          `${ASSETS_BASE}/img_user${id}.jpg`,
-          `${ASSETS_BASE}/img_user${id}.png`,
-        ]
-      : [];
-
-    const candidates = [
-      ...(cookieUrl ? [cookieUrl] : []),
-      ...convenciones,
-      DEFAULT_URL,
-    ].map((u) => (u.startsWith("/") ? withBust(u) : u));
+    baseArr.forEach((b) => {
+      if (!b) return;
+      if (hasExt(b)) {
+        queue.push(b);
+      } else {
+        extOrder.forEach((ext) => queue.push(`${b}.${ext}`));
+      }
+    });
 
     let i = 0;
     const tryNext = () => {
-      if (i >= candidates.length) {
-        console.warn(
-          "Avatar: no se pudo cargar ninguna candidata.",
-          candidates
-        );
+      if (i >= queue.length) {
+        if (placeholder) {
+          imgEl.onerror = null;
+          imgEl.src = cacheBust ? withBust(placeholder) : placeholder;
+        }
         return;
       }
-      const url = candidates[i++];
-      imgEl.onerror = () => {
-        imgEl.onerror = null;
-        setTimeout(() => {
-          imgEl.onerror = tryNext;
-          tryNext();
-        }, 0);
-      };
+      const url = queue[i++];
+      imgEl.onerror = tryNext;
       imgEl.onload = () => {
         imgEl.dataset.srcResolved = url;
+        imgEl.onerror = null;
       };
-      imgEl.src = url;
+      const finalUrl = cacheBust && isAbsolute(url) ? withBust(url) : url;
+      imgEl.src = finalUrl;
     };
+
+    tryNext();
+  }
+
+  function setAvatarSrc(imgEl, usuario) {
+    const ASSETS_BASE = "/ASSETS/usuario/usuarioImg";
+    const DEFAULT_URL = DEFAULT_AVATAR;
+
+    const cookieUrl = usuario?.avatarUrl || usuario?.avatar || null; 
+    const id = usuario?.id != null ? String(usuario.id).trim() : null;
+
+    const basesSinExt = id
+      ? [`${ASSETS_BASE}/user_${id}`, `${ASSETS_BASE}/img_user${id}`]
+      : [];
+
+    const primary = cookieUrl
+      ? /\.[a-zA-Z0-9]{2,5}(\?|#|$)/.test(cookieUrl)
+        ? [cookieUrl]
+        : [cookieUrl]
+      : [];
+
+    const candidates = [
+      ...primary,
+      ...basesSinExt,
+      DEFAULT_URL, 
+    ];
+
+    setImgWithExtFallback(imgEl, candidates, {
+      extOrder: ["png", "jpg"], // si luego se necesitan mas formatos se agrega
+      placeholder: DEFAULT_URL,
+      cacheBust: true,
+    });
 
     imgEl.alt = usuario?.nombre || "Avatar";
     imgEl.loading = "lazy";
-    tryNext();
   }
 
   const applyVH = () =>
