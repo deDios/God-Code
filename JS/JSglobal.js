@@ -400,8 +400,8 @@
     function abs(path) {
       if (!path) return "/";
       const p = String(path);
-      if (p.startsWith("http://") || p.startsWith("https://")) return p; // ya es absoluta
-      const clean = "/" + p.replace(/^\/+/, ""); // fuerza raíz
+      if (p.startsWith("http://") || p.startsWith("https://")) return p; 
+      const clean = "/" + p.replace(/^\/+/, ""); 
       return clean;
     }
 
@@ -455,10 +455,10 @@
   `;
 
     const LINKS = {
-      home: getNavLink("home", "/home.php"),
+      home: getNavLink("home", "/VIEW/Home.php"),
       proyectos: getNavLink("proyectos", "/proyectos.php"),
       cursos: getNavLink("cursos", "/cursos.php"),
-      admin: getNavLink("admin", "/admin.php"),
+      admin: getNavLink("admin", "/VIEW/admin/admin.php"),
     };
 
     function isActive(href) {
