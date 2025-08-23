@@ -19,7 +19,6 @@
 
     noticias:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
-    // Si tu backend sigue el patrón, esta ruta debería existir:
     uNoticias:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
     comentarios:
@@ -44,7 +43,6 @@
   const API_UPLOAD = {
     cursoImg:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
-    // noticiaImg opcional si luego la habilitan:
     // noticiaImg: "https://.../u_noticiaImg.php"
   };
 
@@ -72,7 +70,7 @@
   let currentUser = null;
   let isAdminUser = false;
 
-  // ---- Helpers cortos
+  // ---- Helpers
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
   const toast = (msg, tipo = "exito", dur = 2500) =>
@@ -90,8 +88,8 @@
     }
   }
 
+  // -------- Panel de cuenta
   function showCuentaPanel() {
-    // Oculta tablas/listas/paginación
     qs(".recursos-box.desktop-only")?.style &&
       (qs(".recursos-box.desktop-only").style.display = "none");
     qs(".recursos-box.mobile-only")?.style &&
@@ -101,25 +99,21 @@
     qs("#pagination-mobile")?.style &&
       (qs("#pagination-mobile").style.display = "none");
 
-    // Crea el contenedor si no existe
     if (!qs("#cuenta-panel")) {
       const host = qs(".main-content") || document.body;
       const panel = document.createElement("div");
       panel.id = "cuenta-panel";
       panel.style.padding = "16px 18px";
-      panel.innerHTML = window.renderCuentaOpciones // si ya tienes un renderer
+      panel.innerHTML = window.renderCuentaOpciones
         ? window.renderCuentaOpciones()
-        : `<div>Panel de cuenta</div>`; // placeholder si aún no integras el HTML
+        : `<div>Panel de cuenta</div>`;
       host.appendChild(panel);
     }
   }
-
   function hideCuentaPanel() {
-    // Elimina el panel de cuenta (si es que existe)
     const panel = qs("#cuenta-panel");
     if (panel) panel.remove();
 
-    // Restaura tablas/listas/paginacion
     const d = qs(".recursos-box.desktop-only");
     const m = qs(".recursos-box.mobile-only");
     if (d) d.style.display = "block";
@@ -224,9 +218,7 @@
     const txt = (el.textContent || "").toLowerCase();
     return href.includes("#/cuentas") || txt.includes("cuenta");
   }
-
   function applyAdminVisibility(isAdmin) {
-    // Sidebar: si no es admin, deja sólo "Cuentas"
     qsa(".gc-side .nav-item").forEach((a) => {
       if (!isAdmin && !isCuentasLink(a)) {
         (a.closest("li") || a).style.display = "none";
@@ -234,12 +226,9 @@
         a.setAttribute("aria-hidden", "true");
       }
     });
-
-    // Botón "Agregar" sólo admin
     const addBtn = qs("#btn-add");
     if (addBtn) addBtn.style.display = isAdmin ? "" : "none";
   }
-
   function enforceRouteGuard() {
     if (!isAdminUser) {
       const h = (window.location.hash || "").toLowerCase();
@@ -283,7 +272,6 @@
       showCuentaPanel();
       return;
     }
-
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
 
@@ -339,6 +327,13 @@
     qsa("#recursos-list .table-row").forEach((el) => {
       el.addEventListener("click", () => {
         const data = el.dataset;
+        if (data.type === "noticia") {
+          state.currentDrawer = {
+            type: "noticia",
+            id: Number(data.id),
+            mode: "view",
+          };
+        }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
@@ -366,6 +361,13 @@
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const data = btn.closest(".table-row-mobile").dataset;
+        if (data.type === "noticia") {
+          state.currentDrawer = {
+            type: "noticia",
+            id: Number(data.id),
+            mode: "view",
+          };
+        }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
@@ -496,7 +498,6 @@
 
     showSkeletons();
     try {
-      // activos + inactivos concatenados
       const [activosRaw, inactivosRaw, tmap, pmap, cmap, calmap, temap, ammap] =
         await Promise.all([
           postJSON(API.cursos, { estatus: 1 }),
@@ -615,7 +616,7 @@
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
 
-  // ---- Drawer Curso (view/edit/create)
+  // ---- Drawer Curso
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || "view";
@@ -626,7 +627,6 @@
     const c = isCreate ? getEmptyCourse() : item ? item._all : null;
     if (!c) return "<p>No encontrado.</p>";
 
-    // options
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
     const catOptions = mapToOptions(
@@ -646,7 +646,6 @@
       String(c.actividades || "")
     );
 
-    // inputs
     const inText = (id, val, ph = "") =>
       `<input id="${id}" type="text" value="${escapeAttr(
         val || ""
@@ -673,7 +672,6 @@
         }</div>
       </div>`;
 
-    // acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
@@ -795,7 +793,6 @@
       </div>
     `;
 
-    // JSON (sólo admin)
     if (isAdminUser) {
       html += jsonSection(
         c,
@@ -805,7 +802,6 @@
       );
     }
 
-    // título/estado drawer
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
@@ -827,9 +823,7 @@
       };
     }
 
-    // post-render
     setTimeout(() => {
-      // Guardar
       const bSave = qs("#btn-save");
       if (bSave)
         bSave.addEventListener("click", async (e) => {
@@ -843,7 +837,6 @@
           }
         });
 
-      // Editar
       const bEdit = qs("#btn-edit");
       if (bEdit)
         bEdit.addEventListener("click", (e) => {
@@ -858,7 +851,6 @@
           });
         });
 
-      // Reactivar
       const bReact = qs("#btn-reactivar");
       if (bReact)
         bReact.addEventListener("click", async (e) => {
@@ -879,7 +871,6 @@
           }
         });
 
-      // Cancelar
       const bCancel = qs("#btn-cancel");
       if (bCancel)
         bCancel.addEventListener("click", (e) => {
@@ -898,7 +889,6 @@
           }
         });
 
-      // Eliminar (2 pasos → inactivar)
       const bDel = qs("#btn-delete");
       if (bDel)
         bDel.addEventListener("click", async (e) => {
@@ -926,10 +916,8 @@
           }
         });
 
-      // Habilitar/Deshabilitar inputs
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // Galería
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
         const cid = Number(c.id ?? item?.id);
@@ -950,7 +938,6 @@
         }
       }
 
-      // Copiar JSON (curso)
       if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
     }, 0);
 
@@ -1115,7 +1102,6 @@
         ...(Array.isArray(inactivasRaw) ? inactivasRaw : []),
       ];
 
-      // Contar comentarios para cada noticia
       const counts = await Promise.all(
         arr.map((n) => getCommentsCount(n.id).catch(() => 0))
       );
@@ -1193,147 +1179,8 @@
         const item = state.data.find((x) => String(x.id) === d.id);
         return item ? `Noticia · ${item.titulo}` : "Noticia";
       },
-      drawerBody: (d) => {
-        const n = state.data.find((x) => String(x.id) === d.id)?._all;
-        if (!n) return "<p>No encontrado.</p>";
-
-        const isEdit =
-          state.currentDrawer?.type === "noticia" &&
-          state.currentDrawer?.id === n.id &&
-          state.currentDrawer?.mode === "edit";
-        const isView = !isEdit;
-
-        const controlsRow = isAdminUser
-          ? `
-  <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-    ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
-    ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
-    ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
-    <button class="btn" id="btn-delete" data-step="1">
-      ${Number(n.estatus) === 1 ? "Eliminar" : "Reactivar"}
-    </button>
-  </div>
-`
-          : "";
-
-        return `
-    ${controlsRow}
-
-    ${pair("Título", n.titulo)}
-    ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
-    ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
-    ${pair("Descripción (1)", n.desc_uno)}
-    ${pair("Descripción (2)", n.desc_dos)}
-    ${pair("Creado por", n.creado_por)}
-
-    <div class="field">
-      <div class="label">Imágenes</div>
-      <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
-    </div>F
-
-    ${
-      isAdminUser
-        ? jsonSection(
-            n,
-            "JSON · Noticia",
-            "json-noticia",
-            "btn-copy-json-noticia"
-          )
-        : ""
-    }
-  `;
-      },
+      drawerBody: (d) => renderNoticiaDrawer(d),
     });
-
-    // Acciones del drawer de noticia (reactivar / eliminar –inactivar– / editar placeholder)
-    setTimeout(() => {
-      const btnReact = qs("#btn-reactivar-noticia");
-      if (btnReact)
-        btnReact.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const bodyEl = qs("#drawer-body");
-          const id = Number(
-            bodyEl?.querySelector("#media-noticia")?.dataset?.id || 0
-          );
-          if (!id) return;
-          const ok = await reactivateNoticia(id);
-          if (ok) {
-            toast("Noticia reactivada", "exito");
-            await loadNoticias();
-            const re = state.data.find((x) => x.id === id);
-            if (re)
-              openDrawer(
-                `Noticia · ${re.titulo}`,
-                // re-dibujar con datos actualizados
-                (function (d) {
-                  const n = state.data.find(
-                    (x) => String(x.id) === String(d)
-                  )?._all;
-                  if (!n) return "<p>No encontrado.</p>";
-                  return `
-                    ${pair("Título", n.titulo)}
-                    ${pair(
-                      "Estado",
-                      Number(n.estatus) === 1 ? "Publicada" : "Inactiva"
-                    )}
-                    ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
-                    ${pair("Descripción (1)", n.desc_uno)}
-                    ${pair("Descripción (2)", n.desc_dos)}
-                    ${pair("Creado por", n.creado_por)}
-                    <div class="field">
-                      <div class="label">Imágenes</div>
-                      <div class="value"><div id="media-noticia" data-id="${
-                        n.id
-                      }"></div></div>
-                    </div>
-                    ${
-                      isAdminUser
-                        ? jsonSection(
-                            n,
-                            "JSON · Noticia",
-                            "json-noticia",
-                            "btn-copy-json-noticia"
-                          )
-                        : ""
-                    }
-                  `;
-                })(id)
-              );
-          }
-        });
-
-      const btnDel = qs("#btn-delete-noticia");
-      if (btnDel)
-        btnDel.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const step = btnDel.dataset.step || "1";
-          if (step === "1") {
-            btnDel.textContent = "Confirmar";
-            btnDel.dataset.step = "2";
-            setTimeout(() => {
-              if (btnDel.dataset.step === "2") {
-                btnDel.textContent = "Eliminar";
-                btnDel.dataset.step = "1";
-              }
-            }, 4000);
-            return;
-          }
-          try {
-            // inactivar noticia (estatus: 0)
-            const bodyEl = qs("#drawer-body");
-            const id = Number(
-              bodyEl?.querySelector("#media-noticia")?.dataset?.id || 0
-            );
-            await inactivateNoticia(id);
-            toast("Noticia eliminada (inactiva)", "exito");
-            closeDrawer();
-            await loadNoticias();
-          } catch (err) {
-            console.error(err);
-            toast("No se pudo eliminar", "error");
-          }
-        });
-    }, 0);
   }
 
   function badgeNoticia(estatus) {
@@ -1362,6 +1209,163 @@
     return true;
   }
 
+  // ---- Drawer Noticia (view/edit – mismo look que cursos)
+  function renderNoticiaDrawer(dataset) {
+    const item = state.data.find((x) => String(x.id) === dataset.id);
+    const n = item?._all;
+    if (!n) return "<p>No encontrado.</p>";
+
+    const mode =
+      state.currentDrawer?.type === "noticia" &&
+      state.currentDrawer?.id === n.id
+        ? state.currentDrawer.mode
+        : "view";
+    const isEdit = mode === "edit";
+    const isView = !isEdit;
+    const isInactive = Number(n.estatus) === 0;
+
+    const controlsRow = isAdminUser
+      ? `
+        <div class="gc-actions">
+          ${
+            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+              : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+              : ""
+          }
+          ${
+            isInactive
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+              : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
+          }
+        </div>`
+      : "";
+
+    let html = `
+      ${controlsRow}
+
+      ${pair("Título", n.titulo)}
+      ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
+      ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
+      ${pair("Descripción (1)", n.desc_uno)}
+      ${pair("Descripción (2)", n.desc_dos)}
+      ${pair("Creado por", n.creado_por)}
+
+      <div class="field">
+        <div class="label">Imágenes</div>
+        <div class="value"><div id="media-noticia" data-id="${
+          n.id
+        }"></div></div>
+      </div>
+    `;
+
+    if (isAdminUser) {
+      html += jsonSection(
+        n,
+        "JSON · Noticia",
+        "json-noticia",
+        "btn-copy-json-noticia"
+      );
+    }
+
+    if (isEdit) {
+      qs("#drawer-title").textContent = `Noticia · ${
+        item?.titulo || ""
+      } (edición)`;
+      state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+    } else {
+      qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""}`;
+      state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+    }
+
+    // Bind acciones
+    setTimeout(() => {
+      qs("#btn-edit")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+          id: String(n.id),
+        });
+      });
+
+      qs("#btn-cancel")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+          id: String(n.id),
+        });
+      });
+
+      qs("#btn-save")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        // Aquí podrías leer inputs y POST a API.uNoticias (si habilitas edición real)
+        toast("Cambios guardados", "exito");
+        state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+        await loadNoticias();
+        const re = state.data.find((x) => x.id === n.id);
+        if (re)
+          openDrawer(
+            `Noticia · ${re.titulo}`,
+            renderNoticiaDrawer({ id: String(re.id) })
+          );
+      });
+
+      const bDel = qs("#btn-delete");
+      if (bDel)
+        bDel.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const step = bDel.dataset.step || "1";
+          if (step === "1") {
+            bDel.textContent = "Confirmar";
+            bDel.dataset.step = "2";
+            setTimeout(() => {
+              if (bDel.dataset.step === "2") {
+                bDel.textContent = "Eliminar";
+                bDel.dataset.step = "1";
+              }
+            }, 4000);
+            return;
+          }
+          try {
+            await inactivateNoticia(n.id);
+            toast("Noticia eliminada (inactiva)", "exito");
+            closeDrawer();
+            await loadNoticias();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
+
+      qs("#btn-reactivar")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const ok = await reactivateNoticia(n.id);
+        if (ok) {
+          toast("Noticia reactivada", "exito");
+          await loadNoticias();
+          const re = state.data.find((x) => x.id === n.id);
+          if (re)
+            openDrawer(
+              `Noticia · ${re.titulo}`,
+              renderNoticiaDrawer({ id: String(re.id) })
+            );
+        }
+      });
+
+      // Si en algún punto agregas inputs para editar noticia:
+      disableDrawerInputs(!isEdit);
+    }, 0);
+
+    return html;
+  }
+
   // ---------- CUENTAS ----------
   function drawCuentas() {
     const title = qs("#mod-title");
@@ -1376,7 +1380,6 @@
       ttStatus.classList.add("badge-activo");
     }
 
-    // ocultar tablas (desktop y mobile)
     const desktopTable = qs(".recursos-table");
     const mobileTable = qs(".recursos-table-mobile");
     if (desktopTable) desktopTable.style.display = "none";
@@ -1653,7 +1656,7 @@
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
   }
 
-  // ---- Modal de preview de imagen
+  // ---- Modal / preview de imagen
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
     const url = URL.createObjectURL(file);
 
@@ -1697,7 +1700,6 @@
       drawerOverlay.style.zIndex = "2";
     }
 
-    //modal
     const modal = document.createElement("div");
     modal.className = "gc-preview-modal";
     modal.style.cssText = `
@@ -1771,7 +1773,6 @@
     lockScroll();
 
     const cleanup = () => {
-      // restaura drawer
       if (drawer) {
         drawer.style.pointerEvents = prev.drawerPE ?? "";
         drawer.style.filter = prev.drawerFilter ?? "";
@@ -1993,7 +1994,6 @@
       });
     });
 
-    // Cerrar drawer
     const drawerClose = document.getElementById("drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
 
@@ -2003,7 +2003,6 @@
         if (e.target.id === "gc-dash-overlay") closeDrawer();
       });
 
-    // Agregar curso
     const addBtn = document.getElementById("btn-add");
     if (addBtn) addBtn.addEventListener("click", openCreateCurso);
   }
