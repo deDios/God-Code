@@ -524,11 +524,6 @@
         <div class="col-fecha">${fmtDate(it.fecha)}</div>
         <div class="col-status">
           ${badgeCurso(it.estatus)}
-          ${
-            Number(it.estatus) === 0
-              ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}" style="margin-left:8px;">Reactivar</button>`
-              : ""
-          }
         </div>
       </div>`,
       mobileRow: (it) => `
@@ -661,11 +656,6 @@
           ${
             !isCreate
               ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
-              : ""
-          }
-          ${
-            isInactive
-              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
               : ""
           }
         </div>`;
