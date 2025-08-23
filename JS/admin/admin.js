@@ -1205,15 +1205,15 @@
 
         const controlsRow = isAdminUser
           ? `
-    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-      ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
-      ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
-      ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
-      <button class="btn" id="btn-delete" data-step="1">
-        ${Number(n.estatus) === 1 ? "Eliminar" : "Reactivar"}
-      </button>
-    </div>
-  `
+  <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+    ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
+    ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
+    ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
+    <button class="btn" id="btn-delete" data-step="1">
+      ${Number(n.estatus) === 1 ? "Eliminar" : "Reactivar"}
+    </button>
+  </div>
+`
           : "";
 
         return `
