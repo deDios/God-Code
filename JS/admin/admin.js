@@ -265,7 +265,6 @@
     state.route = hash;
     state.page = 1;
 
-    
     qsa(".gc-side .nav-item").forEach((a) => {
       const isActive = a.getAttribute("href") === hash;
       a.classList.toggle("is-active", isActive);
@@ -273,17 +272,16 @@
     });
 
     if (hash.startsWith("#/cursos")) {
-      hideCuentaPanel(); 
+      hideCuentaPanel();
       return isAdminUser ? loadCursos() : enforceRouteGuard();
     }
     if (hash.startsWith("#/noticias")) {
-      hideCuentaPanel(); 
+      hideCuentaPanel();
       return isAdminUser ? loadNoticias() : enforceRouteGuard();
     }
     if (hash.startsWith("#/cuentas")) {
-      
-      showCuentaPanel(); 
-      return; 
+      showCuentaPanel();
+      return;
     }
 
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
@@ -1199,46 +1197,51 @@
         const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
 
-        const isInactive = Number(n.estatus) === 0;
+        const isEdit =
+          state.currentDrawer?.type === "noticia" &&
+          state.currentDrawer?.id === n.id &&
+          state.currentDrawer?.mode === "edit";
+        const isView = !isEdit;
 
-        const headerActions = isAdminUser
+        const controlsRow = isAdminUser
           ? `
-          <div class="gc-actions" style="margin-bottom:12px;">
-            <button class="gc-btn gc-btn--ghost" data-id="${n.id}">Editar</button>
-            <button class="gc-btn gc-btn--primary" data-id="${n.id}">Eliminar</button>
-            ${
-              isInactive
-                ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-noticia">Reactivar</button>`
-                : ""
-            }
-          </div>`
+    <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+      ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
+      ${isEdit ? `<button class="btn" id="btn-cancel">Cancelar</button>` : ""}
+      ${isEdit ? `<button class="btn blue" id="btn-save">Guardar</button>` : ""}
+      <button class="btn" id="btn-delete" data-step="1">
+        ${Number(n.estatus) === 1 ? "Eliminar" : "Reactivar"}
+      </button>
+    </div>
+  `
           : "";
 
         return `
-          ${headerActions}
-          ${pair("Título", n.titulo)}
-          ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
-          ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
-          ${pair("Descripción (1)", n.desc_uno)}
-          ${pair("Descripción (2)", n.desc_dos)}
-          ${pair("Creado por", n.creado_por)}
-          <div class="field">
-            <div class="label">Imágenes</div>
-            <div class="value"><div id="media-noticia" data-id="${
-              n.id
-            }"></div></div>
-          </div>
-          ${
-            isAdminUser
-              ? jsonSection(
-                  n,
-                  "JSON · Noticia",
-                  "json-noticia",
-                  "btn-copy-json-noticia"
-                )
-              : ""
-          }
-        `;
+    ${controlsRow}
+
+    ${pair("Título", n.titulo)}
+    ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
+    ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
+    ${pair("Descripción (1)", n.desc_uno)}
+    ${pair("Descripción (2)", n.desc_dos)}
+    ${pair("Creado por", n.creado_por)}
+
+    <div class="field">
+      <div class="label">Imágenes</div>
+      <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
+    </div>F
+
+    ${
+      isAdminUser
+        ? jsonSection(
+            n,
+            "JSON · Noticia",
+            "json-noticia",
+            "btn-copy-json-noticia"
+          )
+        : ""
+    }
+  `;
       },
     });
 
