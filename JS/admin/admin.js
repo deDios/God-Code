@@ -19,6 +19,9 @@
 
     noticias:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
+    // Si tu backend sigue el patrón, esta ruta debería existir:
+    uNoticias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
     comentarios:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
 
@@ -41,6 +44,8 @@
   const API_UPLOAD = {
     cursoImg:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
+    // noticiaImg opcional si luego la habilitan:
+    // noticiaImg: "https://.../u_noticiaImg.php"
   };
 
   // ---- ids de usuarios con los permisos de admin
@@ -95,7 +100,7 @@
     return res.json();
   }
 
-  // ---- Catalogos
+  // ---- Catálogos
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
       return state.tutorsMap;
@@ -333,6 +338,31 @@
       });
     });
 
+    // Botones Reactivar (lista)
+    qsa(".gc-reactivate").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const id = Number(btn.dataset.id);
+        const t = btn.dataset.type;
+        try {
+          if (t === "curso") {
+            await reactivateCurso(id);
+            toast("Curso reactivado", "exito");
+            await loadCursos();
+          } else if (t === "noticia") {
+            const ok = await reactivateNoticia(id);
+            if (ok) {
+              toast("Noticia reactivada", "exito");
+              await loadNoticias();
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo reactivar", "error");
+        }
+      });
+    });
+
     renderPagination(rows.length);
   }
 
@@ -384,7 +414,6 @@
   }
 
   // ---------- CURSOS ----------
-  // ---------- CURSOS ----------
   async function loadCursos() {
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
@@ -415,15 +444,14 @@
     if (tt) tt.textContent = "Cursos:";
     const ttStatus = qs("#tt-status");
     if (ttStatus) {
-      // Antes decía "Activo"; ahora mostramos que hay mezcla
-      ttStatus.textContent = "Activos + Inactivos";
+      ttStatus.textContent = "Activos e Inactivos";
       ttStatus.classList.remove("badge-inactivo");
       ttStatus.classList.add("badge-activo");
     }
 
     showSkeletons();
     try {
-      //ahora se mandan a llamar todos los cursos de status 1 y 0 (activos y inactivos)
+      // activos + inactivos concatenados
       const [activosRaw, inactivosRaw, tmap, pmap, cmap, calmap, temap, ammap] =
         await Promise.all([
           postJSON(API.cursos, { estatus: 1 }),
@@ -436,7 +464,6 @@
           getActividadesMap(),
         ]);
 
-      //  aqui se concatenan los activos y luego inactivos quedando estos listados al ultimo
       const raw = [
         ...(Array.isArray(activosRaw) ? activosRaw : []),
         ...(Array.isArray(inactivosRaw) ? inactivosRaw : []),
@@ -495,7 +522,14 @@
         </div>
         <div class="col-tutor">${escapeHTML(it.tutor)}</div>
         <div class="col-fecha">${fmtDate(it.fecha)}</div>
-        <div class="col-status">${badgeCurso(it.estatus)}</div>
+        <div class="col-status">
+          ${badgeCurso(it.estatus)}
+          ${
+            Number(it.estatus) === 0
+              ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}" style="margin-left:8px;">Reactivar</button>`
+              : ""
+          }
+        </div>
       </div>`,
       mobileRow: (it) => `
       <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
@@ -509,7 +543,14 @@
           <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
           <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
           <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
-          <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
+          <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
+            <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+            ${
+              Number(it.estatus) === 0
+                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+                : ""
+            }
+          </div>
         </div>
       </div>`,
       drawerTitle: (d) => {
@@ -522,13 +563,13 @@
 
   function badgePrecio(precio) {
     return Number(precio) === 0
-      ? `<span class="badge-neutral">Gratuito</span>`
-      : `<span class="badge-neutral">Con costo</span>`;
+      ? `<span class="gc-chip gray">Gratuito</span>`
+      : `<span class="gc-chip gray">Con costo</span>`;
   }
   function badgeCurso(estatus) {
     return Number(estatus) === 1
-      ? `<span class="badge-activo">Activo</span>`
-      : `<span class="badge-inactivo">Inactivo</span>`;
+      ? `<span class="gc-badge-activo">Activo</span>`
+      : `<span class="gc-badge-inactivo">Inactivo</span>`;
   }
   function textCursoStatus(estatus) {
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
@@ -596,27 +637,35 @@
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
-        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-          <button class="btn" id="btn-cancel">Cancelar</button>
-          <button class="btn blue" id="btn-save">Guardar</button>
+        <div class="gc-actions">
+          <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
+          <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
         </div>`;
     } else if (isAdminUser) {
+      const isInactive = Number(c.estatus) === 0;
       controlsRow = `
-        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-          ${isView ? `<button class="btn" id="btn-edit">Editar</button>` : ""}
+        <div class="gc-actions">
+          ${
+            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
+          }
           ${
             isEdit
-              ? `<button class="btn" id="btn-cancel">Cancelar</button>`
+              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
               : ""
           }
           ${
             isEdit
-              ? `<button class="btn blue" id="btn-save">Guardar</button>`
+              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
               : ""
           }
           ${
             !isCreate
-              ? `<button class="btn" id="btn-delete" data-step="1">Eliminar</button>`
+              ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
+              : ""
+          }
+          ${
+            isInactive
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
               : ""
           }
         </div>`;
@@ -769,6 +818,27 @@
           });
         });
 
+      // Reactivar
+      const bReact = qs("#btn-reactivar");
+      if (bReact)
+        bReact.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          try {
+            await reactivateCurso(Number(item?.id));
+            toast("Curso reactivado", "exito");
+            await loadCursos();
+            const re = state.data.find((x) => x.id === item.id);
+            if (re)
+              openDrawer(
+                `Curso · ${re.nombre}`,
+                renderCursoDrawer({ id: String(re.id) })
+              );
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo reactivar", "error");
+          }
+        });
+
       // Cancelar
       const bCancel = qs("#btn-cancel");
       if (bCancel)
@@ -788,7 +858,7 @@
           }
         });
 
-      // Eliminar (2 pasos)
+      // Eliminar (2 pasos → inactivar)
       const bDel = qs("#btn-delete");
       if (bDel)
         bDel.addEventListener("click", async (e) => {
@@ -956,6 +1026,13 @@
     await postJSON(API.uCursos, base);
   }
 
+  async function reactivateCurso(id) {
+    const it = state.data.find((x) => x.id === Number(id));
+    if (!it || !it._all) throw new Error("Curso no encontrado");
+    const body = { ...it._all, estatus: 1 };
+    await postJSON(API.uCursos, body);
+  }
+
   // ---------- NOTICIAS ----------
   async function loadNoticias() {
     const title = qs("#mod-title");
@@ -981,7 +1058,7 @@
     if (tt) tt.textContent = "Noticias:";
     const ttStatus = qs("#tt-status");
     if (ttStatus) {
-      ttStatus.textContent = "Publicadas + Inactivas";
+      ttStatus.textContent = "Publicadas e Inactivas";
       ttStatus.classList.remove("badge-inactivo");
       ttStatus.classList.add("badge-activo");
     }
@@ -1049,7 +1126,14 @@
           </div>
           <div class="col-tutor">${it.comentarios}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">${badgeNoticia(it.estatus)}</div>
+          <div class="col-status">
+            ${badgeNoticia(it.estatus)}
+            ${
+              Number(it.estatus) === 0
+                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}" style="margin-left:8px;">Reactivar</button>`
+                : ""
+            }
+          </div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -1060,7 +1144,14 @@
           <div class="row-details">
             <div><strong>Comentarios:</strong> ${it.comentarios}</div>
             <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
-            <button class="btn open-drawer" style="margin:.25rem 0 .5rem;">Ver detalle</button>
+            <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
+              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+              ${
+                Number(it.estatus) === 0
+                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
+                  : ""
+              }
+            </div>
           </div>
         </div>`,
       drawerTitle: (d) => {
@@ -1070,7 +1161,24 @@
       drawerBody: (d) => {
         const n = state.data.find((x) => String(x.id) === d.id)?._all;
         if (!n) return "<p>No encontrado.</p>";
+
+        const isInactive = Number(n.estatus) === 0;
+
+        const headerActions = isAdminUser
+          ? `
+          <div class="gc-actions" style="margin-bottom:12px;">
+            <button class="gc-btn" id="btn-edit-noticia">Editar</button>
+            <button class="gc-btn gc-btn--danger" id="btn-delete-noticia" data-step="1">Eliminar</button>
+            ${
+              isInactive
+                ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-noticia">Reactivar</button>`
+                : ""
+            }
+          </div>`
+          : "";
+
         return `
+          ${headerActions}
           ${pair("Título", n.titulo)}
           ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
           ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
@@ -1096,12 +1204,122 @@
         `;
       },
     });
+
+    // Acciones del drawer de noticia (reactivar / eliminar –inactivar– / editar placeholder)
+    setTimeout(() => {
+      const btnReact = qs("#btn-reactivar-noticia");
+      if (btnReact)
+        btnReact.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const bodyEl = qs("#drawer-body");
+          const id = Number(
+            bodyEl?.querySelector("#media-noticia")?.dataset?.id || 0
+          );
+          if (!id) return;
+          const ok = await reactivateNoticia(id);
+          if (ok) {
+            toast("Noticia reactivada", "exito");
+            await loadNoticias();
+            const re = state.data.find((x) => x.id === id);
+            if (re)
+              openDrawer(
+                `Noticia · ${re.titulo}`,
+                // re-dibujar con datos actualizados
+                (function (d) {
+                  const n = state.data.find(
+                    (x) => String(x.id) === String(d)
+                  )?._all;
+                  if (!n) return "<p>No encontrado.</p>";
+                  return `
+                    ${pair("Título", n.titulo)}
+                    ${pair(
+                      "Estado",
+                      Number(n.estatus) === 1 ? "Publicada" : "Inactiva"
+                    )}
+                    ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
+                    ${pair("Descripción (1)", n.desc_uno)}
+                    ${pair("Descripción (2)", n.desc_dos)}
+                    ${pair("Creado por", n.creado_por)}
+                    <div class="field">
+                      <div class="label">Imágenes</div>
+                      <div class="value"><div id="media-noticia" data-id="${
+                        n.id
+                      }"></div></div>
+                    </div>
+                    ${
+                      isAdminUser
+                        ? jsonSection(
+                            n,
+                            "JSON · Noticia",
+                            "json-noticia",
+                            "btn-copy-json-noticia"
+                          )
+                        : ""
+                    }
+                  `;
+                })(id)
+              );
+          }
+        });
+
+      const btnDel = qs("#btn-delete-noticia");
+      if (btnDel)
+        btnDel.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const step = btnDel.dataset.step || "1";
+          if (step === "1") {
+            btnDel.textContent = "Confirmar";
+            btnDel.dataset.step = "2";
+            setTimeout(() => {
+              if (btnDel.dataset.step === "2") {
+                btnDel.textContent = "Eliminar";
+                btnDel.dataset.step = "1";
+              }
+            }, 4000);
+            return;
+          }
+          try {
+            // inactivar noticia (estatus: 0)
+            const bodyEl = qs("#drawer-body");
+            const id = Number(
+              bodyEl?.querySelector("#media-noticia")?.dataset?.id || 0
+            );
+            await inactivateNoticia(id);
+            toast("Noticia eliminada (inactiva)", "exito");
+            closeDrawer();
+            await loadNoticias();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
+    }, 0);
   }
 
   function badgeNoticia(estatus) {
     return Number(estatus) === 1
-      ? `<span class="badge-activo">Publicada</span>`
-      : `<span class="badge-inactivo">Inactiva</span>`;
+      ? `<span class="gc-badge-activo">Publicada</span>`
+      : `<span class="gc-badge-inactivo">Inactiva</span>`;
+  }
+
+  async function inactivateNoticia(id) {
+    const it = state.data.find((x) => x.id === Number(id));
+    if (!it || !it._all) throw new Error("Noticia no encontrada");
+    if (!API.uNoticias) throw new Error("Endpoint u_noticia no configurado");
+    const body = { ...it._all, estatus: 0 };
+    await postJSON(API.uNoticias, body);
+  }
+
+  async function reactivateNoticia(id) {
+    const it = state.data.find((x) => x.id === Number(id));
+    if (!it || !it._all) throw new Error("Noticia no encontrada");
+    if (!API.uNoticias) {
+      toast("Falta endpoint u_noticia.php en backend", "warning", 3500);
+      return false;
+    }
+    const body = { ...it._all, estatus: 1 };
+    await postJSON(API.uNoticias, body);
+    return true;
   }
 
   // ---------- CUENTAS ----------
@@ -1117,7 +1335,7 @@
         <div class="col-fecha" role="columnheader">Estado</div>`;
     }
 
-    // Contenido
+    // Contenido (placeholder – aquí luego inyectamos el menú de cuenta)
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
     if (d)
@@ -1252,13 +1470,12 @@
       ];
     }
     if (type === "curso") {
-      // para mostrar algo inicial (puede ser PNG). Si no existe, se verá el placeholder.
       return [`/ASSETS/cursos/img${nid}.png`];
     }
     return [];
   }
 
-  // ---- Seccion para mostrar el JSON del recurso
+  // ---- Sección JSON
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj ?? {}, null, 2));
     return `
@@ -1267,7 +1484,7 @@
           title
         )}</summary>
         <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-          <button class="btn" id="${btnId}">Copiar JSON</button>
+          <button class="gc-btn" id="${btnId}">Copiar JSON</button>
         </div>
         <pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
       </details>
@@ -1287,7 +1504,6 @@
         toast("JSON copiado", "exito");
       } catch {
         try {
-          // fallback
           const ta = document.createElement("textarea");
           ta.value = text;
           ta.style.position = "fixed";
@@ -1311,7 +1527,7 @@
     return Promise.reject(new Error("Clipboard API no disponible"));
   }
 
-  //
+  // ---- Validación de imagen
   function validarImagen(file, { maxMB = 2 } = {}) {
     if (!file) return { ok: false, error: "No se seleccionó archivo" };
     const allowed = ["image/jpeg", "image/png"];
@@ -1331,11 +1547,10 @@
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
   }
 
-  //modal para el preview de imagen
+  // ---- Modal de preview de imagen
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
     const url = URL.createObjectURL(file);
 
-    // --- referencias del drawer para desactivarlo temporalmente
     const drawer = document.getElementById("gc-drawer");
     const drawerOverlay = document.getElementById("gc-dash-overlay");
     const prev = {
@@ -1350,87 +1565,80 @@
     const lockScroll = () => {
       document.body.style.overflow = "hidden";
     };
-    const unlockScroll = () => {
-      document.body.style.overflow = "";
-    };
 
-    // overlay (↑ z-index más alto que el drawer)
     const overlay = document.createElement("div");
     overlay.className = "gc-preview-overlay";
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.style.cssText = `
-    position: fixed; inset: 0;
-    z-index: 99999;                      /* << clave */
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(17,24,39,.55);
-    backdrop-filter: saturate(120%) blur(2px);
-  `;
+      position: fixed; inset: 0;
+      z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(17,24,39,.55);
+      backdrop-filter: saturate(120%) blur(2px);
+    `;
 
-    // --- desactiva el drawer debajo mientras el modal está abierto
     if (drawer) {
       drawer.style.pointerEvents = "none";
-      drawer.style.filter = "blur(1px)"; // opcional, solo efecto visual
-      drawer.style.zIndex = "1"; // asegúrate que quede debajo
+      drawer.style.filter = "blur(1px)";
+      drawer.style.zIndex = "1";
       drawer.setAttribute("aria-hidden", "true");
-      // inert evita foco/tab (si el navegador lo soporta)
       try {
         drawer.setAttribute("inert", "");
       } catch {}
     }
     if (drawerOverlay) {
-      drawerOverlay.style.zIndex = "2"; // queda muy debajo del modal
+      drawerOverlay.style.zIndex = "2";
     }
 
-    // modal
+    //modal
     const modal = document.createElement("div");
     modal.className = "gc-preview-modal";
     modal.style.cssText = `
-    background:#fff; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,.25);
-    width:min(920px,94vw); max-height:90vh; overflow:hidden; display:flex; flex-direction:column;
-  `;
+      background:#fff; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,.25);
+      width:min(920px,94vw); max-height:90vh; overflow:hidden; display:flex; flex-direction:column;
+    `;
 
     const header = document.createElement("div");
     header.style.cssText = `
-    display:flex; align-items:center; justify-content:space-between; gap:8px;
-    padding:12px 16px; border-bottom:1px solid #eee;
-  `;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:12px 16px; border-bottom:1px solid #eee;
+    `;
     header.innerHTML = `
-    <div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>
-    <button class="btn" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>
-  `;
+      <div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>
+      <button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>
+    `;
 
     const body = document.createElement("div");
     body.style.cssText = `
-    display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;
-  `;
+      display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;
+    `;
 
     const imgWrap = document.createElement("div");
     imgWrap.style.cssText = `
-    border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa;
-    display:flex; align-items:center; justify-content:center; min-height:320px; max-height:60vh;
-  `;
+      border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa;
+      display:flex; align-items:center; justify-content:center; min-height:320px; max-height:60vh;
+    `;
     imgWrap.innerHTML = `<img src="${url}" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">`;
 
     const side = document.createElement("div");
     side.style.cssText = `
-    border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;
-  `;
+      border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;
+    `;
     side.innerHTML = `
-    <div style="font-weight:600;">Detalles</div>
-    <div style="font-size:.92rem; color:#444; line-height:1.35;">
-      <div><strong>Archivo:</strong> ${file.name}</div>
-      <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
-      <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
-      <div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
-    </div>
-    <div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn blue" data-act="confirm">Subir</button>
-      <button class="btn" data-act="cancel">Cancelar</button>
-    </div>
-  `;
+      <div style="font-weight:600;">Detalles</div>
+      <div style="font-size:.92rem; color:#444; line-height:1.35;">
+        <div><strong>Archivo:</strong> ${file.name}</div>
+        <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
+        <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
+        <div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
+      </div>
+      <div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>
+        <button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>
+      </div>
+    `;
 
-    // responsive
     const mql = window.matchMedia("(max-width: 720px)");
     const applyResponsive = () => {
       if (mql.matches) {
@@ -1510,9 +1718,7 @@
       });
   }
 
-  // final del js para el modal de preview de imagenes
-
-  // ---- imagenes (lectura y, en cursos+edit, subida)
+  // ---- Imágenes (lectura y, en cursos+edit, subida)
   function mountReadOnlyMedia(opt) {
     const {
       container,
@@ -1523,7 +1729,6 @@
     } = opt;
     if (!container) return;
 
-    // PRIORIDAD: lo que mande el caller; si no, usa el estado global
     const editable =
       typeof editableOverride === "boolean"
         ? editableOverride
@@ -1668,7 +1873,7 @@
     </div>`;
     container.appendChild(grid);
   }
-  //---------------------------------- fin del bloque destinado para la edicion de imagenes de cursos y noticias
+  //---------------------------------- fin del bloque de imágenes
 
   // ---- Toolbar / botones
   function bindUI() {

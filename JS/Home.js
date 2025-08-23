@@ -28,6 +28,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const idNoticiaPrincipal = 1; // esta variable esta por si acaso luego queremos cambiar la noticia principal
 
+  // ---------------- helper para cargar imagen ----------------
+  function cargarImagenConFallback(imgEl, basePath) {
+    const exts = ["png", "jpg"];
+    let idx = 0;
+
+    function intentar() {
+      if (idx >= exts.length) {
+        imgEl.src = "../ASSETS/Noticias/noticia_noEncontrada.png";
+        imgEl.onerror = null;
+        return;
+      }
+      imgEl.src = `${basePath}.${exts[idx]}`;
+      imgEl.onerror = () => {
+        idx++;
+        intentar();
+      };
+    }
+
+    intentar();
+  }
+
   function formatearTexto(texto) {
     return (texto || "").toString().replace(/\n/g, "<br>");
   }
@@ -49,12 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // ordenar por fecha de mas reciente a mas antigua, lo dejo por si luego se usa
-    //    noticias = noticias.sort(
-    //      (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
-    //    );
-
-    //noticia principal
+    // noticia principal
     const principal = noticias.find((n) => n.id === idNoticiaPrincipal);
     if (!principal) {
       console.warn(`No se encontró la noticia con ID ${idNoticiaPrincipal}`);
@@ -65,12 +81,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementos.descripcion.innerHTML = formatearTexto(principal.desc_uno);
     elementos.boton.textContent = "Descrubre GodCode 360°";
     elementos.boton.href = `VIEW/Noticia.php?id=${principal.id}`;
-    //elementos.imagen.src = `../ASSETS/Noticias/noticia_img1_${principal.id}.png`; por si acaso
 
-    //eliminar la noticia principal para no repetirla en el listado derecho
+    if (elementos.imagen) {
+      cargarImagenConFallback(
+        elementos.imagen,
+        `../ASSETS/Noticias/noticia_img1_${principal.id}`
+      );
+      elementos.imagen.alt = principal.titulo;
+    }
+
+    // eliminar la noticia principal para no repetirla en el listado derecho
     noticias = noticias.filter((n) => n.id !== idNoticiaPrincipal);
 
-    noticias = noticias.sort((a, b) => b.id - a.id); //se ordenan las noticias segun su id y con orden decendente (mayor id a menor id)
+    // se ordenan las noticias segun su id y con orden descendente
+    noticias = noticias.sort((a, b) => b.id - a.id);
 
     mostrarNoticias(paginaActual);
     crearPaginacion();
@@ -151,8 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 //--------------------------------------aca termina el section 1
 
 document.addEventListener("DOMContentLoaded", () => {
-  //seccion de preguntas frecuentes
-  //las demas preguntas
+  // seccion de preguntas frecuentes
   const botonVerMas = document.getElementById("ver-mas-preguntas");
   const contenedorBoton = botonVerMas?.parentElement;
   const preguntasExtras = document.querySelectorAll(".acordeon .item.extra");
@@ -179,6 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
 function toggleItem(btn) {
   const respuesta = btn.nextElementSibling;
 
