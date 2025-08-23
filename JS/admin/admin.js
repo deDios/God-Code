@@ -90,6 +90,46 @@
     }
   }
 
+  function showCuentaPanel() {
+    // Oculta tablas/listas/paginación
+    qs(".recursos-box.desktop-only")?.style &&
+      (qs(".recursos-box.desktop-only").style.display = "none");
+    qs(".recursos-box.mobile-only")?.style &&
+      (qs(".recursos-box.mobile-only").style.display = "none");
+    qs("#pagination-controls")?.style &&
+      (qs("#pagination-controls").style.display = "none");
+    qs("#pagination-mobile")?.style &&
+      (qs("#pagination-mobile").style.display = "none");
+
+    // Crea el contenedor si no existe
+    if (!qs("#cuenta-panel")) {
+      const host = qs(".main-content") || document.body;
+      const panel = document.createElement("div");
+      panel.id = "cuenta-panel";
+      panel.style.padding = "16px 18px";
+      panel.innerHTML = window.renderCuentaOpciones // si ya tienes un renderer
+        ? window.renderCuentaOpciones()
+        : `<div>Panel de cuenta</div>`; // placeholder si aún no integras el HTML
+      host.appendChild(panel);
+    }
+  }
+
+  function hideCuentaPanel() {
+    // Elimina el panel de cuenta (si es que existe)
+    const panel = qs("#cuenta-panel");
+    if (panel) panel.remove();
+
+    // Restaura tablas/listas/paginacion
+    const d = qs(".recursos-box.desktop-only");
+    const m = qs(".recursos-box.mobile-only");
+    if (d) d.style.display = "block";
+    if (m) m.style.display = "block";
+    const pg = qs("#pagination-controls");
+    const pgm = qs("#pagination-mobile");
+    if (pg) pg.style.display = "";
+    if (pgm) pgm.style.display = "";
+  }
+
   async function postJSON(url, body) {
     const res = await fetch(url, {
       method: "POST",
@@ -209,7 +249,7 @@
     }
   }
 
-  // ---- Router
+  // ---- Route
   function setRoute(hash) {
     const target = hash || (isAdminUser ? "#/cursos" : "#/cuentas");
     if (location.hash !== target) location.hash = target;
@@ -225,19 +265,26 @@
     state.route = hash;
     state.page = 1;
 
-    // activa item del sidebar
+    
     qsa(".gc-side .nav-item").forEach((a) => {
       const isActive = a.getAttribute("href") === hash;
       a.classList.toggle("is-active", isActive);
       a.setAttribute("aria-current", isActive ? "page" : "false");
     });
 
-    // rutas
-    if (hash.startsWith("#/cursos"))
+    if (hash.startsWith("#/cursos")) {
+      hideCuentaPanel(); 
       return isAdminUser ? loadCursos() : enforceRouteGuard();
-    if (hash.startsWith("#/noticias"))
+    }
+    if (hash.startsWith("#/noticias")) {
+      hideCuentaPanel(); 
       return isAdminUser ? loadNoticias() : enforceRouteGuard();
-    if (hash.startsWith("#/cuentas")) return drawCuentas();
+    }
+    if (hash.startsWith("#/cuentas")) {
+      
+      showCuentaPanel(); 
+      return; 
+    }
 
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
@@ -1157,8 +1204,8 @@
         const headerActions = isAdminUser
           ? `
           <div class="gc-actions" style="margin-bottom:12px;">
-            <button class="gc-btn" id="btn-edit-noticia">Editar</button>
-            <button class="gc-btn gc-btn--danger" id="btn-delete-noticia" data-step="1">Eliminar</button>
+            <button class="btn btn-editar" data-id="${n.id}">Editar</button>
+            <button class="btn btn-eliminar" data-id="${n.id}">Eliminar</button>
             ${
               isInactive
                 ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-noticia">Reactivar</button>`
@@ -1350,7 +1397,7 @@
     mount.innerHTML = `
     <div class="gc-card-grid" style="margin:12px 0 20px;">
       <div class="gc-card">
-        <img src="/ASSETS/admin/cuenta/delete.png" alt="" width="28" height="28">
+        <img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">
         <div>
           <div class="gc-card-title">Borrar cuenta</div>
           <div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>
@@ -1359,7 +1406,7 @@
       </div>
 
       <div class="gc-card">
-        <img src="/ASSETS/admin/cuenta/privacy.png" alt="" width="28" height="28">
+        <img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">
         <div>
           <div class="gc-card-title">Opciones de privacidad / Visibilidad</div>
           <div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>
@@ -1368,7 +1415,7 @@
       </div>
 
       <div class="gc-card">
-        <img src="/ASSETS/admin/cuenta/bell.png" alt="" width="28" height="28">
+        <img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">
         <div>
           <div class="gc-card-title">Notificaciones / Preferencias</div>
           <div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>
