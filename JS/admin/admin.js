@@ -1315,36 +1315,7 @@
   // ---------- CUENTAS ----------
   function drawCuentas() {
     const title = qs("#mod-title");
-    if (title) title.textContent = "Cuentas";
-
-    // Header mínimo
-    const hdr = qs(".recursos-box.desktop-only .table-header");
-    if (hdr) {
-      hdr.innerHTML = `
-        <div class="col-nombre" role="columnheader">Sección</div>
-        <div class="col-fecha" role="columnheader">Estado</div>`;
-    }
-
-    // Contenido (placeholder – aquí luego inyectamos el menú de cuenta)
-    const d = qs("#recursos-list");
-    const m = qs("#recursos-list-mobile");
-    if (d)
-      d.innerHTML = `
-      <div class="table-row">
-        <div class="col-nombre">Gestión de cuenta</div>
-        <div class="col-fecha">Disponible</div>
-      </div>`;
-    if (m)
-      m.innerHTML = `
-      <div class="table-row-mobile expanded">
-        <button class="row-toggle">
-          <div class="col-nombre">Gestión de cuenta</div>
-          <span class="icon-chevron">›</span>
-        </button>
-        <div class="row-details">
-          <div><strong>Estado:</strong> Disponible</div>
-        </div>
-      </div>`;
+    if (title) title.textContent = "Cuenta";
 
     const tt = qs(".tt-title");
     if (tt) tt.textContent = "Cuentas:";
@@ -1355,7 +1326,102 @@
       ttStatus.classList.add("badge-activo");
     }
 
-    renderPagination(1);
+    // ocultar tablas (desktop y mobile)
+    const desktopTable = qs(".recursos-table");
+    const mobileTable = qs(".recursos-table-mobile");
+    if (desktopTable) desktopTable.style.display = "none";
+    if (mobileTable) mobileTable.style.display = "none";
+
+    const d = qs("#recursos-list");
+    const m = qs("#recursos-list-mobile");
+    if (d) d.innerHTML = "";
+    if (m) m.innerHTML = "";
+
+    const host = qs(".recursos-box");
+    if (!host) return;
+
+    let mount = document.getElementById("cuenta-menu");
+    if (!mount) {
+      mount = document.createElement("div");
+      mount.id = "cuenta-menu";
+      host.appendChild(mount);
+    }
+
+    mount.innerHTML = `
+    <div class="gc-card-grid" style="margin:12px 0 20px;">
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/delete.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Borrar cuenta</div>
+          <div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>
+        </div>
+        <button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/privacy.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Opciones de privacidad / Visibilidad</div>
+          <div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>
+        </div>
+        <button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/bell.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Notificaciones / Preferencias</div>
+          <div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>
+        </div>
+        <button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Ajustes de privacidad o configuraciones</div>
+          <div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>
+        </div>
+        <button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Cambiar de cuenta</div>
+          <div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>
+        </div>
+        <button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>
+      </div>
+    </div>
+  `;
+
+    const pag1 = qs("#pagination-controls");
+    const pag2 = qs("#pagination-mobile");
+    if (pag1) pag1.innerHTML = "";
+    if (pag2) pag2.innerHTML = "";
+
+    const safeOpen = (fnName) => {
+      const fn = window[fnName];
+      if (typeof fn === "function") fn();
+      else toast("Modal no disponible aún", "warning");
+    };
+
+    mount
+      .querySelector("#btn-delete-account")
+      ?.addEventListener("click", () => safeOpen("openModalDeleteAccount"));
+    mount
+      .querySelector("#btn-privacy")
+      ?.addEventListener("click", () => safeOpen("openModalPrivacy"));
+    mount
+      .querySelector("#btn-notifications")
+      ?.addEventListener("click", () => safeOpen("openModalNotifications"));
+    mount
+      .querySelector("#btn-privacy-toggles")
+      ?.addEventListener("click", () => safeOpen("openModalPrivacyToggles"));
+    mount
+      .querySelector("#btn-switch-account")
+      ?.addEventListener("click", () => safeOpen("openModalSwitchAccount"));
   }
 
   // ---------- Drawer base ----------
