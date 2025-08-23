@@ -152,9 +152,32 @@ html, body {
 .gc-btn--primary:hover { background:#1b66c9; }
 .gc-btn--primary:active { background: var(--gc-primary-ink); }
 
-.gc-btn--success { background: var(--gc-green); color:#fff; border-color:transparent; }
-.gc-btn--success:hover { background:#137333; }
-.gc-btn--success:active { background: var(--gc-green-ink); }
+.gc-btn--success {
+  border: 1px solid #34a853;  
+  background: #e6f4ea;         
+  color: #137333;              
+  font-weight: 600;
+  border-radius: 999px;
+  padding: .5rem .9rem;
+  transition: background .15s ease, border-color .15s ease,
+              box-shadow .15s ease, transform .05s ease;
+}
+
+.gc-btn--success:hover {
+  background: #d6f0db;
+  border-color: #2a963d;
+  box-shadow: 0 2px 6px rgba(52, 168, 83, .25);
+}
+
+.gc-btn--success:active {
+  transform: scale(.98);
+  background: #cce8d3;
+}
+
+.gc-btn--success:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(52, 168, 83, .35);
+}
 
 .gc-btn--danger { background: var(--gc-danger); color:#fff; border-color:transparent; }
 .gc-btn--danger:hover { background:#c5221f; }
