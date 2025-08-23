@@ -658,6 +658,11 @@
               ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
               : ""
           }
+          ${
+            isInactive
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+              : ""
+          }
         </div>`;
     }
 
@@ -1118,11 +1123,6 @@
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
           <div class="col-status">
             ${badgeNoticia(it.estatus)}
-            ${
-              Number(it.estatus) === 0
-                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}" style="margin-left:8px;">Reactivar</button>`
-                : ""
-            }
           </div>
         </div>`,
       mobileRow: (it) => `
