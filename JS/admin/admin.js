@@ -1204,8 +1204,8 @@
         const headerActions = isAdminUser
           ? `
           <div class="gc-actions" style="margin-bottom:12px;">
-            <button class="btn btn-editar" data-id="${n.id}">Editar</button>
-            <button class="btn btn-eliminar" data-id="${n.id}">Eliminar</button>
+            <button class="gc-btn gc-btn--ghost" data-id="${n.id}">Editar</button>
+            <button class="gc-btn gc-btn--primary" data-id="${n.id}">Eliminar</button>
             ${
               isInactive
                 ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-noticia">Reactivar</button>`
