@@ -85,7 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (elementos.imagen) {
       cargarImagenConFallback(
         elementos.imagen,
-        `../ASSETS/Noticias/noticia_img${principal.id}`
+        //`../ASSETS/Noticias/noticia_img${principal.id}`
+        `../ASSETS/index/Seccion1_img1.png`
       );
       elementos.imagen.alt = principal.titulo;
     }
