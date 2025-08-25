@@ -185,7 +185,6 @@ html, body {
 
 .gc-btn--ghost { background:#fff; border-color:var(--gc-border); }
 
-/* Icon button (circular). `btn-icon` queda como alias para legacy */
 .icon-btn, .btn-icon {
   position: relative;
   display: inline-flex; align-items:center; justify-content:center;
@@ -384,7 +383,7 @@ html, body {
   outline:none; box-shadow:0 0 0 3px rgba(21,101,192,.18); border-color:#c7dafc;
 }
 
-/* --------------------- Drawer actions (botones Editar/Eliminar) --------------------- */
+/* --------------------- Drawer actions (botones editar/eliminar/reactivar) --------------------- */
 #gc-drawer :is(.btn, .gc-btn)#btn-edit {
   border: 1px solid #f59e0b;
   background: #fff8e1;
@@ -429,7 +428,7 @@ html, body {
   background:#a21d27; border-color:#a21d27;
 }
 
-/* --------------------- Menús / config --------------------- */
+/* --------------------- Menu / config --------------------- */
 .btn-config-wrap { position:relative; }
 .config-menu {
   position:absolute; top:46px; right:0; background:#fff; border:1px solid var(--gc-border);
@@ -456,7 +455,7 @@ html, body {
 .menu-item.toggle.active .switch { background:#3b82f6; }
 .menu-item.toggle.active .switch .knob { left:18px; }
 
-/* --------------------- Media grid (drawer imágenes) --------------------- */
+/* --------------------- field para imagenes --------------------- */
 .media-head { display:flex; align-items:center; justify-content:space-between; margin:.25rem 0 .5rem; }
 .media-title { font-weight:700; }
 .media-help { font-size:.85rem; color:#666; }
