@@ -25,7 +25,6 @@
 
   dlog("admin.js init: DEBUG =", window.GC_DEBUG);
 
-  // ===== Viewport CSS var =====
   const setVH = () => {
     try {
       document.documentElement.style.setProperty(
@@ -113,24 +112,42 @@
       : void 0;
 
   function getUsuarioFromCookie() {
+    const row = document.cookie
+      .split("; ")
+      .find((r) => r.startsWith("usuario="));
+    if (!row) return null;
+    const raw = row.split("=")[1] || "";
     try {
-      const cookie = document.cookie || "";
-      const c = cookie.split("; ").find((r) => r.indexOf("usuario=") === 0);
-      dlog("Cookie full:", cookie);
-      dlog("Cookie match:", c);
-      if (!c) return null;
-      const raw = c.split("=")[1] || "";
-      dlog("Cookie raw:", raw);
-      const dec = decodeURIComponent(raw || "");
-      dlog("Cookie dec:", dec);
-      if (!dec || !dec.trim()) return null;
-      const obj = JSON.parse(dec);
-      dlog("Cookie JSON:", obj);
-      return obj;
-    } catch (err) {
-      dwarn("getUsuarioFromCookie parse error:", err);
+      const once = decodeURIComponent(raw);
+      const maybeTwice = /%7B|%22/.test(once) ? decodeURIComponent(once) : once;
+      return JSON.parse(maybeTwice);
+    } catch {
       return null;
     }
+  }
+
+  function normalizeCursoPayload(p) {
+    return {
+      ...p,
+      nombre: String(p.nombre || ""),
+      descripcion_breve: String(p.descripcion_breve || ""),
+      descripcion_curso: String(p.descripcion_curso || ""),
+      descripcion_media: String(p.descripcion_media || ""),
+      dirigido: String(p.dirigido || ""),
+      competencias: String(p.competencias || ""),
+      certificado: Number(!!p.certificado),
+      tutor: Number(p.tutor || 0),
+      horas: Number(p.horas || 0),
+      precio: Number(p.precio || 0),
+      estatus: Number(p.estatus ?? 1),
+      prioridad: Number(p.prioridad || 1),
+      categoria: Number(p.categoria || 1),
+      calendario: Number(p.calendario || 1),
+      tipo_evaluacion: Number(p.tipo_evaluacion || 1),
+      actividades: Number(p.actividades || 1),
+      creado_por: Number(p.creado_por || 0),
+      fecha_inicio: String(p.fecha_inicio || ""),
+    };
   }
 
   // -------- Panel de cuenta
@@ -184,30 +201,20 @@
     }
   }
 
-  // ---- Fetch JSON robusto
+  // ---- Fetch JSON
   async function postJSON(url, body) {
-    dlog("postJSON ->", url, "payload:", body);
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
-
-    const raw = await res.text();
-    dlog("postJSON <-", url, "status:", res.status, "raw:", raw);
-
-    if (!res.ok) {
-      const snippet = raw ? ` — body: ${raw.slice(0, 200)}` : "";
-      throw new Error(`HTTP ${res.status} en ${url}${snippet}`);
-    }
-    if (!raw || !raw.trim()) return {};
-
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${text || ""}`);
+    if (!text || !text.trim()) return {};
     try {
-      const json = JSON.parse(raw);
-      return json;
-    } catch (e) {
-      derr("Respuesta no JSON de", url, "raw:", raw);
-      throw new Error(`Respuesta no JSON en ${url}`);
+      return JSON.parse(text);
+    } catch {
+      return { _raw: text };
     }
   }
 
@@ -1333,6 +1340,7 @@
 
   // Crear curso + (opcional) subir imagen
   async function saveNewCurso() {
+    const payload = normalizeCursoPayload(readCursoForm(null));
     try {
       dlog("saveNewCurso()");
       const payload = readCursoForm(null);
@@ -1398,7 +1406,8 @@
       dlog("saveUpdateCurso item:", item);
       if (!item || !item._all)
         return toast("Sin item para actualizar", "error");
-      const payload = readCursoForm(item.id);
+      const payload = normalizeCursoPayload(readCursoForm(item.id));
+      await postJSON(API.uCursos, payload);
       const res = await postJSON(API.uCursos, payload);
       dlog("saveUpdateCurso res:", res);
 
