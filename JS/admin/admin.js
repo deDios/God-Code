@@ -50,6 +50,7 @@
   const ADMIN_IDS = [1, 12, 13];
 
   // ---- Estado global
+  // ---- Estado global
   const state = {
     route: "#/cursos",
     page: 1,
@@ -65,7 +66,6 @@
     actividadesMap: null,
 
     currentDrawer: null, // {type:'curso'|'noticia', id:number|null, mode:'view'|'edit'|'create'}
-    currentDrawer: null,
     tempNewCourseImage: null,
   };
 
@@ -323,8 +323,9 @@
 
     const countEl = qs("#mod-count");
     if (countEl)
-      countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"
-        }`;
+      countEl.textContent = `${rows.length} ${
+        rows.length === 1 ? "elemento" : "elementos"
+      }`;
 
     // desktop -> drawer
     qsa("#recursos-list .table-row").forEach((el) => {
@@ -589,10 +590,11 @@
           <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-            ${Number(it.estatus) === 0
-          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
-          : ""
-        }
+            ${
+              Number(it.estatus) === 0
+                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+                : ""
+            }
           </div>
         </div>
       </div>`,
@@ -626,29 +628,54 @@
     const isEdit = mode === "edit";
     const isView = mode === "view" && !!item;
 
-    const c = isCreate ? getEmptyCourse() : (item ? item._all : null);
+    const c = isCreate ? getEmptyCourse() : item ? item._all : null;
     if (!c) return "<p>No encontrado.</p>";
 
     // helpers
-    const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
-    const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
-    const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
-    const inCheck = (id, val) => `<label class="gc-inline"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
+    const inText = (id, val, ph = "") =>
+      `<input id="${id}" type="text" value="${escapeAttr(
+        val || ""
+      )}" placeholder="${escapeAttr(ph)}" />`;
+    const inNum = (id, val, min = "0") =>
+      `<input id="${id}" type="number" value="${escapeAttr(
+        val ?? ""
+      )}" min="${min}" />`;
+    const inDate = (id, val) =>
+      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+    const inCheck = (id, val) =>
+      `<label class="gc-inline"><input id="${id}" type="checkbox" ${
+        Number(val) ? "checked" : ""
+      }/> <span>Sí</span></label>`;
     const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
-    const inTA = (id, val, rows = 4) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+    const inTA = (id, val, rows = 4) =>
+      `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
-    const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
-    const calOptions = mapToOptions(state.calendarioMap, String(c.calendario || ""));
-    const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
-    const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
+    const catOptions = mapToOptions(
+      state.categoriasMap,
+      String(c.categoria || "")
+    );
+    const calOptions = mapToOptions(
+      state.calendarioMap,
+      String(c.calendario || "")
+    );
+    const tipoOptions = mapToOptions(
+      state.tipoEvalMap,
+      String(c.tipo_evaluacion || "")
+    );
+    const actOptions = mapToOptions(
+      state.actividadesMap,
+      String(c.actividades || "")
+    );
 
     const field = (label, value, inputHTML) => `
     <div class="field">
       <div class="label">${escapeHTML(label)}</div>
-      <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
+      <div class="value">${
+        isEdit || isCreate ? inputHTML : escapeHTML(value ?? "-")
+      }</div>
     </div>`;
 
     // acciones
@@ -664,10 +691,22 @@
       controlsRow = `
       <div class="gc-actions">
         ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
-        ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
-        ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
+        ${
+          isEdit
+            ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+            : ""
+        }
+        ${
+          isEdit
+            ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+            : ""
+        }
         <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
-        ${isInactive ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>` : ""}
+        ${
+          isInactive
+            ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+            : ""
+        }
       </div>`;
     }
 
@@ -675,32 +714,88 @@
     let html = `
     ${controlsRow}
 
-    ${field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
-    ${field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
-    ${field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
-    ${field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))}
+    ${field(
+      "Nombre",
+      c.nombre,
+      inText("f_nombre", c.nombre, "Nombre del curso")
+    )}
+    ${field(
+      "Descripción breve",
+      c.descripcion_breve,
+      inTA("f_desc_breve", c.descripcion_breve, 3)
+    )}
+    ${field(
+      "Descripción media",
+      c.descripcion_media,
+      inTA("f_desc_media", c.descripcion_media, 4)
+    )}
+    ${field(
+      "Descripción del curso",
+      c.descripcion_curso,
+      inTA("f_desc_curso", c.descripcion_curso, 6)
+    )}
     ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
-    ${field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))}
+    ${field(
+      "Competencias",
+      c.competencias,
+      inTA("f_competencias", c.competencias, 3)
+    )}
 
     <div class="grid-3">
-      ${field("Tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSel("f_tutor", tutorOptions))}
-      ${field("Categoría", state.categoriasMap?.[c.categoria] || c.categoria, inSel("f_categoria", catOptions))}
-      ${field("Prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSel("f_prioridad", prioOptions))}
+      ${field(
+        "Tutor",
+        state.tutorsMap?.[c.tutor] || c.tutor,
+        inSel("f_tutor", tutorOptions)
+      )}
+      ${field(
+        "Categoría",
+        state.categoriasMap?.[c.categoria] || c.categoria,
+        inSel("f_categoria", catOptions)
+      )}
+      ${field(
+        "Prioridad",
+        state.prioMap?.[c.prioridad] || c.prioridad,
+        inSel("f_prioridad", prioOptions)
+      )}
     </div>
 
     <div class="grid-3">
-      ${field("Tipo de evaluación", state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))}
-      ${field("Actividades", state.actividadesMap?.[c.actividades] || c.actividades, inSel("f_actividades", actOptions))}
-      ${field("Calendario", state.calendarioMap?.[c.calendario] || c.calendario, inSel("f_calendario", calOptions))}
+      ${field(
+        "Tipo de evaluación",
+        state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion,
+        inSel("f_tipo_eval", tipoOptions)
+      )}
+      ${field(
+        "Actividades",
+        state.actividadesMap?.[c.actividades] || c.actividades,
+        inSel("f_actividades", actOptions)
+      )}
+      ${field(
+        "Calendario",
+        state.calendarioMap?.[c.calendario] || c.calendario,
+        inSel("f_calendario", calOptions)
+      )}
     </div>
 
     <div class="grid-3">
       ${field("Horas", c.horas, inNum("f_horas", c.horas ?? 0))}
-      ${field("Precio", (c.precio === 0 ? "Gratuito" : fmtMoney(c.precio)), inNum("f_precio", c.precio ?? 0))}
-      ${field("Certificado", (Number(c.certificado) ? "Sí" : "No"), inCheck("f_certificado", c.certificado))}
+      ${field(
+        "Precio",
+        c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
+        inNum("f_precio", c.precio ?? 0)
+      )}
+      ${field(
+        "Certificado",
+        Number(c.certificado) ? "Sí" : "No",
+        inCheck("f_certificado", c.certificado)
+      )}
     </div>
 
-    ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+    ${field(
+      "Fecha de inicio",
+      c.fecha_inicio,
+      inDate("f_fecha", c.fecha_inicio)
+    )}
   `;
 
     // IMAGEN:
@@ -714,7 +809,9 @@
           <div id="create-media-curso" class="media-grid">
             <div class="media-card">
               <figure class="media-thumb">
-                <img id="create-media-thumb" alt="Portada" src="${withBust('/ASSETS/cursos/img0.png')}" />
+                <img id="create-media-thumb" alt="Portada" src="${withBust(
+                  "/ASSETS/cursos/img0.png"
+                )}" />
                 <button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
@@ -733,12 +830,19 @@
       html += `
       <div class="field">
         <div class="label">Imágenes existentes</div>
-        <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
+        <div class="value"><div id="media-curso" data-id="${
+          c.id ?? item?.id ?? ""
+        }"></div></div>
       </div>`;
     }
 
     if (isAdminUser) {
-      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
+      html += jsonSection(
+        c,
+        "JSON · Curso",
+        "json-curso",
+        "btn-copy-json-curso"
+      );
     }
 
     // título y estado
@@ -746,11 +850,21 @@
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
     } else if (isEdit) {
-      qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""} (edición)`;
-      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+      qs("#drawer-title").textContent = `Curso · ${
+        item?.nombre || ""
+      } (edición)`;
+      state.currentDrawer = {
+        type: "curso",
+        id: item?.id ?? null,
+        mode: "edit",
+      };
     } else {
       qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""}`;
-      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+      state.currentDrawer = {
+        type: "curso",
+        id: item?.id ?? null,
+        mode: "view",
+      };
     }
 
     // bindings
@@ -776,20 +890,25 @@
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
-              if (!v.ok) { toast(v.error, "error"); return; }
+              if (!v.ok) {
+                toast(v.error, "error");
+                return;
+              }
 
               renderPreviewUI(
                 card,
                 file,
                 async () => {
                   state.tempNewCourseImage = file;
-                  try { URL.revokeObjectURL(thumb.dataset.blobUrl || ""); } catch { }
+                  try {
+                    URL.revokeObjectURL(thumb.dataset.blobUrl || "");
+                  } catch {}
                   const blobUrl = URL.createObjectURL(file);
                   thumb.dataset.blobUrl = blobUrl;
                   thumb.src = blobUrl;
                   toast("Imagen seleccionada (se subirá al guardar)", "exito");
                 },
-                () => { }
+                () => {}
               );
             });
 
@@ -802,7 +921,8 @@
       qs("#btn-save")?.addEventListener("click", async (e) => {
         e.stopPropagation();
         try {
-          if (isCreate) await saveNewCurso();   // sube state.tempNewCourseImage al final
+          if (isCreate)
+            await saveNewCurso(); // sube state.tempNewCourseImage al final
           else await saveUpdateCurso(item);
         } catch (err) {
           console.error(err);
@@ -812,8 +932,14 @@
 
       qs("#btn-edit")?.addEventListener("click", (e) => {
         e.stopPropagation();
-        state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
-        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+        state.currentDrawer = {
+          type: "curso",
+          id: item?.id ?? null,
+          mode: "edit",
+        };
+        qs("#drawer-body").innerHTML = renderCursoDrawer({
+          id: String(item?.id ?? ""),
+        });
       });
 
       qs("#btn-cancel")?.addEventListener("click", (e) => {
@@ -822,8 +948,14 @@
           state.tempNewCourseImage = null;
           closeDrawer();
         } else {
-          state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
-          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+          state.currentDrawer = {
+            type: "curso",
+            id: item?.id ?? null,
+            mode: "view",
+          };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({
+            id: String(item?.id ?? ""),
+          });
         }
       });
 
@@ -836,7 +968,10 @@
             bDel.textContent = "Confirmar";
             bDel.dataset.step = "2";
             setTimeout(() => {
-              if (bDel.dataset.step === "2") { bDel.textContent = "Eliminar"; bDel.dataset.step = "1"; }
+              if (bDel.dataset.step === "2") {
+                bDel.textContent = "Eliminar";
+                bDel.dataset.step = "1";
+              }
             }, 4000);
             return;
           }
@@ -858,7 +993,11 @@
           toast("Curso reactivado", "exito");
           await loadCursos();
           const re = state.data.find((x) => x.id === item.id);
-          if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+          if (re)
+            openDrawer(
+              `Curso · ${re.nombre}`,
+              renderCursoDrawer({ id: String(re.id) })
+            );
         } catch (err) {
           console.error(err);
           toast("No se pudo reactivar", "error");
@@ -885,8 +1024,6 @@
 
     return html;
   }
-
-
 
   function disableDrawerInputs(disabled) {
     qsa(
@@ -926,7 +1063,8 @@
     return clean
       .map(
         ([id, name]) =>
-          `<option value="${escapeAttr(id)}" ${String(selectedId) === String(id) ? "selected" : ""
+          `<option value="${escapeAttr(id)}" ${
+            String(selectedId) === String(id) ? "selected" : ""
           }>${escapeHTML(name)}</option>`
       )
       .join("");
@@ -965,7 +1103,8 @@
 
   // 👉 Helper global para subir imagen (usable en crear/editar)
   async function uploadCursoImagen(cursoId, file) {
-    if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
+    if (!API_UPLOAD?.cursoImg)
+      throw new Error("API_UPLOAD.cursoImg no configurado");
     const v = validarImagen(file, { maxMB: 2 });
     if (!v.ok) throw new Error(v.error);
 
@@ -988,16 +1127,13 @@
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
     if (!payload.categoria) return toast("Selecciona categoría", "warning");
-    if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
+    if (!payload.fecha_inicio)
+      return toast("Fecha de inicio requerida", "warning");
 
     const res = await postJSON(API.iCursos, payload);
 
     const newId = Number(
-      res?.id ??
-      res?.curso_id ??
-      res?.insert_id ??
-      res?.data?.id ??
-      0
+      res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id ?? 0
     );
 
     if (!newId) {
@@ -1025,7 +1161,11 @@
 
     if (newId) {
       const re = state.data.find((x) => x.id === newId);
-      if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+      if (re)
+        openDrawer(
+          `Curso · ${re.nombre}`,
+          renderCursoDrawer({ id: String(re.id) })
+        );
     }
   }
 
@@ -1177,10 +1317,11 @@
             <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
             <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
               <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-              ${Number(it.estatus) === 0
-          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
-          : ""
-        }
+              ${
+                Number(it.estatus) === 0
+                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
+                  : ""
+              }
             </div>
           </div>
         </div>`,
@@ -1226,7 +1367,7 @@
 
     const mode =
       state.currentDrawer?.type === "noticia" &&
-        state.currentDrawer?.id === n.id
+      state.currentDrawer?.id === n.id
         ? state.currentDrawer.mode
         : "view";
     const isEdit = mode === "edit";
@@ -1236,13 +1377,24 @@
     const controlsRow = isAdminUser
       ? `
         <div class="gc-actions">
-          ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
-          ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
-          ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
-          ${isInactive
-        ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
-        : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
-      }
+          ${
+            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+              : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+              : ""
+          }
+          ${
+            isInactive
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+              : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
+          }
         </div>`
       : "";
 
@@ -1258,7 +1410,9 @@
 
       <div class="field">
         <div class="label">Imágenes</div>
-        <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
+        <div class="value"><div id="media-noticia" data-id="${
+          n.id
+        }"></div></div>
       </div>
     `;
 
@@ -1272,7 +1426,9 @@
     }
 
     if (isEdit) {
-      qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""} (edición)`;
+      qs("#drawer-title").textContent = `Noticia · ${
+        item?.titulo || ""
+      } (edición)`;
       state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
     } else {
       qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""}`;
@@ -1284,13 +1440,17 @@
       qs("#btn-edit")?.addEventListener("click", (e) => {
         e.stopPropagation();
         state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+          id: String(n.id),
+        });
       });
 
       qs("#btn-cancel")?.addEventListener("click", (e) => {
         e.stopPropagation();
         state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+          id: String(n.id),
+        });
       });
 
       qs("#btn-save")?.addEventListener("click", async (e) => {
@@ -1300,7 +1460,10 @@
         await loadNoticias();
         const re = state.data.find((x) => x.id === n.id);
         if (re)
-          openDrawer(`Noticia · ${re.titulo}`, renderNoticiaDrawer({ id: String(re.id) }));
+          openDrawer(
+            `Noticia · ${re.titulo}`,
+            renderNoticiaDrawer({ id: String(re.id) })
+          );
       });
 
       const bDel = qs("#btn-delete");
@@ -1338,7 +1501,10 @@
           await loadNoticias();
           const re = state.data.find((x) => x.id === n.id);
           if (re)
-            openDrawer(`Noticia · ${re.titulo}`, renderNoticiaDrawer({ id: String(re.id) }));
+            openDrawer(
+              `Noticia · ${re.titulo}`,
+              renderNoticiaDrawer({ id: String(re.id) })
+            );
         }
       });
 
@@ -1487,13 +1653,13 @@
     return String(str ?? "").replace(
       /[&<>'"]/g,
       (s) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "'": "&#39;",
-        '"': "&quot;",
-      }[s])
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          '"': "&quot;",
+        }[s])
     );
   }
   function escapeAttr(str) {
@@ -1572,8 +1738,8 @@
     return `
       <details class="dev-json" open style="margin-top:16px;">
         <summary style="cursor:pointer; font-weight:600;">${escapeHTML(
-      title
-    )}</summary>
+          title
+        )}</summary>
         <div style="display:flex;gap:.5rem;margin:.5rem 0;">
           <button class="gc-btn" id="${btnId}">Copiar JSON</button>
         </div>
@@ -1676,7 +1842,7 @@
       drawer.setAttribute("aria-hidden", "true");
       try {
         drawer.setAttribute("inert", "");
-      } catch { }
+      } catch {}
     }
     if (drawerOverlay) {
       drawerOverlay.style.zIndex = "2";
@@ -1765,7 +1931,7 @@
         if (!prev.hadInert)
           try {
             drawer.removeAttribute("inert");
-          } catch { }
+          } catch {}
       }
       if (drawerOverlay) {
         drawerOverlay.style.zIndex = prev.overlayZ ?? "";
@@ -1885,7 +2051,10 @@
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD?.cursoImg) {
-                        toast("Configura API_UPLOAD.cursoImg para habilitar la subida", "warning");
+                        toast(
+                          "Configura API_UPLOAD.cursoImg para habilitar la subida",
+                          "warning"
+                        );
                         return;
                       }
                       const fd = new FormData();
@@ -1907,7 +2076,10 @@
 
                     if (type === "noticia") {
                       if (!API_UPLOAD?.noticiaImg) {
-                        toast("Configura API_UPLOAD.noticiaImg para habilitar la subida", "warning");
+                        toast(
+                          "Configura API_UPLOAD.noticiaImg para habilitar la subida",
+                          "warning"
+                        );
                         return;
                       }
                       const pos = i + 1;
@@ -1933,7 +2105,7 @@
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                () => { }
+                () => {}
               );
             });
 
@@ -1948,9 +2120,10 @@
     container.innerHTML = `
     <div class="media-head">
       <div class="media-title">Imágenes</div>
-      ${editable
-        ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
-        : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+      ${
+        editable
+          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
       }
     </div>`;
     container.appendChild(grid);
@@ -1979,14 +2152,15 @@
       });
 
     const addBtn = document.getElementById("btn-add");
-    if (addBtn) addBtn.addEventListener("click", async () => {
-      if (!isAdminUser) return;
-      if (state.route.startsWith("#/cursos")) {
-        await openCreateCurso();
-      } else if (state.route.startsWith("#/noticias")) {
-        toast("Crear noticia: pendiente de implementar", "warning");
-      }
-    });
+    if (addBtn)
+      addBtn.addEventListener("click", async () => {
+        if (!isAdminUser) return;
+        if (state.route.startsWith("#/cursos")) {
+          await openCreateCurso();
+        } else if (state.route.startsWith("#/noticias")) {
+          toast("Crear noticia: pendiente de implementar", "warning");
+        }
+      });
   }
 
   async function openCreateCurso() {
@@ -2026,7 +2200,7 @@
         getTipoEvalMap(),
         getActividadesMap(),
       ]);
-    } catch { }
+    } catch {}
 
     if (!window.location.hash)
       window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
