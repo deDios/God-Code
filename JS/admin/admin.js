@@ -47,7 +47,7 @@
   };
 
   // ---- ids de usuarios con los permisos de admin
-  const ADMIN_IDS = [1, 12];
+  const ADMIN_IDS = [1, 12, 13];
 
   // ---- Estado global
   const state = {
