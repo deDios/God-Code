@@ -1,23 +1,40 @@
 (() => {
-  // -------- helpers de compatibilidad
-  function exists(v) {
-    return v !== undefined && v !== null;
-  }
-  function on(el, ev, fn) {
-    if (el && el.addEventListener) el.addEventListener(ev, fn);
-  }
-  function qs(s, r) {
-    return (r || document).querySelector(s);
-  }
-  function qsa(s, r) {
-    return Array.from((r || document).querySelectorAll(s));
-  }
+  // ===== DEBUG SWITCH (global): cambia a true para ver logs =====
+  if (typeof window.GC_DEBUG === "undefined") window.GC_DEBUG = false;
+  const dlog = (...args) => {
+    if (window.GC_DEBUG) {
+      try {
+        console.log("[GC]", ...args);
+      } catch (_) {}
+    }
+  };
+  const dwarn = (...args) => {
+    if (window.GC_DEBUG) {
+      try {
+        console.warn("[GC][WARN]", ...args);
+      } catch (_) {}
+    }
+  };
+  const derr = (...args) => {
+    if (window.GC_DEBUG) {
+      try {
+        console.error("[GC][ERR]", ...args);
+      } catch (_) {}
+    }
+  };
 
+  dlog("admin.js init: DEBUG =", window.GC_DEBUG);
+
+  // ===== Viewport CSS var =====
   const setVH = () => {
-    document.documentElement.style.setProperty(
-      "--vh",
-      window.innerHeight * 0.01 + "px"
-    );
+    try {
+      document.documentElement.style.setProperty(
+        "--vh",
+        String(window.innerHeight * 0.01) + "px"
+      );
+    } catch (e) {
+      derr("setVH error:", e);
+    }
   };
   setVH();
   window.addEventListener("resize", setVH);
@@ -85,120 +102,138 @@
   let currentUser = null;
   let isAdminUser = false;
 
-  const toast = (msg, tipo, dur) =>
+  // ---- Helpers
+  const qs = (s, r = document) => r.querySelector(s);
+  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const toast = (msg, tipo = "exito", dur = 2500) =>
     window.gcToast
-      ? window.gcToast(msg, tipo || "exito", dur || 2500)
-      : console.log("[" + (tipo || "exito") + "] " + msg);
+      ? window.gcToast(msg, tipo, dur)
+      : window.GC_DEBUG
+      ? console.log(`[toast:${tipo}] ${msg}`)
+      : void 0;
 
   function getUsuarioFromCookie() {
-    // Busca la cookie "usuario"
-    var c = (document.cookie || "").split("; ").find(function (r) {
-      console.log("cookie c: ",c);
-      console.log("cookie r: ",r)
-      return r.indexOf("usuario=") === 0;
-    });
-    if (!c) return null;
-
-    var raw = "";
     try {
-      raw = c.split("=").slice(1).join("="); 
-    } catch (e) {
-      return null;
-    }
-    if (!raw) return null;
-
-    var dec;
-    try {
-      dec = decodeURIComponent(raw);
-      console.log("cookie raw: ",raw);
-    } catch (e) {
-      dec = raw;
-    }
-
-    dec = (dec || "").trim();
-    if (!dec) return null;
-
-    var first = dec.charAt(0);
-    if (first !== "{" && first !== "[") {
-      return null; 
-    }
-
-    try {
-      return JSON.parse(dec);
-    } catch (e) {
+      const cookie = document.cookie || "";
+      const c = cookie.split("; ").find((r) => r.indexOf("usuario=") === 0);
+      dlog("Cookie full:", cookie);
+      dlog("Cookie match:", c);
+      if (!c) return null;
+      const raw = c.split("=")[1] || "";
+      dlog("Cookie raw:", raw);
+      const dec = decodeURIComponent(raw || "");
+      dlog("Cookie dec:", dec);
+      if (!dec || !dec.trim()) return null;
+      const obj = JSON.parse(dec);
+      dlog("Cookie JSON:", obj);
+      return obj;
+    } catch (err) {
+      dwarn("getUsuarioFromCookie parse error:", err);
       return null;
     }
   }
 
   // -------- Panel de cuenta
   function showCuentaPanel() {
-    var d1 = qs(".recursos-box.desktop-only");
-    if (d1 && d1.style) d1.style.display = "none";
-    var d2 = qs(".recursos-box.mobile-only");
-    if (d2 && d2.style) d2.style.display = "none";
-    var pc = qs("#pagination-controls");
-    if (pc && pc.style) pc.style.display = "none";
-    var pm = qs("#pagination-mobile");
-    if (pm && pm.style) pm.style.display = "none";
+    try {
+      dlog("showCuentaPanel()");
+      if (
+        qs(".recursos-box.desktop-only") &&
+        qs(".recursos-box.desktop-only").style
+      )
+        qs(".recursos-box.desktop-only").style.display = "none";
+      if (
+        qs(".recursos-box.mobile-only") &&
+        qs(".recursos-box.mobile-only").style
+      )
+        qs(".recursos-box.mobile-only").style.display = "none";
+      if (qs("#pagination-controls") && qs("#pagination-controls").style)
+        qs("#pagination-controls").style.display = "none";
+      if (qs("#pagination-mobile") && qs("#pagination-mobile").style)
+        qs("#pagination-mobile").style.display = "none";
 
-    if (!qs("#cuenta-panel")) {
-      const host = qs(".main-content") || document.body;
-      const panel = document.createElement("div");
-      panel.id = "cuenta-panel";
-      panel.style.padding = "16px 18px";
-      panel.innerHTML =
-        (window.renderCuentaOpciones && window.renderCuentaOpciones()) ||
-        "<div>Panel de cuenta</div>";
-      host.appendChild(panel);
+      if (!qs("#cuenta-panel")) {
+        const host = qs(".main-content") || document.body;
+        const panel = document.createElement("div");
+        panel.id = "cuenta-panel";
+        panel.style.padding = "16px 18px";
+        panel.innerHTML = window.renderCuentaOpciones
+          ? window.renderCuentaOpciones()
+          : `<div>Panel de cuenta</div>`;
+        host.appendChild(panel);
+      }
+    } catch (e) {
+      derr("showCuentaPanel error:", e);
     }
   }
   function hideCuentaPanel() {
-    const panel = qs("#cuenta-panel");
-    if (panel) panel.remove();
-
-    const d = qs(".recursos-box.desktop-only");
-    const m = qs(".recursos-box.mobile-only");
-    if (d) d.style.display = "block";
-    if (m) m.style.display = "block";
-    const pg = qs("#pagination-controls");
-    const pgm = qs("#pagination-mobile");
-    if (pg) pg.style.display = "";
-    if (pgm) pgm.style.display = "";
+    try {
+      dlog("hideCuentaPanel()");
+      const panel = qs("#cuenta-panel");
+      if (panel) panel.remove();
+      const d = qs(".recursos-box.desktop-only");
+      const m = qs(".recursos-box.mobile-only");
+      if (d) d.style.display = "block";
+      if (m) m.style.display = "block";
+      const pg = qs("#pagination-controls");
+      const pgm = qs("#pagination-mobile");
+      if (pg) pg.style.display = "";
+      if (pgm) pgm.style.display = "";
+    } catch (e) {
+      derr("hideCuentaPanel error:", e);
+    }
   }
 
+  // ---- Fetch JSON robusto
   async function postJSON(url, body) {
+    dlog("postJSON ->", url, "payload:", body);
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
+
+    const raw = await res.text();
+    dlog("postJSON <-", url, "status:", res.status, "raw:", raw);
+
+    if (!res.ok) {
+      const snippet = raw ? ` — body: ${raw.slice(0, 200)}` : "";
+      throw new Error(`HTTP ${res.status} en ${url}${snippet}`);
+    }
+    if (!raw || !raw.trim()) return {};
+
+    try {
+      const json = JSON.parse(raw);
+      return json;
+    } catch (e) {
+      derr("Respuesta no JSON de", url, "raw:", raw);
+      throw new Error(`Respuesta no JSON en ${url}`);
+    }
   }
 
   // ---- Catálogos
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
       return state.tutorsMap;
+    dlog("getTutorsMap()");
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (t) {
-      map[t.id] = t.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((t) => (map[t.id] = t.nombre));
     map._ts = Date.now();
     state.tutorsMap = map;
+    dlog("tutorsMap:", map);
     return map;
   }
   async function getPrioridadMap() {
     if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000)
       return state.prioMap;
+    dlog("getPrioridadMap()");
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (p) {
-      map[p.id] = p.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((p) => (map[p.id] = p.nombre));
     map._ts = Date.now();
     state.prioMap = map;
+    dlog("prioMap:", map);
     return map;
   }
   async function getCategoriasMap() {
@@ -207,13 +242,13 @@
       Date.now() - state.categoriasMap._ts < 30 * 60 * 1000
     )
       return state.categoriasMap;
+    dlog("getCategoriasMap()");
     const arr = await postJSON(API.categorias, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c) {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.categoriasMap = map;
+    dlog("categoriasMap:", map);
     return map;
   }
   async function getCalendarioMap() {
@@ -222,13 +257,13 @@
       Date.now() - state.calendarioMap._ts < 30 * 60 * 1000
     )
       return state.calendarioMap;
+    dlog("getCalendarioMap()");
     const arr = await postJSON(API.calendario, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c) {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.calendarioMap = map;
+    dlog("calendarioMap:", map);
     return map;
   }
   async function getTipoEvalMap() {
@@ -237,13 +272,13 @@
       Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000
     )
       return state.tipoEvalMap;
+    dlog("getTipoEvalMap()");
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c) {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.tipoEvalMap = map;
+    dlog("tipoEvalMap:", map);
     return map;
   }
   async function getActividadesMap() {
@@ -252,13 +287,13 @@
       Date.now() - state.actividadesMap._ts < 30 * 60 * 1000
     )
       return state.actividadesMap;
+    dlog("getActividadesMap()");
     const arr = await postJSON(API.actividades, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c) {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
     map._ts = Date.now();
     state.actividadesMap = map;
+    dlog("actividadesMap:", map);
     return map;
   }
 
@@ -270,11 +305,12 @@
       ""
     ).toLowerCase();
     const txt = (el.textContent || "").toLowerCase();
-    return href.indexOf("#/cuentas") !== -1 || txt.indexOf("cuenta") !== -1;
+    return href.indexOf("#/cuentas") >= 0 || txt.indexOf("cuenta") >= 0;
   }
 
   function applyAdminVisibility(isAdmin) {
-    qsa(".gc-side .nav-item").forEach(function (a) {
+    dlog("applyAdminVisibility -> isAdmin:", isAdmin);
+    qsa(".gc-side .nav-item").forEach((a) => {
       if (!isAdmin && !isCuentasLink(a)) {
         (a.closest("li") || a).style.display = "none";
         a.setAttribute("tabindex", "-1");
@@ -289,6 +325,7 @@
     if (!isAdminUser) {
       const h = (window.location.hash || "").toLowerCase();
       if (h.indexOf("#/cuentas") !== 0) {
+        dlog("enforceRouteGuard redirect to #/cuentas");
         if (location.hash !== "#/cuentas") location.hash = "#/cuentas";
       }
     }
@@ -297,42 +334,48 @@
   // ---- Route
   function setRoute(hash) {
     const target = hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+    dlog("setRoute:", hash, "->", target);
     if (location.hash !== target) location.hash = target;
     else onRouteChange();
   }
   window.addEventListener("hashchange", onRouteChange);
 
   function onRouteChange() {
-    enforceRouteGuard();
+    try {
+      enforceRouteGuard();
+      const hash =
+        window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+      dlog("onRouteChange ->", hash);
+      state.route = hash;
+      state.page = 1;
 
-    const hash =
-      window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
-    state.route = hash;
-    state.page = 1;
+      qsa(".gc-side .nav-item").forEach((a) => {
+        const isActive = a.getAttribute("href") === hash;
+        a.classList.toggle("is-active", isActive);
+        a.setAttribute("aria-current", isActive ? "page" : "false");
+      });
 
-    qsa(".gc-side .nav-item").forEach(function (a) {
-      const isActive = a.getAttribute("href") === hash;
-      a.classList.toggle("is-active", isActive);
-      a.setAttribute("aria-current", isActive ? "page" : "false");
-    });
-
-    if (hash.indexOf("#/cursos") === 0) {
-      hideCuentaPanel();
-      return isAdminUser ? loadCursos() : enforceRouteGuard();
+      if (hash.indexOf("#/cursos") === 0) {
+        hideCuentaPanel();
+        return isAdminUser ? loadCursos() : enforceRouteGuard();
+      }
+      if (hash.indexOf("#/noticias") === 0) {
+        hideCuentaPanel();
+        return isAdminUser ? loadNoticias() : enforceRouteGuard();
+      }
+      if (hash.indexOf("#/cuentas") === 0) {
+        showCuentaPanel();
+        return;
+      }
+      return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
+    } catch (e) {
+      derr("onRouteChange error:", e);
     }
-    if (hash.indexOf("#/noticias") === 0) {
-      hideCuentaPanel();
-      return isAdminUser ? loadNoticias() : enforceRouteGuard();
-    }
-    if (hash.indexOf("#/cuentas") === 0) {
-      showCuentaPanel();
-      return;
-    }
-    return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
 
   // ---- Skeletons
   function showSkeletons() {
+    dlog("showSkeletons()");
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = "";
@@ -342,13 +385,14 @@
     for (let i = 0; i < 5; i++) {
       target.insertAdjacentHTML(
         "beforeend",
-        '<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>'
+        `<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>`
       );
     }
   }
 
   // ---- Render listas
   function renderList(rows, config) {
+    dlog("renderList() rows:", rows.length);
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = "";
@@ -356,11 +400,9 @@
 
     if (!rows.length) {
       if (d)
-        d.innerHTML =
-          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+        d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
       if (m)
-        m.innerHTML =
-          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+        m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
       const countEl = qs("#mod-count");
       if (countEl) countEl.textContent = "0 resultados";
       renderPagination(0);
@@ -369,21 +411,31 @@
 
     const start = (state.page - 1) * state.pageSize;
     const pageRows = rows.slice(start, start + state.pageSize);
+    dlog(
+      "renderList page:",
+      state.page,
+      "start:",
+      start,
+      "pageRows:",
+      pageRows.length
+    );
 
-    pageRows.forEach(function (item) {
+    pageRows.forEach((item) => {
       if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
       if (m) m.insertAdjacentHTML("beforeend", config.mobileRow(item));
     });
 
     const countEl = qs("#mod-count");
     if (countEl)
-      countEl.textContent =
-        rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
+      countEl.textContent = `${rows.length} ${
+        rows.length === 1 ? "elemento" : "elementos"
+      }`;
 
     // desktop -> drawer
-    qsa("#recursos-list .table-row").forEach(function (el) {
-      el.addEventListener("click", function () {
+    qsa("#recursos-list .table-row").forEach((el) => {
+      el.addEventListener("click", () => {
         const data = el.dataset;
+        dlog("desktop row click ->", data);
         if (data.type === "noticia") {
           state.currentDrawer = {
             type: "noticia",
@@ -394,7 +446,7 @@
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
-          setTimeout(function () {
+          setTimeout(() => {
             mountReadOnlyMedia({
               container: document.getElementById("media-noticia"),
               type: "noticia",
@@ -409,15 +461,17 @@
     });
 
     // acordeón mobile
-    qsa("#recursos-list-mobile .row-toggle").forEach(function (el) {
-      el.addEventListener("click", function () {
+    qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
+      el.addEventListener("click", () => {
+        dlog("mobile row toggle");
         el.closest(".table-row-mobile").classList.toggle("expanded");
       });
     });
-    qsa("#recursos-list-mobile .open-drawer").forEach(function (btn) {
-      btn.addEventListener("click", function (e) {
+    qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const data = btn.closest(".table-row-mobile").dataset;
+        dlog("mobile open drawer ->", data);
         if (data.type === "noticia") {
           state.currentDrawer = {
             type: "noticia",
@@ -428,7 +482,7 @@
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
-          setTimeout(function () {
+          setTimeout(() => {
             mountReadOnlyMedia({
               container: document.getElementById("media-noticia"),
               type: "noticia",
@@ -443,11 +497,12 @@
     });
 
     // Botones Reactivar (lista)
-    qsa(".gc-reactivate").forEach(function (btn) {
-      btn.addEventListener("click", async function (e) {
+    qsa(".gc-reactivate").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
         e.stopPropagation();
         const id = Number(btn.dataset.id);
         const t = btn.dataset.type;
+        dlog("reactivate click ->", t, id);
         try {
           if (t === "curso") {
             await reactivateCurso(id);
@@ -461,7 +516,7 @@
             }
           }
         } catch (err) {
-          console.error(err);
+          derr("reactivate error:", err);
           toast("No se pudo reactivar", "error");
         }
       });
@@ -471,9 +526,10 @@
   }
 
   function renderPagination(total) {
+    dlog("renderPagination total:", total, "pageSize:", state.pageSize);
     const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
     const conts = [qs("#pagination-controls"), qs("#pagination-mobile")];
-    conts.forEach(function (cont) {
+    conts.forEach((cont) => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -482,8 +538,9 @@
       prev.className = "arrow-btn";
       prev.textContent = "‹";
       prev.disabled = state.page === 1;
-      prev.onclick = function () {
+      prev.onclick = () => {
         state.page = Math.max(1, state.page - 1);
+        dlog("pagination prev -> new page:", state.page);
         refreshCurrent();
       };
       cont.appendChild(prev);
@@ -492,8 +549,9 @@
         const b = document.createElement("button");
         b.className = "page-btn" + (p === state.page ? " active" : "");
         b.textContent = p;
-        b.onclick = function () {
+        b.onclick = () => {
           state.page = p;
+          dlog("pagination click -> page:", p);
           refreshCurrent();
         };
         cont.appendChild(b);
@@ -503,8 +561,9 @@
       next.className = "arrow-btn";
       next.textContent = "›";
       next.disabled = state.page === totalPages;
-      next.onclick = function () {
+      next.onclick = () => {
         state.page = Math.min(totalPages, state.page + 1);
+        dlog("pagination next -> new page:", state.page);
         refreshCurrent();
       };
       cont.appendChild(next);
@@ -512,6 +571,7 @@
   }
 
   function refreshCurrent() {
+    dlog("refreshCurrent route:", state.route);
     if (state.route.indexOf("#/cursos") === 0) return drawCursos();
     if (state.route.indexOf("#/noticias") === 0) return drawNoticias();
     if (state.route.indexOf("#/cuentas") === 0) return drawCuentas();
@@ -519,6 +579,7 @@
 
   // ---------- CURSOS ----------
   async function loadCursos() {
+    dlog("loadCursos()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
 
@@ -555,150 +616,124 @@
 
     showSkeletons();
     try {
-      const results = await Promise.all([
-        postJSON(API.cursos, { estatus: 1 }),
-        postJSON(API.cursos, { estatus: 0 }),
-        getTutorsMap(),
-        getPrioridadMap(),
-        getCategoriasMap(),
-        getCalendarioMap(),
-        getTipoEvalMap(),
-        getActividadesMap(),
-      ]);
+      const [activosRaw, inactivosRaw, tmap, pmap, cmap, calmap, temap, ammap] =
+        await Promise.all([
+          postJSON(API.cursos, { estatus: 1 }),
+          postJSON(API.cursos, { estatus: 0 }),
+          getTutorsMap(),
+          getPrioridadMap(),
+          getCategoriasMap(),
+          getCalendarioMap(),
+          getTipoEvalMap(),
+          getActividadesMap(),
+        ]);
 
-      const activosRaw = results[0];
-      const inactivosRaw = results[1];
-      const tmap = results[2];
-      const pmap = results[3];
-      const cmap = results[4];
-      const calmap = results[5];
-      const temap = results[6];
-      const ammap = results[7];
+      dlog("loadCursos raw activos:", activosRaw);
+      dlog("loadCursos raw inactivos:", inactivosRaw);
 
-      const raw = []
-        .concat(Array.isArray(activosRaw) ? activosRaw : [])
-        .concat(Array.isArray(inactivosRaw) ? inactivosRaw : []);
+      const raw = [
+        ...(Array.isArray(activosRaw) ? activosRaw : []),
+        ...(Array.isArray(inactivosRaw) ? inactivosRaw : []),
+      ];
 
       state.raw = raw;
-      state.data = raw.map(function (c) {
-        return {
-          id: c.id,
-          nombre: c.nombre,
-          tutor: tmap[c.tutor] || "Tutor #" + c.tutor,
-          tutor_id: c.tutor,
-          prioridad_id: c.prioridad,
-          prioridad_nombre: pmap[c.prioridad] || "#" + c.prioridad,
-          categoria_id: c.categoria,
-          categoria_nombre: cmap[c.categoria] || "#" + c.categoria,
-          calendario_id: c.calendario,
-          calendario_nombre: calmap[c.calendario] || "#" + c.calendario,
-          tipo_eval_id: c.tipo_evaluacion,
-          tipo_eval_nombre: temap[c.tipo_evaluacion] || "#" + c.tipo_evaluacion,
-          actividades_id: c.actividades,
-          actividades_nombre: ammap[c.actividades] || "#" + c.actividades,
-          precio: c.precio,
-          certificado: !!c.certificado,
-          fecha: c.fecha_inicio,
-          estatus: Number(c.estatus),
-          _all: c,
-        };
-      });
+      state.data = raw.map((c) => ({
+        id: c.id,
+        nombre: c.nombre,
 
+        tutor: tmap[c.tutor] || "Tutor #" + c.tutor,
+        tutor_id: c.tutor,
+
+        prioridad_id: c.prioridad,
+        prioridad_nombre: pmap[c.prioridad] || "#" + c.prioridad,
+
+        categoria_id: c.categoria,
+        categoria_nombre: cmap[c.categoria] || "#" + c.categoria,
+
+        calendario_id: c.calendario,
+        calendario_nombre: calmap[c.calendario] || "#" + c.calendario,
+
+        tipo_eval_id: c.tipo_evaluacion,
+        tipo_eval_nombre: temap[c.tipo_evaluacion] || "#" + c.tipo_evaluacion,
+
+        actividades_id: c.actividades,
+        actividades_nombre: ammap[c.actividades] || "#" + c.actividades,
+
+        precio: c.precio,
+        certificado: !!c.certificado,
+        fecha: c.fecha_inicio,
+        estatus: Number(c.estatus),
+        _all: c,
+      }));
+
+      dlog("state.data cursos:", state.data);
       drawCursos();
     } catch (err) {
+      derr("loadCursos error:", err);
       const list = qs("#recursos-list");
       if (list)
-        list.innerHTML =
-          '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>';
+        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
-      console.error(err);
       toast("No se pudieron cargar cursos", "error");
     }
   }
 
   function drawCursos() {
+    dlog("drawCursos() rows:", state.data.length);
     const rows = state.data;
     renderList(rows, {
-      desktopRow: function (it) {
-        return (
-          '<div class="table-row" data-id="' +
-          it.id +
-          '" data-type="curso">' +
-          '<div class="col-nombre">' +
-          '<span class="name-text">' +
-          escapeHTML(it.nombre) +
-          "</span>" +
-          badgePrecio(it.precio) +
-          "</div>" +
-          '<div class="col-tutor">' +
-          escapeHTML(it.tutor) +
-          "</div>" +
-          '<div class="col-fecha">' +
-          fmtDate(it.fecha) +
-          "</div>" +
-          '<div class="col-status">' +
-          badgeCurso(it.estatus) +
-          "</div>" +
-          "</div>"
-        );
+      desktopRow: (it) => `
+      <div class="table-row" data-id="${it.id}" data-type="curso">
+        <div class="col-nombre">
+          <span class="name-text">${escapeHTML(it.nombre)}</span>
+          ${badgePrecio(it.precio)}
+        </div>
+        <div class="col-tutor">${escapeHTML(it.tutor)}</div>
+        <div class="col-fecha">${fmtDate(it.fecha)}</div>
+        <div class="col-status">
+          ${badgeCurso(it.estatus)}
+        </div>
+      </div>`,
+      mobileRow: (it) => `
+      <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
+        <button class="row-toggle">
+          <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(
+        it.precio
+      )}</div>
+          <span class="icon-chevron">›</span>
+        </button>
+        <div class="row-details">
+          <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
+          <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
+          <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
+          <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
+            <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+            ${
+              Number(it.estatus) === 0
+                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+                : ""
+            }
+          </div>
+        </div>
+      </div>`,
+      drawerTitle: (d) => {
+        const item = state.data.find((x) => String(x.id) === d.id);
+        return item ? `Curso · ${item.nombre}` : "Curso";
       },
-      mobileRow: function (it) {
-        return (
-          '<div class="table-row-mobile" data-id="' +
-          it.id +
-          '" data-type="curso">' +
-          '<button class="row-toggle">' +
-          '<div class="col-nombre">' +
-          escapeHTML(it.nombre) +
-          " " +
-          badgePrecio(it.precio) +
-          "</div>" +
-          '<span class="icon-chevron">›</span>' +
-          "</button>" +
-          '<div class="row-details">' +
-          "<div><strong>Tutor:</strong> " +
-          escapeHTML(it.tutor) +
-          "</div>" +
-          "<div><strong>Inicio:</strong> " +
-          fmtDate(it.fecha) +
-          "</div>" +
-          "<div><strong>Status:</strong> " +
-          textCursoStatus(it.estatus) +
-          "</div>" +
-          '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">' +
-          '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>' +
-          (Number(it.estatus) === 0
-            ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="' +
-              it.id +
-              '">Reactivar</button>'
-            : "") +
-          "</div>" +
-          "</div>" +
-          "</div>"
-        );
-      },
-      drawerTitle: function (d) {
-        const item = state.data.find(function (x) {
-          return String(x.id) === d.id;
-        });
-        return item ? "Curso · " + item.nombre : "Curso";
-      },
-      drawerBody: function (d) {
-        return renderCursoDrawer(d);
-      },
+      drawerBody: (d) => renderCursoDrawer(d),
     });
   }
 
   function badgePrecio(precio) {
     return Number(precio) === 0
-      ? '<span class="gc-chip gray">Gratuito</span>'
-      : '<span class="gc-chip gray">Con costo</span>';
+      ? `<span class="gc-chip gray">Gratuito</span>`
+      : `<span class="gc-chip gray">Con costo</span>`;
   }
   function badgeCurso(estatus) {
     return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Activo</span>'
-      : '<span class="gc-badge-inactivo">Inactivo</span>';
+      ? `<span class="gc-badge-activo">Activo</span>`
+      : `<span class="gc-badge-inactivo">Inactivo</span>`;
   }
   function textCursoStatus(estatus) {
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
@@ -706,74 +741,58 @@
 
   // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
-    const item = state.data.find(function (x) {
-      return String(x.id) === dataset.id;
-    });
+    dlog(
+      "renderCursoDrawer IN dataset:",
+      dataset,
+      "state.currentDrawer:",
+      state.currentDrawer
+    );
+    const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode =
-      (state.currentDrawer && state.currentDrawer.mode) ||
-      (item ? "view" : "create");
+      state.currentDrawer && state.currentDrawer.mode
+        ? state.currentDrawer.mode
+        : item
+        ? "view"
+        : "create";
     const isCreate = mode === "create" || !item;
     const isEdit = mode === "edit";
     const isView = mode === "view" && !!item;
-
     const c = isCreate ? getEmptyCourse() : item ? item._all : null;
-    if (!c) return "<p>No encontrado.</p>";
+    if (!c) {
+      dlog("renderCursoDrawer: curso no encontrado");
+      return "<p>No encontrado.</p>";
+    }
+    dlog(
+      "renderCursoDrawer mode:",
+      mode,
+      "isCreate:",
+      isCreate,
+      "isEdit:",
+      isEdit,
+      "isView:",
+      isView,
+      "curso:",
+      c
+    );
 
     // helpers
-    const inText = function (id, val, ph) {
-      return (
-        '<input id="' +
-        id +
-        '" type="text" value="' +
-        escapeAttr(exists(val) ? val : "") +
-        '" placeholder="' +
-        escapeAttr(ph || "") +
-        '" />'
-      );
-    };
-    const inNum = function (id, val, min) {
-      return (
-        '<input id="' +
-        id +
-        '" type="number" value="' +
-        escapeAttr(exists(val) ? val : "") +
-        '" min="' +
-        (min || "0") +
-        '" />'
-      );
-    };
-    const inDate = function (id, val) {
-      return (
-        '<input id="' +
-        id +
-        '" type="date" value="' +
-        escapeAttr(exists(val) ? val : "") +
-        '" />'
-      );
-    };
-    const inCheck = function (id, val) {
-      return (
-        '<label class="gc-inline"><input id="' +
-        id +
-        '" type="checkbox" ' +
-        (Number(val) ? "checked" : "") +
-        "/> <span>Sí</span></label>"
-      );
-    };
-    const inSel = function (id, opts) {
-      return '<select id="' + id + '">' + opts + "</select>";
-    };
-    const inTA = function (id, val, rows) {
-      return (
-        '<textarea id="' +
-        id +
-        '" rows="' +
-        (rows || 4) +
-        '">' +
-        escapeHTML(exists(val) ? val : "") +
-        "</textarea>"
-      );
-    };
+    const inText = (id, val, ph = "") =>
+      `<input id="${id}" type="text" value="${escapeAttr(
+        val || ""
+      )}" placeholder="${escapeAttr(ph)}" />`;
+    const inNum = (id, val, min = "0") =>
+      `<input id="${id}" type="number" value="${escapeAttr(
+        val != null ? val : ""
+      )}" min="${min}" />`;
+    const inDate = (id, val) =>
+      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+    const inCheck = (id, val) =>
+      `<label class="gc-inline"><input id="${id}" type="checkbox" ${
+        Number(val) ? "checked" : ""
+      }/> <span>Sí</span></label>`;
+    const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
+    const inTA = (id, val, rows = 4) =>
+      `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
@@ -795,168 +814,184 @@
       String(c.actividades || "")
     );
 
-    const field = function (label, value, inputHTML) {
-      return (
-        '<div class="field">' +
-        '<div class="label">' +
-        escapeHTML(label) +
-        "</div>" +
-        '<div class="value">' +
-        (isEdit || isCreate
-          ? inputHTML
-          : escapeHTML(exists(value) ? value : "-")) +
-        "</div>" +
-        "</div>"
-      );
-    };
+    const field = (label, value, inputHTML) => `
+    <div class="field">
+      <div class="label">${escapeHTML(label)}</div>
+      <div class="value">${
+        isEdit || isCreate ? inputHTML : escapeHTML(value != null ? value : "-")
+      }</div>
+    </div>`;
 
     // acciones
     let controlsRow = "";
     if (isCreate) {
-      controlsRow =
-        '<div class="gc-actions">' +
-        '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' +
-        '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' +
-        "</div>";
+      controlsRow = `
+      <div class="gc-actions">
+        <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
+        <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
+      </div>`;
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
-      controlsRow =
-        '<div class="gc-actions">' +
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
-          : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
-          : "") +
-        '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>' +
-        (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : "") +
-        "</div>";
+      controlsRow = `
+      <div class="gc-actions">
+        ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
+        ${
+          isEdit
+            ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+            : ""
+        }
+        ${
+          isEdit
+            ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+            : ""
+        }
+        <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
+        ${
+          isInactive
+            ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+            : ""
+        }
+      </div>`;
     }
 
     // contenido
-    let html =
-      "" +
-      controlsRow +
-      field(
-        "Nombre",
-        c.nombre,
-        inText("f_nombre", c.nombre, "Nombre del curso")
-      ) +
-      field(
-        "Descripción breve",
-        c.descripcion_breve,
-        inTA("f_desc_breve", c.descripcion_breve, 3)
-      ) +
-      field(
-        "Descripción media",
-        c.descripcion_media,
-        inTA("f_desc_media", c.descripcion_media, 4)
-      ) +
-      field(
-        "Descripción del curso",
-        c.descripcion_curso,
-        inTA("f_desc_curso", c.descripcion_curso, 6)
-      ) +
-      field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3)) +
-      field(
-        "Competencias",
-        c.competencias,
-        inTA("f_competencias", c.competencias, 3)
-      ) +
-      '<div class="grid-3">' +
-      field(
+    let html = `
+    ${controlsRow}
+
+    ${field(
+      "Nombre",
+      c.nombre,
+      inText("f_nombre", c.nombre, "Nombre del curso")
+    )}
+    ${field(
+      "Descripción breve",
+      c.descripcion_breve,
+      inTA("f_desc_breve", c.descripcion_breve, 3)
+    )}
+    ${field(
+      "Descripción media",
+      c.descripcion_media,
+      inTA("f_desc_media", c.descripcion_media, 4)
+    )}
+    ${field(
+      "Descripción del curso",
+      c.descripcion_curso,
+      inTA("f_desc_curso", c.descripcion_curso, 6)
+    )}
+    ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
+    ${field(
+      "Competencias",
+      c.competencias,
+      inTA("f_competencias", c.competencias, 3)
+    )}
+
+    <div class="grid-3">
+      ${field(
         "Tutor",
-        (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor,
+        state.tutorsMap && state.tutorsMap[c.tutor]
+          ? state.tutorsMap[c.tutor]
+          : c.tutor,
         inSel("f_tutor", tutorOptions)
-      ) +
-      field(
+      )}
+      ${field(
         "Categoría",
-        (state.categoriasMap && state.categoriasMap[c.categoria]) ||
-          c.categoria,
+        state.categoriasMap && state.categoriasMap[c.categoria]
+          ? state.categoriasMap[c.categoria]
+          : c.categoria,
         inSel("f_categoria", catOptions)
-      ) +
-      field(
+      )}
+      ${field(
         "Prioridad",
-        (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad,
+        state.prioMap && state.prioMap[c.prioridad]
+          ? state.prioMap[c.prioridad]
+          : c.prioridad,
         inSel("f_prioridad", prioOptions)
-      ) +
-      "</div>" +
-      '<div class="grid-3">' +
-      field(
+      )}
+    </div>
+
+    <div class="grid-3">
+      ${field(
         "Tipo de evaluación",
-        (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) ||
-          c.tipo_evaluacion,
+        state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]
+          ? state.tipoEvalMap[c.tipo_evaluacion]
+          : c.tipo_evaluacion,
         inSel("f_tipo_eval", tipoOptions)
-      ) +
-      field(
+      )}
+      ${field(
         "Actividades",
-        (state.actividadesMap && state.actividadesMap[c.actividades]) ||
-          c.actividades,
+        state.actividadesMap && state.actividadesMap[c.actividades]
+          ? state.actividadesMap[c.actividades]
+          : c.actividades,
         inSel("f_actividades", actOptions)
-      ) +
-      field(
+      )}
+      ${field(
         "Calendario",
-        (state.calendarioMap && state.calendarioMap[c.calendario]) ||
-          c.calendario,
+        state.calendarioMap && state.calendarioMap[c.calendario]
+          ? state.calendarioMap[c.calendario]
+          : c.calendario,
         inSel("f_calendario", calOptions)
-      ) +
-      "</div>" +
-      '<div class="grid-3">' +
-      field("Horas", c.horas, inNum("f_horas", exists(c.horas) ? c.horas : 0)) +
-      field(
+      )}
+    </div>
+
+    <div class="grid-3">
+      ${field(
+        "Horas",
+        c.horas,
+        inNum("f_horas", c.horas != null ? c.horas : 0)
+      )}
+      ${field(
         "Precio",
         c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
-        inNum("f_precio", exists(c.precio) ? c.precio : 0)
-      ) +
-      field(
+        inNum("f_precio", c.precio != null ? c.precio : 0)
+      )}
+      ${field(
         "Certificado",
         Number(c.certificado) ? "Sí" : "No",
         inCheck("f_certificado", c.certificado)
-      ) +
-      "</div>" +
-      field(
-        "Fecha de inicio",
-        c.fecha_inicio,
-        inDate("f_fecha", c.fecha_inicio)
-      );
+      )}
+    </div>
+
+    ${field(
+      "Fecha de inicio",
+      c.fecha_inicio,
+      inDate("f_fecha", c.fecha_inicio)
+    )}
+  `;
 
     // IMAGEN
     if (isCreate) {
-      html +=
-        '<div class="field">' +
-        '<div class="label">Imagen del curso</div>' +
-        '<div class="value">' +
-        '<div id="create-media-curso" class="media-grid">' +
-        '<div class="media-card">' +
-        '<figure class="media-thumb">' +
-        '<img id="create-media-thumb" alt="Portada" src="' +
-        withBust("/ASSETS/cursos/img0.png") +
-        '" />' +
-        '<button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">' +
-        '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
-        '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>' +
-        "</svg>" +
-        "</button>" +
-        "</figure>" +
-        '<div class="media-meta">' +
-        '<div class="media-label">Portada</div>' +
-        '<div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>' +
-        "</div>" +
-        "</div>" +
-        "</div>" +
-        "</div>" +
-        "</div>";
+      html += `
+      <div class="field">
+        <div class="label">Imagen del curso</div>
+        <div class="value">
+          <div id="create-media-curso" class="media-grid">
+            <div class="media-card">
+              <figure class="media-thumb">
+                <img id="create-media-thumb" alt="Portada" src="${withBust(
+                  "/ASSETS/cursos/img0.png"
+                )}" />
+                <button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </figure>
+              <div class="media-meta">
+                <div class="media-label">Portada</div>
+                <div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
     } else {
-      html +=
-        '<div class="field">' +
-        '<div class="label">Imágenes existentes</div>' +
-        '<div class="value"><div id="media-curso" data-id="' +
-        (exists(c.id) ? c.id : item ? item.id : "") +
-        '"></div></div>' +
-        "</div>";
+      html += `
+      <div class="field">
+        <div class="label">Imágenes existentes</div>
+        <div class="value"><div id="media-curso" data-id="${
+          c.id != null ? c.id : item ? item.id : ""
+        }"></div></div>
+      </div>`;
     }
 
     if (isAdminUser) {
@@ -988,27 +1023,37 @@
         mode: "view",
       };
     }
+    dlog(
+      "renderCursoDrawer set header and state.currentDrawer:",
+      state.currentDrawer
+    );
 
     // bindings
-    setTimeout(function () {
+    setTimeout(() => {
+      dlog("renderCursoDrawer BINDINGS start");
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // CREAR: lápiz + modal para seleccionar imagen
+      // CREAR: seleccionar imagen
       if (isCreate) {
         const card = document.getElementById("create-media-curso");
         const btn = document.getElementById("create-media-edit");
         const thumb = document.getElementById("create-media-thumb");
         if (btn && thumb && card) {
-          btn.addEventListener("click", function () {
+          btn.addEventListener("click", () => {
+            dlog("create image picker clicked");
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/png, image/jpeg";
             input.style.display = "none";
             document.body.appendChild(input);
 
-            input.addEventListener("change", function () {
+            input.addEventListener("change", () => {
               const file = input.files && input.files[0];
               document.body.removeChild(input);
+              dlog(
+                "create image picked:",
+                file && { name: file.name, size: file.size, type: file.type }
+              );
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
@@ -1020,18 +1065,21 @@
               renderPreviewUI(
                 card,
                 file,
-                async function () {
+                async () => {
                   state.tempNewCourseImage = file;
                   try {
-                    if (thumb && thumb.dataset && thumb.dataset.blobUrl)
+                    if (thumb.dataset && thumb.dataset.blobUrl)
                       URL.revokeObjectURL(thumb.dataset.blobUrl);
-                  } catch (e) {}
+                  } catch (_) {}
                   const blobUrl = URL.createObjectURL(file);
-                  if (thumb && thumb.dataset) thumb.dataset.blobUrl = blobUrl;
-                  if (thumb) thumb.src = blobUrl;
+                  if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
+                  thumb.src = blobUrl;
+                  dlog("create image set preview blobUrl:", blobUrl);
                   toast("Imagen seleccionada (se subirá al guardar)", "exito");
                 },
-                function () {}
+                () => {
+                  dlog("create image preview cancel");
+                }
               );
             });
 
@@ -1041,23 +1089,26 @@
       }
 
       // guardar/editar
-      var elSave = qs("#btn-save");
-      if (elSave)
-        elSave.addEventListener("click", async function (e) {
+      const btnSave = qs("#btn-save");
+      if (btnSave)
+        btnSave.addEventListener("click", async (e) => {
           e.stopPropagation();
           try {
-            if (isCreate) await saveNewCurso();
+            dlog("btn-save clicked, isCreate:", isCreate);
+            if (isCreate)
+              await saveNewCurso(); // sube state.tempNewCourseImage al final
             else await saveUpdateCurso(item);
           } catch (err) {
-            console.error(err);
+            derr("btn-save error:", err);
             toast("Error al guardar", "error");
           }
         });
 
-      var elEdit = qs("#btn-edit");
-      if (elEdit)
-        elEdit.addEventListener("click", function (e) {
+      const bEdit = qs("#btn-edit");
+      if (bEdit)
+        bEdit.addEventListener("click", (e) => {
           e.stopPropagation();
+          dlog("btn-edit clicked for id:", item && item.id);
           state.currentDrawer = {
             type: "curso",
             id: item ? item.id : null,
@@ -1068,10 +1119,11 @@
           });
         });
 
-      var elCancel = qs("#btn-cancel");
-      if (elCancel)
-        elCancel.addEventListener("click", function (e) {
+      const bCancel = qs("#btn-cancel");
+      if (bCancel)
+        bCancel.addEventListener("click", (e) => {
           e.stopPropagation();
+          dlog("btn-cancel clicked, isCreate:", isCreate);
           if (isCreate) {
             state.tempNewCourseImage = null;
             closeDrawer();
@@ -1089,13 +1141,14 @@
 
       const bDel = qs("#btn-delete");
       if (bDel)
-        bDel.addEventListener("click", async function (e) {
+        bDel.addEventListener("click", async (e) => {
           e.stopPropagation();
           const step = bDel.getAttribute("data-step") || "1";
+          dlog("btn-delete clicked step:", step);
           if (step === "1") {
             bDel.textContent = "Confirmar";
             bDel.setAttribute("data-step", "2");
-            setTimeout(function () {
+            setTimeout(() => {
               if (bDel.getAttribute("data-step") === "2") {
                 bDel.textContent = "Eliminar";
                 bDel.setAttribute("data-step", "1");
@@ -1109,29 +1162,28 @@
             closeDrawer();
             await loadCursos();
           } catch (err) {
-            console.error(err);
+            derr("softDeleteCurso error:", err);
             toast("No se pudo eliminar", "error");
           }
         });
 
-      const elRe = qs("#btn-reactivar");
-      if (elRe)
-        elRe.addEventListener("click", async function (e) {
+      const bReact = qs("#btn-reactivar");
+      if (bReact)
+        bReact.addEventListener("click", async (e) => {
           e.stopPropagation();
+          dlog("btn-reactivar clicked:", item && item.id);
           try {
-            await reactivateCurso(Number(item ? item.id : 0));
+            await reactivateCurso(Number(item && item.id));
             toast("Curso reactivado", "exito");
             await loadCursos();
-            const re = state.data.find(function (x) {
-              return x.id === (item ? item.id : 0);
-            });
+            const re = state.data.find((x) => item && x.id === item.id);
             if (re)
               openDrawer(
                 "Curso · " + re.nombre,
                 renderCursoDrawer({ id: String(re.id) })
               );
           } catch (err) {
-            console.error(err);
+            derr("reactivateCurso error:", err);
             toast("No se pudo reactivar", "error");
           }
         });
@@ -1139,8 +1191,14 @@
       // montar media
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
-        const cid = Number(exists(c.id) ? c.id : item ? item.id : 0);
-        if (!isNaN(cid) && cid) {
+        const cid = Number(c.id != null ? c.id : item ? item.id : 0);
+        dlog(
+          "mountReadOnlyMedia for curso id:",
+          cid,
+          "editable:",
+          isEdit && isAdminUser
+        );
+        if (!Number.isNaN(cid) && cid) {
           mountReadOnlyMedia({
             container: contCurso,
             type: "curso",
@@ -1152,21 +1210,23 @@
       }
 
       if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
+      dlog("renderCursoDrawer BINDINGS end");
     }, 0);
 
     return html;
   }
 
   function disableDrawerInputs(disabled) {
+    dlog("disableDrawerInputs:", disabled);
     qsa(
       "#drawer-body input, #drawer-body select, #drawer-body textarea"
-    ).forEach(function (el) {
+    ).forEach((el) => {
       el.disabled = !!disabled;
     });
   }
 
   function getEmptyCourse() {
-    return {
+    const ec = {
       nombre: "",
       descripcion_breve: "",
       descripcion_curso: "",
@@ -1186,44 +1246,34 @@
       actividades: 1,
       creado_por: Number((currentUser && currentUser.id) || 0) || 1,
     };
+    dlog("getEmptyCourse() ->", ec);
+    return ec;
   }
 
   function mapToOptions(map, selectedId) {
     const pairs = Object.entries(map || {});
-    const clean = pairs.filter(function (p) {
-      return p[0] !== "_ts";
+    const clean = pairs.filter(function (arr) {
+      return arr[0] !== "_ts";
     });
-    if (!clean.length) return '<option value="">—</option>';
-    return clean
-      .map(function (p) {
-        const id = p[0],
-          name = p[1];
-        return (
-          '<option value="' +
-          escapeAttr(id) +
-          '" ' +
-          (String(selectedId) === String(id) ? "selected" : "") +
-          ">" +
-          escapeHTML(name) +
-          "</option>"
-        );
+    if (!clean.length) return `<option value="">—</option>`;
+    const html = clean
+      .map(function (entry) {
+        const id = entry[0],
+          name = entry[1];
+        const sel = String(selectedId) === String(id) ? "selected" : "";
+        return `<option value="${escapeAttr(
+          id
+        )}" ${sel}>${escapeHTML(name)}</option>`;
       })
       .join("");
+    return html;
   }
 
   function readCursoForm(existingId) {
-    const read = function (id) {
-      var el = qs("#" + id);
-      return el ? el.value : "";
-    };
-    const readN = function (id, def) {
-      var el = qs("#" + id);
-      return Number(el ? el.value : exists(def) ? def : 0);
-    };
-    const readCh = function (id) {
-      var el = qs("#" + id);
-      return el && el.checked ? 1 : 0;
-    };
+    const read = (id) => (qs("#" + id) ? qs("#" + id).value : "");
+    const readN = (id, def) =>
+      Number(qs("#" + id) ? qs("#" + id).value : def != null ? def : 0);
+    const readCh = (id) => (qs("#" + id) && qs("#" + id).checked ? 1 : 0);
 
     const payload = {
       nombre: read("f_nombre"),
@@ -1232,11 +1282,9 @@
       descripcion_media: read("f_desc_media"),
       dirigido: read("f_dirigido"),
       competencias: read("f_competencias"),
-
       certificado: readCh("f_certificado"),
       tutor: readN("f_tutor", 0),
       horas: readN("f_horas", 0),
-
       precio: readN("f_precio", 0),
       estatus: 1,
       fecha_inicio: read("f_fecha"),
@@ -1247,12 +1295,18 @@
       actividades: readN("f_actividades", 1),
       creado_por: Number((currentUser && currentUser.id) || 0) || 1,
     };
-    if (exists(existingId)) payload.id = Number(existingId);
+    if (existingId != null) payload.id = Number(existingId);
+    dlog("readCursoForm ->", payload);
     return payload;
   }
 
-  // 👉 Helper global para subir imagen
+  // ---- Upload imagen
   async function uploadCursoImagen(cursoId, file) {
+    dlog(
+      "uploadCursoImagen ->",
+      cursoId,
+      file && { name: file.name, size: file.size, type: file.type }
+    );
     if (!API_UPLOAD || !API_UPLOAD.cursoImg)
       throw new Error("API_UPLOAD.cursoImg no configurado");
     const v = validarImagen(file, { maxMB: 2 });
@@ -1263,11 +1317,13 @@
     fd.append("imagen", file);
 
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+    const raw = await res.text();
+    dlog("uploadCursoImagen <- status:", res.status, "raw:", raw);
     let json = {};
     try {
-      json = await res.json();
+      json = raw ? JSON.parse(raw) : {};
     } catch (e) {
-      json = {};
+      derr("uploadCursoImagen parse error:", e, "raw:", raw);
     }
     if (!res.ok || (json && json.error)) {
       throw new Error((json && json.error) || "HTTP " + res.status);
@@ -1277,110 +1333,123 @@
 
   // Crear curso + (opcional) subir imagen
   async function saveNewCurso() {
-    const payload = readCursoForm(null);
+    try {
+      dlog("saveNewCurso()");
+      const payload = readCursoForm(null);
 
-    if (!payload.nombre) return toast("Falta el nombre", "warning");
-    if (!payload.tutor) return toast("Selecciona tutor", "warning");
-    if (!payload.categoria) return toast("Selecciona categoría", "warning");
-    if (!payload.fecha_inicio)
-      return toast("Fecha de inicio requerida", "warning");
+      if (!payload.nombre) return toast("Falta el nombre", "warning");
+      if (!payload.tutor) return toast("Selecciona tutor", "warning");
+      if (!payload.categoria) return toast("Selecciona categoría", "warning");
+      if (!payload.fecha_inicio)
+        return toast("Fecha de inicio requerida", "warning");
 
-    const res = await postJSON(API.iCursos, payload);
+      const res = await postJSON(API.iCursos, payload);
+      dlog("saveNewCurso res:", res);
 
-    const newId = Number(
-      (res &&
-        (res.id ||
-          res.curso_id ||
-          res.insert_id ||
-          (res.data && res.data.id))) ||
-        0
-    );
+      const newId = Number(
+        (res &&
+          (res.id ||
+            res.curso_id ||
+            res.insert_id ||
+            (res.data && res.data.id))) ||
+          0
+      );
+      dlog("saveNewCurso newId:", newId);
 
-    if (!newId) {
-      console.warn("Respuesta de iCursos sin id utilizable:", res);
-      toast("Curso creado, pero no se recibió ID", "warning");
-    }
-
-    const fileToUpload = state.tempNewCourseImage || null;
-    if (newId && fileToUpload) {
-      try {
-        await uploadCursoImagen(newId, fileToUpload);
-        toast("Imagen subida", "exito");
-      } catch (err) {
-        console.error(err);
-        toast("Curso creado, pero falló la subida de imagen", "error");
-      } finally {
-        state.tempNewCourseImage = null;
+      if (!newId) {
+        dwarn("Respuesta de iCursos sin id utilizable:", res);
+        toast("Curso creado, pero no se recibió ID", "warning");
       }
-    }
 
-    toast("Curso creado", "exito");
-    closeDrawer();
-    await loadCursos();
+      const fileToUpload = state.tempNewCourseImage || null;
+      if (newId && fileToUpload) {
+        try {
+          await uploadCursoImagen(newId, fileToUpload);
+          toast("Imagen subida", "exito");
+        } catch (err) {
+          derr("upload after create error:", err);
+          toast("Curso creado, pero falló la subida de imagen", "error");
+        } finally {
+          state.tempNewCourseImage = null;
+        }
+      }
 
-    if (newId) {
-      const re = state.data.find(function (x) {
-        return x.id === newId;
-      });
-      if (re)
-        openDrawer(
-          "Curso · " + re.nombre,
-          renderCursoDrawer({ id: String(re.id) })
-        );
+      toast("Curso creado", "exito");
+      closeDrawer();
+      await loadCursos();
+
+      if (newId) {
+        const re = state.data.find((x) => x.id === newId);
+        if (re)
+          openDrawer(
+            "Curso · " + re.nombre,
+            renderCursoDrawer({ id: String(re.id) })
+          );
+      }
+    } catch (e) {
+      derr("saveNewCurso error:", e);
+      toast("No se pudo crear el curso", "error");
     }
   }
 
   // Actualizar curso + (opcional) subir imagen si hay archivo seleccionado
   async function saveUpdateCurso(item) {
-    if (!item || !item._all) return toast("Sin item para actualizar", "error");
-    const payload = readCursoForm(item.id);
-    await postJSON(API.uCursos, payload);
+    try {
+      dlog("saveUpdateCurso item:", item);
+      if (!item || !item._all)
+        return toast("Sin item para actualizar", "error");
+      const payload = readCursoForm(item.id);
+      const res = await postJSON(API.uCursos, payload);
+      dlog("saveUpdateCurso res:", res);
 
-    const fEl = qs("#f_curso_img");
-    const f = (fEl && fEl.files && fEl.files[0]) || null;
-    if (f) {
-      try {
-        await uploadCursoImagen(item.id, f);
-        toast("Imagen actualizada", "exito");
-      } catch (err) {
-        console.error(err);
-        toast("Se guardó el curso, pero falló la imagen", "error");
+      const f =
+        qs("#f_curso_img") &&
+        qs("#f_curso_img").files &&
+        qs("#f_curso_img").files[0];
+      if (f) {
+        try {
+          await uploadCursoImagen(item.id, f);
+          toast("Imagen actualizada", "exito");
+        } catch (err) {
+          derr("upload image in update error:", err);
+          toast("Se guardó el curso, pero falló la imagen", "error");
+        }
       }
-    }
 
-    toast("Cambios guardados", "exito");
-    await loadCursos();
-    const re = state.data.find(function (x) {
-      return x.id === item.id;
-    });
-    if (re)
-      openDrawer(
-        "Curso · " + re.nombre,
-        renderCursoDrawer({ id: String(re.id) })
-      );
+      toast("Cambios guardados", "exito");
+      await loadCursos();
+      const re = state.data.find((x) => x.id === item.id);
+      if (re)
+        openDrawer(
+          "Curso · " + re.nombre,
+          renderCursoDrawer({ id: String(re.id) })
+        );
+    } catch (e) {
+      derr("saveUpdateCurso error:", e);
+      toast("No se pudo guardar", "error");
+    }
   }
 
   async function softDeleteCurso(item) {
+    dlog("softDeleteCurso item:", item && item._all);
     if (!item || !item._all) throw new Error("Item inválido");
-    const base = {};
-    for (var k in item._all) base[k] = item._all[k];
-    base.estatus = 0;
-    await postJSON(API.uCursos, base);
+    const base = Object.assign({}, item._all, { estatus: 0 });
+    const res = await postJSON(API.uCursos, base);
+    dlog("softDeleteCurso res:", res);
   }
 
   async function reactivateCurso(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
+    dlog("reactivateCurso id:", id);
+    const it = state.data.find((x) => x.id === Number(id));
     if (!it || !it._all) throw new Error("Curso no encontrado");
-    const body = {};
-    for (var k in it._all) body[k] = it._all[k];
-    body.estatus = 1;
-    await postJSON(API.uCursos, body);
+    const body = Object.assign({}, it._all, { estatus: 1 });
+    const res = await postJSON(API.uCursos, body);
+    dlog("reactivateCurso res:", res);
   }
 
   // ---------- NOTICIAS ----------
   async function loadNoticias() {
+    dlog("loadNoticias()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
 
@@ -1411,47 +1480,45 @@
 
     showSkeletons();
     try {
-      const resAct = await postJSON(API.noticias, { estatus: 1 });
-      const resIn = await postJSON(API.noticias, { estatus: 0 });
+      const [activasRaw, inactivasRaw] = await Promise.all([
+        postJSON(API.noticias, { estatus: 1 }),
+        postJSON(API.noticias, { estatus: 0 }),
+      ]);
 
-      const arr = []
-        .concat(Array.isArray(resAct) ? resAct : [])
-        .concat(Array.isArray(resIn) ? resIn : []);
+      const arr = [
+        ...(Array.isArray(activasRaw) ? activasRaw : []),
+        ...(Array.isArray(inactivasRaw) ? inactivasRaw : []),
+      ];
 
       const counts = await Promise.all(
-        arr.map(function (n) {
-          return getCommentsCount(n.id).catch(function () {
-            return 0;
-          });
-        })
+        arr.map((n) => getCommentsCount(n.id).catch(() => 0))
       );
 
       state.raw = arr;
-      state.data = arr.map(function (n, i) {
-        return {
-          id: n.id,
-          titulo: n.titulo,
-          fecha: n.fecha_creacion,
-          estatus: Number(n.estatus),
-          comentarios: counts[i] || 0,
-          _all: n,
-        };
-      });
+      state.data = arr.map((n, i) => ({
+        id: n.id,
+        titulo: n.titulo,
+        fecha: n.fecha_creacion,
+        estatus: Number(n.estatus),
+        comentarios: counts[i] || 0,
+        _all: n,
+      }));
 
+      dlog("state.data noticias:", state.data);
       drawNoticias();
     } catch (err) {
+      derr("loadNoticias error:", err);
       const list = qs("#recursos-list");
       if (list)
-        list.innerHTML =
-          '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>';
+        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
-      console.error(err);
       toast("No se pudieron cargar noticias", "error");
     }
   }
 
   async function getCommentsCount(noticiaId) {
+    dlog("getCommentsCount noticiaId:", noticiaId);
     const res = await postJSON(API.comentarios, {
       noticia_id: Number(noticiaId),
       estatus: 1,
@@ -1461,115 +1528,88 @@
     for (let i = 0; i < arr.length; i++) {
       const c = arr[i];
       total += 1;
-      if (Array.isArray(c.respuestas)) total += c.respuestas.length;
+      if (c && Array.isArray(c.respuestas)) total += c.respuestas.length;
     }
+    dlog("comments count ->", total);
     return total;
   }
 
   function drawNoticias() {
+    dlog("drawNoticias() rows:", state.data.length);
     const rows = state.data;
     renderList(rows, {
-      desktopRow: function (it) {
-        return (
-          '<div class="table-row" data-id="' +
-          it.id +
-          '" data-type="noticia">' +
-          '<div class="col-nombre"><span class="name-text">' +
-          escapeHTML(it.titulo) +
-          "</span></div>" +
-          '<div class="col-tutor">' +
-          it.comentarios +
-          "</div>" +
-          '<div class="col-fecha">' +
-          fmtDateTime(it.fecha) +
-          "</div>" +
-          '<div class="col-status">' +
-          badgeNoticia(it.estatus) +
-          "</div>" +
-          "</div>"
-        );
+      desktopRow: (it) => `
+        <div class="table-row" data-id="${it.id}" data-type="noticia">
+          <div class="col-nombre">
+            <span class="name-text">${escapeHTML(it.titulo)}</span>
+          </div>
+          <div class="col-tutor">${it.comentarios}</div>
+          <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
+          <div class="col-status">
+            ${badgeNoticia(it.estatus)}
+          </div>
+        </div>`,
+      mobileRow: (it) => `
+        <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
+          <button class="row-toggle">
+            <div class="col-nombre">${escapeHTML(it.titulo)}</div>
+            <span class="icon-chevron">›</span>
+          </button>
+          <div class="row-details">
+            <div><strong>Comentarios:</strong> ${it.comentarios}</div>
+            <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
+            <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
+              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+              ${
+                Number(it.estatus) === 0
+                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
+                  : ""
+              }
+            </div>
+          </div>
+        </div>`,
+      drawerTitle: (d) => {
+        const item = state.data.find((x) => String(x.id) === d.id);
+        return item ? `Noticia · ${item.titulo}` : "Noticia";
       },
-      mobileRow: function (it) {
-        return (
-          '<div class="table-row-mobile" data-id="' +
-          it.id +
-          '" data-type="noticia">' +
-          '<button class="row-toggle">' +
-          '<div class="col-nombre">' +
-          escapeHTML(it.titulo) +
-          "</div>" +
-          '<span class="icon-chevron">›</span>' +
-          "</button>" +
-          '<div class="row-details">' +
-          "<div><strong>Comentarios:</strong> " +
-          it.comentarios +
-          "</div>" +
-          "<div><strong>Publicada:</strong> " +
-          fmtDateTime(it.fecha) +
-          "</div>" +
-          '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">' +
-          '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>' +
-          (Number(it.estatus) === 0
-            ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="' +
-              it.id +
-              '">Reactivar</button>'
-            : "") +
-          "</div>" +
-          "</div>" +
-          "</div>"
-        );
-      },
-      drawerTitle: function (d) {
-        const item = state.data.find(function (x) {
-          return String(x.id) === d.id;
-        });
-        return item ? "Noticia · " + item.titulo : "Noticia";
-      },
-      drawerBody: function (d) {
-        return renderNoticiaDrawer(d);
-      },
+      drawerBody: (d) => renderNoticiaDrawer(d),
     });
   }
 
   function badgeNoticia(estatus) {
     return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Publicada</span>'
-      : '<span class="gc-badge-inactivo">Inactiva</span>';
+      ? `<span class="gc-badge-activo">Publicada</span>`
+      : `<span class="gc-badge-inactivo">Inactiva</span>`;
   }
 
   async function inactivateNoticia(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
+    dlog("inactivateNoticia id:", id);
+    const it = state.data.find((x) => x.id === Number(id));
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) throw new Error("Endpoint u_noticia no configurado");
-    const body = {};
-    for (var k in it._all) body[k] = it._all[k];
-    body.estatus = 0;
-    await postJSON(API.uNoticias, body);
+    const body = Object.assign({}, it._all, { estatus: 0 });
+    const res = await postJSON(API.uNoticias, body);
+    dlog("inactivateNoticia res:", res);
   }
 
   async function reactivateNoticia(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
+    dlog("reactivateNoticia id:", id);
+    const it = state.data.find((x) => x.id === Number(id));
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) {
       toast("Falta endpoint u_noticia.php en backend", "warning", 3500);
       return false;
     }
-    const body = {};
-    for (var k in it._all) body[k] = it._all[k];
-    body.estatus = 1;
-    await postJSON(API.uNoticias, body);
+    const body = Object.assign({}, it._all, { estatus: 1 });
+    const res = await postJSON(API.uNoticias, body);
+    dlog("reactivateNoticia res:", res);
     return true;
   }
 
   // ---- Drawer Noticia
   function renderNoticiaDrawer(dataset) {
-    const item = state.data.find(function (x) {
-      return String(x.id) === dataset.id;
-    });
+    dlog("renderNoticiaDrawer dataset:", dataset);
+    const item = state.data.find((x) => String(x.id) === dataset.id);
     const n = item && item._all;
     if (!n) return "<p>No encontrado.</p>";
 
@@ -1584,40 +1624,55 @@
     const isInactive = Number(n.estatus) === 0;
 
     const controlsRow = isAdminUser
-      ? '<div class="gc-actions">' +
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
-          : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
-          : "") +
-        (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
-        "</div>"
+      ? `
+        <div class="gc-actions">
+          ${
+            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+              : ""
+          }
+          ${
+            isEdit
+              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+              : ""
+          }
+          ${
+            isInactive
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+              : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
+          }
+        </div>`
       : "";
 
-    let html =
-      "" +
-      controlsRow +
-      pair("Título", n.titulo) +
-      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
-      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
-      pair("Descripción (1)", n.desc_uno) +
-      pair("Descripción (2)", n.desc_dos) +
-      pair("Creado por", n.creado_por) +
-      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
-      n.id +
-      '"></div></div></div>';
+    let html = `
+      ${controlsRow}
 
-    if (isAdminUser)
+      ${pair("Título", n.titulo)}
+      ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
+      ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
+      ${pair("Descripción (1)", n.desc_uno)}
+      ${pair("Descripción (2)", n.desc_dos)}
+      ${pair("Creado por", n.creado_por)}
+
+      <div class="field">
+        <div class="label">Imágenes</div>
+        <div class="value"><div id="media-noticia" data-id="${
+          n.id
+        }"></div></div>
+      </div>
+    `;
+
+    if (isAdminUser) {
       html += jsonSection(
         n,
         "JSON · Noticia",
         "json-noticia",
         "btn-copy-json-noticia"
       );
+    }
 
     if (isEdit) {
       qs("#drawer-title").textContent =
@@ -1628,39 +1683,42 @@
         "Noticia · " + (item ? item.titulo : "");
       state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
     }
+    dlog("renderNoticiaDrawer: set header and state", state.currentDrawer);
 
     // Bind acciones
-    setTimeout(function () {
-      var e1 = qs("#btn-edit");
-      if (e1)
-        e1.addEventListener("click", function (e) {
+    setTimeout(() => {
+      dlog("renderNoticiaDrawer BINDINGS start");
+      const be = qs("#btn-edit");
+      if (be)
+        be.addEventListener("click", (e) => {
           e.stopPropagation();
+          dlog("noticia btn-edit");
           state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
           qs("#drawer-body").innerHTML = renderNoticiaDrawer({
             id: String(n.id),
           });
         });
 
-      var e2 = qs("#btn-cancel");
-      if (e2)
-        e2.addEventListener("click", function (e) {
+      const bc = qs("#btn-cancel");
+      if (bc)
+        bc.addEventListener("click", (e) => {
           e.stopPropagation();
+          dlog("noticia btn-cancel");
           state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
           qs("#drawer-body").innerHTML = renderNoticiaDrawer({
             id: String(n.id),
           });
         });
 
-      var e3 = qs("#btn-save");
-      if (e3)
-        e3.addEventListener("click", async function (e) {
+      const bs = qs("#btn-save");
+      if (bs)
+        bs.addEventListener("click", async (e) => {
           e.stopPropagation();
+          dlog("noticia btn-save (noop demo)");
           toast("Cambios guardados", "exito");
           state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
           await loadNoticias();
-          const re = state.data.find(function (x) {
-            return x.id === n.id;
-          });
+          const re = state.data.find((x) => x.id === n.id);
           if (re)
             openDrawer(
               "Noticia · " + re.titulo,
@@ -1670,13 +1728,14 @@
 
       const bDel = qs("#btn-delete");
       if (bDel)
-        bDel.addEventListener("click", async function (e) {
+        bDel.addEventListener("click", async (e) => {
           e.stopPropagation();
           const step = bDel.getAttribute("data-step") || "1";
+          dlog("noticia btn-delete step:", step);
           if (step === "1") {
             bDel.textContent = "Confirmar";
             bDel.setAttribute("data-step", "2");
-            setTimeout(function () {
+            setTimeout(() => {
               if (bDel.getAttribute("data-step") === "2") {
                 bDel.textContent = "Eliminar";
                 bDel.setAttribute("data-step", "1");
@@ -1690,22 +1749,21 @@
             closeDrawer();
             await loadNoticias();
           } catch (err) {
-            console.error(err);
+            derr("inactivateNoticia error:", err);
             toast("No se pudo eliminar", "error");
           }
         });
 
-      var e4 = qs("#btn-reactivar");
-      if (e4)
-        e4.addEventListener("click", async function (e) {
+      const br = qs("#btn-reactivar");
+      if (br)
+        br.addEventListener("click", async (e) => {
           e.stopPropagation();
+          dlog("noticia btn-reactivar");
           const ok = await reactivateNoticia(n.id);
           if (ok) {
             toast("Noticia reactivada", "exito");
             await loadNoticias();
-            const re = state.data.find(function (x) {
-              return x.id === n.id;
-            });
+            const re = state.data.find((x) => x.id === n.id);
             if (re)
               openDrawer(
                 "Noticia · " + re.titulo,
@@ -1715,6 +1773,7 @@
         });
 
       disableDrawerInputs(!isEdit);
+      dlog("renderNoticiaDrawer BINDINGS end");
     }, 0);
 
     return html;
@@ -1722,6 +1781,7 @@
 
   // ---------- CUENTAS ----------
   function drawCuentas() {
+    dlog("drawCuentas()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Cuenta";
 
@@ -1754,103 +1814,103 @@
       host.appendChild(mount);
     }
 
-    mount.innerHTML =
-      '<div class="gc-card-grid" style="margin:12px 0 20px;">' +
-      '<div class="gc-card">' +
-      '<img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">' +
-      "<div>" +
-      '<div class="gc-card-title">Borrar cuenta</div>' +
-      '<div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>' +
-      "</div>" +
-      '<button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>' +
-      "</div>" +
-      '<div class="gc-card">' +
-      '<img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">' +
-      "<div>" +
-      '<div class="gc-card-title">Opciones de privacidad / Visibilidad</div>' +
-      '<div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>' +
-      "</div>" +
-      '<button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>' +
-      "</div>" +
-      '<div class="gc-card">' +
-      '<img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">' +
-      "<div>" +
-      '<div class="gc-card-title">Notificaciones / Preferencias</div>' +
-      '<div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>' +
-      "</div>" +
-      '<button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>' +
-      "</div>" +
-      '<div class="gc-card">' +
-      '<img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">' +
-      "<div>" +
-      '<div class="gc-card-title">Ajustes de privacidad o configuraciones</div>' +
-      '<div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>' +
-      "</div>" +
-      '<button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>' +
-      "</div>" +
-      '<div class="gc-card">' +
-      '<img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">' +
-      "<div>" +
-      '<div class="gc-card-title">Cambiar de cuenta</div>' +
-      '<div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>' +
-      "</div>" +
-      '<button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>' +
-      "</div>" +
-      "</div>";
+    mount.innerHTML = `
+    <div class="gc-card-grid" style="margin:12px 0 20px;">
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Borrar cuenta</div>
+          <div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>
+        </div>
+        <button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Opciones de privacidad / Visibilidad</div>
+          <div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>
+        </div>
+        <button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Notificaciones / Preferencias</div>
+          <div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>
+        </div>
+        <button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Ajustes de privacidad o configuraciones</div>
+          <div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>
+        </div>
+        <button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>
+      </div>
+
+      <div class="gc-card">
+        <img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">
+        <div>
+          <div class="gc-card-title">Cambiar de cuenta</div>
+          <div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>
+        </div>
+        <button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>
+      </div>
+    </div>
+  `;
 
     const pag1 = qs("#pagination-controls");
     const pag2 = qs("#pagination-mobile");
     if (pag1) pag1.innerHTML = "";
     if (pag2) pag2.innerHTML = "";
 
-    const safeOpen = function (fnName) {
+    const safeOpen = (fnName) => {
       const fn = window[fnName];
       if (typeof fn === "function") fn();
       else toast("Modal no disponible aún", "warning");
     };
 
-    const b1 = mount.querySelector("#btn-delete-account");
-    if (b1)
-      b1.addEventListener("click", function () {
-        safeOpen("openModalDeleteAccount");
-      });
-    const b2 = mount.querySelector("#btn-privacy");
-    if (b2)
-      b2.addEventListener("click", function () {
-        safeOpen("openModalPrivacy");
-      });
-    const b3 = mount.querySelector("#btn-notifications");
-    if (b3)
-      b3.addEventListener("click", function () {
-        safeOpen("openModalNotifications");
-      });
-    const b4 = mount.querySelector("#btn-privacy-toggles");
-    if (b4)
-      b4.addEventListener("click", function () {
-        safeOpen("openModalPrivacyToggles");
-      });
-    const b5 = mount.querySelector("#btn-switch-account");
-    if (b5)
-      b5.addEventListener("click", function () {
-        safeOpen("openModalSwitchAccount");
-      });
+    mount.querySelector("#btn-delete-account") &&
+      mount
+        .querySelector("#btn-delete-account")
+        .addEventListener("click", () => safeOpen("openModalDeleteAccount"));
+    mount.querySelector("#btn-privacy") &&
+      mount
+        .querySelector("#btn-privacy")
+        .addEventListener("click", () => safeOpen("openModalPrivacy"));
+    mount.querySelector("#btn-notifications") &&
+      mount
+        .querySelector("#btn-notifications")
+        .addEventListener("click", () => safeOpen("openModalNotifications"));
+    mount.querySelector("#btn-privacy-toggles") &&
+      mount
+        .querySelector("#btn-privacy-toggles")
+        .addEventListener("click", () => safeOpen("openModalPrivacyToggles"));
+    mount.querySelector("#btn-switch-account") &&
+      mount
+        .querySelector("#btn-switch-account")
+        .addEventListener("click", () => safeOpen("openModalSwitchAccount"));
   }
 
   // ---------- Drawer base ----------
   function openDrawer(title, bodyHTML) {
+    dlog("openDrawer ->", title);
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.add("open");
 
     const drawer = qs("#gc-drawer");
     if (!drawer) return;
-    const ttl = qs("#drawer-title");
-    if (ttl) ttl.textContent = title || "Detalle";
-    const body = qs("#drawer-body");
-    if (body) body.innerHTML = bodyHTML || "";
+    qs("#drawer-title").textContent = title || "Detalle";
+    qs("#drawer-body").innerHTML = bodyHTML || "";
     drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
   }
   function closeDrawer() {
+    dlog("closeDrawer");
     const overlay = qs("#gc-dash-overlay");
     if (overlay) overlay.classList.remove("open");
 
@@ -1863,7 +1923,7 @@
 
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
-    return String(exists(str) ? str : "").replace(/[&<>'"]/g, function (s) {
+    return String(str != null ? str : "").replace(/[&<>'"]/g, function (s) {
       return {
         "&": "&amp;",
         "<": "&lt;",
@@ -1874,23 +1934,26 @@
     });
   }
   function escapeAttr(str) {
-    return String(exists(str) ? str : "").replace(/"/g, "&quot;");
+    return String(str != null ? str : "").replace(/"/g, "&quot;");
   }
   function fmtDate(d) {
     if (!d) return "-";
     try {
-      const p = d.split("-");
-      return p[2] + "/" + p[1] + "/" + p[0];
-    } catch (e) {
+      const parts = String(d).split("-");
+      const y = parts[0],
+        m = parts[1],
+        day = parts[2];
+      return `${day}/${m}/${y}`;
+    } catch {
       return d;
     }
   }
   function fmtDateTime(dt) {
     if (!dt) return "-";
     try {
-      const sp = dt.split(" ");
-      return (fmtDate(sp[0]) + " " + (sp[1] || "")).trim();
-    } catch (e) {
+      const parts = String(dt).split(" ");
+      return (fmtDate(parts[0]) + " " + (parts[1] || "")).trim();
+    } catch {
       return dt;
     }
   }
@@ -1900,50 +1963,47 @@
         style: "currency",
         currency: "MXN",
       }).format(n);
-    } catch (e) {
+    } catch {
       return "$" + n;
     }
   }
   function pair(label, val) {
-    return (
-      '<div class="field"><div class="label">' +
-      escapeHTML(label) +
-      '</div><div class="value">' +
-      escapeHTML(exists(val) ? val : "-") +
-      "</div></div>"
-    );
+    return `<div class="field"><div class="label">${escapeHTML(
+      label
+    )}</div><div class="value">${escapeHTML(
+      val != null ? val : "-"
+    )}</div></div>`;
   }
 
   function withBust(url) {
     try {
       const u = new URL(url, window.location.origin);
-      u.searchParams.set("v", Date.now());
+      u.searchParams.set("v", String(Date.now()));
       return u.pathname + "?" + u.searchParams.toString();
-    } catch (e) {
-      return url + (url.indexOf("?") > -1 ? "&" : "?") + "v=" + Date.now();
+    } catch {
+      return url + (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + Date.now();
     }
   }
 
   function noImageSvg() {
-    return (
-      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>" +
-      "<rect width='100%' height='100%' fill='#f3f3f3'/>" +
-      "<path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>" +
-      "<circle cx='52' cy='30' r='8' fill='#c9c9c9'/>" +
-      "</svg>"
-    );
+    return `
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>
+        <rect width='100%' height='100%' fill='#f3f3f3'/>
+        <path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>
+        <circle cx='52' cy='30' r='8' fill='#c9c9c9'/>
+      </svg>`;
   }
 
   function mediaUrlsByType(type, id) {
     const nid = Number(id);
     if (type === "noticia") {
       return [
-        "/ASSETS/noticia/NoticiasImg/noticia_img1_" + nid + ".png",
-        "/ASSETS/noticia/NoticiasImg/noticia_img2_" + nid + ".png",
+        `/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`,
+        `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`,
       ];
     }
     if (type === "curso") {
-      return ["/ASSETS/cursos/img" + nid + ".png"];
+      return [`/ASSETS/cursos/img${nid}.png`];
     }
     return [];
   }
@@ -1951,42 +2011,31 @@
   // ---- Sección JSON
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj || {}, null, 2));
-    return (
-      "" +
-      '<details class="dev-json" open style="margin-top:16px;">' +
-      '<summary style="cursor:pointer; font-weight:600;">' +
-      escapeHTML(title) +
-      "</summary>" +
-      '<div style="display:flex;gap:.5rem;margin:.5rem 0;">' +
-      '<button class="gc-btn" id="' +
-      btnId +
-      '">Copiar JSON</button>' +
-      "</div>" +
-      '<pre id="' +
-      preId +
-      '" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">' +
-      safe +
-      "</pre>" +
-      "</details>"
-    );
+    return `
+      <details class="dev-json" open style="margin-top:16px;">
+        <summary style="cursor:pointer; font-weight:600;">${escapeHTML(
+          title
+        )}</summary>
+        <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+          <button class="gc-btn" id="${btnId}">Copiar JSON</button>
+        </div>
+        <pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
+      </details>
+    `;
   }
 
   function bindCopyFromPre(preSel, btnSel) {
     const btn = qs(btnSel);
     const pre = qs(preSel);
     if (!btn || !pre) return;
-    btn.addEventListener("click", async function (e) {
+    btn.addEventListener("click", async (e) => {
       e.preventDefault();
       const text = pre.textContent || "";
       if (!text) return toast("No hay JSON para copiar", "warning");
       try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(text);
-        } else {
-          throw new Error("No Clipboard API");
-        }
+        await copyText(text);
         toast("JSON copiado", "exito");
-      } catch (er) {
+      } catch {
         try {
           const ta = document.createElement("textarea");
           ta.value = text;
@@ -1997,17 +2046,24 @@
           document.execCommand("copy");
           document.body.removeChild(ta);
           toast("JSON copiado", "exito");
-        } catch (e) {
+        } catch {
           alert("No se pudo copiar");
         }
       }
     });
   }
 
-  // ---- Validacion de imagen
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return Promise.reject(new Error("Clipboard API no disponible"));
+  }
+
+  // ---- Validación de imagen
   function validarImagen(file, opt) {
     opt = opt || {};
-    var maxMB = exists(opt.maxMB) ? opt.maxMB : 2;
+    const maxMB = typeof opt.maxMB === "number" ? opt.maxMB : 2;
     if (!file) return { ok: false, error: "No se seleccionó archivo" };
     const allowed = ["image/jpeg", "image/png"];
     if (allowed.indexOf(file.type) === -1) {
@@ -2028,26 +2084,25 @@
 
   // ---- Modal / preview de imagen
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
+    dlog(
+      "renderPreviewUI file:",
+      file && { name: file.name, size: file.size, type: file.type }
+    );
     const url = URL.createObjectURL(file);
 
     const drawer = document.getElementById("gc-drawer");
     const drawerOverlay = document.getElementById("gc-dash-overlay");
     const prev = {
-      drawerPE: drawer && drawer.style ? drawer.style.pointerEvents : undefined,
-      drawerFilter: drawer && drawer.style ? drawer.style.filter : undefined,
-      drawerZ: drawer && drawer.style ? drawer.style.zIndex : undefined,
+      drawerPE: drawer && drawer.style ? drawer.style.pointerEvents : "",
+      drawerFilter: drawer && drawer.style ? drawer.style.filter : "",
+      drawerZ: drawer && drawer.style ? drawer.style.zIndex : "",
       overlayZ:
-        drawerOverlay && drawerOverlay.style
-          ? drawerOverlay.style.zIndex
-          : undefined,
-      drawerAria: drawer ? drawer.getAttribute("aria-hidden") : undefined,
-      hadInert:
-        drawer && typeof drawer.hasAttribute === "function"
-          ? drawer.hasAttribute("inert")
-          : false,
+        drawerOverlay && drawerOverlay.style ? drawerOverlay.style.zIndex : "",
+      drawerAria: drawer ? drawer.getAttribute("aria-hidden") : null,
+      hadInert: drawer ? !!drawer.hasAttribute("inert") : false,
     };
 
-    const lockScroll = function () {
+    const lockScroll = () => {
       document.body.style.overflow = "hidden";
     };
 
@@ -2065,9 +2120,9 @@
       drawer.setAttribute("aria-hidden", "true");
       try {
         drawer.setAttribute("inert", "");
-      } catch (e) {}
+      } catch (_) {}
     }
-    if (drawerOverlay) {
+    if (drawerOverlay && drawerOverlay.style) {
       drawerOverlay.style.zIndex = "2";
     }
 
@@ -2080,8 +2135,7 @@
     header.style.cssText =
       "display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 16px; border-bottom:1px solid #eee;";
     header.innerHTML =
-      '<div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>' +
-      '<button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>';
+      '<div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div><button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>';
 
     const body = document.createElement("div");
     body.style.cssText =
@@ -2099,26 +2153,27 @@
     side.style.cssText =
       "border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;";
     side.innerHTML =
+      "" +
       '<div style="font-weight:600;">Detalles</div>' +
       '<div style="font-size:.92rem; color:#444; line-height:1.35;">' +
-      "<div><strong>Archivo:</strong> " +
-      file.name +
+      "  <div><strong>Archivo:</strong> " +
+      escapeHTML(file.name) +
       "</div>" +
-      "<div><strong>Peso:</strong> " +
+      "  <div><strong>Peso:</strong> " +
       humanSize(file.size) +
       "</div>" +
-      "<div><strong>Tipo:</strong> " +
-      (file.type || "desconocido") +
+      "  <div><strong>Tipo:</strong> " +
+      escapeHTML(file.type || "desconocido") +
       "</div>" +
-      '<div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
+      '  <div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
       "</div>" +
       '<div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">' +
-      '<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>' +
-      '<button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>' +
+      '  <button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>' +
+      '  <button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>' +
       "</div>";
 
     const mql = window.matchMedia("(max-width: 720px)");
-    const applyResponsive = function () {
+    const applyResponsive = () => {
       if (mql.matches) {
         body.style.gridTemplateColumns = "1fr";
         side.style.borderLeft = "none";
@@ -2131,11 +2186,8 @@
         imgWrap.style.minHeight = "320px";
       }
     };
-    if (mql.addEventListener) {
+    if (mql && mql.addEventListener)
       mql.addEventListener("change", applyResponsive);
-    } else if (mql.addListener) {
-      mql.addListener(applyResponsive);
-    }
     applyResponsive();
 
     body.appendChild(imgWrap);
@@ -2146,32 +2198,31 @@
     document.body.appendChild(overlay);
     lockScroll();
 
-    const cleanup = function () {
+    const cleanup = () => {
       if (drawer) {
-        drawer.style.pointerEvents = exists(prev.drawerPE) ? prev.drawerPE : "";
-        drawer.style.filter = exists(prev.drawerFilter)
-          ? prev.drawerFilter
-          : "";
-        drawer.style.zIndex = exists(prev.drawerZ) ? prev.drawerZ : "";
-        if (exists(prev.drawerAria))
+        if (drawer.style) {
+          drawer.style.pointerEvents = prev.drawerPE || "";
+          drawer.style.filter = prev.drawerFilter || "";
+          drawer.style.zIndex = prev.drawerZ || "";
+        }
+        if (prev.drawerAria != null)
           drawer.setAttribute("aria-hidden", prev.drawerAria);
         else drawer.removeAttribute("aria-hidden");
         try {
           if (!prev.hadInert) drawer.removeAttribute("inert");
-        } catch (e) {}
+        } catch (_) {}
       }
-      if (drawerOverlay) {
-        drawerOverlay.style.zIndex = exists(prev.overlayZ) ? prev.overlayZ : "";
-      }
+      if (drawerOverlay && drawerOverlay.style)
+        drawerOverlay.style.zIndex = prev.overlayZ || "";
       document.body.style.overflow = "";
       try {
         URL.revokeObjectURL(url);
-      } catch (e) {}
+      } catch (_) {}
       overlay.remove();
       document.removeEventListener("keydown", onEsc);
     };
 
-    const onEsc = function (e) {
+    const onEsc = (e) => {
       if (e.key === "Escape") {
         e.preventDefault();
         cleanup();
@@ -2179,21 +2230,20 @@
     };
     document.addEventListener("keydown", onEsc);
 
-    overlay.addEventListener("click", function (e) {
+    overlay.addEventListener("click", (e) => {
       if (e.target === overlay) cleanup();
     });
-    const cBtn = header.querySelector('[data-act="close"]');
-    if (cBtn) cBtn.addEventListener("click", cleanup);
-    const cancelBtn = side.querySelector('[data-act="cancel"]');
-    if (cancelBtn)
-      cancelBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        if (onCancel) onCancel();
-        cleanup();
-      });
-    const okBtn = side.querySelector('[data-act="confirm"]');
-    if (okBtn)
-      okBtn.addEventListener("click", async function (e) {
+    header
+      .querySelector('[data-act="close"]')
+      .addEventListener("click", cleanup);
+    side.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
+      e.preventDefault();
+      onCancel && onCancel();
+      cleanup();
+    });
+    side
+      .querySelector('[data-act="confirm"]')
+      .addEventListener("click", async (e) => {
         e.preventDefault();
         try {
           if (onConfirm) await onConfirm();
@@ -2205,13 +2255,15 @@
 
   // ---- Imágenes (lectura y, en cursos+edit, subida)
   function mountReadOnlyMedia(opt) {
-    const container = opt.container;
-    const type = opt.type;
-    const id = opt.id;
-    const labels = opt.labels || [];
-    const editableOverride = opt.editable;
-
-    if (!container) return;
+    const container = opt && opt.container;
+    const type = opt && opt.type;
+    const id = opt && opt.id;
+    const labels = (opt && opt.labels) || [];
+    const editableOverride = opt ? opt.editable : void 0;
+    if (!container) {
+      dwarn("mountReadOnlyMedia: missing container");
+      return;
+    }
 
     const editable =
       typeof editableOverride === "boolean"
@@ -2221,37 +2273,44 @@
           state.currentDrawer.mode === "edit";
 
     const urls = mediaUrlsByType(type, id);
+    dlog(
+      "mountReadOnlyMedia type:",
+      type,
+      "id:",
+      id,
+      "urls:",
+      urls,
+      "editable:",
+      editable
+    );
     const grid = document.createElement("div");
     grid.className = "media-grid";
 
-    urls.forEach(function (url, i) {
+    urls.forEach((url, i) => {
       const label = labels[i] || "Imagen " + (i + 1);
       const card = document.createElement("div");
       card.className = "media-card";
 
       const editBtnHTML = editable
-        ? '<button class="icon-btn media-edit" title="Editar imagen">' +
-          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
-          '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>' +
-          "</svg>" +
-          "</button>"
+        ? `
+      <button class="icon-btn media-edit" title="Editar imagen">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+        </svg>
+      </button>`
         : "";
 
-      card.innerHTML =
-        '<figure class="media-thumb">' +
-        '<img alt="' +
-        escapeAttr(label) +
-        '" src="' +
-        withBust(url) +
-        '">' +
-        editBtnHTML +
-        "</figure>" +
-        '<div class="media-meta"><div class="media-label">' +
-        escapeHTML(label) +
-        "</div></div>";
+      card.innerHTML = `
+      <figure class="media-thumb">
+        <img alt="${escapeAttr(label)}" src="${withBust(url)}">
+        ${editBtnHTML}
+      </figure>
+      <div class="media-meta">
+        <div class="media-label">${escapeHTML(label)}</div>
+      </div>`;
 
       const img = card.querySelector("img");
-      img.onerror = function () {
+      img.onerror = () => {
         img.onerror = null;
         img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg());
       };
@@ -2259,9 +2318,10 @@
       if (editable) {
         const btnEdit = card.querySelector(".media-edit");
         if (btnEdit) {
-          btnEdit.addEventListener("click", function (e) {
+          btnEdit.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
+            dlog("media edit click -> type:", type, "id:", id, "pos:", i);
 
             const input = document.createElement("input");
             input.type = "file";
@@ -2269,9 +2329,13 @@
             input.style.display = "none";
             document.body.appendChild(input);
 
-            input.addEventListener("change", async function () {
+            input.addEventListener("change", async () => {
               const file = input.files && input.files[0];
               document.body.removeChild(input);
+              dlog(
+                "media picked:",
+                file && { name: file.name, size: file.size, type: file.type }
+              );
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
@@ -2280,12 +2344,12 @@
               renderPreviewUI(
                 card,
                 file,
-                async function () {
+                async () => {
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD || !API_UPLOAD.cursoImg) {
                         toast(
-                          "API u_cursoImg para habilitar la subida",
+                          "Configura API_UPLOAD.cursoImg para habilitar la subida",
                           "warning"
                         );
                         return;
@@ -2298,11 +2362,20 @@
                         method: "POST",
                         body: fd,
                       });
-                      if (!res.ok) throw new Error("HTTP " + res.status);
-                      const json = await res.json();
-                      if (json.error) throw new Error(json.error);
+                      const raw = await res.text();
+                      dlog("media upload curso <-", res.status, raw);
+                      let json = {};
+                      try {
+                        json = raw ? JSON.parse(raw) : {};
+                      } catch (e) {
+                        derr("media upload parse error:", e, raw);
+                      }
+                      if (!res.ok || (json && json.error))
+                        throw new Error(
+                          (json && json.error) || "HTTP " + res.status
+                        );
 
-                      img.src = withBust(json.url || url);
+                      img.src = withBust((json && json.url) || url);
                       toast("Imagen de curso actualizada", "exito");
                       return;
                     }
@@ -2310,7 +2383,7 @@
                     if (type === "noticia") {
                       if (!API_UPLOAD || !API_UPLOAD.noticiaImg) {
                         toast(
-                          "API u_noticiaImg para habilitar la subida",
+                          "Configura API_UPLOAD.noticiaImg para habilitar la subida",
                           "warning"
                         );
                         return;
@@ -2325,11 +2398,20 @@
                         method: "POST",
                         body: fd,
                       });
-                      if (!res.ok) throw new Error("HTTP " + res.status);
-                      const json = await res.json();
-                      if (json.error) throw new Error(json.error);
+                      const raw = await res.text();
+                      dlog("media upload noticia <-", res.status, raw);
+                      let json = {};
+                      try {
+                        json = raw ? JSON.parse(raw) : {};
+                      } catch (e) {
+                        derr("media upload parse error:", e, raw);
+                      }
+                      if (!res.ok || (json && json.error))
+                        throw new Error(
+                          (json && json.error) || "HTTP " + res.status
+                        );
 
-                      img.src = withBust(json.url || url);
+                      img.src = withBust((json && json.url) || url);
                       toast(
                         "Imagen " + pos + " de noticia actualizada",
                         "exito"
@@ -2337,11 +2419,13 @@
                       return;
                     }
                   } catch (err) {
-                    console.error(err);
+                    derr("media upload error:", err);
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                function () {}
+                () => {
+                  dlog("media preview cancel");
+                }
               );
             });
 
@@ -2353,22 +2437,26 @@
       grid.appendChild(card);
     });
 
-    container.innerHTML =
-      '<div class="media-head">' +
-      '<div class="media-title">Imágenes</div>' +
-      (editable
-        ? '<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>'
-        : '<div class="media-help" style="color:#888;">Solo lectura</div>') +
-      "</div>";
+    container.innerHTML = `
+    <div class="media-head">
+      <div class="media-title">Imágenes</div>
+      ${
+        editable
+          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+      }
+    </div>`;
     container.appendChild(grid);
   }
   //---------------------------------- fin del bloque de imágenes
 
   // ---- Toolbar / botones
   function bindUI() {
-    qsa(".admin-dash .admin-nav").forEach(function (btn) {
-      btn.addEventListener("click", function () {
+    dlog("bindUI()");
+    qsa(".admin-dash .admin-nav").forEach((btn) => {
+      btn.addEventListener("click", () => {
         const route = btn.dataset.route || btn.getAttribute("href");
+        dlog("nav click ->", route);
         if (route) {
           if (location.hash !== route) location.hash = route;
           else onRouteChange();
@@ -2381,13 +2469,14 @@
 
     const overlay = document.getElementById("gc-dash-overlay");
     if (overlay)
-      overlay.addEventListener("click", function (e) {
+      overlay.addEventListener("click", (e) => {
         if (e.target.id === "gc-dash-overlay") closeDrawer();
       });
 
     const addBtn = document.getElementById("btn-add");
     if (addBtn)
-      addBtn.addEventListener("click", async function () {
+      addBtn.addEventListener("click", async () => {
+        dlog("btn-add clicked route:", state.route);
         if (!isAdminUser) return;
         if (state.route.indexOf("#/cursos") === 0) {
           await openCreateCurso();
@@ -2400,6 +2489,7 @@
   async function openCreateCurso() {
     if (!isAdminUser) return;
     try {
+      dlog("openCreateCurso()");
       await Promise.all([
         getTutorsMap(),
         getPrioridadMap(),
@@ -2411,16 +2501,18 @@
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
       openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
     } catch (e) {
-      console.error(e);
+      derr("openCreateCurso error:", e);
       toast("No se pudo abrir el formulario", "error");
     }
   }
 
   // ---- INIT
-  document.addEventListener("DOMContentLoaded", async function () {
+  document.addEventListener("DOMContentLoaded", async () => {
+    dlog("DOMContentLoaded");
     currentUser = getUsuarioFromCookie();
     const uid = Number((currentUser && currentUser.id) || 0);
-    isAdminUser = ADMIN_IDS.indexOf(uid) !== -1;
+    isAdminUser = ADMIN_IDS.indexOf(uid) >= 0;
+    dlog("currentUser:", currentUser, "uid:", uid, "isAdminUser:", isAdminUser);
 
     applyAdminVisibility(isAdminUser);
     bindUI();
@@ -2434,7 +2526,9 @@
         getTipoEvalMap(),
         getActividadesMap(),
       ]);
-    } catch (e) {}
+    } catch (e) {
+      derr("INIT catalogs error:", e);
+    }
 
     if (!window.location.hash)
       window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
