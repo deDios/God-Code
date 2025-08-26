@@ -218,6 +218,7 @@
     const txt = (el.textContent || "").toLowerCase();
     return href.includes("#/cuentas") || txt.includes("cuenta");
   }
+
   function applyAdminVisibility(isAdmin) {
     qsa(".gc-side .nav-item").forEach((a) => {
       if (!isAdmin && !isCuentasLink(a)) {
@@ -229,6 +230,7 @@
     const addBtn = qs("#btn-add");
     if (addBtn) addBtn.style.display = isAdmin ? "" : "none";
   }
+
   function enforceRouteGuard() {
     if (!isAdminUser) {
       const h = (window.location.hash || "").toLowerCase();
@@ -319,9 +321,8 @@
 
     const countEl = qs("#mod-count");
     if (countEl)
-      countEl.textContent = `${rows.length} ${
-        rows.length === 1 ? "elemento" : "elementos"
-      }`;
+      countEl.textContent = `${rows.length} ${rows.length === 1 ? "elemento" : "elementos"
+        }`;
 
     // desktop -> drawer
     qsa("#recursos-list .table-row").forEach((el) => {
@@ -586,11 +587,10 @@
           <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-            ${
-              Number(it.estatus) === 0
-                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
-                : ""
-            }
+            ${Number(it.estatus) === 0
+          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+          : ""
+        }
           </div>
         </div>
       </div>`,
@@ -617,277 +617,201 @@
   }
 
   // ---- Drawer Curso
+  // ---- Drawer Curso (REEMPLAZAR COMPLETO)
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
-    const mode = state.currentDrawer?.mode || "view";
-    const isCreate = mode === "create";
+    const mode = state.currentDrawer?.mode || (item ? "view" : "create");
+    const isCreate = mode === "create" || !item;
     const isEdit = mode === "edit";
-    const isView = mode === "view";
+    const isView = mode === "view" && !!item;
 
-    const c = isCreate ? getEmptyCourse() : item ? item._all : null;
+    const c = isCreate ? getEmptyCourse() : (item ? item._all : null);
     if (!c) return "<p>No encontrado.</p>";
 
-    const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
-    const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
-    const catOptions = mapToOptions(
-      state.categoriasMap,
-      String(c.categoria || "")
-    );
-    const calOptions = mapToOptions(
-      state.calendarioMap,
-      String(c.calendario || "")
-    );
-    const tipoOptions = mapToOptions(
-      state.tipoEvalMap,
-      String(c.tipo_evaluacion || "")
-    );
-    const actOptions = mapToOptions(
-      state.actividadesMap,
-      String(c.actividades || "")
-    );
-
+    // helpers de inputs
     const inText = (id, val, ph = "") =>
-      `<input id="${id}" type="text" value="${escapeAttr(
-        val || ""
-      )}" placeholder="${escapeAttr(ph)}" />`;
+      `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
     const inNum = (id, val, min = "0") =>
-      `<input id="${id}" type="number" value="${escapeAttr(
-        val ?? ""
-      )}" min="${min}" />`;
+      `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
     const inDate = (id, val) =>
       `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
     const inCheck = (id, val) =>
-      `<label style="display:inline-flex;align-items:center;gap:.5rem;"><input id="${id}" type="checkbox" ${
-        Number(val) ? "checked" : ""
-      }/> <span>Sí</span></label>`;
+      `<label class="gc-inline"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
     const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
     const inTA = (id, val, rows = 4) =>
       `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
-    const field = (label, _key, value, inputHTML) => `
-      <div class="field">
-        <div class="label">${escapeHTML(label)}</div>
-        <div class="value">${
-          isEdit || isCreate ? inputHTML : escapeHTML(value ?? "-")
-        }</div>
-      </div>`;
+    // opciones de catálogos
+    const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
+    const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
+    const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
+    const calOptions = mapToOptions(state.calendarioMap, String(c.calendario || ""));
+    const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
+    const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
 
+    // field wrapper
+    const field = (label, value, inputHTML) => `
+    <div class="field">
+      <div class="label">${escapeHTML(label)}</div>
+      <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
+    </div>`;
+
+    // barra de acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
-        <div class="gc-actions">
-          <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-          <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
-        </div>`;
+      <div class="gc-actions">
+        <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
+        <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
+      </div>`;
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
       controlsRow = `
-        <div class="gc-actions">
-          ${
-            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
-              : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
-              : ""
-          }
-          ${
-            !isCreate
-              ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
-              : ""
-          }
-          ${
-            isInactive
-              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
-              : ""
-          }
-        </div>`;
+      <div class="gc-actions">
+        ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
+        ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
+        ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
+        ${!isCreate ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>` : ""}
+        ${isInactive ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>` : ""}
+      </div>`;
     }
 
+    // HTML del drawer (SIEMPRE completo)
     let html = `
-      ${controlsRow}
+    ${controlsRow}
 
-      ${field(
-        "Nombre",
-        "nombre",
-        c.nombre,
-        inText("f_nombre", c.nombre, "Nombre del curso")
-      )}
-      ${field(
-        "Tutor",
-        "tutor",
-        state.tutorsMap?.[c.tutor] || c.tutor,
-        inSel("f_tutor", tutorOptions)
-      )}
-      ${field(
-        "Fecha inicio",
-        "fecha_inicio",
-        c.fecha_inicio,
-        inDate("f_fecha", c.fecha_inicio)
-      )}
-      ${field(
-        "Precio",
-        "precio",
-        c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
-        inNum("f_precio", c.precio ?? 0)
-      )}
-      ${field(
-        "Certificado",
-        "certificado",
-        Number(c.certificado) ? "Sí" : "No",
-        inCheck("f_certificado", c.certificado)
-      )}
-      ${field(
-        "Prioridad",
-        "prioridad",
-        state.prioMap?.[c.prioridad] || c.prioridad,
-        inSel("f_prioridad", prioOptions)
-      )}
-      ${field(
-        "Categoría",
-        "categoria",
-        state.categoriasMap?.[c.categoria] || c.categoria,
-        inSel("f_categoria", catOptions)
-      )}
-      ${field(
-        "Calendario",
-        "calendario",
-        state.calendarioMap?.[c.calendario] || c.calendario,
-        inSel("f_calendario", calOptions)
-      )}
-      ${field(
-        "Tipo de evaluación",
-        "tipo_evaluacion",
-        state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion,
-        inSel("f_tipo_eval", tipoOptions)
-      )}
-      ${field(
-        "Actividades",
-        "actividades",
-        state.actividadesMap?.[c.actividades] || c.actividades,
-        inSel("f_actividades", actOptions)
-      )}
-      ${field(
-        "Descripción breve",
-        "descripcion_breve",
-        c.descripcion_breve,
-        inTA("f_desc_breve", c.descripcion_breve, 3)
-      )}
-      ${field(
-        "Descripción media",
-        "descripcion_media",
-        c.descripcion_media,
-        inTA("f_desc_media", c.descripcion_media, 4)
-      )}
+    ${field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
+    ${field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
+    ${field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
+    ${field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))}
+    ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
+    ${field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))}
 
-      <div class="field">
-        <div class="label">Imágenes</div>
-        <div class="value"><div id="media-curso" data-id="${
-          c.id ?? item?.id ?? ""
-        }"></div></div>
+    <div class="grid-3">
+      ${field("Tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSel("f_tutor", tutorOptions))}
+      ${field("Categoría", state.categoriasMap?.[c.categoria] || c.categoria, inSel("f_categoria", catOptions))}
+      ${field("Prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSel("f_prioridad", prioOptions))}
+    </div>
+
+    <div class="grid-3">
+      ${field("Tipo de evaluación", state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))}
+      ${field("Actividades", state.actividadesMap?.[c.actividades] || c.actividades, inSel("f_actividades", actOptions))}
+      ${field("Calendario", state.calendarioMap?.[c.calendario] || c.calendario, inSel("f_calendario", calOptions))}
+    </div>
+
+    <div class="grid-3">
+      ${field("Horas", c.horas, inNum("f_horas", c.horas ?? 0))}
+      ${field("Precio", (c.precio === 0 ? "Gratuito" : fmtMoney(c.precio)), inNum("f_precio", c.precio ?? 0))}
+      ${field("Certificado", (Number(c.certificado) ? "Sí" : "No"), inCheck("f_certificado", c.certificado))}
+    </div>
+
+    ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+
+    <div class="field">
+      <div class="label">Imagen del curso</div>
+      <div class="value">
+        <div class="img-uploader">
+          <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
+          <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
+          <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
+            <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
+          </div>
+          ${!isCreate && isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
+        </div>
       </div>
-    `;
+    </div>
+
+    <div class="field">
+      <div class="label">Imágenes existentes</div>
+      <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
+    </div>
+  `;
 
     if (isAdminUser) {
-      html += jsonSection(
-        c,
-        "JSON · Curso",
-        "json-curso",
-        "btn-copy-json-curso"
-      );
+      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
     }
 
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
     } else if (isEdit) {
-      qs("#drawer-title").textContent = `Curso · ${
-        item?.nombre || ""
-      } (edición)`;
-      state.currentDrawer = {
-        type: "curso",
-        id: item?.id ?? null,
-        mode: "edit",
-      };
+      qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""} (edición)`;
+      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
     } else {
       qs("#drawer-title").textContent = `Curso · ${item?.nombre || ""}`;
-      state.currentDrawer = {
-        type: "curso",
-        id: item?.id ?? null,
-        mode: "view",
-      };
+      state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
     }
 
+    // bindings
     setTimeout(() => {
-      const bSave = qs("#btn-save");
-      if (bSave)
-        bSave.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          try {
-            if (isCreate) await saveNewCurso();
-            else await saveUpdateCurso(item);
-          } catch (err) {
-            console.error(err);
-            toast("Error al guardar", "error");
-          }
-        });
+      disableDrawerInputs(!(isEdit || isCreate));
 
-      const bEdit = qs("#btn-edit");
-      if (bEdit)
-        bEdit.addEventListener("click", (e) => {
-          e.stopPropagation();
-          state.currentDrawer = {
+      // previsualizar imagen seleccionada 
+      const fileInput = qs("#f_curso_img");
+      const prevBox = qs("#f_curso_img_preview");
+      const prevImg = prevBox?.querySelector("img");
+      if (fileInput && prevBox && prevImg) {
+        fileInput.addEventListener("change", () => {
+          const f = fileInput.files?.[0];
+          if (!f) { prevBox.style.display = "none"; return; }
+          const v = validarImagen(f, { maxMB: 2 });
+          if (!v.ok) { toast(v.error, "error"); prevBox.style.display = "none"; fileInput.value = ""; return; }
+          const url = URL.createObjectURL(f);
+          prevImg.src = url;
+          prevBox.style.display = "";
+        });
+      }
+
+      // subir en edición inmediata
+      qs("#btn-upload-now")?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const f = qs("#f_curso_img")?.files?.[0];
+        if (!f) return toast("Selecciona un archivo primero", "warning");
+        const itemId = item?.id;
+        if (!itemId) return toast("No hay ID de curso", "error");
+        try {
+          await uploadCursoImagen(itemId, f);
+          const contCurso = document.getElementById("media-curso");
+          if (contCurso) mountReadOnlyMedia({
+            container: contCurso,
             type: "curso",
-            id: item?.id ?? null,
-            mode: "edit",
-          };
-          qs("#drawer-body").innerHTML = renderCursoDrawer({
-            id: String(item?.id ?? ""),
+            id: itemId,
+            labels: ["Portada"],
+            editable: isEdit && isAdminUser,
           });
-        });
+          toast("Imagen subida", "exito");
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo subir la imagen", "error");
+        }
+      });
 
-      const bReact = qs("#btn-reactivar");
-      if (bReact)
-        bReact.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          try {
-            await reactivateCurso(Number(item?.id));
-            toast("Curso reactivado", "exito");
-            await loadCursos();
-            const re = state.data.find((x) => x.id === item.id);
-            if (re)
-              openDrawer(
-                `Curso · ${re.nombre}`,
-                renderCursoDrawer({ id: String(re.id) })
-              );
-          } catch (err) {
-            console.error(err);
-            toast("No se pudo reactivar", "error");
-          }
-        });
+      // acciones
+      qs("#btn-save")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          if (isCreate) await saveNewCurso();
+          else await saveUpdateCurso(item);
+        } catch (err) {
+          console.error(err);
+          toast("Error al guardar", "error");
+        }
+      });
 
-      const bCancel = qs("#btn-cancel");
-      if (bCancel)
-        bCancel.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (isCreate) {
-            closeDrawer();
-          } else {
-            state.currentDrawer = {
-              type: "curso",
-              id: item?.id ?? null,
-              mode: "view",
-            };
-            qs("#drawer-body").innerHTML = renderCursoDrawer({
-              id: String(item?.id ?? ""),
-            });
-          }
-        });
+      qs("#btn-edit")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+      });
+
+      qs("#btn-cancel")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (isCreate) closeDrawer();
+        else {
+          state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+        }
+      });
 
       const bDel = qs("#btn-delete");
       if (bDel)
@@ -898,10 +822,7 @@
             bDel.textContent = "Confirmar";
             bDel.dataset.step = "2";
             setTimeout(() => {
-              if (bDel.dataset.step === "2") {
-                bDel.textContent = "Eliminar";
-                bDel.dataset.step = "1";
-              }
+              if (bDel.dataset.step === "2") { bDel.textContent = "Eliminar"; bDel.dataset.step = "1"; }
             }, 4000);
             return;
           }
@@ -916,12 +837,24 @@
           }
         });
 
-      disableDrawerInputs(!(isEdit || isCreate));
+      qs("#btn-reactivar")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          await reactivateCurso(Number(item?.id));
+          toast("Curso reactivado", "exito");
+          await loadCursos();
+          const re = state.data.find((x) => x.id === item.id);
+          if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo reactivar", "error");
+        }
+      });
 
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
         const cid = Number(c.id ?? item?.id);
-        if (!Number.isNaN(cid)) {
+        if (!Number.isNaN(cid) && cid) {
           mountReadOnlyMedia({
             container: contCurso,
             type: "curso",
@@ -931,10 +864,10 @@
           });
         } else {
           contCurso.innerHTML = `
-            <div class="media-head">
-              <div class="media-title">Imágenes</div>
-              <div class="media-help">Disponible al crear el curso</div>
-            </div>`;
+          <div class="media-head">
+            <div class="media-title">Imágenes</div>
+            <div class="media-help" style="color:#666;">Se habilita tras crear el curso</div>
+          </div>`;
         }
       }
 
@@ -943,6 +876,7 @@
 
     return html;
   }
+
 
   function disableDrawerInputs(disabled) {
     qsa(
@@ -982,8 +916,7 @@
     return clean
       .map(
         ([id, name]) =>
-          `<option value="${escapeAttr(id)}" ${
-            String(selectedId) === String(id) ? "selected" : ""
+          `<option value="${escapeAttr(id)}" ${String(selectedId) === String(id) ? "selected" : ""
           }>${escapeHTML(name)}</option>`
       )
       .join("");
@@ -1020,18 +953,50 @@
     return payload;
   }
 
+  // Crear curso + subir imagen 
   async function saveNewCurso() {
     const payload = readCursoForm(null);
+
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
-    if (!payload.fecha_inicio)
-      return toast("Fecha de inicio requerida", "warning");
+    if (!payload.categoria) return toast("Selecciona categoría", "warning");
+    if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
 
-    await postJSON(API.iCursos, payload);
+    const res = await postJSON(API.iCursos, payload);
+
+    const newId = Number(
+      res?.id ??
+      res?.curso_id ??
+      res?.insert_id ??
+      res?.data?.id ??
+      0
+    );
+    if (!newId) {
+      console.warn("Respuesta de iCursos sin id utilizable:", res);
+      toast("Curso creado, pero no se recibió ID", "warning");
+    }
+
+    const f = qs("#f_curso_img")?.files?.[0];
+    if (newId && f) {
+      try {
+        await uploadCursoImagen(newId, f);
+        toast("Imagen subida", "exito");
+      } catch (err) {
+        console.error(err);
+        toast("Curso creado, pero falló la subida de imagen", "error");
+      }
+    }
+
     toast("Curso creado", "exito");
     closeDrawer();
     await loadCursos();
+
+    if (newId) {
+      const re = state.data.find((x) => x.id === newId);
+      if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+    }
   }
+
 
   async function saveUpdateCurso(item) {
     if (!item || !item._all) return toast("Sin item para actualizar", "error");
@@ -1167,11 +1132,10 @@
             <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
             <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
               <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-              ${
-                Number(it.estatus) === 0
-                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
-                  : ""
-              }
+              ${Number(it.estatus) === 0
+          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
+          : ""
+        }
             </div>
           </div>
         </div>`,
@@ -1217,7 +1181,7 @@
 
     const mode =
       state.currentDrawer?.type === "noticia" &&
-      state.currentDrawer?.id === n.id
+        state.currentDrawer?.id === n.id
         ? state.currentDrawer.mode
         : "view";
     const isEdit = mode === "edit";
@@ -1227,24 +1191,20 @@
     const controlsRow = isAdminUser
       ? `
         <div class="gc-actions">
-          ${
-            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
-              : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
-              : ""
-          }
-          ${
-            isInactive
-              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
-              : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
-          }
+          ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
+      }
+          ${isEdit
+        ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
+        : ""
+      }
+          ${isEdit
+        ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
+        : ""
+      }
+          ${isInactive
+        ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
+        : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
+      }
         </div>`
       : "";
 
@@ -1260,9 +1220,8 @@
 
       <div class="field">
         <div class="label">Imágenes</div>
-        <div class="value"><div id="media-noticia" data-id="${
-          n.id
-        }"></div></div>
+        <div class="value"><div id="media-noticia" data-id="${n.id
+      }"></div></div>
       </div>
     `;
 
@@ -1276,9 +1235,8 @@
     }
 
     if (isEdit) {
-      qs("#drawer-title").textContent = `Noticia · ${
-        item?.titulo || ""
-      } (edición)`;
+      qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""
+        } (edición)`;
       state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
     } else {
       qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""}`;
@@ -1505,13 +1463,13 @@
     return String(str ?? "").replace(
       /[&<>'"]/g,
       (s) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          "'": "&#39;",
-          '"': "&quot;",
-        }[s])
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      }[s])
     );
   }
   function escapeAttr(str) {
@@ -1590,8 +1548,8 @@
     return `
       <details class="dev-json" open style="margin-top:16px;">
         <summary style="cursor:pointer; font-weight:600;">${escapeHTML(
-          title
-        )}</summary>
+      title
+    )}</summary>
         <div style="display:flex;gap:.5rem;margin:.5rem 0;">
           <button class="gc-btn" id="${btnId}">Copiar JSON</button>
         </div>
@@ -1650,6 +1608,24 @@
     return { ok: true };
   }
 
+  // subir imagen
+  async function uploadCursoImagen(cursoId, file) {
+  if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
+  const v = validarImagen(file, { maxMB: 2 });
+  if (!v.ok) throw new Error(v.error);
+
+  const fd = new FormData();
+  fd.append("curso_id", String(cursoId));
+  fd.append("imagen", file);
+
+  const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json?.error) {
+    throw new Error(json?.error || `HTTP ${res.status}`);
+  }
+  return json; // { url: ".../img10.png" } 
+}
+
   function humanSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -1694,7 +1670,7 @@
       drawer.setAttribute("aria-hidden", "true");
       try {
         drawer.setAttribute("inert", "");
-      } catch {}
+      } catch { }
     }
     if (drawerOverlay) {
       drawerOverlay.style.zIndex = "2";
@@ -1783,7 +1759,7 @@
         if (!prev.hadInert)
           try {
             drawer.removeAttribute("inert");
-          } catch {}
+          } catch { }
       }
       if (drawerOverlay) {
         drawerOverlay.style.zIndex = prev.overlayZ ?? "";
@@ -1957,7 +1933,7 @@
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                () => {}
+                () => { }
               );
             });
 
@@ -1972,10 +1948,9 @@
     container.innerHTML = `
     <div class="media-head">
       <div class="media-title">Imágenes</div>
-      ${
-        editable
-          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
-          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
+      ${editable
+        ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
+        : `<div class="media-help" style="color:#888;">Solo lectura</div>`
       }
     </div>`;
     container.appendChild(grid);
@@ -2004,7 +1979,15 @@
       });
 
     const addBtn = document.getElementById("btn-add");
-    if (addBtn) addBtn.addEventListener("click", openCreateCurso);
+    if (addBtn) addBtn.addEventListener("click", async () => {
+      if (!isAdminUser) return;
+      if (state.route.startsWith("#/cursos")) {
+        await openCreateCurso();
+      } else if (state.route.startsWith("#/noticias")) {
+        // openCreateNoticia(); // cuando este listo
+        toast("Crear noticia: pendiente de implementar", "warning");
+      }
+    });
   }
 
   async function openCreateCurso() {
@@ -2044,7 +2027,7 @@
         getTipoEvalMap(),
         getActividadesMap(),
       ]);
-    } catch {}
+    } catch { }
 
     if (!window.location.hash)
       window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
