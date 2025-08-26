@@ -93,6 +93,8 @@
   function getUsuarioFromCookie() {
     // Busca la cookie "usuario"
     var c = (document.cookie || "").split("; ").find(function (r) {
+      console.log("cookie c: ",c);
+      console.log("cookie r: ",r)
       return r.indexOf("usuario=") === 0;
     });
     if (!c) return null;
@@ -108,6 +110,7 @@
     var dec;
     try {
       dec = decodeURIComponent(raw);
+      console.log("cookie raw: ",raw);
     } catch (e) {
       dec = raw;
     }
