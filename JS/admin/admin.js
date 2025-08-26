@@ -1,6 +1,6 @@
 (() => {
-  // ===== DEBUG SWITCH (global): cambia a true para ver logs =====
-  if (typeof window.GC_DEBUG === "undefined") window.GC_DEBUG = false;
+  // ---- DEBUG SWITCH  colocar true o false para ver los logs
+  if (typeof window.GC_DEBUG === "undefined") window.GC_DEBUG = true;
   const dlog = (...args) => {
     if (window.GC_DEBUG) {
       try {
