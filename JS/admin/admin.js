@@ -619,7 +619,6 @@
   }
 
   // ---- Drawer Curso (COMPLETO)
-  // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || (item ? "view" : "create");
@@ -630,20 +629,15 @@
     const c = isCreate ? getEmptyCourse() : (item ? item._all : null);
     if (!c) return "<p>No encontrado.</p>";
 
-    // helpers de inputs
-    const inText = (id, val, ph = "") =>
-      `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
-    const inNum = (id, val, min = "0") =>
-      `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
-    const inDate = (id, val) =>
-      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
-    const inCheck = (id, val) =>
-      `<label class="gc-inline"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
+    // helpers
+    const inText = (id, val, ph = "") => `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph)}" />`;
+    const inNum = (id, val, min = "0") => `<input id="${id}" type="number" value="${escapeAttr(val ?? "")}" min="${min}" />`;
+    const inDate = (id, val) => `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+    const inCheck = (id, val) => `<label class="gc-inline"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
     const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
-    const inTA = (id, val, rows = 4) =>
-      `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+    const inTA = (id, val, rows = 4) => `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
 
-    // opciones de catálogos
+    // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
     const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
@@ -651,14 +645,13 @@
     const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
     const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
 
-    // field wrapper
     const field = (label, value, inputHTML) => `
     <div class="field">
       <div class="label">${escapeHTML(label)}</div>
       <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
     </div>`;
 
-    // barra de acciones
+    // acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
@@ -673,12 +666,12 @@
         ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
         ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
         ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
-        ${!isCreate ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>` : ""}
+        <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
         ${isInactive ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>` : ""}
       </div>`;
     }
 
-    // HTML del drawer (SIEMPRE completo)
+    // contenido
     let html = `
     ${controlsRow}
 
@@ -710,7 +703,9 @@
     ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
   `;
 
-    // --- Imagen del curso (crear = card con lápiz + modal; editar/ver = input + media-grid)
+    // IMAGEN:
+    // * CREAR: tarjeta con lápiz + modal (buffer en state.tempNewCourseImage)
+    // * EDITAR/VER: SOLO "Imágenes existentes" (media-grid con lápiz en modo edición)
     if (isCreate) {
       html += `
       <div class="field">
@@ -733,35 +728,20 @@
             </div>
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
     } else {
       html += `
       <div class="field">
-        <div class="label">Imagen del curso</div>
-        <div class="value">
-          <div class="img-uploader">
-            <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
-            <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
-            <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
-              <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
-            </div>
-            ${isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
         <div class="label">Imágenes existentes</div>
         <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
-      </div>
-    `;
+      </div>`;
     }
 
     if (isAdminUser) {
       html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
     }
 
+    // título y estado
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
@@ -777,13 +757,13 @@
     setTimeout(() => {
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // ---------- Crear: lápiz + modal de preview (usa renderPreviewUI)
+      // CREAR: lápiz + modal para seleccionar imagen (usa renderPreviewUI)
       if (isCreate) {
         const card = document.getElementById("create-media-curso");
-        const btnEdit = document.getElementById("create-media-edit");
+        const btn = document.getElementById("create-media-edit");
         const thumb = document.getElementById("create-media-thumb");
-        if (btnEdit && thumb && card) {
-          btnEdit.addEventListener("click", () => {
+        if (btn && thumb && card) {
+          btn.addEventListener("click", () => {
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/png, image/jpeg";
@@ -802,7 +782,6 @@
                 card,
                 file,
                 async () => {
-                  // Confirmado -> buffer + preview
                   state.tempNewCourseImage = file;
                   try { URL.revokeObjectURL(thumb.dataset.blobUrl || ""); } catch { }
                   const blobUrl = URL.createObjectURL(file);
@@ -819,69 +798,11 @@
         }
       }
 
-      // ---------- Editar: input clásico + preview + subir ahora
-      const fileInput = qs("#f_curso_img");
-      const prevBox = qs("#f_curso_img_preview");
-      const prevImg = prevBox?.querySelector("img");
-      if (fileInput && prevBox && prevImg) {
-        fileInput.addEventListener("change", () => {
-          const f = fileInput.files?.[0];
-          if (!f) { prevBox.style.display = "none"; return; }
-          const v = validarImagen(f, { maxMB: 2 });
-          if (!v.ok) { toast(v.error, "error"); prevBox.style.display = "none"; fileInput.value = ""; return; }
-          const url = URL.createObjectURL(f);
-          prevImg.src = url;
-          prevBox.style.display = "";
-        });
-      }
-
-      // subir en edición inmediata
-      qs("#btn-upload-now")?.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const f = qs("#f_curso_img")?.files?.[0];
-        if (!f) return toast("Selecciona un archivo primero", "warning");
-        const itemId = item?.id;
-        if (!itemId) return toast("No hay ID de curso", "error");
-        try {
-          await uploadCursoImagen(itemId, f);
-          const contCurso = document.getElementById("media-curso");
-          if (contCurso) mountReadOnlyMedia({
-            container: contCurso,
-            type: "curso",
-            id: itemId,
-            labels: ["Portada"],
-            editable: isEdit && isAdminUser,
-          });
-          toast("Imagen subida", "exito");
-        } catch (err) {
-          console.error(err);
-          toast("No se pudo subir la imagen", "error");
-        }
-      });
-
-      // helper local para subir imagen (se usa en crear y en editar)
-      async function uploadCursoImagen(cursoId, file) {
-        if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
-        const v = validarImagen(file, { maxMB: 2 });
-        if (!v.ok) throw new Error(v.error);
-
-        const fd = new FormData();
-        fd.append("curso_id", String(cursoId));
-        fd.append("imagen", file);
-
-        const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
-        const json = await res.json().catch(() => ({}));
-        if (!res.ok || json?.error) {
-          throw new Error(json?.error || `HTTP ${res.status}`);
-        }
-        return json; // { url: ".../img10.png" }
-      }
-
-      // ---------- Acciones
+      // guardar/editar
       qs("#btn-save")?.addEventListener("click", async (e) => {
         e.stopPropagation();
         try {
-          if (isCreate) await saveNewCurso();  // usa state.tempNewCourseImage internamente
+          if (isCreate) await saveNewCurso();   // sube state.tempNewCourseImage al final
           else await saveUpdateCurso(item);
         } catch (err) {
           console.error(err);
@@ -898,7 +819,7 @@
       qs("#btn-cancel")?.addEventListener("click", (e) => {
         e.stopPropagation();
         if (isCreate) {
-          state.tempNewCourseImage = null; // limpiar buffer si se cancela crear
+          state.tempNewCourseImage = null;
           closeDrawer();
         } else {
           state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
@@ -944,7 +865,7 @@
         }
       });
 
-      // montar media existente (solo si hay id)
+      // montar media (solo existe en view/edit y cuando hay id)
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
         const cid = Number(c.id ?? item?.id);
@@ -954,14 +875,8 @@
             type: "curso",
             id: cid,
             labels: ["Portada"],
-            editable: isEdit && isAdminUser,
+            editable: isEdit && isAdminUser, // lápiz visible en edición
           });
-        } else if (!isCreate) {
-          contCurso.innerHTML = `
-          <div class="media-head">
-            <div class="media-title">Imágenes</div>
-            <div class="media-help" style="color:#666;">Se habilita tras crear el curso</div>
-          </div>`;
         }
       }
 
@@ -970,6 +885,7 @@
 
     return html;
   }
+
 
 
   function disableDrawerInputs(disabled) {
