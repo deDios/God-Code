@@ -1,14 +1,22 @@
 (() => {
   // -------- helpers de compatibilidad
-  function exists(v){ return v !== undefined && v !== null; }
-  function on(el, ev, fn){ if (el && el.addEventListener) el.addEventListener(ev, fn); }
-  function qs(s, r){ return (r||document).querySelector(s); }
-  function qsa(s, r){ return Array.from((r||document).querySelectorAll(s)); }
+  function exists(v) {
+    return v !== undefined && v !== null;
+  }
+  function on(el, ev, fn) {
+    if (el && el.addEventListener) el.addEventListener(ev, fn);
+  }
+  function qs(s, r) {
+    return (r || document).querySelector(s);
+  }
+  function qsa(s, r) {
+    return Array.from((r || document).querySelectorAll(s));
+  }
 
   const setVH = () => {
     document.documentElement.style.setProperty(
       "--vh",
-      (window.innerHeight * 0.01) + "px"
+      window.innerHeight * 0.01 + "px"
     );
   };
   setVH();
@@ -16,26 +24,39 @@
 
   // ---- ENDPOINTS
   const API = {
-    cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
-    iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
-    uCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
+    cursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+    iCursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
+    uCursos:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
 
-    noticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
-    uNoticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
-    comentarios: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
+    noticias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
+    uNoticias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
+    comentarios:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
 
-    tutores: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
-    prioridad: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+    tutores:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
+    prioridad:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
 
-    categorias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
-    calendario: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
-    tipoEval: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
-    actividades: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+    categorias:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
+    calendario:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
+    tipoEval:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
+    actividades:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
   // --- subida de imagen de curso
   const API_UPLOAD = {
-    cursoImg: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
+    cursoImg:
+      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
     // noticiaImg: "https://.../u_noticiaImg.php"
   };
 
@@ -65,13 +86,42 @@
   let isAdminUser = false;
 
   const toast = (msg, tipo, dur) =>
-    window.gcToast ? window.gcToast(msg, tipo || "exito", dur || 2500) : console.log("[" + (tipo||"exito") + "] " + msg);
+    window.gcToast
+      ? window.gcToast(msg, tipo || "exito", dur || 2500)
+      : console.log("[" + (tipo || "exito") + "] " + msg);
 
   function getUsuarioFromCookie() {
-    const c = document.cookie.split("; ").find(function (r){ return r.indexOf("usuario=")===0; });
+    // Busca la cookie "usuario"
+    var c = (document.cookie || "").split("; ").find(function (r) {
+      return r.indexOf("usuario=") === 0;
+    });
     if (!c) return null;
+
+    var raw = "";
     try {
-      return JSON.parse(decodeURIComponent(c.split("=")[1]));
+      raw = c.split("=").slice(1).join("="); 
+    } catch (e) {
+      return null;
+    }
+    if (!raw) return null;
+
+    var dec;
+    try {
+      dec = decodeURIComponent(raw);
+    } catch (e) {
+      dec = raw;
+    }
+
+    dec = (dec || "").trim();
+    if (!dec) return null;
+
+    var first = dec.charAt(0);
+    if (first !== "{" && first !== "[") {
+      return null; 
+    }
+
+    try {
+      return JSON.parse(dec);
     } catch (e) {
       return null;
     }
@@ -93,7 +143,9 @@
       const panel = document.createElement("div");
       panel.id = "cuenta-panel";
       panel.style.padding = "16px 18px";
-      panel.innerHTML = (window.renderCuentaOpciones && window.renderCuentaOpciones()) || "<div>Panel de cuenta</div>";
+      panel.innerHTML =
+        (window.renderCuentaOpciones && window.renderCuentaOpciones()) ||
+        "<div>Panel de cuenta</div>";
       host.appendChild(panel);
     }
   }
@@ -123,55 +175,85 @@
 
   // ---- Catálogos
   async function getTutorsMap() {
-    if (state.tutorsMap && (Date.now() - state.tutorsMap._ts) < 30 * 60 * 1000) return state.tutorsMap;
+    if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
+      return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (t){ map[t.id] = t.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (t) {
+      map[t.id] = t.nombre;
+    });
     map._ts = Date.now();
     state.tutorsMap = map;
     return map;
   }
   async function getPrioridadMap() {
-    if (state.prioMap && (Date.now() - state.prioMap._ts) < 30 * 60 * 1000) return state.prioMap;
+    if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000)
+      return state.prioMap;
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (p){ map[p.id] = p.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (p) {
+      map[p.id] = p.nombre;
+    });
     map._ts = Date.now();
     state.prioMap = map;
     return map;
   }
   async function getCategoriasMap() {
-    if (state.categoriasMap && (Date.now() - state.categoriasMap._ts) < 30 * 60 * 1000) return state.categoriasMap;
+    if (
+      state.categoriasMap &&
+      Date.now() - state.categoriasMap._ts < 30 * 60 * 1000
+    )
+      return state.categoriasMap;
     const arr = await postJSON(API.categorias, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c){ map[c.id] = c.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (c) {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.categoriasMap = map;
     return map;
   }
   async function getCalendarioMap() {
-    if (state.calendarioMap && (Date.now() - state.calendarioMap._ts) < 30 * 60 * 1000) return state.calendarioMap;
+    if (
+      state.calendarioMap &&
+      Date.now() - state.calendarioMap._ts < 30 * 60 * 1000
+    )
+      return state.calendarioMap;
     const arr = await postJSON(API.calendario, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c){ map[c.id] = c.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (c) {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.calendarioMap = map;
     return map;
   }
   async function getTipoEvalMap() {
-    if (state.tipoEvalMap && (Date.now() - state.tipoEvalMap._ts) < 30 * 60 * 1000) return state.tipoEvalMap;
+    if (
+      state.tipoEvalMap &&
+      Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000
+    )
+      return state.tipoEvalMap;
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c){ map[c.id] = c.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (c) {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.tipoEvalMap = map;
     return map;
   }
   async function getActividadesMap() {
-    if (state.actividadesMap && (Date.now() - state.actividadesMap._ts) < 30 * 60 * 1000) return state.actividadesMap;
+    if (
+      state.actividadesMap &&
+      Date.now() - state.actividadesMap._ts < 30 * 60 * 1000
+    )
+      return state.actividadesMap;
     const arr = await postJSON(API.actividades, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach(function (c){ map[c.id] = c.nombre; });
+    (Array.isArray(arr) ? arr : []).forEach(function (c) {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.actividadesMap = map;
     return map;
@@ -179,7 +261,11 @@
 
   // ---- Visibilidad por rol
   function isCuentasLink(el) {
-    const href = (el.getAttribute("href") || el.dataset.route || "").toLowerCase();
+    const href = (
+      el.getAttribute("href") ||
+      el.dataset.route ||
+      ""
+    ).toLowerCase();
     const txt = (el.textContent || "").toLowerCase();
     return href.indexOf("#/cuentas") !== -1 || txt.indexOf("cuenta") !== -1;
   }
@@ -216,7 +302,8 @@
   function onRouteChange() {
     enforceRouteGuard();
 
-    const hash = window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+    const hash =
+      window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
     state.route = hash;
     state.page = 1;
 
@@ -250,8 +337,10 @@
     const target = d || m;
     if (!target) return;
     for (let i = 0; i < 5; i++) {
-      target.insertAdjacentHTML("beforeend",
-        '<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>');
+      target.insertAdjacentHTML(
+        "beforeend",
+        '<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>'
+      );
     }
   }
 
@@ -263,8 +352,12 @@
     if (m) m.innerHTML = "";
 
     if (!rows.length) {
-      if (d) d.innerHTML = '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
-      if (m) m.innerHTML = '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+      if (d)
+        d.innerHTML =
+          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+      if (m)
+        m.innerHTML =
+          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
       const countEl = qs("#mod-count");
       if (countEl) countEl.textContent = "0 resultados";
       renderPagination(0);
@@ -280,14 +373,20 @@
     });
 
     const countEl = qs("#mod-count");
-    if (countEl) countEl.textContent = rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
+    if (countEl)
+      countEl.textContent =
+        rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
 
     // desktop -> drawer
     qsa("#recursos-list .table-row").forEach(function (el) {
       el.addEventListener("click", function () {
         const data = el.dataset;
         if (data.type === "noticia") {
-          state.currentDrawer = { type: "noticia", id: Number(data.id), mode: "view" };
+          state.currentDrawer = {
+            type: "noticia",
+            id: Number(data.id),
+            mode: "view",
+          };
         }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
@@ -299,7 +398,8 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser)
+              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
@@ -316,7 +416,11 @@
         e.stopPropagation();
         const data = btn.closest(".table-row-mobile").dataset;
         if (data.type === "noticia") {
-          state.currentDrawer = { type: "noticia", id: Number(data.id), mode: "view" };
+          state.currentDrawer = {
+            type: "noticia",
+            id: Number(data.id),
+            mode: "view",
+          };
         }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
@@ -328,7 +432,8 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser)
+              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
@@ -417,11 +522,15 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 =
+        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       let c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Nombre";
-      if (c2) { c2.textContent = "Tutor"; c2.classList.add("col-tutor"); }
+      if (c2) {
+        c2.textContent = "Tutor";
+        c2.classList.add("col-tutor");
+      }
       if (c3) c3.textContent = "Fecha de inicio";
       if (!c4) {
         c4 = document.createElement("div");
@@ -454,7 +563,7 @@
         getActividadesMap(),
       ]);
 
-      const activosRaw   = results[0];
+      const activosRaw = results[0];
       const inactivosRaw = results[1];
       const tmap = results[2];
       const pmap = results[3];
@@ -472,18 +581,18 @@
         return {
           id: c.id,
           nombre: c.nombre,
-          tutor: tmap[c.tutor] || ("Tutor #" + c.tutor),
+          tutor: tmap[c.tutor] || "Tutor #" + c.tutor,
           tutor_id: c.tutor,
           prioridad_id: c.prioridad,
-          prioridad_nombre: pmap[c.prioridad] || ("#" + c.prioridad),
+          prioridad_nombre: pmap[c.prioridad] || "#" + c.prioridad,
           categoria_id: c.categoria,
-          categoria_nombre: cmap[c.categoria] || ("#" + c.categoria),
+          categoria_nombre: cmap[c.categoria] || "#" + c.categoria,
           calendario_id: c.calendario,
-          calendario_nombre: calmap[c.calendario] || ("#" + c.calendario),
+          calendario_nombre: calmap[c.calendario] || "#" + c.calendario,
           tipo_eval_id: c.tipo_evaluacion,
-          tipo_eval_nombre: temap[c.tipo_evaluacion] || ("#" + c.tipo_evaluacion),
+          tipo_eval_nombre: temap[c.tipo_evaluacion] || "#" + c.tipo_evaluacion,
           actividades_id: c.actividades,
-          actividades_nombre: ammap[c.actividades] || ("#" + c.actividades),
+          actividades_nombre: ammap[c.actividades] || "#" + c.actividades,
           precio: c.precio,
           certificado: !!c.certificado,
           fecha: c.fecha_inicio,
@@ -495,7 +604,9 @@
       drawCursos();
     } catch (err) {
       const list = qs("#recursos-list");
-      if (list) list.innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>';
+      if (list)
+        list.innerHTML =
+          '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>';
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
       console.error(err);
@@ -508,41 +619,71 @@
     renderList(rows, {
       desktopRow: function (it) {
         return (
-      '<div class="table-row" data-id="'+it.id+'" data-type="curso">'+
-        '<div class="col-nombre">'+
-          '<span class="name-text">'+escapeHTML(it.nombre)+'</span>'+
-          badgePrecio(it.precio)+
-        '</div>'+
-        '<div class="col-tutor">'+escapeHTML(it.tutor)+'</div>'+
-        '<div class="col-fecha">'+fmtDate(it.fecha)+'</div>'+
-        '<div class="col-status">'+
-          badgeCurso(it.estatus)+
-        '</div>'+
-      '</div>');
+          '<div class="table-row" data-id="' +
+          it.id +
+          '" data-type="curso">' +
+          '<div class="col-nombre">' +
+          '<span class="name-text">' +
+          escapeHTML(it.nombre) +
+          "</span>" +
+          badgePrecio(it.precio) +
+          "</div>" +
+          '<div class="col-tutor">' +
+          escapeHTML(it.tutor) +
+          "</div>" +
+          '<div class="col-fecha">' +
+          fmtDate(it.fecha) +
+          "</div>" +
+          '<div class="col-status">' +
+          badgeCurso(it.estatus) +
+          "</div>" +
+          "</div>"
+        );
       },
       mobileRow: function (it) {
         return (
-      '<div class="table-row-mobile" data-id="'+it.id+'" data-type="curso">'+
-        '<button class="row-toggle">'+
-          '<div class="col-nombre">'+escapeHTML(it.nombre)+' '+badgePrecio(it.precio)+'</div>'+
-          '<span class="icon-chevron">›</span>'+
-        '</button>'+
-        '<div class="row-details">'+
-          '<div><strong>Tutor:</strong> '+escapeHTML(it.tutor)+'</div>'+
-          '<div><strong>Inicio:</strong> '+fmtDate(it.fecha)+'</div>'+
-          '<div><strong>Status:</strong> '+textCursoStatus(it.estatus)+'</div>'+
-          '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">'+
-            '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>'+
-            (Number(it.estatus)===0 ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="'+it.id+'">Reactivar</button>' : '')+
-          '</div>'+
-        '</div>'+
-      '</div>');
+          '<div class="table-row-mobile" data-id="' +
+          it.id +
+          '" data-type="curso">' +
+          '<button class="row-toggle">' +
+          '<div class="col-nombre">' +
+          escapeHTML(it.nombre) +
+          " " +
+          badgePrecio(it.precio) +
+          "</div>" +
+          '<span class="icon-chevron">›</span>' +
+          "</button>" +
+          '<div class="row-details">' +
+          "<div><strong>Tutor:</strong> " +
+          escapeHTML(it.tutor) +
+          "</div>" +
+          "<div><strong>Inicio:</strong> " +
+          fmtDate(it.fecha) +
+          "</div>" +
+          "<div><strong>Status:</strong> " +
+          textCursoStatus(it.estatus) +
+          "</div>" +
+          '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">' +
+          '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>' +
+          (Number(it.estatus) === 0
+            ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="' +
+              it.id +
+              '">Reactivar</button>'
+            : "") +
+          "</div>" +
+          "</div>" +
+          "</div>"
+        );
       },
       drawerTitle: function (d) {
-        const item = state.data.find(function (x){ return String(x.id) === d.id; });
-        return item ? ("Curso · " + item.nombre) : "Curso";
+        const item = state.data.find(function (x) {
+          return String(x.id) === d.id;
+        });
+        return item ? "Curso · " + item.nombre : "Curso";
       },
-      drawerBody: function (d) { return renderCursoDrawer(d); },
+      drawerBody: function (d) {
+        return renderCursoDrawer(d);
+      },
     });
   }
 
@@ -562,123 +703,266 @@
 
   // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
-    const item = state.data.find(function (x){ return String(x.id) === dataset.id; });
-    const mode = (state.currentDrawer && state.currentDrawer.mode) || (item ? "view" : "create");
-    const isCreate = (mode === "create") || !item;
-    const isEdit = (mode === "edit");
-    const isView = (mode === "view") && !!item;
+    const item = state.data.find(function (x) {
+      return String(x.id) === dataset.id;
+    });
+    const mode =
+      (state.currentDrawer && state.currentDrawer.mode) ||
+      (item ? "view" : "create");
+    const isCreate = mode === "create" || !item;
+    const isEdit = mode === "edit";
+    const isView = mode === "view" && !!item;
 
-    const c = isCreate ? getEmptyCourse() : (item ? item._all : null);
+    const c = isCreate ? getEmptyCourse() : item ? item._all : null;
     if (!c) return "<p>No encontrado.</p>";
 
     // helpers
-    const inText = function (id, val, ph){ return '<input id="'+id+'" type="text" value="'+escapeAttr(exists(val)?val:"")+'" placeholder="'+escapeAttr(ph||"")+'" />'; };
-    const inNum  = function (id, val, min){ return '<input id="'+id+'" type="number" value="'+escapeAttr(exists(val)?val:"")+'" min="'+(min||"0")+'" />'; };
-    const inDate = function (id, val){ return '<input id="'+id+'" type="date" value="'+escapeAttr(exists(val)?val:"")+'" />'; };
-    const inCheck= function (id, val){ return '<label class="gc-inline"><input id="'+id+'" type="checkbox" '+(Number(val)?'checked':'')+'/> <span>Sí</span></label>'; };
-    const inSel  = function (id, opts){ return '<select id="'+id+'">'+opts+'</select>'; };
-    const inTA   = function (id, val, rows){ return '<textarea id="'+id+'" rows="'+(rows||4)+'">'+escapeHTML(exists(val)?val:"")+'</textarea>'; };
+    const inText = function (id, val, ph) {
+      return (
+        '<input id="' +
+        id +
+        '" type="text" value="' +
+        escapeAttr(exists(val) ? val : "") +
+        '" placeholder="' +
+        escapeAttr(ph || "") +
+        '" />'
+      );
+    };
+    const inNum = function (id, val, min) {
+      return (
+        '<input id="' +
+        id +
+        '" type="number" value="' +
+        escapeAttr(exists(val) ? val : "") +
+        '" min="' +
+        (min || "0") +
+        '" />'
+      );
+    };
+    const inDate = function (id, val) {
+      return (
+        '<input id="' +
+        id +
+        '" type="date" value="' +
+        escapeAttr(exists(val) ? val : "") +
+        '" />'
+      );
+    };
+    const inCheck = function (id, val) {
+      return (
+        '<label class="gc-inline"><input id="' +
+        id +
+        '" type="checkbox" ' +
+        (Number(val) ? "checked" : "") +
+        "/> <span>Sí</span></label>"
+      );
+    };
+    const inSel = function (id, opts) {
+      return '<select id="' + id + '">' + opts + "</select>";
+    };
+    const inTA = function (id, val, rows) {
+      return (
+        '<textarea id="' +
+        id +
+        '" rows="' +
+        (rows || 4) +
+        '">' +
+        escapeHTML(exists(val) ? val : "") +
+        "</textarea>"
+      );
+    };
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
-    const prioOptions  = mapToOptions(state.prioMap, String(c.prioridad || ""));
-    const catOptions   = mapToOptions(state.categoriasMap, String(c.categoria || ""));
-    const calOptions   = mapToOptions(state.calendarioMap, String(c.calendario || ""));
-    const tipoOptions  = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
-    const actOptions   = mapToOptions(state.actividadesMap, String(c.actividades || ""));
+    const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
+    const catOptions = mapToOptions(
+      state.categoriasMap,
+      String(c.categoria || "")
+    );
+    const calOptions = mapToOptions(
+      state.calendarioMap,
+      String(c.calendario || "")
+    );
+    const tipoOptions = mapToOptions(
+      state.tipoEvalMap,
+      String(c.tipo_evaluacion || "")
+    );
+    const actOptions = mapToOptions(
+      state.actividadesMap,
+      String(c.actividades || "")
+    );
 
     const field = function (label, value, inputHTML) {
-      return '<div class="field">'+
-        '<div class="label">'+escapeHTML(label)+'</div>'+
-        '<div class="value">'+( (isEdit||isCreate) ? inputHTML : escapeHTML(exists(value)?value:"-") )+'</div>'+
-      '</div>';
+      return (
+        '<div class="field">' +
+        '<div class="label">' +
+        escapeHTML(label) +
+        "</div>" +
+        '<div class="value">' +
+        (isEdit || isCreate
+          ? inputHTML
+          : escapeHTML(exists(value) ? value : "-")) +
+        "</div>" +
+        "</div>"
+      );
     };
 
     // acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow =
-      '<div class="gc-actions">'+
-        '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'+
-        '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'+
-      '</div>';
+        '<div class="gc-actions">' +
+        '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' +
+        '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' +
+        "</div>";
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
       controlsRow =
-      '<div class="gc-actions">'+
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : '')+
-        (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : '')+
-        (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : '')+
-        '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>'+
-        (isInactive ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>' : '')+
-      '</div>';
+        '<div class="gc-actions">' +
+        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
+          : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
+          : "") +
+        '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>' +
+        (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : "") +
+        "</div>";
     }
 
     // contenido
-    let html = ""+
-    controlsRow +
-
-    field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso")) +
-    field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))+
-    field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))+
-    field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))+
-    field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))+
-    field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))+
-
-    '<div class="grid-3">'+
-      field("Tutor", (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor, inSel("f_tutor", tutorOptions))+
-      field("Categoría", (state.categoriasMap && state.categoriasMap[c.categoria]) || c.categoria, inSel("f_categoria", catOptions))+
-      field("Prioridad", (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad, inSel("f_prioridad", prioOptions))+
-    '</div>'+
-
-    '<div class="grid-3">'+
-      field("Tipo de evaluación", (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))+
-      field("Actividades", (state.actividadesMap && state.actividadesMap[c.actividades]) || c.actividades, inSel("f_actividades", actOptions))+
-      field("Calendario", (state.calendarioMap && state.calendarioMap[c.calendario]) || c.calendario, inSel("f_calendario", calOptions))+
-    '</div>'+
-
-    '<div class="grid-3">'+
-      field("Horas", c.horas, inNum("f_horas", exists(c.horas)?c.horas:0))+
-      field("Precio", (c.precio === 0 ? "Gratuito" : fmtMoney(c.precio)), inNum("f_precio", exists(c.precio)?c.precio:0))+
-      field("Certificado", (Number(c.certificado) ? "Sí" : "No"), inCheck("f_certificado", c.certificado))+
-    '</div>'+
-
-    field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio));
+    let html =
+      "" +
+      controlsRow +
+      field(
+        "Nombre",
+        c.nombre,
+        inText("f_nombre", c.nombre, "Nombre del curso")
+      ) +
+      field(
+        "Descripción breve",
+        c.descripcion_breve,
+        inTA("f_desc_breve", c.descripcion_breve, 3)
+      ) +
+      field(
+        "Descripción media",
+        c.descripcion_media,
+        inTA("f_desc_media", c.descripcion_media, 4)
+      ) +
+      field(
+        "Descripción del curso",
+        c.descripcion_curso,
+        inTA("f_desc_curso", c.descripcion_curso, 6)
+      ) +
+      field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3)) +
+      field(
+        "Competencias",
+        c.competencias,
+        inTA("f_competencias", c.competencias, 3)
+      ) +
+      '<div class="grid-3">' +
+      field(
+        "Tutor",
+        (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor,
+        inSel("f_tutor", tutorOptions)
+      ) +
+      field(
+        "Categoría",
+        (state.categoriasMap && state.categoriasMap[c.categoria]) ||
+          c.categoria,
+        inSel("f_categoria", catOptions)
+      ) +
+      field(
+        "Prioridad",
+        (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad,
+        inSel("f_prioridad", prioOptions)
+      ) +
+      "</div>" +
+      '<div class="grid-3">' +
+      field(
+        "Tipo de evaluación",
+        (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) ||
+          c.tipo_evaluacion,
+        inSel("f_tipo_eval", tipoOptions)
+      ) +
+      field(
+        "Actividades",
+        (state.actividadesMap && state.actividadesMap[c.actividades]) ||
+          c.actividades,
+        inSel("f_actividades", actOptions)
+      ) +
+      field(
+        "Calendario",
+        (state.calendarioMap && state.calendarioMap[c.calendario]) ||
+          c.calendario,
+        inSel("f_calendario", calOptions)
+      ) +
+      "</div>" +
+      '<div class="grid-3">' +
+      field("Horas", c.horas, inNum("f_horas", exists(c.horas) ? c.horas : 0)) +
+      field(
+        "Precio",
+        c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
+        inNum("f_precio", exists(c.precio) ? c.precio : 0)
+      ) +
+      field(
+        "Certificado",
+        Number(c.certificado) ? "Sí" : "No",
+        inCheck("f_certificado", c.certificado)
+      ) +
+      "</div>" +
+      field(
+        "Fecha de inicio",
+        c.fecha_inicio,
+        inDate("f_fecha", c.fecha_inicio)
+      );
 
     // IMAGEN
     if (isCreate) {
       html +=
-      '<div class="field">'+
-        '<div class="label">Imagen del curso</div>'+
-        '<div class="value">'+
-          '<div id="create-media-curso" class="media-grid">'+
-            '<div class="media-card">'+
-              '<figure class="media-thumb">'+
-                '<img id="create-media-thumb" alt="Portada" src="'+withBust("/ASSETS/cursos/img0.png")+'" />'+
-                '<button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">'+
-                  '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">'+
-                    '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>'+
-                  '</svg>'+
-                '</button>'+
-              '</figure>'+
-              '<div class="media-meta">'+
-                '<div class="media-label">Portada</div>'+
-                '<div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>'+
-              '</div>'+
-            '</div>'+
-          '</div>'+
-        '</div>'+
-      '</div>';
+        '<div class="field">' +
+        '<div class="label">Imagen del curso</div>' +
+        '<div class="value">' +
+        '<div id="create-media-curso" class="media-grid">' +
+        '<div class="media-card">' +
+        '<figure class="media-thumb">' +
+        '<img id="create-media-thumb" alt="Portada" src="' +
+        withBust("/ASSETS/cursos/img0.png") +
+        '" />' +
+        '<button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">' +
+        '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
+        '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>' +
+        "</svg>" +
+        "</button>" +
+        "</figure>" +
+        '<div class="media-meta">' +
+        '<div class="media-label">Portada</div>' +
+        '<div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>' +
+        "</div>" +
+        "</div>" +
+        "</div>" +
+        "</div>" +
+        "</div>";
     } else {
       html +=
-      '<div class="field">'+
-        '<div class="label">Imágenes existentes</div>'+
-        '<div class="value"><div id="media-curso" data-id="'+(exists(c.id)?c.id:(item?item.id:""))+'"></div></div>'+
-      '</div>';
+        '<div class="field">' +
+        '<div class="label">Imágenes existentes</div>' +
+        '<div class="value"><div id="media-curso" data-id="' +
+        (exists(c.id) ? c.id : item ? item.id : "") +
+        '"></div></div>' +
+        "</div>";
     }
 
     if (isAdminUser) {
-      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
+      html += jsonSection(
+        c,
+        "JSON · Curso",
+        "json-curso",
+        "btn-copy-json-curso"
+      );
     }
 
     // título y estado
@@ -686,11 +970,20 @@
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
     } else if (isEdit) {
-      qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : "") + " (edición)";
-      state.currentDrawer = { type: "curso", id: (item ? item.id : null), mode: "edit" };
+      qs("#drawer-title").textContent =
+        "Curso · " + (item ? item.nombre : "") + " (edición)";
+      state.currentDrawer = {
+        type: "curso",
+        id: item ? item.id : null,
+        mode: "edit",
+      };
     } else {
       qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : "");
-      state.currentDrawer = { type: "curso", id: (item ? item.id : null), mode: "view" };
+      state.currentDrawer = {
+        type: "curso",
+        id: item ? item.id : null,
+        mode: "view",
+      };
     }
 
     // bindings
@@ -700,8 +993,8 @@
       // CREAR: lápiz + modal para seleccionar imagen
       if (isCreate) {
         const card = document.getElementById("create-media-curso");
-        const btn  = document.getElementById("create-media-edit");
-        const thumb= document.getElementById("create-media-thumb");
+        const btn = document.getElementById("create-media-edit");
+        const thumb = document.getElementById("create-media-thumb");
         if (btn && thumb && card) {
           btn.addEventListener("click", function () {
             const input = document.createElement("input");
@@ -716,14 +1009,20 @@
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
-              if (!v.ok) { toast(v.error, "error"); return; }
+              if (!v.ok) {
+                toast(v.error, "error");
+                return;
+              }
 
               renderPreviewUI(
                 card,
                 file,
                 async function () {
                   state.tempNewCourseImage = file;
-                  try { if (thumb && thumb.dataset && thumb.dataset.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl); } catch (e) {}
+                  try {
+                    if (thumb && thumb.dataset && thumb.dataset.blobUrl)
+                      URL.revokeObjectURL(thumb.dataset.blobUrl);
+                  } catch (e) {}
                   const blobUrl = URL.createObjectURL(file);
                   if (thumb && thumb.dataset) thumb.dataset.blobUrl = blobUrl;
                   if (thumb) thumb.src = blobUrl;
@@ -740,78 +1039,104 @@
 
       // guardar/editar
       var elSave = qs("#btn-save");
-      if (elSave) elSave.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        try {
-          if (isCreate) await saveNewCurso();
-          else await saveUpdateCurso(item);
-        } catch (err) {
-          console.error(err);
-          toast("Error al guardar", "error");
-        }
-      });
+      if (elSave)
+        elSave.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          try {
+            if (isCreate) await saveNewCurso();
+            else await saveUpdateCurso(item);
+          } catch (err) {
+            console.error(err);
+            toast("Error al guardar", "error");
+          }
+        });
 
       var elEdit = qs("#btn-edit");
-      if (elEdit) elEdit.addEventListener("click", function (e) {
-        e.stopPropagation();
-        state.currentDrawer = { type: "curso", id: (item ? item.id : null), mode: "edit" };
-        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") });
-      });
+      if (elEdit)
+        elEdit.addEventListener("click", function (e) {
+          e.stopPropagation();
+          state.currentDrawer = {
+            type: "curso",
+            id: item ? item.id : null,
+            mode: "edit",
+          };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({
+            id: String(item ? item.id : ""),
+          });
+        });
 
       var elCancel = qs("#btn-cancel");
-      if (elCancel) elCancel.addEventListener("click", function (e) {
-        e.stopPropagation();
-        if (isCreate) {
-          state.tempNewCourseImage = null;
-          closeDrawer();
-        } else {
-          state.currentDrawer = { type: "curso", id: (item ? item.id : null), mode: "view" };
-          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") });
-        }
-      });
+      if (elCancel)
+        elCancel.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (isCreate) {
+            state.tempNewCourseImage = null;
+            closeDrawer();
+          } else {
+            state.currentDrawer = {
+              type: "curso",
+              id: item ? item.id : null,
+              mode: "view",
+            };
+            qs("#drawer-body").innerHTML = renderCursoDrawer({
+              id: String(item ? item.id : ""),
+            });
+          }
+        });
 
       const bDel = qs("#btn-delete");
-      if (bDel) bDel.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        const step = bDel.getAttribute("data-step") || "1";
-        if (step === "1") {
-          bDel.textContent = "Confirmar";
-          bDel.setAttribute("data-step", "2");
-          setTimeout(function () {
-            if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1"); }
-          }, 4000);
-          return;
-        }
-        try {
-          await softDeleteCurso(item);
-          toast("Curso eliminado (inactivo)", "exito");
-          closeDrawer();
-          await loadCursos();
-        } catch (err) {
-          console.error(err);
-          toast("No se pudo eliminar", "error");
-        }
-      });
+      if (bDel)
+        bDel.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          const step = bDel.getAttribute("data-step") || "1";
+          if (step === "1") {
+            bDel.textContent = "Confirmar";
+            bDel.setAttribute("data-step", "2");
+            setTimeout(function () {
+              if (bDel.getAttribute("data-step") === "2") {
+                bDel.textContent = "Eliminar";
+                bDel.setAttribute("data-step", "1");
+              }
+            }, 4000);
+            return;
+          }
+          try {
+            await softDeleteCurso(item);
+            toast("Curso eliminado (inactivo)", "exito");
+            closeDrawer();
+            await loadCursos();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
 
       const elRe = qs("#btn-reactivar");
-      if (elRe) elRe.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        try {
-          await reactivateCurso(Number(item ? item.id : 0));
-          toast("Curso reactivado", "exito");
-          await loadCursos();
-          const re = state.data.find(function (x){ return x.id === (item ? item.id : 0); });
-          if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }));
-        } catch (err) {
-          console.error(err);
-          toast("No se pudo reactivar", "error");
-        }
-      });
+      if (elRe)
+        elRe.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          try {
+            await reactivateCurso(Number(item ? item.id : 0));
+            toast("Curso reactivado", "exito");
+            await loadCursos();
+            const re = state.data.find(function (x) {
+              return x.id === (item ? item.id : 0);
+            });
+            if (re)
+              openDrawer(
+                "Curso · " + re.nombre,
+                renderCursoDrawer({ id: String(re.id) })
+              );
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo reactivar", "error");
+          }
+        });
 
       // montar media
       const contCurso = document.getElementById("media-curso");
       if (contCurso) {
-        const cid = Number(exists(c.id) ? c.id : (item ? item.id : 0));
+        const cid = Number(exists(c.id) ? c.id : item ? item.id : 0);
         if (!isNaN(cid) && cid) {
           mountReadOnlyMedia({
             container: contCurso,
@@ -830,7 +1155,9 @@
   }
 
   function disableDrawerInputs(disabled) {
-    qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(function (el) {
+    qsa(
+      "#drawer-body input, #drawer-body select, #drawer-body textarea"
+    ).forEach(function (el) {
       el.disabled = !!disabled;
     });
   }
@@ -860,18 +1187,40 @@
 
   function mapToOptions(map, selectedId) {
     const pairs = Object.entries(map || {});
-    const clean = pairs.filter(function (p){ return p[0] !== "_ts"; });
+    const clean = pairs.filter(function (p) {
+      return p[0] !== "_ts";
+    });
     if (!clean.length) return '<option value="">—</option>';
-    return clean.map(function (p) {
-      const id = p[0], name = p[1];
-      return '<option value="'+escapeAttr(id)+'" '+(String(selectedId)===String(id) ? 'selected' : '')+'>'+escapeHTML(name)+'</option>';
-    }).join("");
+    return clean
+      .map(function (p) {
+        const id = p[0],
+          name = p[1];
+        return (
+          '<option value="' +
+          escapeAttr(id) +
+          '" ' +
+          (String(selectedId) === String(id) ? "selected" : "") +
+          ">" +
+          escapeHTML(name) +
+          "</option>"
+        );
+      })
+      .join("");
   }
 
   function readCursoForm(existingId) {
-    const read = function (id) { var el = qs("#"+id); return el ? el.value : ""; };
-    const readN = function (id, def) { var el = qs("#"+id); return Number(el ? el.value : (exists(def)?def:0)); };
-    const readCh= function (id) { var el = qs("#"+id); return (el && el.checked) ? 1 : 0; };
+    const read = function (id) {
+      var el = qs("#" + id);
+      return el ? el.value : "";
+    };
+    const readN = function (id, def) {
+      var el = qs("#" + id);
+      return Number(el ? el.value : exists(def) ? def : 0);
+    };
+    const readCh = function (id) {
+      var el = qs("#" + id);
+      return el && el.checked ? 1 : 0;
+    };
 
     const payload = {
       nombre: read("f_nombre"),
@@ -901,7 +1250,8 @@
 
   // 👉 Helper global para subir imagen
   async function uploadCursoImagen(cursoId, file) {
-    if (!API_UPLOAD || !API_UPLOAD.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
+    if (!API_UPLOAD || !API_UPLOAD.cursoImg)
+      throw new Error("API_UPLOAD.cursoImg no configurado");
     const v = validarImagen(file, { maxMB: 2 });
     if (!v.ok) throw new Error(v.error);
 
@@ -911,9 +1261,13 @@
 
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     let json = {};
-    try { json = await res.json(); } catch (e) { json = {}; }
+    try {
+      json = await res.json();
+    } catch (e) {
+      json = {};
+    }
     if (!res.ok || (json && json.error)) {
-      throw new Error((json && json.error) || ("HTTP " + res.status));
+      throw new Error((json && json.error) || "HTTP " + res.status);
     }
     return json;
   }
@@ -925,12 +1279,18 @@
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
     if (!payload.categoria) return toast("Selecciona categoría", "warning");
-    if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
+    if (!payload.fecha_inicio)
+      return toast("Fecha de inicio requerida", "warning");
 
     const res = await postJSON(API.iCursos, payload);
 
     const newId = Number(
-      (res && (res.id || res.curso_id || res.insert_id || (res.data && res.data.id))) || 0
+      (res &&
+        (res.id ||
+          res.curso_id ||
+          res.insert_id ||
+          (res.data && res.data.id))) ||
+        0
     );
 
     if (!newId) {
@@ -956,8 +1316,14 @@
     await loadCursos();
 
     if (newId) {
-      const re = state.data.find(function (x){ return x.id === newId; });
-      if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }));
+      const re = state.data.find(function (x) {
+        return x.id === newId;
+      });
+      if (re)
+        openDrawer(
+          "Curso · " + re.nombre,
+          renderCursoDrawer({ id: String(re.id) })
+        );
     }
   }
 
@@ -981,8 +1347,14 @@
 
     toast("Cambios guardados", "exito");
     await loadCursos();
-    const re = state.data.find(function (x){ return x.id === item.id; });
-    if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }));
+    const re = state.data.find(function (x) {
+      return x.id === item.id;
+    });
+    if (re)
+      openDrawer(
+        "Curso · " + re.nombre,
+        renderCursoDrawer({ id: String(re.id) })
+      );
   }
 
   async function softDeleteCurso(item) {
@@ -994,7 +1366,9 @@
   }
 
   async function reactivateCurso(id) {
-    const it = state.data.find(function (x){ return x.id === Number(id); });
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Curso no encontrado");
     const body = {};
     for (var k in it._all) body[k] = it._all[k];
@@ -1010,11 +1384,15 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 =
+        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       const c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Título";
-      if (c2) { c2.textContent = "Comentarios"; c2.classList.add("col-tipo"); }
+      if (c2) {
+        c2.textContent = "Comentarios";
+        c2.classList.add("col-tipo");
+      }
       if (c3) c3.textContent = "Fecha de publicación";
       if (c4) c4.textContent = "Status";
     }
@@ -1031,15 +1409,19 @@
     showSkeletons();
     try {
       const resAct = await postJSON(API.noticias, { estatus: 1 });
-      const resIn  = await postJSON(API.noticias, { estatus: 0 });
+      const resIn = await postJSON(API.noticias, { estatus: 0 });
 
       const arr = []
         .concat(Array.isArray(resAct) ? resAct : [])
         .concat(Array.isArray(resIn) ? resIn : []);
 
-      const counts = await Promise.all(arr.map(function (n){
-        return getCommentsCount(n.id).catch(function (){ return 0; });
-      }));
+      const counts = await Promise.all(
+        arr.map(function (n) {
+          return getCommentsCount(n.id).catch(function () {
+            return 0;
+          });
+        })
+      );
 
       state.raw = arr;
       state.data = arr.map(function (n, i) {
@@ -1056,7 +1438,9 @@
       drawNoticias();
     } catch (err) {
       const list = qs("#recursos-list");
-      if (list) list.innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>';
+      if (list)
+        list.innerHTML =
+          '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>';
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
       console.error(err);
@@ -1065,10 +1449,13 @@
   }
 
   async function getCommentsCount(noticiaId) {
-    const res = await postJSON(API.comentarios, { noticia_id: Number(noticiaId), estatus: 1 });
+    const res = await postJSON(API.comentarios, {
+      noticia_id: Number(noticiaId),
+      estatus: 1,
+    });
     const arr = Array.isArray(res) ? res : [];
     let total = 0;
-    for (let i=0;i<arr.length;i++){
+    for (let i = 0; i < arr.length; i++) {
       const c = arr[i];
       total += 1;
       if (Array.isArray(c.respuestas)) total += c.respuestas.length;
@@ -1081,35 +1468,63 @@
     renderList(rows, {
       desktopRow: function (it) {
         return (
-        '<div class="table-row" data-id="'+it.id+'" data-type="noticia">'+
-          '<div class="col-nombre"><span class="name-text">'+escapeHTML(it.titulo)+'</span></div>'+
-          '<div class="col-tutor">'+it.comentarios+'</div>'+
-          '<div class="col-fecha">'+fmtDateTime(it.fecha)+'</div>'+
-          '<div class="col-status">'+badgeNoticia(it.estatus)+'</div>'+
-        '</div>');
+          '<div class="table-row" data-id="' +
+          it.id +
+          '" data-type="noticia">' +
+          '<div class="col-nombre"><span class="name-text">' +
+          escapeHTML(it.titulo) +
+          "</span></div>" +
+          '<div class="col-tutor">' +
+          it.comentarios +
+          "</div>" +
+          '<div class="col-fecha">' +
+          fmtDateTime(it.fecha) +
+          "</div>" +
+          '<div class="col-status">' +
+          badgeNoticia(it.estatus) +
+          "</div>" +
+          "</div>"
+        );
       },
       mobileRow: function (it) {
         return (
-        '<div class="table-row-mobile" data-id="'+it.id+'" data-type="noticia">'+
-          '<button class="row-toggle">'+
-            '<div class="col-nombre">'+escapeHTML(it.titulo)+'</div>'+
-            '<span class="icon-chevron">›</span>'+
-          '</button>'+
-          '<div class="row-details">'+
-            '<div><strong>Comentarios:</strong> '+it.comentarios+'</div>'+
-            '<div><strong>Publicada:</strong> '+fmtDateTime(it.fecha)+'</div>'+
-            '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">'+
-              '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>'+
-              (Number(it.estatus)===0 ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="'+it.id+'">Reactivar</button>' : '')+
-            '</div>'+
-          '</div>'+
-        '</div>');
+          '<div class="table-row-mobile" data-id="' +
+          it.id +
+          '" data-type="noticia">' +
+          '<button class="row-toggle">' +
+          '<div class="col-nombre">' +
+          escapeHTML(it.titulo) +
+          "</div>" +
+          '<span class="icon-chevron">›</span>' +
+          "</button>" +
+          '<div class="row-details">' +
+          "<div><strong>Comentarios:</strong> " +
+          it.comentarios +
+          "</div>" +
+          "<div><strong>Publicada:</strong> " +
+          fmtDateTime(it.fecha) +
+          "</div>" +
+          '<div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">' +
+          '<button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>' +
+          (Number(it.estatus) === 0
+            ? '<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="' +
+              it.id +
+              '">Reactivar</button>'
+            : "") +
+          "</div>" +
+          "</div>" +
+          "</div>"
+        );
       },
       drawerTitle: function (d) {
-        const item = state.data.find(function (x){ return String(x.id) === d.id; });
-        return item ? ("Noticia · " + item.titulo) : "Noticia";
+        const item = state.data.find(function (x) {
+          return String(x.id) === d.id;
+        });
+        return item ? "Noticia · " + item.titulo : "Noticia";
       },
-      drawerBody: function (d) { return renderNoticiaDrawer(d); },
+      drawerBody: function (d) {
+        return renderNoticiaDrawer(d);
+      },
     });
   }
 
@@ -1120,7 +1535,9 @@
   }
 
   async function inactivateNoticia(id) {
-    const it = state.data.find(function (x){ return x.id === Number(id); });
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) throw new Error("Endpoint u_noticia no configurado");
     const body = {};
@@ -1130,7 +1547,9 @@
   }
 
   async function reactivateNoticia(id) {
-    const it = state.data.find(function (x){ return x.id === Number(id); });
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) {
       toast("Falta endpoint u_noticia.php en backend", "warning", 3500);
@@ -1145,107 +1564,152 @@
 
   // ---- Drawer Noticia
   function renderNoticiaDrawer(dataset) {
-    const item = state.data.find(function (x){ return String(x.id) === dataset.id; });
+    const item = state.data.find(function (x) {
+      return String(x.id) === dataset.id;
+    });
     const n = item && item._all;
     if (!n) return "<p>No encontrado.</p>";
 
-    const mode = (state.currentDrawer && state.currentDrawer.type === "noticia" && state.currentDrawer.id === n.id)
-      ? state.currentDrawer.mode : "view";
+    const mode =
+      state.currentDrawer &&
+      state.currentDrawer.type === "noticia" &&
+      state.currentDrawer.id === n.id
+        ? state.currentDrawer.mode
+        : "view";
     const isEdit = mode === "edit";
     const isView = !isEdit;
     const isInactive = Number(n.estatus) === 0;
 
     const controlsRow = isAdminUser
-      ? (
-        '<div class="gc-actions">'+
-          (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : '')+
-          (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : '')+
-          (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : '')+
-          (isInactive ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>' :
-                         '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>')+
-        '</div>'
-      ) : "";
+      ? '<div class="gc-actions">' +
+        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
+          : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
+          : "") +
+        (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
+        "</div>"
+      : "";
 
-    let html = ""+
-      controlsRow+
-      pair("Título", n.titulo)+
-      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")+
-      pair("Fecha publicación", fmtDateTime(n.fecha_creacion))+
-      pair("Descripción (1)", n.desc_uno)+
-      pair("Descripción (2)", n.desc_dos)+
-      pair("Creado por", n.creado_por)+
-      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="'+n.id+'"></div></div></div>';
+    let html =
+      "" +
+      controlsRow +
+      pair("Título", n.titulo) +
+      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
+      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
+      pair("Descripción (1)", n.desc_uno) +
+      pair("Descripción (2)", n.desc_dos) +
+      pair("Creado por", n.creado_por) +
+      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
+      n.id +
+      '"></div></div></div>';
 
-    if (isAdminUser) html += jsonSection(n, "JSON · Noticia", "json-noticia", "btn-copy-json-noticia");
+    if (isAdminUser)
+      html += jsonSection(
+        n,
+        "JSON · Noticia",
+        "json-noticia",
+        "btn-copy-json-noticia"
+      );
 
     if (isEdit) {
-      qs("#drawer-title").textContent = "Noticia · " + (item ? item.titulo : "") + " (edición)";
+      qs("#drawer-title").textContent =
+        "Noticia · " + (item ? item.titulo : "") + " (edición)";
       state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
     } else {
-      qs("#drawer-title").textContent = "Noticia · " + (item ? item.titulo : "");
+      qs("#drawer-title").textContent =
+        "Noticia · " + (item ? item.titulo : "");
       state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
     }
 
     // Bind acciones
     setTimeout(function () {
       var e1 = qs("#btn-edit");
-      if (e1) e1.addEventListener("click", function (e) {
-        e.stopPropagation();
-        state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
-      });
+      if (e1)
+        e1.addEventListener("click", function (e) {
+          e.stopPropagation();
+          state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+          qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+            id: String(n.id),
+          });
+        });
 
       var e2 = qs("#btn-cancel");
-      if (e2) e2.addEventListener("click", function (e) {
-        e.stopPropagation();
-        state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
-      });
+      if (e2)
+        e2.addEventListener("click", function (e) {
+          e.stopPropagation();
+          state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+          qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+            id: String(n.id),
+          });
+        });
 
       var e3 = qs("#btn-save");
-      if (e3) e3.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        toast("Cambios guardados", "exito");
-        state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-        await loadNoticias();
-        const re = state.data.find(function (x){ return x.id === n.id; });
-        if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) }));
-      });
+      if (e3)
+        e3.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          toast("Cambios guardados", "exito");
+          state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+          await loadNoticias();
+          const re = state.data.find(function (x) {
+            return x.id === n.id;
+          });
+          if (re)
+            openDrawer(
+              "Noticia · " + re.titulo,
+              renderNoticiaDrawer({ id: String(re.id) })
+            );
+        });
 
       const bDel = qs("#btn-delete");
-      if (bDel) bDel.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        const step = bDel.getAttribute("data-step") || "1";
-        if (step === "1") {
-          bDel.textContent = "Confirmar";
-          bDel.setAttribute("data-step", "2");
-          setTimeout(function () {
-            if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1"); }
-          }, 4000);
-          return;
-        }
-        try {
-          await inactivateNoticia(n.id);
-          toast("Noticia eliminada (inactiva)", "exito");
-          closeDrawer();
-          await loadNoticias();
-        } catch (err) {
-          console.error(err);
-          toast("No se pudo eliminar", "error");
-        }
-      });
+      if (bDel)
+        bDel.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          const step = bDel.getAttribute("data-step") || "1";
+          if (step === "1") {
+            bDel.textContent = "Confirmar";
+            bDel.setAttribute("data-step", "2");
+            setTimeout(function () {
+              if (bDel.getAttribute("data-step") === "2") {
+                bDel.textContent = "Eliminar";
+                bDel.setAttribute("data-step", "1");
+              }
+            }, 4000);
+            return;
+          }
+          try {
+            await inactivateNoticia(n.id);
+            toast("Noticia eliminada (inactiva)", "exito");
+            closeDrawer();
+            await loadNoticias();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
 
       var e4 = qs("#btn-reactivar");
-      if (e4) e4.addEventListener("click", async function (e) {
-        e.stopPropagation();
-        const ok = await reactivateNoticia(n.id);
-        if (ok) {
-          toast("Noticia reactivada", "exito");
-          await loadNoticias();
-          const re = state.data.find(function (x){ return x.id === n.id; });
-          if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) }));
-        }
-      });
+      if (e4)
+        e4.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          const ok = await reactivateNoticia(n.id);
+          if (ok) {
+            toast("Noticia reactivada", "exito");
+            await loadNoticias();
+            const re = state.data.find(function (x) {
+              return x.id === n.id;
+            });
+            if (re)
+              openDrawer(
+                "Noticia · " + re.titulo,
+                renderNoticiaDrawer({ id: String(re.id) })
+              );
+          }
+        });
 
       disableDrawerInputs(!isEdit);
     }, 0);
@@ -1288,52 +1752,48 @@
     }
 
     mount.innerHTML =
-    '<div class="gc-card-grid" style="margin:12px 0 20px;">'+
-      '<div class="gc-card">'+
-        '<img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">'+
-        '<div>'+
-          '<div class="gc-card-title">Borrar cuenta</div>'+
-          '<div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>'+
-        '</div>'+
-        '<button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>'+
-      '</div>'+
-
-      '<div class="gc-card">'+
-        '<img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">'+
-        '<div>'+
-          '<div class="gc-card-title">Opciones de privacidad / Visibilidad</div>'+
-          '<div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>'+
-        '</div>'+
-        '<button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>'+
-      '</div>'+
-
-      '<div class="gc-card">'+
-        '<img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">'+
-        '<div>'+
-          '<div class="gc-card-title">Notificaciones / Preferencias</div>'+
-          '<div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>'+
-        '</div>'+
-        '<button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>'+
-      '</div>'+
-
-      '<div class="gc-card">'+
-        '<img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">'+
-        '<div>'+
-          '<div class="gc-card-title">Ajustes de privacidad o configuraciones</div>'+
-          '<div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>'+
-        '</div>'+
-        '<button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>'+
-      '</div>'+
-
-      '<div class="gc-card">'+
-        '<img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">'+
-        '<div>'+
-          '<div class="gc-card-title">Cambiar de cuenta</div>'+
-          '<div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>'+
-        '</div>'+
-        '<button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>'+
-      '</div>'+
-    '</div>';
+      '<div class="gc-card-grid" style="margin:12px 0 20px;">' +
+      '<div class="gc-card">' +
+      '<img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">' +
+      "<div>" +
+      '<div class="gc-card-title">Borrar cuenta</div>' +
+      '<div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>' +
+      "</div>" +
+      '<button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>' +
+      "</div>" +
+      '<div class="gc-card">' +
+      '<img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">' +
+      "<div>" +
+      '<div class="gc-card-title">Opciones de privacidad / Visibilidad</div>' +
+      '<div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>' +
+      "</div>" +
+      '<button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>' +
+      "</div>" +
+      '<div class="gc-card">' +
+      '<img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">' +
+      "<div>" +
+      '<div class="gc-card-title">Notificaciones / Preferencias</div>' +
+      '<div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>' +
+      "</div>" +
+      '<button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>' +
+      "</div>" +
+      '<div class="gc-card">' +
+      '<img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">' +
+      "<div>" +
+      '<div class="gc-card-title">Ajustes de privacidad o configuraciones</div>' +
+      '<div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>' +
+      "</div>" +
+      '<button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>' +
+      "</div>" +
+      '<div class="gc-card">' +
+      '<img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">' +
+      "<div>" +
+      '<div class="gc-card-title">Cambiar de cuenta</div>' +
+      '<div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>' +
+      "</div>" +
+      '<button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>' +
+      "</div>" +
+      "</div>";
 
     const pag1 = qs("#pagination-controls");
     const pag2 = qs("#pagination-mobile");
@@ -1347,15 +1807,30 @@
     };
 
     const b1 = mount.querySelector("#btn-delete-account");
-    if (b1) b1.addEventListener("click", function (){ safeOpen("openModalDeleteAccount"); });
+    if (b1)
+      b1.addEventListener("click", function () {
+        safeOpen("openModalDeleteAccount");
+      });
     const b2 = mount.querySelector("#btn-privacy");
-    if (b2) b2.addEventListener("click", function (){ safeOpen("openModalPrivacy"); });
+    if (b2)
+      b2.addEventListener("click", function () {
+        safeOpen("openModalPrivacy");
+      });
     const b3 = mount.querySelector("#btn-notifications");
-    if (b3) b3.addEventListener("click", function (){ safeOpen("openModalNotifications"); });
+    if (b3)
+      b3.addEventListener("click", function () {
+        safeOpen("openModalNotifications");
+      });
     const b4 = mount.querySelector("#btn-privacy-toggles");
-    if (b4) b4.addEventListener("click", function (){ safeOpen("openModalPrivacyToggles"); });
+    if (b4)
+      b4.addEventListener("click", function () {
+        safeOpen("openModalPrivacyToggles");
+      });
     const b5 = mount.querySelector("#btn-switch-account");
-    if (b5) b5.addEventListener("click", function (){ safeOpen("openModalSwitchAccount"); });
+    if (b5)
+      b5.addEventListener("click", function () {
+        safeOpen("openModalSwitchAccount");
+      });
   }
 
   // ---------- Drawer base ----------
@@ -1385,12 +1860,18 @@
 
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
-    return String(exists(str)?str:"").replace(/[&<>'"]/g, function (s) {
-      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#39;", '"':"&quot;" }[s];
+    return String(exists(str) ? str : "").replace(/[&<>'"]/g, function (s) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+      }[s];
     });
   }
   function escapeAttr(str) {
-    return String(exists(str)?str:"").replace(/"/g, "&quot;");
+    return String(exists(str) ? str : "").replace(/"/g, "&quot;");
   }
   function fmtDate(d) {
     if (!d) return "-";
@@ -1406,15 +1887,28 @@
     try {
       const sp = dt.split(" ");
       return (fmtDate(sp[0]) + " " + (sp[1] || "")).trim();
-    } catch (e) { return dt; }
+    } catch (e) {
+      return dt;
+    }
   }
   function fmtMoney(n) {
     try {
-      return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
-    } catch (e) { return "$" + n; }
+      return new Intl.NumberFormat("es-MX", {
+        style: "currency",
+        currency: "MXN",
+      }).format(n);
+    } catch (e) {
+      return "$" + n;
+    }
   }
   function pair(label, val) {
-    return '<div class="field"><div class="label">'+escapeHTML(label)+'</div><div class="value">'+escapeHTML(exists(val)?val:"-")+'</div></div>';
+    return (
+      '<div class="field"><div class="label">' +
+      escapeHTML(label) +
+      '</div><div class="value">' +
+      escapeHTML(exists(val) ? val : "-") +
+      "</div></div>"
+    );
   }
 
   function withBust(url) {
@@ -1423,16 +1917,16 @@
       u.searchParams.set("v", Date.now());
       return u.pathname + "?" + u.searchParams.toString();
     } catch (e) {
-      return url + (url.indexOf("?")>-1 ? "&" : "?") + "v=" + Date.now();
+      return url + (url.indexOf("?") > -1 ? "&" : "?") + "v=" + Date.now();
     }
   }
 
   function noImageSvg() {
     return (
-      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>"+
-        "<rect width='100%' height='100%' fill='#f3f3f3'/>"+
-        "<path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>"+
-        "<circle cx='52' cy='30' r='8' fill='#c9c9c9'/>"+
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>" +
+      "<rect width='100%' height='100%' fill='#f3f3f3'/>" +
+      "<path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>" +
+      "<circle cx='52' cy='30' r='8' fill='#c9c9c9'/>" +
       "</svg>"
     );
   }
@@ -1454,14 +1948,24 @@
   // ---- Sección JSON
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj || {}, null, 2));
-    return ''+
-      '<details class="dev-json" open style="margin-top:16px;">'+
-        '<summary style="cursor:pointer; font-weight:600;">'+escapeHTML(title)+'</summary>'+
-        '<div style="display:flex;gap:.5rem;margin:.5rem 0;">'+
-          '<button class="gc-btn" id="'+btnId+'">Copiar JSON</button>'+
-        '</div>'+
-        '<pre id="'+preId+'" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">'+safe+'</pre>'+
-      '</details>';
+    return (
+      "" +
+      '<details class="dev-json" open style="margin-top:16px;">' +
+      '<summary style="cursor:pointer; font-weight:600;">' +
+      escapeHTML(title) +
+      "</summary>" +
+      '<div style="display:flex;gap:.5rem;margin:.5rem 0;">' +
+      '<button class="gc-btn" id="' +
+      btnId +
+      '">Copiar JSON</button>' +
+      "</div>" +
+      '<pre id="' +
+      preId +
+      '" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">' +
+      safe +
+      "</pre>" +
+      "</details>"
+    );
   }
 
   function bindCopyFromPre(preSel, btnSel) {
@@ -1526,15 +2030,23 @@
     const drawer = document.getElementById("gc-drawer");
     const drawerOverlay = document.getElementById("gc-dash-overlay");
     const prev = {
-      drawerPE: (drawer && drawer.style) ? drawer.style.pointerEvents : undefined,
-      drawerFilter: (drawer && drawer.style) ? drawer.style.filter : undefined,
-      drawerZ: (drawer && drawer.style) ? drawer.style.zIndex : undefined,
-      overlayZ: (drawerOverlay && drawerOverlay.style) ? drawerOverlay.style.zIndex : undefined,
+      drawerPE: drawer && drawer.style ? drawer.style.pointerEvents : undefined,
+      drawerFilter: drawer && drawer.style ? drawer.style.filter : undefined,
+      drawerZ: drawer && drawer.style ? drawer.style.zIndex : undefined,
+      overlayZ:
+        drawerOverlay && drawerOverlay.style
+          ? drawerOverlay.style.zIndex
+          : undefined,
       drawerAria: drawer ? drawer.getAttribute("aria-hidden") : undefined,
-      hadInert: drawer && typeof drawer.hasAttribute === "function" ? drawer.hasAttribute("inert") : false,
+      hadInert:
+        drawer && typeof drawer.hasAttribute === "function"
+          ? drawer.hasAttribute("inert")
+          : false,
     };
 
-    const lockScroll = function () { document.body.style.overflow = "hidden"; };
+    const lockScroll = function () {
+      document.body.style.overflow = "hidden";
+    };
 
     const overlay = document.createElement("div");
     overlay.className = "gc-preview-overlay";
@@ -1548,7 +2060,9 @@
       drawer.style.filter = "blur(1px)";
       drawer.style.zIndex = "1";
       drawer.setAttribute("aria-hidden", "true");
-      try { drawer.setAttribute("inert", ""); } catch (e) {}
+      try {
+        drawer.setAttribute("inert", "");
+      } catch (e) {}
     }
     if (drawerOverlay) {
       drawerOverlay.style.zIndex = "2";
@@ -1563,31 +2077,42 @@
     header.style.cssText =
       "display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 16px; border-bottom:1px solid #eee;";
     header.innerHTML =
-      '<div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>'+
+      '<div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div>' +
       '<button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>';
 
     const body = document.createElement("div");
-    body.style.cssText = "display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;";
+    body.style.cssText =
+      "display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;";
 
     const imgWrap = document.createElement("div");
     imgWrap.style.cssText =
       "border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa; display:flex; align-items:center; justify-content:center; min-height:320px; max-height:60vh;";
-    imgWrap.innerHTML = '<img src="'+url+'" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">';
+    imgWrap.innerHTML =
+      '<img src="' +
+      url +
+      '" alt="Vista previa" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;">';
 
     const side = document.createElement("div");
-    side.style.cssText = "border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;";
+    side.style.cssText =
+      "border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;";
     side.innerHTML =
-      '<div style="font-weight:600;">Detalles</div>'+
-      '<div style="font-size:.92rem; color:#444; line-height:1.35;">'+
-        '<div><strong>Archivo:</strong> '+file.name+'</div>'+
-        '<div><strong>Peso:</strong> '+humanSize(file.size)+'</div>'+
-        '<div><strong>Tipo:</strong> '+(file.type || "desconocido")+'</div>'+
-        '<div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>'+
-      '</div>'+
-      '<div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">'+
-        '<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>'+
-        '<button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>'+
-      '</div>';
+      '<div style="font-weight:600;">Detalles</div>' +
+      '<div style="font-size:.92rem; color:#444; line-height:1.35;">' +
+      "<div><strong>Archivo:</strong> " +
+      file.name +
+      "</div>" +
+      "<div><strong>Peso:</strong> " +
+      humanSize(file.size) +
+      "</div>" +
+      "<div><strong>Tipo:</strong> " +
+      (file.type || "desconocido") +
+      "</div>" +
+      '<div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
+      "</div>" +
+      '<div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">' +
+      '<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>' +
+      '<button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>' +
+      "</div>";
 
     const mql = window.matchMedia("(max-width: 720px)");
     const applyResponsive = function () {
@@ -1621,17 +2146,24 @@
     const cleanup = function () {
       if (drawer) {
         drawer.style.pointerEvents = exists(prev.drawerPE) ? prev.drawerPE : "";
-        drawer.style.filter = exists(prev.drawerFilter) ? prev.drawerFilter : "";
+        drawer.style.filter = exists(prev.drawerFilter)
+          ? prev.drawerFilter
+          : "";
         drawer.style.zIndex = exists(prev.drawerZ) ? prev.drawerZ : "";
-        if (exists(prev.drawerAria)) drawer.setAttribute("aria-hidden", prev.drawerAria);
+        if (exists(prev.drawerAria))
+          drawer.setAttribute("aria-hidden", prev.drawerAria);
         else drawer.removeAttribute("aria-hidden");
-        try { if (!prev.hadInert) drawer.removeAttribute("inert"); } catch (e) {}
+        try {
+          if (!prev.hadInert) drawer.removeAttribute("inert");
+        } catch (e) {}
       }
       if (drawerOverlay) {
         drawerOverlay.style.zIndex = exists(prev.overlayZ) ? prev.overlayZ : "";
       }
       document.body.style.overflow = "";
-      try { URL.revokeObjectURL(url); } catch (e) {}
+      try {
+        URL.revokeObjectURL(url);
+      } catch (e) {}
       overlay.remove();
       document.removeEventListener("keydown", onEsc);
     };
@@ -1650,16 +2182,22 @@
     const cBtn = header.querySelector('[data-act="close"]');
     if (cBtn) cBtn.addEventListener("click", cleanup);
     const cancelBtn = side.querySelector('[data-act="cancel"]');
-    if (cancelBtn) cancelBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (onCancel) onCancel();
-      cleanup();
-    });
+    if (cancelBtn)
+      cancelBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (onCancel) onCancel();
+        cleanup();
+      });
     const okBtn = side.querySelector('[data-act="confirm"]');
-    if (okBtn) okBtn.addEventListener("click", async function (e) {
-      e.preventDefault();
-      try { if (onConfirm) await onConfirm(); } finally { cleanup(); }
-    });
+    if (okBtn)
+      okBtn.addEventListener("click", async function (e) {
+        e.preventDefault();
+        try {
+          if (onConfirm) await onConfirm();
+        } finally {
+          cleanup();
+        }
+      });
   }
 
   // ---- Imágenes (lectura y, en cursos+edit, subida)
@@ -1672,34 +2210,42 @@
 
     if (!container) return;
 
-    const editable = (typeof editableOverride === "boolean")
-      ? editableOverride
-      : (isAdminUser && state.currentDrawer && state.currentDrawer.mode === "edit");
+    const editable =
+      typeof editableOverride === "boolean"
+        ? editableOverride
+        : isAdminUser &&
+          state.currentDrawer &&
+          state.currentDrawer.mode === "edit";
 
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
     grid.className = "media-grid";
 
     urls.forEach(function (url, i) {
-      const label = labels[i] || ("Imagen " + (i + 1));
+      const label = labels[i] || "Imagen " + (i + 1);
       const card = document.createElement("div");
       card.className = "media-card";
 
       const editBtnHTML = editable
-        ? (
-      '<button class="icon-btn media-edit" title="Editar imagen">'+
-        '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">'+
-          '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>'+
-        '</svg>'+
-      '</button>')
+        ? '<button class="icon-btn media-edit" title="Editar imagen">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
+          '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>' +
+          "</svg>" +
+          "</button>"
         : "";
 
       card.innerHTML =
-      '<figure class="media-thumb">'+
-        '<img alt="'+escapeAttr(label)+'" src="'+withBust(url)+'">'+
-        editBtnHTML+
-      '</figure>'+
-      '<div class="media-meta"><div class="media-label">'+escapeHTML(label)+'</div></div>';
+        '<figure class="media-thumb">' +
+        '<img alt="' +
+        escapeAttr(label) +
+        '" src="' +
+        withBust(url) +
+        '">' +
+        editBtnHTML +
+        "</figure>" +
+        '<div class="media-meta"><div class="media-label">' +
+        escapeHTML(label) +
+        "</div></div>";
 
       const img = card.querySelector("img");
       img.onerror = function () {
@@ -1735,14 +2281,20 @@
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD || !API_UPLOAD.cursoImg) {
-                        toast("API u_cursoImg para habilitar la subida", "warning");
+                        toast(
+                          "API u_cursoImg para habilitar la subida",
+                          "warning"
+                        );
                         return;
                       }
                       const fd = new FormData();
                       fd.append("curso_id", String(id));
                       fd.append("imagen", file);
 
-                      const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+                      const res = await fetch(API_UPLOAD.cursoImg, {
+                        method: "POST",
+                        body: fd,
+                      });
                       if (!res.ok) throw new Error("HTTP " + res.status);
                       const json = await res.json();
                       if (json.error) throw new Error(json.error);
@@ -1754,7 +2306,10 @@
 
                     if (type === "noticia") {
                       if (!API_UPLOAD || !API_UPLOAD.noticiaImg) {
-                        toast("API u_noticiaImg para habilitar la subida", "warning");
+                        toast(
+                          "API u_noticiaImg para habilitar la subida",
+                          "warning"
+                        );
                         return;
                       }
                       const pos = i + 1;
@@ -1763,13 +2318,19 @@
                       fd.append("pos", String(pos));
                       fd.append("imagen", file);
 
-                      const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd });
+                      const res = await fetch(API_UPLOAD.noticiaImg, {
+                        method: "POST",
+                        body: fd,
+                      });
                       if (!res.ok) throw new Error("HTTP " + res.status);
                       const json = await res.json();
                       if (json.error) throw new Error(json.error);
 
                       img.src = withBust(json.url || url);
-                      toast("Imagen " + pos + " de noticia actualizada", "exito");
+                      toast(
+                        "Imagen " + pos + " de noticia actualizada",
+                        "exito"
+                      );
                       return;
                     }
                   } catch (err) {
@@ -1790,11 +2351,12 @@
     });
 
     container.innerHTML =
-    '<div class="media-head">'+
-      '<div class="media-title">Imágenes</div>'+
-      (editable ? '<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>'
-                : '<div class="media-help" style="color:#888;">Solo lectura</div>')+
-    '</div>';
+      '<div class="media-head">' +
+      '<div class="media-title">Imágenes</div>' +
+      (editable
+        ? '<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>'
+        : '<div class="media-help" style="color:#888;">Solo lectura</div>') +
+      "</div>";
     container.appendChild(grid);
   }
   //---------------------------------- fin del bloque de imágenes
@@ -1815,19 +2377,21 @@
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
 
     const overlay = document.getElementById("gc-dash-overlay");
-    if (overlay) overlay.addEventListener("click", function (e) {
-      if (e.target.id === "gc-dash-overlay") closeDrawer();
-    });
+    if (overlay)
+      overlay.addEventListener("click", function (e) {
+        if (e.target.id === "gc-dash-overlay") closeDrawer();
+      });
 
     const addBtn = document.getElementById("btn-add");
-    if (addBtn) addBtn.addEventListener("click", async function () {
-      if (!isAdminUser) return;
-      if (state.route.indexOf("#/cursos") === 0) {
-        await openCreateCurso();
-      } else if (state.route.indexOf("#/noticias") === 0) {
-        toast("Crear noticia: pendiente de implementar", "warning");
-      }
-    });
+    if (addBtn)
+      addBtn.addEventListener("click", async function () {
+        if (!isAdminUser) return;
+        if (state.route.indexOf("#/cursos") === 0) {
+          await openCreateCurso();
+        } else if (state.route.indexOf("#/noticias") === 0) {
+          toast("Crear noticia: pendiente de implementar", "warning");
+        }
+      });
   }
 
   async function openCreateCurso() {
@@ -1869,7 +2433,8 @@
       ]);
     } catch (e) {}
 
-    if (!window.location.hash) window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
+    if (!window.location.hash)
+      window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
 })();
