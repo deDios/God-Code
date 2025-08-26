@@ -65,6 +65,8 @@
     actividadesMap: null,
 
     currentDrawer: null, // {type:'curso'|'noticia', id:number|null, mode:'view'|'edit'|'create'}
+    currentDrawer: null,
+    tempNewCourseImage: null,
   };
 
   let currentUser = null;
@@ -617,6 +619,7 @@
   }
 
   // ---- Drawer Curso (COMPLETO)
+  // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || (item ? "view" : "create");
@@ -675,7 +678,7 @@
       </div>`;
     }
 
-    // HTML del drawer (siempre completo)
+    // HTML del drawer (SIEMPRE completo)
     let html = `
     ${controlsRow}
 
@@ -705,29 +708,54 @@
     </div>
 
     ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+  `;
 
-    <div class="field">
-      <div class="label">Imagen del curso</div>
-      <div class="value">
-        <div class="img-uploader">
-          <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
-          <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
-          <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
-            <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
-          </div>
-          ${!isCreate && isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
-        </div>
-      </div>
-    </div>
-    `;
-
-    // Imágenes existentes SOLO en ver/editar
-    if (!isCreate && (c.id || item?.id)) {
+    // --- Imagen del curso (crear = card con lápiz + modal; editar/ver = input + media-grid)
+    if (isCreate) {
       html += `
       <div class="field">
+        <div class="label">Imagen del curso</div>
+        <div class="value">
+          <div id="create-media-curso" class="media-grid">
+            <div class="media-card">
+              <figure class="media-thumb">
+                <img id="create-media-thumb" alt="Portada" src="${withBust('/ASSETS/cursos/img0.png')}" />
+                <button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </figure>
+              <div class="media-meta">
+                <div class="media-label">Portada</div>
+                <div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    } else {
+      html += `
+      <div class="field">
+        <div class="label">Imagen del curso</div>
+        <div class="value">
+          <div class="img-uploader">
+            <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
+            <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
+            <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
+              <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
+            </div>
+            ${isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
         <div class="label">Imágenes existentes</div>
-        <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id}"></div></div>
-      </div>`;
+        <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id ?? ""}"></div></div>
+      </div>
+    `;
     }
 
     if (isAdminUser) {
@@ -749,31 +777,60 @@
     setTimeout(() => {
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // preview de imagen (selección de archivo)
-      const fileInput = qs("#f_curso_img");
-      const prevBox = qs("#f_curso_img_preview");
-      const prevImg = prevBox?.querySelector("img");
+      // ---------- Crear: lápiz + modal de preview (usa renderPreviewUI)
+      if (isCreate) {
+        const card = document.getElementById("create-media-curso");
+        const btnEdit = document.getElementById("create-media-edit");
+        const thumb = document.getElementById("create-media-thumb");
+        if (btnEdit && thumb && card) {
+          btnEdit.addEventListener("click", () => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "image/png, image/jpeg";
+            input.style.display = "none";
+            document.body.appendChild(input);
 
-      // 👉 Al EDITAR, mostrar preview con la imagen ACTUAL del curso
-      if (!isCreate && prevBox && prevImg) {
-        const cid = c.id ?? item?.id;
-        const currentUrl = mediaUrlsByType("curso", cid)[0];
-        if (cid && currentUrl) {
-          prevImg.src = withBust(currentUrl);
-          prevBox.style.display = "";
+            input.addEventListener("change", () => {
+              const file = input.files && input.files[0];
+              document.body.removeChild(input);
+              if (!file) return;
+
+              const v = validarImagen(file, { maxMB: 2 });
+              if (!v.ok) { toast(v.error, "error"); return; }
+
+              renderPreviewUI(
+                card,
+                file,
+                async () => {
+                  // Confirmado -> buffer + preview
+                  state.tempNewCourseImage = file;
+                  try { URL.revokeObjectURL(thumb.dataset.blobUrl || ""); } catch { }
+                  const blobUrl = URL.createObjectURL(file);
+                  thumb.dataset.blobUrl = blobUrl;
+                  thumb.src = blobUrl;
+                  toast("Imagen seleccionada (se subirá al guardar)", "exito");
+                },
+                () => { }
+              );
+            });
+
+            input.click();
+          });
         }
       }
 
+      // ---------- Editar: input clásico + preview + subir ahora
+      const fileInput = qs("#f_curso_img");
+      const prevBox = qs("#f_curso_img_preview");
+      const prevImg = prevBox?.querySelector("img");
       if (fileInput && prevBox && prevImg) {
-        let lastURL = null;
         fileInput.addEventListener("change", () => {
-          if (lastURL) { try { URL.revokeObjectURL(lastURL); } catch { } }
           const f = fileInput.files?.[0];
           if (!f) { prevBox.style.display = "none"; return; }
           const v = validarImagen(f, { maxMB: 2 });
           if (!v.ok) { toast(v.error, "error"); prevBox.style.display = "none"; fileInput.value = ""; return; }
-          lastURL = URL.createObjectURL(f);
-          prevImg.src = lastURL;
+          const url = URL.createObjectURL(f);
+          prevImg.src = url;
           prevBox.style.display = "";
         });
       }
@@ -802,11 +859,29 @@
         }
       });
 
-      // acciones
+      // helper local para subir imagen (se usa en crear y en editar)
+      async function uploadCursoImagen(cursoId, file) {
+        if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
+        const v = validarImagen(file, { maxMB: 2 });
+        if (!v.ok) throw new Error(v.error);
+
+        const fd = new FormData();
+        fd.append("curso_id", String(cursoId));
+        fd.append("imagen", file);
+
+        const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json?.error) {
+          throw new Error(json?.error || `HTTP ${res.status}`);
+        }
+        return json; // { url: ".../img10.png" }
+      }
+
+      // ---------- Acciones
       qs("#btn-save")?.addEventListener("click", async (e) => {
         e.stopPropagation();
         try {
-          if (isCreate) await saveNewCurso();
+          if (isCreate) await saveNewCurso();  // usa state.tempNewCourseImage internamente
           else await saveUpdateCurso(item);
         } catch (err) {
           console.error(err);
@@ -822,8 +897,10 @@
 
       qs("#btn-cancel")?.addEventListener("click", (e) => {
         e.stopPropagation();
-        if (isCreate) closeDrawer();
-        else {
+        if (isCreate) {
+          state.tempNewCourseImage = null; // limpiar buffer si se cancela crear
+          closeDrawer();
+        } else {
           state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
           qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
         }
@@ -867,10 +944,11 @@
         }
       });
 
-      if (!isCreate) {
-        const contCurso = document.getElementById("media-curso");
+      // montar media existente (solo si hay id)
+      const contCurso = document.getElementById("media-curso");
+      if (contCurso) {
         const cid = Number(c.id ?? item?.id);
-        if (contCurso && cid) {
+        if (!Number.isNaN(cid) && cid) {
           mountReadOnlyMedia({
             container: contCurso,
             type: "curso",
@@ -878,6 +956,12 @@
             labels: ["Portada"],
             editable: isEdit && isAdminUser,
           });
+        } else if (!isCreate) {
+          contCurso.innerHTML = `
+          <div class="media-head">
+            <div class="media-title">Imágenes</div>
+            <div class="media-help" style="color:#666;">Se habilita tras crear el curso</div>
+          </div>`;
         }
       }
 
@@ -886,6 +970,7 @@
 
     return html;
   }
+
 
   function disableDrawerInputs(disabled) {
     qsa(
@@ -1005,14 +1090,16 @@
     }
 
     // subir imagen si se seleccionó
-    const f = qs("#f_curso_img")?.files?.[0];
-    if (newId && f) {
+    const fileToUpload = state.tempNewCourseImage || null;
+    if (newId && fileToUpload) {
       try {
-        await uploadCursoImagen(newId, f);
+        await uploadCursoImagen(newId, fileToUpload);
         toast("Imagen subida", "exito");
       } catch (err) {
         console.error(err);
         toast("Curso creado, pero falló la subida de imagen", "error");
+      } finally {
+        state.tempNewCourseImage = null; // limpiar buffer
       }
     }
 
