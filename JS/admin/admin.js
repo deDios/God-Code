@@ -616,7 +616,7 @@
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
 
-  // ---- Drawer Curso
+  // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode = state.currentDrawer?.mode || (item ? "view" : "create");
@@ -650,91 +650,90 @@
 
     // field wrapper
     const field = (label, value, inputHTML) => `
-  <div class="field">
-    <div class="label">${escapeHTML(label)}</div>
-    <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
-  </div>`;
+    <div class="field">
+      <div class="label">${escapeHTML(label)}</div>
+      <div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value ?? "-")}</div>
+    </div>`;
 
     // barra de acciones
     let controlsRow = "";
     if (isCreate) {
       controlsRow = `
-    <div class="gc-actions">
-      <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-      <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
-    </div>`;
+      <div class="gc-actions">
+        <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
+        <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
+      </div>`;
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
       controlsRow = `
-    <div class="gc-actions">
-      ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
-      ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
-      ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
-      ${!isCreate ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>` : ""}
-      ${isInactive ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>` : ""}
-    </div>`;
+      <div class="gc-actions">
+        ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
+        ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
+        ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
+        ${!isCreate ? `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>` : ""}
+        ${isInactive ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>` : ""}
+      </div>`;
     }
 
-    // HTML del drawer
+    // HTML del drawer (siempre completo)
     let html = `
-  ${controlsRow}
+    ${controlsRow}
 
-  ${field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
-  ${field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
-  ${field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
-  ${field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))}
-  ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
-  ${field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))}
+    ${field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))}
+    ${field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))}
+    ${field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))}
+    ${field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))}
+    ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
+    ${field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))}
 
-  <div class="grid-3">
-    ${field("Tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSel("f_tutor", tutorOptions))}
-    ${field("Categoría", state.categoriasMap?.[c.categoria] || c.categoria, inSel("f_categoria", catOptions))}
-    ${field("Prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSel("f_prioridad", prioOptions))}
-  </div>
+    <div class="grid-3">
+      ${field("Tutor", state.tutorsMap?.[c.tutor] || c.tutor, inSel("f_tutor", tutorOptions))}
+      ${field("Categoría", state.categoriasMap?.[c.categoria] || c.categoria, inSel("f_categoria", catOptions))}
+      ${field("Prioridad", state.prioMap?.[c.prioridad] || c.prioridad, inSel("f_prioridad", prioOptions))}
+    </div>
 
-  <div class="grid-3">
-    ${field("Tipo de evaluación", state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))}
-    ${field("Actividades", state.actividadesMap?.[c.actividades] || c.actividades, inSel("f_actividades", actOptions))}
-    ${field("Calendario", state.calendarioMap?.[c.calendario] || c.calendario, inSel("f_calendario", calOptions))}
-  </div>
+    <div class="grid-3">
+      ${field("Tipo de evaluación", state.tipoEvalMap?.[c.tipo_evaluacion] || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))}
+      ${field("Actividades", state.actividadesMap?.[c.actividades] || c.actividades, inSel("f_actividades", actOptions))}
+      ${field("Calendario", state.calendarioMap?.[c.calendario] || c.calendario, inSel("f_calendario", calOptions))}
+    </div>
 
-  <div class="grid-3">
-    ${field("Horas", c.horas, inNum("f_horas", c.horas ?? 0))}
-    ${field("Precio", (c.precio === 0 ? "Gratuito" : fmtMoney(c.precio)), inNum("f_precio", c.precio ?? 0))}
-    ${field("Certificado", (Number(c.certificado) ? "Sí" : "No"), inCheck("f_certificado", c.certificado))}
-  </div>
+    <div class="grid-3">
+      ${field("Horas", c.horas, inNum("f_horas", c.horas ?? 0))}
+      ${field("Precio", (c.precio === 0 ? "Gratuito" : fmtMoney(c.precio)), inNum("f_precio", c.precio ?? 0))}
+      ${field("Certificado", (Number(c.certificado) ? "Sí" : "No"), inCheck("f_certificado", c.certificado))}
+    </div>
 
-  ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
+    ${field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio))}
 
-  <div class="field">
-    <div class="label">Imagen del curso</div>
-    <div class="value">
-      <div class="img-uploader">
-        <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
-        <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
-        <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
-          <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
+    <div class="field">
+      <div class="label">Imagen del curso</div>
+      <div class="value">
+        <div class="img-uploader">
+          <input id="f_curso_img" type="file" accept="image/png, image/jpeg" />
+          <div id="f_curso_img_hint" class="gc-muted" style="margin-top:.25rem;">Formatos: JPG/PNG · Máx 2MB</div>
+          <div id="f_curso_img_preview" style="margin-top:.5rem;display:none;">
+            <img alt="Vista previa" style="max-width:100%;max-height:220px;border:1px solid #eee;border-radius:8px;object-fit:contain;">
+          </div>
+          ${!isCreate && isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
         </div>
-        ${!isCreate && isEdit ? `<button class="gc-btn" id="btn-upload-now" style="margin-top:.5rem;">Subir ahora</button>` : ""}
       </div>
     </div>
-  </div>
-  `;
+    `;
 
-    // Solo mostrar imágenes existentes si NO es creación
+    // Imágenes existentes SOLO en ver/editar
     if (!isCreate && (c.id || item?.id)) {
       html += `
-    <div class="field">
-      <div class="label">Imágenes existentes</div>
-      <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id}"></div></div>
-    </div>`;
+      <div class="field">
+        <div class="label">Imágenes existentes</div>
+        <div class="value"><div id="media-curso" data-id="${c.id ?? item?.id}"></div></div>
+      </div>`;
     }
 
     if (isAdminUser) {
       html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
     }
 
-    // título del drawer
     if (isCreate) {
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
@@ -750,23 +749,124 @@
     setTimeout(() => {
       disableDrawerInputs(!(isEdit || isCreate));
 
-      // preview de imagen
+      // preview de imagen (selección de archivo)
       const fileInput = qs("#f_curso_img");
       const prevBox = qs("#f_curso_img_preview");
       const prevImg = prevBox?.querySelector("img");
+
+      // 👉 Al EDITAR, mostrar preview con la imagen ACTUAL del curso
+      if (!isCreate && prevBox && prevImg) {
+        const cid = c.id ?? item?.id;
+        const currentUrl = mediaUrlsByType("curso", cid)[0];
+        if (cid && currentUrl) {
+          prevImg.src = withBust(currentUrl);
+          prevBox.style.display = "";
+        }
+      }
+
       if (fileInput && prevBox && prevImg) {
+        let lastURL = null;
         fileInput.addEventListener("change", () => {
+          if (lastURL) { try { URL.revokeObjectURL(lastURL); } catch { } }
           const f = fileInput.files?.[0];
           if (!f) { prevBox.style.display = "none"; return; }
           const v = validarImagen(f, { maxMB: 2 });
           if (!v.ok) { toast(v.error, "error"); prevBox.style.display = "none"; fileInput.value = ""; return; }
-          const url = URL.createObjectURL(f);
-          prevImg.src = url;
+          lastURL = URL.createObjectURL(f);
+          prevImg.src = lastURL;
           prevBox.style.display = "";
         });
       }
 
-      // montar imágenes solo en edición/vista
+      // subir en edición inmediata
+      qs("#btn-upload-now")?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const f = qs("#f_curso_img")?.files?.[0];
+        if (!f) return toast("Selecciona un archivo primero", "warning");
+        const itemId = item?.id;
+        if (!itemId) return toast("No hay ID de curso", "error");
+        try {
+          await uploadCursoImagen(itemId, f);
+          const contCurso = document.getElementById("media-curso");
+          if (contCurso) mountReadOnlyMedia({
+            container: contCurso,
+            type: "curso",
+            id: itemId,
+            labels: ["Portada"],
+            editable: isEdit && isAdminUser,
+          });
+          toast("Imagen subida", "exito");
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo subir la imagen", "error");
+        }
+      });
+
+      // acciones
+      qs("#btn-save")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          if (isCreate) await saveNewCurso();
+          else await saveUpdateCurso(item);
+        } catch (err) {
+          console.error(err);
+          toast("Error al guardar", "error");
+        }
+      });
+
+      qs("#btn-edit")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "edit" };
+        qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+      });
+
+      qs("#btn-cancel")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (isCreate) closeDrawer();
+        else {
+          state.currentDrawer = { type: "curso", id: item?.id ?? null, mode: "view" };
+          qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item?.id ?? "") });
+        }
+      });
+
+      const bDel = qs("#btn-delete");
+      if (bDel)
+        bDel.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const step = bDel.dataset.step || "1";
+          if (step === "1") {
+            bDel.textContent = "Confirmar";
+            bDel.dataset.step = "2";
+            setTimeout(() => {
+              if (bDel.dataset.step === "2") { bDel.textContent = "Eliminar"; bDel.dataset.step = "1"; }
+            }, 4000);
+            return;
+          }
+          try {
+            await softDeleteCurso(item);
+            toast("Curso eliminado (inactivo)", "exito");
+            closeDrawer();
+            await loadCursos();
+          } catch (err) {
+            console.error(err);
+            toast("No se pudo eliminar", "error");
+          }
+        });
+
+      qs("#btn-reactivar")?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          await reactivateCurso(Number(item?.id));
+          toast("Curso reactivado", "exito");
+          await loadCursos();
+          const re = state.data.find((x) => x.id === item.id);
+          if (re) openDrawer(`Curso · ${re.nombre}`, renderCursoDrawer({ id: String(re.id) }));
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo reactivar", "error");
+        }
+      });
+
       if (!isCreate) {
         const contCurso = document.getElementById("media-curso");
         const cid = Number(c.id ?? item?.id);
@@ -786,8 +886,6 @@
 
     return html;
   }
-
-
 
   function disableDrawerInputs(disabled) {
     qsa(
@@ -864,7 +962,25 @@
     return payload;
   }
 
-  // Crear curso + subir imagen 
+  // 👉 Helper global para subir imagen (usable en crear/editar)
+  async function uploadCursoImagen(cursoId, file) {
+    if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
+    const v = validarImagen(file, { maxMB: 2 });
+    if (!v.ok) throw new Error(v.error);
+
+    const fd = new FormData();
+    fd.append("curso_id", String(cursoId));
+    fd.append("imagen", file);
+
+    const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json?.error) {
+      throw new Error(json?.error || `HTTP ${res.status}`);
+    }
+    return json; // { url: ".../img10.png" } opcional
+  }
+
+  // Crear curso + (opcional) subir imagen
   async function saveNewCurso() {
     const payload = readCursoForm(null);
 
@@ -882,11 +998,13 @@
       res?.data?.id ??
       0
     );
+
     if (!newId) {
       console.warn("Respuesta de iCursos sin id utilizable:", res);
       toast("Curso creado, pero no se recibió ID", "warning");
     }
 
+    // subir imagen si se seleccionó
     const f = qs("#f_curso_img")?.files?.[0];
     if (newId && f) {
       try {
@@ -908,11 +1026,24 @@
     }
   }
 
-
+  // Actualizar curso + (opcional) subir imagen si hay archivo seleccionado
   async function saveUpdateCurso(item) {
     if (!item || !item._all) return toast("Sin item para actualizar", "error");
     const payload = readCursoForm(item.id);
     await postJSON(API.uCursos, payload);
+
+    // Si el usuario eligió un archivo, súbelo junto con la actualización
+    const f = qs("#f_curso_img")?.files?.[0];
+    if (f) {
+      try {
+        await uploadCursoImagen(item.id, f);
+        toast("Imagen actualizada", "exito");
+      } catch (err) {
+        console.error(err);
+        toast("Se guardó el curso, pero falló la imagen", "error");
+      }
+    }
+
     toast("Cambios guardados", "exito");
     await loadCursos();
     const re = state.data.find((x) => x.id === item.id);
@@ -1084,7 +1215,7 @@
     return true;
   }
 
-  // ---- Drawer Noticia (view/edit – mismo look que cursos)
+  // ---- Drawer Noticia
   function renderNoticiaDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const n = item?._all;
@@ -1102,16 +1233,9 @@
     const controlsRow = isAdminUser
       ? `
         <div class="gc-actions">
-          ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
-      }
-          ${isEdit
-        ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
-        : ""
-      }
-          ${isEdit
-        ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
-        : ""
-      }
+          ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
+          ${isEdit ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>` : ""}
+          ${isEdit ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>` : ""}
           ${isInactive
         ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
         : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
@@ -1131,8 +1255,7 @@
 
       <div class="field">
         <div class="label">Imágenes</div>
-        <div class="value"><div id="media-noticia" data-id="${n.id
-      }"></div></div>
+        <div class="value"><div id="media-noticia" data-id="${n.id}"></div></div>
       </div>
     `;
 
@@ -1146,8 +1269,7 @@
     }
 
     if (isEdit) {
-      qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""
-        } (edición)`;
+      qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""} (edición)`;
       state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
     } else {
       qs("#drawer-title").textContent = `Noticia · ${item?.titulo || ""}`;
@@ -1159,31 +1281,23 @@
       qs("#btn-edit")?.addEventListener("click", (e) => {
         e.stopPropagation();
         state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-          id: String(n.id),
-        });
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
       });
 
       qs("#btn-cancel")?.addEventListener("click", (e) => {
         e.stopPropagation();
         state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-        qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-          id: String(n.id),
-        });
+        qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) });
       });
 
       qs("#btn-save")?.addEventListener("click", async (e) => {
         e.stopPropagation();
-        // Aquí podrías leer inputs y POST a API.uNoticias (si habilitas edición real)
         toast("Cambios guardados", "exito");
         state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
         await loadNoticias();
         const re = state.data.find((x) => x.id === n.id);
         if (re)
-          openDrawer(
-            `Noticia · ${re.titulo}`,
-            renderNoticiaDrawer({ id: String(re.id) })
-          );
+          openDrawer(`Noticia · ${re.titulo}`, renderNoticiaDrawer({ id: String(re.id) }));
       });
 
       const bDel = qs("#btn-delete");
@@ -1221,14 +1335,10 @@
           await loadNoticias();
           const re = state.data.find((x) => x.id === n.id);
           if (re)
-            openDrawer(
-              `Noticia · ${re.titulo}`,
-              renderNoticiaDrawer({ id: String(re.id) })
-            );
+            openDrawer(`Noticia · ${re.titulo}`, renderNoticiaDrawer({ id: String(re.id) }));
         }
       });
 
-      // Si en algún punto agregas inputs para editar noticia:
       disableDrawerInputs(!isEdit);
     }, 0);
 
@@ -1519,31 +1629,13 @@
     return { ok: true };
   }
 
-  // subir imagen
-  async function uploadCursoImagen(cursoId, file) {
-    if (!API_UPLOAD?.cursoImg) throw new Error("API_UPLOAD.cursoImg no configurado");
-    const v = validarImagen(file, { maxMB: 2 });
-    if (!v.ok) throw new Error(v.error);
-
-    const fd = new FormData();
-    fd.append("curso_id", String(cursoId));
-    fd.append("imagen", file);
-
-    const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok || json?.error) {
-      throw new Error(json?.error || `HTTP ${res.status}`);
-    }
-    return json; // { url: ".../img10.png" } 
-  }
-
   function humanSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
   }
 
-  // ---- Modal / preview de imagen
+  // ---- Modal / preview de imagen (para media grid)
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
     const url = URL.createObjectURL(file);
 
@@ -1790,10 +1882,7 @@
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD?.cursoImg) {
-                        toast(
-                          "Configura API_UPLOAD.cursoImg para habilitar la subida",
-                          "warning"
-                        );
+                        toast("Configura API_UPLOAD.cursoImg para habilitar la subida", "warning");
                         return;
                       }
                       const fd = new FormData();
@@ -1815,10 +1904,7 @@
 
                     if (type === "noticia") {
                       if (!API_UPLOAD?.noticiaImg) {
-                        toast(
-                          "Configura API_UPLOAD.noticiaImg para habilitar la subida",
-                          "warning"
-                        );
+                        toast("Configura API_UPLOAD.noticiaImg para habilitar la subida", "warning");
                         return;
                       }
                       const pos = i + 1;
@@ -1895,7 +1981,6 @@
       if (state.route.startsWith("#/cursos")) {
         await openCreateCurso();
       } else if (state.route.startsWith("#/noticias")) {
-        // openCreateNoticia(); // cuando este listo
         toast("Crear noticia: pendiente de implementar", "warning");
       }
     });
