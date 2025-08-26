@@ -1,6 +1,6 @@
 (() => {
-  // ===== DEBUG SWITCH =====
-  window.GC_DEBUG = true; // pon false en prod
+  // ------------------------------------- este bloque es para habilitar el debug
+  window.GC_DEBUG = false; // aca colocar true o false para ver o no todos los console logs 
   function gcLog(...a) {
     if (window.GC_DEBUG && typeof console !== "undefined")
       try {
