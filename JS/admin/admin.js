@@ -1,39 +1,18 @@
 (() => {
-  // ---- DEBUG SWITCH  colocar true o false para ver los logs
-  if (typeof window.GC_DEBUG === "undefined") window.GC_DEBUG = true;
-  const dlog = (...args) => {
-    if (window.GC_DEBUG) {
+  // ===== DEBUG SWITCH =====
+  window.GC_DEBUG = true; // pon false en prod
+  function gcLog(...a) {
+    if (window.GC_DEBUG && typeof console !== "undefined")
       try {
-        console.log("[GC]", ...args);
-      } catch (_) {}
-    }
-  };
-  const dwarn = (...args) => {
-    if (window.GC_DEBUG) {
-      try {
-        console.warn("[GC][WARN]", ...args);
-      } catch (_) {}
-    }
-  };
-  const derr = (...args) => {
-    if (window.GC_DEBUG) {
-      try {
-        console.error("[GC][ERR]", ...args);
-      } catch (_) {}
-    }
-  };
-
-  dlog("admin.js init: DEBUG =", window.GC_DEBUG);
+        console.log("[GC]", ...a);
+      } catch {}
+  }
 
   const setVH = () => {
-    try {
-      document.documentElement.style.setProperty(
-        "--vh",
-        String(window.innerHeight * 0.01) + "px"
-      );
-    } catch (e) {
-      derr("setVH error:", e);
-    }
+    document.documentElement.style.setProperty(
+      "--vh",
+      `${window.innerHeight * 0.01}px`
+    );
   };
   setVH();
   window.addEventListener("resize", setVH);
@@ -103,114 +82,83 @@
 
   // ---- Helpers
   const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const qsa = (s, r = document) =>
+    Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (msg, tipo = "exito", dur = 2500) =>
-    window.gcToast
-      ? window.gcToast(msg, tipo, dur)
-      : window.GC_DEBUG
-      ? console.log(`[toast:${tipo}] ${msg}`)
-      : void 0;
+    window.gcToast ? window.gcToast(msg, tipo, dur) : gcLog(`[${tipo}] ${msg}`);
 
   function getUsuarioFromCookie() {
-    const row = document.cookie
-      .split("; ")
-      .find((r) => r.startsWith("usuario="));
+    const row = (document.cookie || "").split("; ").find(function (r) {
+      return r.indexOf("usuario=") === 0;
+    });
     if (!row) return null;
     const raw = row.split("=")[1] || "";
     try {
       const once = decodeURIComponent(raw);
       const maybeTwice = /%7B|%22/.test(once) ? decodeURIComponent(once) : once;
       return JSON.parse(maybeTwice);
-    } catch {
+    } catch (e) {
+      gcLog("cookie parse fail", e);
       return null;
     }
-  }
-
-  function normalizeCursoPayload(p) {
-    return {
-      ...p,
-      nombre: String(p.nombre || ""),
-      descripcion_breve: String(p.descripcion_breve || ""),
-      descripcion_curso: String(p.descripcion_curso || ""),
-      descripcion_media: String(p.descripcion_media || ""),
-      dirigido: String(p.dirigido || ""),
-      competencias: String(p.competencias || ""),
-      certificado: Number(!!p.certificado),
-      tutor: Number(p.tutor || 0),
-      horas: Number(p.horas || 0),
-      precio: Number(p.precio || 0),
-      estatus: Number(p.estatus ?? 1),
-      prioridad: Number(p.prioridad || 1),
-      categoria: Number(p.categoria || 1),
-      calendario: Number(p.calendario || 1),
-      tipo_evaluacion: Number(p.tipo_evaluacion || 1),
-      actividades: Number(p.actividades || 1),
-      creado_por: Number(p.creado_por || 0),
-      fecha_inicio: String(p.fecha_inicio || ""),
-    };
   }
 
   // -------- Panel de cuenta
   function showCuentaPanel() {
     try {
-      dlog("showCuentaPanel()");
-      if (
-        qs(".recursos-box.desktop-only") &&
-        qs(".recursos-box.desktop-only").style
-      )
-        qs(".recursos-box.desktop-only").style.display = "none";
-      if (
-        qs(".recursos-box.mobile-only") &&
-        qs(".recursos-box.mobile-only").style
-      )
-        qs(".recursos-box.mobile-only").style.display = "none";
-      if (qs("#pagination-controls") && qs("#pagination-controls").style)
-        qs("#pagination-controls").style.display = "none";
-      if (qs("#pagination-mobile") && qs("#pagination-mobile").style)
-        qs("#pagination-mobile").style.display = "none";
+      var el = qs(".recursos-box.desktop-only");
+      if (el && el.style) el.style.display = "none";
+    } catch {}
+    try {
+      var el2 = qs(".recursos-box.mobile-only");
+      if (el2 && el2.style) el2.style.display = "none";
+    } catch {}
+    try {
+      var p1 = qs("#pagination-controls");
+      if (p1 && p1.style) p1.style.display = "none";
+    } catch {}
+    try {
+      var p2 = qs("#pagination-mobile");
+      if (p2 && p2.style) p2.style.display = "none";
+    } catch {}
 
-      if (!qs("#cuenta-panel")) {
-        const host = qs(".main-content") || document.body;
-        const panel = document.createElement("div");
-        panel.id = "cuenta-panel";
-        panel.style.padding = "16px 18px";
-        panel.innerHTML = window.renderCuentaOpciones
-          ? window.renderCuentaOpciones()
-          : `<div>Panel de cuenta</div>`;
-        host.appendChild(panel);
-      }
-    } catch (e) {
-      derr("showCuentaPanel error:", e);
+    if (!qs("#cuenta-panel")) {
+      const host = qs(".main-content") || document.body;
+      const panel = document.createElement("div");
+      panel.id = "cuenta-panel";
+      panel.style.padding = "16px 18px";
+      panel.innerHTML = window.renderCuentaOpciones
+        ? window.renderCuentaOpciones()
+        : "<div>Panel de cuenta</div>";
+      host.appendChild(panel);
     }
   }
   function hideCuentaPanel() {
-    try {
-      dlog("hideCuentaPanel()");
-      const panel = qs("#cuenta-panel");
-      if (panel) panel.remove();
-      const d = qs(".recursos-box.desktop-only");
-      const m = qs(".recursos-box.mobile-only");
-      if (d) d.style.display = "block";
-      if (m) m.style.display = "block";
-      const pg = qs("#pagination-controls");
-      const pgm = qs("#pagination-mobile");
-      if (pg) pg.style.display = "";
-      if (pgm) pgm.style.display = "";
-    } catch (e) {
-      derr("hideCuentaPanel error:", e);
-    }
+    const panel = qs("#cuenta-panel");
+    if (panel) panel.remove();
+
+    const d = qs(".recursos-box.desktop-only");
+    if (d) d.style.display = "block";
+    const m = qs(".recursos-box.mobile-only");
+    if (m) m.style.display = "block";
+    const pg = qs("#pagination-controls");
+    if (pg) pg.style.display = "";
+    const pgm = qs("#pagination-mobile");
+    if (pgm) pgm.style.display = "";
   }
 
-  // ---- Fetch JSON
+  // ---- fetch helper TOLERANTE
   async function postJSON(url, body) {
+    gcLog("postJSON ->", url, "payload:", body);
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
-    const text = await res.text();
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${text || ""}`);
-    if (!text || !text.trim()) return {};
+    const text = await res.text().catch(() => "");
+    gcLog("postJSON <-", url, "status:", res.status, "raw:\n", text);
+    if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
+    if (!text || !String(text).trim()) return {};
     try {
       return JSON.parse(text);
     } catch {
@@ -218,29 +166,29 @@
     }
   }
 
-  // ---- Catálogos
+  // ---- Catálogos (con cache)
   async function getTutorsMap() {
     if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
       return state.tutorsMap;
-    dlog("getTutorsMap()");
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((t) => (map[t.id] = t.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((t) => {
+      map[t.id] = t.nombre;
+    });
     map._ts = Date.now();
     state.tutorsMap = map;
-    dlog("tutorsMap:", map);
     return map;
   }
   async function getPrioridadMap() {
     if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000)
       return state.prioMap;
-    dlog("getPrioridadMap()");
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((p) => (map[p.id] = p.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((p) => {
+      map[p.id] = p.nombre;
+    });
     map._ts = Date.now();
     state.prioMap = map;
-    dlog("prioMap:", map);
     return map;
   }
   async function getCategoriasMap() {
@@ -249,13 +197,13 @@
       Date.now() - state.categoriasMap._ts < 30 * 60 * 1000
     )
       return state.categoriasMap;
-    dlog("getCategoriasMap()");
     const arr = await postJSON(API.categorias, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((c) => {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.categoriasMap = map;
-    dlog("categoriasMap:", map);
     return map;
   }
   async function getCalendarioMap() {
@@ -264,13 +212,13 @@
       Date.now() - state.calendarioMap._ts < 30 * 60 * 1000
     )
       return state.calendarioMap;
-    dlog("getCalendarioMap()");
     const arr = await postJSON(API.calendario, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((c) => {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.calendarioMap = map;
-    dlog("calendarioMap:", map);
     return map;
   }
   async function getTipoEvalMap() {
@@ -279,13 +227,13 @@
       Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000
     )
       return state.tipoEvalMap;
-    dlog("getTipoEvalMap()");
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((c) => {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.tipoEvalMap = map;
-    dlog("tipoEvalMap:", map);
     return map;
   }
   async function getActividadesMap() {
@@ -294,13 +242,13 @@
       Date.now() - state.actividadesMap._ts < 30 * 60 * 1000
     )
       return state.actividadesMap;
-    dlog("getActividadesMap()");
     const arr = await postJSON(API.actividades, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => (map[c.id] = c.nombre));
+    (Array.isArray(arr) ? arr : []).forEach((c) => {
+      map[c.id] = c.nombre;
+    });
     map._ts = Date.now();
     state.actividadesMap = map;
-    dlog("actividadesMap:", map);
     return map;
   }
 
@@ -316,10 +264,10 @@
   }
 
   function applyAdminVisibility(isAdmin) {
-    dlog("applyAdminVisibility -> isAdmin:", isAdmin);
     qsa(".gc-side .nav-item").forEach((a) => {
       if (!isAdmin && !isCuentasLink(a)) {
-        (a.closest("li") || a).style.display = "none";
+        (a.closest && a.closest("li") ? a.closest("li") : a).style.display =
+          "none";
         a.setAttribute("tabindex", "-1");
         a.setAttribute("aria-hidden", "true");
       }
@@ -332,7 +280,6 @@
     if (!isAdminUser) {
       const h = (window.location.hash || "").toLowerCase();
       if (h.indexOf("#/cuentas") !== 0) {
-        dlog("enforceRouteGuard redirect to #/cuentas");
         if (location.hash !== "#/cuentas") location.hash = "#/cuentas";
       }
     }
@@ -341,48 +288,42 @@
   // ---- Route
   function setRoute(hash) {
     const target = hash || (isAdminUser ? "#/cursos" : "#/cuentas");
-    dlog("setRoute:", hash, "->", target);
     if (location.hash !== target) location.hash = target;
     else onRouteChange();
   }
   window.addEventListener("hashchange", onRouteChange);
 
   function onRouteChange() {
-    try {
-      enforceRouteGuard();
-      const hash =
-        window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
-      dlog("onRouteChange ->", hash);
-      state.route = hash;
-      state.page = 1;
+    enforceRouteGuard();
 
-      qsa(".gc-side .nav-item").forEach((a) => {
-        const isActive = a.getAttribute("href") === hash;
-        a.classList.toggle("is-active", isActive);
-        a.setAttribute("aria-current", isActive ? "page" : "false");
-      });
+    const hash =
+      window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+    state.route = hash;
+    state.page = 1;
 
-      if (hash.indexOf("#/cursos") === 0) {
-        hideCuentaPanel();
-        return isAdminUser ? loadCursos() : enforceRouteGuard();
-      }
-      if (hash.indexOf("#/noticias") === 0) {
-        hideCuentaPanel();
-        return isAdminUser ? loadNoticias() : enforceRouteGuard();
-      }
-      if (hash.indexOf("#/cuentas") === 0) {
-        showCuentaPanel();
-        return;
-      }
-      return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
-    } catch (e) {
-      derr("onRouteChange error:", e);
+    qsa(".gc-side .nav-item").forEach((a) => {
+      const isActive = a.getAttribute("href") === hash;
+      if (a.classList) a.classList.toggle("is-active", isActive);
+      a.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    if (hash.indexOf("#/cursos") === 0) {
+      hideCuentaPanel();
+      return isAdminUser ? loadCursos() : enforceRouteGuard();
     }
+    if (hash.indexOf("#/noticias") === 0) {
+      hideCuentaPanel();
+      return isAdminUser ? loadNoticias() : enforceRouteGuard();
+    }
+    if (hash.indexOf("#/cuentas") === 0) {
+      showCuentaPanel();
+      return;
+    }
+    return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
 
   // ---- Skeletons
   function showSkeletons() {
-    dlog("showSkeletons()");
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = "";
@@ -392,14 +333,13 @@
     for (let i = 0; i < 5; i++) {
       target.insertAdjacentHTML(
         "beforeend",
-        `<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>`
+        '<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>'
       );
     }
   }
 
   // ---- Render listas
   function renderList(rows, config) {
-    dlog("renderList() rows:", rows.length);
     const d = qs("#recursos-list");
     const m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = "";
@@ -407,9 +347,11 @@
 
     if (!rows.length) {
       if (d)
-        d.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+        d.innerHTML =
+          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
       if (m)
-        m.innerHTML = `<div class="empty-state" style="padding:1rem;">Sin resultados</div>`;
+        m.innerHTML =
+          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
       const countEl = qs("#mod-count");
       if (countEl) countEl.textContent = "0 resultados";
       renderPagination(0);
@@ -418,14 +360,6 @@
 
     const start = (state.page - 1) * state.pageSize;
     const pageRows = rows.slice(start, start + state.pageSize);
-    dlog(
-      "renderList page:",
-      state.page,
-      "start:",
-      start,
-      "pageRows:",
-      pageRows.length
-    );
 
     pageRows.forEach((item) => {
       if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
@@ -434,15 +368,13 @@
 
     const countEl = qs("#mod-count");
     if (countEl)
-      countEl.textContent = `${rows.length} ${
-        rows.length === 1 ? "elemento" : "elementos"
-      }`;
+      countEl.textContent =
+        rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
 
     // desktop -> drawer
     qsa("#recursos-list .table-row").forEach((el) => {
-      el.addEventListener("click", () => {
-        const data = el.dataset;
-        dlog("desktop row click ->", data);
+      el.addEventListener("click", function () {
+        const data = el.dataset || {};
         if (data.type === "noticia") {
           state.currentDrawer = {
             type: "noticia",
@@ -453,7 +385,7 @@
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
-          setTimeout(() => {
+          setTimeout(function () {
             mountReadOnlyMedia({
               container: document.getElementById("media-noticia"),
               type: "noticia",
@@ -469,16 +401,16 @@
 
     // acordeón mobile
     qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
-      el.addEventListener("click", () => {
-        dlog("mobile row toggle");
-        el.closest(".table-row-mobile").classList.toggle("expanded");
+      el.addEventListener("click", function () {
+        const row = el.closest(".table-row-mobile");
+        if (row && row.classList) row.classList.toggle("expanded");
       });
     });
     qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", function (e) {
         e.stopPropagation();
-        const data = btn.closest(".table-row-mobile").dataset;
-        dlog("mobile open drawer ->", data);
+        const host = btn.closest(".table-row-mobile");
+        const data = (host && host.dataset) || {};
         if (data.type === "noticia") {
           state.currentDrawer = {
             type: "noticia",
@@ -489,7 +421,7 @@
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
-          setTimeout(() => {
+          setTimeout(function () {
             mountReadOnlyMedia({
               container: document.getElementById("media-noticia"),
               type: "noticia",
@@ -505,11 +437,10 @@
 
     // Botones Reactivar (lista)
     qsa(".gc-reactivate").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
+      btn.addEventListener("click", async function (e) {
         e.stopPropagation();
-        const id = Number(btn.dataset.id);
-        const t = btn.dataset.type;
-        dlog("reactivate click ->", t, id);
+        const id = Number(btn.getAttribute("data-id"));
+        const t = btn.getAttribute("data-type");
         try {
           if (t === "curso") {
             await reactivateCurso(id);
@@ -523,7 +454,7 @@
             }
           }
         } catch (err) {
-          derr("reactivate error:", err);
+          gcLog(err);
           toast("No se pudo reactivar", "error");
         }
       });
@@ -533,10 +464,8 @@
   }
 
   function renderPagination(total) {
-    dlog("renderPagination total:", total, "pageSize:", state.pageSize);
     const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
-    const conts = [qs("#pagination-controls"), qs("#pagination-mobile")];
-    conts.forEach((cont) => {
+    [qs("#pagination-controls"), qs("#pagination-mobile")].forEach((cont) => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -545,9 +474,8 @@
       prev.className = "arrow-btn";
       prev.textContent = "‹";
       prev.disabled = state.page === 1;
-      prev.onclick = () => {
+      prev.onclick = function () {
         state.page = Math.max(1, state.page - 1);
-        dlog("pagination prev -> new page:", state.page);
         refreshCurrent();
       };
       cont.appendChild(prev);
@@ -556,9 +484,8 @@
         const b = document.createElement("button");
         b.className = "page-btn" + (p === state.page ? " active" : "");
         b.textContent = p;
-        b.onclick = () => {
+        b.onclick = function () {
           state.page = p;
-          dlog("pagination click -> page:", p);
           refreshCurrent();
         };
         cont.appendChild(b);
@@ -568,9 +495,8 @@
       next.className = "arrow-btn";
       next.textContent = "›";
       next.disabled = state.page === totalPages;
-      next.onclick = () => {
+      next.onclick = function () {
         state.page = Math.min(totalPages, state.page + 1);
-        dlog("pagination next -> new page:", state.page);
         refreshCurrent();
       };
       cont.appendChild(next);
@@ -578,7 +504,6 @@
   }
 
   function refreshCurrent() {
-    dlog("refreshCurrent route:", state.route);
     if (state.route.indexOf("#/cursos") === 0) return drawCursos();
     if (state.route.indexOf("#/noticias") === 0) return drawNoticias();
     if (state.route.indexOf("#/cuentas") === 0) return drawCuentas();
@@ -586,7 +511,6 @@
 
   // ---------- CURSOS ----------
   async function loadCursos() {
-    dlog("loadCursos()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Cursos";
 
@@ -635,60 +559,58 @@
           getActividadesMap(),
         ]);
 
-      dlog("loadCursos raw activos:", activosRaw);
-      dlog("loadCursos raw inactivos:", inactivosRaw);
-
-      const raw = [
-        ...(Array.isArray(activosRaw) ? activosRaw : []),
-        ...(Array.isArray(inactivosRaw) ? inactivosRaw : []),
-      ];
+      const raw = [].concat(
+        Array.isArray(activosRaw) ? activosRaw : [],
+        Array.isArray(inactivosRaw) ? inactivosRaw : []
+      );
+      gcLog("loadCursos raw activos:", activosRaw);
+      gcLog("loadCursos raw inactivos:", inactivosRaw);
 
       state.raw = raw;
-      state.data = raw.map((c) => ({
-        id: c.id,
-        nombre: c.nombre,
+      state.data = raw.map(function (c) {
+        return {
+          id: c.id,
+          nombre: c.nombre,
+          tutor: tmap && tmap[c.tutor] ? tmap[c.tutor] : "Tutor #" + c.tutor,
+          tutor_id: c.tutor,
+          prioridad_id: c.prioridad,
+          prioridad_nombre: (pmap && pmap[c.prioridad]) || "#" + c.prioridad,
+          categoria_id: c.categoria,
+          categoria_nombre: (cmap && cmap[c.categoria]) || "#" + c.categoria,
+          calendario_id: c.calendario,
+          calendario_nombre:
+            (calmap && calmap[c.calendario]) || "#" + c.calendario,
+          tipo_eval_id: c.tipo_evaluacion,
+          tipo_eval_nombre:
+            (temap && temap[c.tipo_evaluacion]) || "#" + c.tipo_evaluacion,
+          actividades_id: c.actividades,
+          actividades_nombre:
+            (ammap && ammap[c.actividades]) || "#" + c.actividades,
+          precio: c.precio,
+          certificado: !!c.certificado,
+          fecha: c.fecha_inicio,
+          estatus: Number(c.estatus),
+          _all: c,
+        };
+      });
 
-        tutor: tmap[c.tutor] || "Tutor #" + c.tutor,
-        tutor_id: c.tutor,
-
-        prioridad_id: c.prioridad,
-        prioridad_nombre: pmap[c.prioridad] || "#" + c.prioridad,
-
-        categoria_id: c.categoria,
-        categoria_nombre: cmap[c.categoria] || "#" + c.categoria,
-
-        calendario_id: c.calendario,
-        calendario_nombre: calmap[c.calendario] || "#" + c.calendario,
-
-        tipo_eval_id: c.tipo_evaluacion,
-        tipo_eval_nombre: temap[c.tipo_evaluacion] || "#" + c.tipo_evaluacion,
-
-        actividades_id: c.actividades,
-        actividades_nombre: ammap[c.actividades] || "#" + c.actividades,
-
-        precio: c.precio,
-        certificado: !!c.certificado,
-        fecha: c.fecha_inicio,
-        estatus: Number(c.estatus),
-        _all: c,
-      }));
-
-      dlog("state.data cursos:", state.data);
+      gcLog("state.data cursos:", state.data.length);
       drawCursos();
     } catch (err) {
-      derr("loadCursos error:", err);
       const list = qs("#recursos-list");
       if (list)
-        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>`;
+        list.innerHTML =
+          '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>';
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
+      gcLog(err);
       toast("No se pudieron cargar cursos", "error");
     }
   }
 
   function drawCursos() {
-    dlog("drawCursos() rows:", state.data.length);
     const rows = state.data;
+    gcLog("drawCursos() rows:", rows.length);
     renderList(rows, {
       desktopRow: (it) => `
       <div class="table-row" data-id="${it.id}" data-type="curso">
@@ -726,7 +648,7 @@
       </div>`,
       drawerTitle: (d) => {
         const item = state.data.find((x) => String(x.id) === d.id);
-        return item ? `Curso · ${item.nombre}` : "Curso";
+        return item ? "Curso · " + item.nombre : "Curso";
       },
       drawerBody: (d) => renderCursoDrawer(d),
     });
@@ -734,72 +656,94 @@
 
   function badgePrecio(precio) {
     return Number(precio) === 0
-      ? `<span class="gc-chip gray">Gratuito</span>`
-      : `<span class="gc-chip gray">Con costo</span>`;
+      ? '<span class="gc-chip gray">Gratuito</span>'
+      : '<span class="gc-chip gray">Con costo</span>';
   }
   function badgeCurso(estatus) {
     return Number(estatus) === 1
-      ? `<span class="gc-badge-activo">Activo</span>`
-      : `<span class="gc-badge-inactivo">Inactivo</span>`;
+      ? '<span class="gc-badge-activo">Activo</span>'
+      : '<span class="gc-badge-inactivo">Inactivo</span>';
   }
   function textCursoStatus(estatus) {
     return Number(estatus) === 1 ? "Activo" : "Inactivo";
   }
 
+  // ---- normalizador de payload (JS only)
+  function normalizeCursoPayload(p) {
+    return {
+      ...p,
+      nombre: String(p.nombre || ""),
+      descripcion_breve: String(p.descripcion_breve || ""),
+      descripcion_curso: String(p.descripcion_curso || ""),
+      descripcion_media: String(p.descripcion_media || ""),
+      dirigido: String(p.dirigido || ""),
+      competencias: String(p.competencias || ""),
+      certificado: Number(!!p.certificado),
+      tutor: Number(p.tutor || 0),
+      horas: Number(p.horas || 0),
+      precio: Number(p.precio || 0),
+      estatus: Number(p.estatus != null ? p.estatus : 1),
+      prioridad: Number(p.prioridad || 1),
+      categoria: Number(p.categoria || 1),
+      calendario: Number(p.calendario || 1),
+      tipo_evaluacion: Number(p.tipo_evaluacion || 1),
+      actividades: Number(p.actividades || 1),
+      creado_por: Number(p.creado_por || 0),
+      fecha_inicio: String(p.fecha_inicio || ""),
+    };
+  }
+
   // ---- Drawer Curso (COMPLETO)
   function renderCursoDrawer(dataset) {
-    dlog(
-      "renderCursoDrawer IN dataset:",
-      dataset,
-      "state.currentDrawer:",
-      state.currentDrawer
-    );
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode =
-      state.currentDrawer && state.currentDrawer.mode
-        ? state.currentDrawer.mode
-        : item
-        ? "view"
-        : "create";
+      (state.currentDrawer && state.currentDrawer.mode) ||
+      (item ? "view" : "create");
     const isCreate = mode === "create" || !item;
     const isEdit = mode === "edit";
     const isView = mode === "view" && !!item;
+
     const c = isCreate ? getEmptyCourse() : item ? item._all : null;
-    if (!c) {
-      dlog("renderCursoDrawer: curso no encontrado");
-      return "<p>No encontrado.</p>";
-    }
-    dlog(
-      "renderCursoDrawer mode:",
-      mode,
-      "isCreate:",
-      isCreate,
-      "isEdit:",
-      isEdit,
-      "isView:",
-      isView,
-      "curso:",
-      c
-    );
+    if (!c) return "<p>No encontrado.</p>";
 
     // helpers
-    const inText = (id, val, ph = "") =>
-      `<input id="${id}" type="text" value="${escapeAttr(
-        val || ""
-      )}" placeholder="${escapeAttr(ph)}" />`;
-    const inNum = (id, val, min = "0") =>
-      `<input id="${id}" type="number" value="${escapeAttr(
-        val != null ? val : ""
-      )}" min="${min}" />`;
+    const inText = (id, val, ph) =>
+      '<input id="' +
+      id +
+      '" type="text" value="' +
+      escapeAttr(val || "") +
+      '" placeholder="' +
+      escapeAttr(ph || "") +
+      '" />';
+    const inNum = (id, val, min) =>
+      '<input id="' +
+      id +
+      '" type="number" value="' +
+      escapeAttr(val != null ? val : "") +
+      '" min="' +
+      (min || "0") +
+      '" />';
     const inDate = (id, val) =>
-      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+      '<input id="' +
+      id +
+      '" type="date" value="' +
+      escapeAttr(val || "") +
+      '" />';
     const inCheck = (id, val) =>
-      `<label class="gc-inline"><input id="${id}" type="checkbox" ${
-        Number(val) ? "checked" : ""
-      }/> <span>Sí</span></label>`;
-    const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
-    const inTA = (id, val, rows = 4) =>
-      `<textarea id="${id}" rows="${rows}">${escapeHTML(val || "")}</textarea>`;
+      '<label class="gc-inline"><input id="' +
+      id +
+      '" type="checkbox" ' +
+      (Number(val) ? "checked" : "") +
+      "/> <span>Sí</span></label>";
+    const inSel = (id, opts) => '<select id="' + id + '">' + opts + "</select>";
+    const inTA = (id, val, rows) =>
+      '<textarea id="' +
+      id +
+      '" rows="' +
+      (rows || 4) +
+      '">' +
+      escapeHTML(val || "") +
+      "</textarea>";
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
@@ -821,151 +765,129 @@
       String(c.actividades || "")
     );
 
-    const field = (label, value, inputHTML) => `
-    <div class="field">
-      <div class="label">${escapeHTML(label)}</div>
-      <div class="value">${
-        isEdit || isCreate ? inputHTML : escapeHTML(value != null ? value : "-")
-      }</div>
-    </div>`;
+    const field = function (label, value, inputHTML) {
+      return (
+        '<div class="field"><div class="label">' +
+        escapeHTML(label) +
+        '</div><div class="value">' +
+        (isEdit || isCreate
+          ? inputHTML
+          : escapeHTML(value != null ? value : "-")) +
+        "</div></div>"
+      );
+    };
 
     // acciones
     let controlsRow = "";
     if (isCreate) {
-      controlsRow = `
-      <div class="gc-actions">
-        <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-        <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
-      </div>`;
+      controlsRow =
+        '<div class="gc-actions"><button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button><button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button></div>';
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
-      controlsRow = `
-      <div class="gc-actions">
-        ${isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""}
-        ${
-          isEdit
-            ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
-            : ""
-        }
-        ${
-          isEdit
-            ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
-            : ""
-        }
-        <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
-        ${
-          isInactive
-            ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
-            : ""
-        }
-      </div>`;
+      controlsRow =
+        '<div class="gc-actions">' +
+        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
+          : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
+          : "") +
+        '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>' +
+        (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : "") +
+        "</div>";
     }
 
     // contenido
-    let html = `
-    ${controlsRow}
-
-    ${field(
-      "Nombre",
-      c.nombre,
-      inText("f_nombre", c.nombre, "Nombre del curso")
-    )}
-    ${field(
-      "Descripción breve",
-      c.descripcion_breve,
-      inTA("f_desc_breve", c.descripcion_breve, 3)
-    )}
-    ${field(
-      "Descripción media",
-      c.descripcion_media,
-      inTA("f_desc_media", c.descripcion_media, 4)
-    )}
-    ${field(
-      "Descripción del curso",
-      c.descripcion_curso,
-      inTA("f_desc_curso", c.descripcion_curso, 6)
-    )}
-    ${field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))}
-    ${field(
-      "Competencias",
-      c.competencias,
-      inTA("f_competencias", c.competencias, 3)
-    )}
-
-    <div class="grid-3">
-      ${field(
+    let html =
+      "" +
+      controlsRow +
+      field(
+        "Nombre",
+        c.nombre,
+        inText("f_nombre", c.nombre, "Nombre del curso")
+      ) +
+      field(
+        "Descripción breve",
+        c.descripcion_breve,
+        inTA("f_desc_breve", c.descripcion_breve, 3)
+      ) +
+      field(
+        "Descripción media",
+        c.descripcion_media,
+        inTA("f_desc_media", c.descripcion_media, 4)
+      ) +
+      field(
+        "Descripción del curso",
+        c.descripcion_curso,
+        inTA("f_desc_curso", c.descripcion_curso, 6)
+      ) +
+      field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3)) +
+      field(
+        "Competencias",
+        c.competencias,
+        inTA("f_competencias", c.competencias, 3)
+      ) +
+      '<div class="grid-3">' +
+      field(
         "Tutor",
-        state.tutorsMap && state.tutorsMap[c.tutor]
-          ? state.tutorsMap[c.tutor]
-          : c.tutor,
+        (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor,
         inSel("f_tutor", tutorOptions)
-      )}
-      ${field(
+      ) +
+      field(
         "Categoría",
-        state.categoriasMap && state.categoriasMap[c.categoria]
-          ? state.categoriasMap[c.categoria]
-          : c.categoria,
+        (state.categoriasMap && state.categoriasMap[c.categoria]) ||
+          c.categoria,
         inSel("f_categoria", catOptions)
-      )}
-      ${field(
+      ) +
+      field(
         "Prioridad",
-        state.prioMap && state.prioMap[c.prioridad]
-          ? state.prioMap[c.prioridad]
-          : c.prioridad,
+        (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad,
         inSel("f_prioridad", prioOptions)
-      )}
-    </div>
-
-    <div class="grid-3">
-      ${field(
+      ) +
+      "</div>" +
+      '<div class="grid-3">' +
+      field(
         "Tipo de evaluación",
-        state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]
-          ? state.tipoEvalMap[c.tipo_evaluacion]
-          : c.tipo_evaluacion,
+        (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) ||
+          c.tipo_evaluacion,
         inSel("f_tipo_eval", tipoOptions)
-      )}
-      ${field(
+      ) +
+      field(
         "Actividades",
-        state.actividadesMap && state.actividadesMap[c.actividades]
-          ? state.actividadesMap[c.actividades]
-          : c.actividades,
+        (state.actividadesMap && state.actividadesMap[c.actividades]) ||
+          c.actividades,
         inSel("f_actividades", actOptions)
-      )}
-      ${field(
+      ) +
+      field(
         "Calendario",
-        state.calendarioMap && state.calendarioMap[c.calendario]
-          ? state.calendarioMap[c.calendario]
-          : c.calendario,
+        (state.calendarioMap && state.calendarioMap[c.calendario]) ||
+          c.calendario,
         inSel("f_calendario", calOptions)
-      )}
-    </div>
-
-    <div class="grid-3">
-      ${field(
-        "Horas",
-        c.horas,
-        inNum("f_horas", c.horas != null ? c.horas : 0)
-      )}
-      ${field(
+      ) +
+      "</div>" +
+      '<div class="grid-3">' +
+      field("Horas", c.horas, inNum("f_horas", c.horas != null ? c.horas : 0)) +
+      field(
         "Precio",
         c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
         inNum("f_precio", c.precio != null ? c.precio : 0)
-      )}
-      ${field(
+      ) +
+      field(
         "Certificado",
         Number(c.certificado) ? "Sí" : "No",
         inCheck("f_certificado", c.certificado)
-      )}
-    </div>
+      ) +
+      "</div>" +
+      field(
+        "Fecha de inicio",
+        c.fecha_inicio,
+        inDate("f_fecha", c.fecha_inicio)
+      );
 
-    ${field(
-      "Fecha de inicio",
-      c.fecha_inicio,
-      inDate("f_fecha", c.fecha_inicio)
-    )}
-  `;
-
-    // IMAGEN
+    // imagen
     if (isCreate) {
       html += `
       <div class="field">
@@ -996,7 +918,7 @@
       <div class="field">
         <div class="label">Imágenes existentes</div>
         <div class="value"><div id="media-curso" data-id="${
-          c.id != null ? c.id : item ? item.id : ""
+          c.id || (item ? item.id : "")
         }"></div></div>
       </div>`;
     }
@@ -1030,210 +952,194 @@
         mode: "view",
       };
     }
-    dlog(
-      "renderCursoDrawer set header and state.currentDrawer:",
-      state.currentDrawer
-    );
 
-    // bindings
-    setTimeout(() => {
-      dlog("renderCursoDrawer BINDINGS start");
-      disableDrawerInputs(!(isEdit || isCreate));
+    // bindings con try/catch
+    setTimeout(function () {
+      try {
+        disableDrawerInputs(!(isEdit || isCreate));
 
-      // CREAR: seleccionar imagen
-      if (isCreate) {
-        const card = document.getElementById("create-media-curso");
-        const btn = document.getElementById("create-media-edit");
-        const thumb = document.getElementById("create-media-thumb");
-        if (btn && thumb && card) {
-          btn.addEventListener("click", () => {
-            dlog("create image picker clicked");
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/png, image/jpeg";
-            input.style.display = "none";
-            document.body.appendChild(input);
-
-            input.addEventListener("change", () => {
-              const file = input.files && input.files[0];
-              document.body.removeChild(input);
-              dlog(
-                "create image picked:",
-                file && { name: file.name, size: file.size, type: file.type }
-              );
-              if (!file) return;
-
-              const v = validarImagen(file, { maxMB: 2 });
-              if (!v.ok) {
-                toast(v.error, "error");
-                return;
-              }
-
-              renderPreviewUI(
-                card,
-                file,
-                async () => {
-                  state.tempNewCourseImage = file;
-                  try {
-                    if (thumb.dataset && thumb.dataset.blobUrl)
-                      URL.revokeObjectURL(thumb.dataset.blobUrl);
-                  } catch (_) {}
-                  const blobUrl = URL.createObjectURL(file);
-                  if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
-                  thumb.src = blobUrl;
-                  dlog("create image set preview blobUrl:", blobUrl);
-                  toast("Imagen seleccionada (se subirá al guardar)", "exito");
-                },
-                () => {
-                  dlog("create image preview cancel");
+        // CREAR: seleccionar imagen con modal preview
+        if (isCreate) {
+          const card = document.getElementById("create-media-curso");
+          const btn = document.getElementById("create-media-edit");
+          const thumb = document.getElementById("create-media-thumb");
+          if (btn && thumb && card) {
+            btn.addEventListener("click", function () {
+              const input = document.createElement("input");
+              input.type = "file";
+              input.accept = "image/png, image/jpeg";
+              input.style.display = "none";
+              document.body.appendChild(input);
+              input.addEventListener("change", function () {
+                const file = input.files && input.files[0];
+                try {
+                  document.body.removeChild(input);
+                } catch {}
+                if (!file) return;
+                const v = validarImagen(file, { maxMB: 2 });
+                if (!v.ok) {
+                  toast(v.error, "error");
+                  return;
                 }
-              );
+                renderPreviewUI(
+                  card,
+                  file,
+                  async function () {
+                    state.tempNewCourseImage = file;
+                    try {
+                      if (thumb.dataset && thumb.dataset.blobUrl)
+                        URL.revokeObjectURL(thumb.dataset.blobUrl);
+                    } catch {}
+                    const blobUrl = URL.createObjectURL(file);
+                    if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
+                    thumb.src = blobUrl;
+                    toast(
+                      "Imagen seleccionada (se subirá al guardar)",
+                      "exito"
+                    );
+                  },
+                  function () {}
+                );
+              });
+              input.click();
             });
-
-            input.click();
-          });
-        }
-      }
-
-      // guardar/editar
-      const btnSave = qs("#btn-save");
-      if (btnSave)
-        btnSave.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          try {
-            dlog("btn-save clicked, isCreate:", isCreate);
-            if (isCreate)
-              await saveNewCurso(); // sube state.tempNewCourseImage al final
-            else await saveUpdateCurso(item);
-          } catch (err) {
-            derr("btn-save error:", err);
-            toast("Error al guardar", "error");
           }
-        });
+        }
 
-      const bEdit = qs("#btn-edit");
-      if (bEdit)
-        bEdit.addEventListener("click", (e) => {
-          e.stopPropagation();
-          dlog("btn-edit clicked for id:", item && item.id);
-          state.currentDrawer = {
-            type: "curso",
-            id: item ? item.id : null,
-            mode: "edit",
-          };
-          qs("#drawer-body").innerHTML = renderCursoDrawer({
-            id: String(item ? item.id : ""),
+        // guardar/editar
+        const btnSave = qs("#btn-save");
+        if (btnSave)
+          btnSave.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            try {
+              if (isCreate) await saveNewCurso();
+              else await saveUpdateCurso(item);
+            } catch (err) {
+              gcLog(err);
+              toast("Error al guardar", "error");
+            }
           });
-        });
 
-      const bCancel = qs("#btn-cancel");
-      if (bCancel)
-        bCancel.addEventListener("click", (e) => {
-          e.stopPropagation();
-          dlog("btn-cancel clicked, isCreate:", isCreate);
-          if (isCreate) {
-            state.tempNewCourseImage = null;
-            closeDrawer();
-          } else {
+        const btnEdit = qs("#btn-edit");
+        if (btnEdit)
+          btnEdit.addEventListener("click", function (e) {
+            e.stopPropagation();
             state.currentDrawer = {
               type: "curso",
               id: item ? item.id : null,
-              mode: "view",
+              mode: "edit",
             };
             qs("#drawer-body").innerHTML = renderCursoDrawer({
               id: String(item ? item.id : ""),
             });
-          }
-        });
-
-      const bDel = qs("#btn-delete");
-      if (bDel)
-        bDel.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const step = bDel.getAttribute("data-step") || "1";
-          dlog("btn-delete clicked step:", step);
-          if (step === "1") {
-            bDel.textContent = "Confirmar";
-            bDel.setAttribute("data-step", "2");
-            setTimeout(() => {
-              if (bDel.getAttribute("data-step") === "2") {
-                bDel.textContent = "Eliminar";
-                bDel.setAttribute("data-step", "1");
-              }
-            }, 4000);
-            return;
-          }
-          try {
-            await softDeleteCurso(item);
-            toast("Curso eliminado (inactivo)", "exito");
-            closeDrawer();
-            await loadCursos();
-          } catch (err) {
-            derr("softDeleteCurso error:", err);
-            toast("No se pudo eliminar", "error");
-          }
-        });
-
-      const bReact = qs("#btn-reactivar");
-      if (bReact)
-        bReact.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          dlog("btn-reactivar clicked:", item && item.id);
-          try {
-            await reactivateCurso(Number(item && item.id));
-            toast("Curso reactivado", "exito");
-            await loadCursos();
-            const re = state.data.find((x) => item && x.id === item.id);
-            if (re)
-              openDrawer(
-                "Curso · " + re.nombre,
-                renderCursoDrawer({ id: String(re.id) })
-              );
-          } catch (err) {
-            derr("reactivateCurso error:", err);
-            toast("No se pudo reactivar", "error");
-          }
-        });
-
-      // montar media
-      const contCurso = document.getElementById("media-curso");
-      if (contCurso) {
-        const cid = Number(c.id != null ? c.id : item ? item.id : 0);
-        dlog(
-          "mountReadOnlyMedia for curso id:",
-          cid,
-          "editable:",
-          isEdit && isAdminUser
-        );
-        if (!Number.isNaN(cid) && cid) {
-          mountReadOnlyMedia({
-            container: contCurso,
-            type: "curso",
-            id: cid,
-            labels: ["Portada"],
-            editable: isEdit && isAdminUser,
           });
-        }
-      }
 
-      if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
-      dlog("renderCursoDrawer BINDINGS end");
+        const btnCancel = qs("#btn-cancel");
+        if (btnCancel)
+          btnCancel.addEventListener("click", function (e) {
+            e.stopPropagation();
+            if (isCreate) {
+              state.tempNewCourseImage = null;
+              closeDrawer();
+            } else {
+              state.currentDrawer = {
+                type: "curso",
+                id: item ? item.id : null,
+                mode: "view",
+              };
+              qs("#drawer-body").innerHTML = renderCursoDrawer({
+                id: String(item ? item.id : ""),
+              });
+            }
+          });
+
+        const bDel = qs("#btn-delete");
+        if (bDel)
+          bDel.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            const step = bDel.getAttribute("data-step") || "1";
+            gcLog("btn-delete clicked step:", step);
+            if (step === "1") {
+              bDel.textContent = "Confirmar";
+              bDel.setAttribute("data-step", "2");
+              setTimeout(function () {
+                if (bDel.getAttribute("data-step") === "2") {
+                  bDel.textContent = "Eliminar";
+                  bDel.setAttribute("data-step", "1");
+                }
+              }, 4000);
+              return;
+            }
+            try {
+              gcLog("softDeleteCurso item:", item);
+              await softDeleteCurso(item);
+              toast("Curso eliminado (inactivo)", "exito");
+              closeDrawer();
+              await loadCursos();
+            } catch (err) {
+              gcLog(err);
+              toast("No se pudo eliminar", "error");
+            }
+          });
+
+        const btnRea = qs("#btn-reactivar");
+        if (btnRea)
+          btnRea.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            try {
+              await reactivateCurso(Number(item && item.id));
+              toast("Curso reactivado", "exito");
+              await loadCursos();
+              const re = state.data.find(function (x) {
+                return x.id === (item && item.id);
+              });
+              if (re)
+                openDrawer(
+                  "Curso · " + re.nombre,
+                  renderCursoDrawer({ id: String(re.id) })
+                );
+            } catch (err) {
+              gcLog(err);
+              toast("No se pudo reactivar", "error");
+            }
+          });
+
+        // montar media existente
+        const contCurso = document.getElementById("media-curso");
+        if (contCurso) {
+          const cid = Number(c.id || (item ? item.id : 0));
+          if (!isNaN(cid) && cid) {
+            mountReadOnlyMedia({
+              container: contCurso,
+              type: "curso",
+              id: cid,
+              labels: ["Portada"],
+              editable: isEdit && isAdminUser,
+            });
+          }
+        }
+
+        if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
+        gcLog("renderCursoDrawer BINDINGS end");
+      } catch (err) {
+        gcLog("renderCursoDrawer bindings error:", err);
+        toast("Ocurrió un error al preparar el formulario", "error");
+      }
     }, 0);
 
     return html;
   }
 
   function disableDrawerInputs(disabled) {
-    dlog("disableDrawerInputs:", disabled);
     qsa(
       "#drawer-body input, #drawer-body select, #drawer-body textarea"
-    ).forEach((el) => {
+    ).forEach(function (el) {
       el.disabled = !!disabled;
     });
   }
 
   function getEmptyCourse() {
-    const ec = {
+    return {
       nombre: "",
       descripcion_breve: "",
       descripcion_curso: "",
@@ -1253,34 +1159,46 @@
       actividades: 1,
       creado_por: Number((currentUser && currentUser.id) || 0) || 1,
     };
-    dlog("getEmptyCourse() ->", ec);
-    return ec;
   }
 
   function mapToOptions(map, selectedId) {
-    const pairs = Object.entries(map || {});
-    const clean = pairs.filter(function (arr) {
-      return arr[0] !== "_ts";
-    });
-    if (!clean.length) return `<option value="">—</option>`;
-    const html = clean
-      .map(function (entry) {
-        const id = entry[0],
-          name = entry[1];
-        const sel = String(selectedId) === String(id) ? "selected" : "";
-        return `<option value="${escapeAttr(
-          id
-        )}" ${sel}>${escapeHTML(name)}</option>`;
+    if (!map || typeof map !== "object") return '<option value="">—</option>';
+    const pairs = Object.keys(map)
+      .filter(function (k) {
+        return k !== "_ts";
+      })
+      .map(function (k) {
+        return [k, map[k]];
+      });
+    if (!pairs.length) return '<option value="">—</option>';
+    return pairs
+      .map(function (pair) {
+        const id = pair[0],
+          name = pair[1];
+        const sel = String(selectedId) === String(id) ? " selected" : "";
+        return (
+          '<option value="' +
+          escapeAttr(id) +
+          '"' +
+          sel +
+          ">" +
+          escapeHTML(name) +
+          "</option>"
+        );
       })
       .join("");
-    return html;
   }
 
   function readCursoForm(existingId) {
-    const read = (id) => (qs("#" + id) ? qs("#" + id).value : "");
-    const readN = (id, def) =>
-      Number(qs("#" + id) ? qs("#" + id).value : def != null ? def : 0);
-    const readCh = (id) => (qs("#" + id) && qs("#" + id).checked ? 1 : 0);
+    const read = (id) => {
+      const el = qs("#" + id);
+      return el ? el.value : "";
+    };
+    const readN = (id, def) => Number(read(id) || def || 0);
+    const readCh = (id) => {
+      const el = qs("#" + id);
+      return el && el.checked ? 1 : 0;
+    };
 
     const payload = {
       nombre: read("f_nombre"),
@@ -1303,162 +1221,128 @@
       creado_por: Number((currentUser && currentUser.id) || 0) || 1,
     };
     if (existingId != null) payload.id = Number(existingId);
-    dlog("readCursoForm ->", payload);
     return payload;
   }
 
-  // ---- Upload imagen
+  // 👉 subida de imagen
   async function uploadCursoImagen(cursoId, file) {
-    dlog(
-      "uploadCursoImagen ->",
-      cursoId,
-      file && { name: file.name, size: file.size, type: file.type }
-    );
     if (!API_UPLOAD || !API_UPLOAD.cursoImg)
       throw new Error("API_UPLOAD.cursoImg no configurado");
     const v = validarImagen(file, { maxMB: 2 });
     if (!v.ok) throw new Error(v.error);
-
     const fd = new FormData();
     fd.append("curso_id", String(cursoId));
     fd.append("imagen", file);
-
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
-    const raw = await res.text();
-    dlog("uploadCursoImagen <- status:", res.status, "raw:", raw);
-    let json = {};
+    const text = await res.text().catch(() => "");
+    if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
     try {
-      json = raw ? JSON.parse(raw) : {};
-    } catch (e) {
-      derr("uploadCursoImagen parse error:", e, "raw:", raw);
+      return JSON.parse(text);
+    } catch {
+      return { _raw: text };
     }
-    if (!res.ok || (json && json.error)) {
-      throw new Error((json && json.error) || "HTTP " + res.status);
-    }
-    return json;
   }
 
   // Crear curso + (opcional) subir imagen
   async function saveNewCurso() {
     const payload = normalizeCursoPayload(readCursoForm(null));
-    try {
-      dlog("saveNewCurso()");
-      const payload = readCursoForm(null);
+    if (!payload.nombre) return toast("Falta el nombre", "warning");
+    if (!payload.tutor) return toast("Selecciona tutor", "warning");
+    if (!payload.categoria) return toast("Selecciona categoría", "warning");
+    if (!payload.fecha_inicio)
+      return toast("Fecha de inicio requerida", "warning");
 
-      if (!payload.nombre) return toast("Falta el nombre", "warning");
-      if (!payload.tutor) return toast("Selecciona tutor", "warning");
-      if (!payload.categoria) return toast("Selecciona categoría", "warning");
-      if (!payload.fecha_inicio)
-        return toast("Fecha de inicio requerida", "warning");
-
-      const res = await postJSON(API.iCursos, payload);
-      dlog("saveNewCurso res:", res);
-
-      const newId = Number(
-        (res &&
-          (res.id ||
-            res.curso_id ||
-            res.insert_id ||
-            (res.data && res.data.id))) ||
-          0
-      );
-      dlog("saveNewCurso newId:", newId);
-
-      if (!newId) {
-        dwarn("Respuesta de iCursos sin id utilizable:", res);
-        toast("Curso creado, pero no se recibió ID", "warning");
-      }
-
-      const fileToUpload = state.tempNewCourseImage || null;
-      if (newId && fileToUpload) {
-        try {
-          await uploadCursoImagen(newId, fileToUpload);
-          toast("Imagen subida", "exito");
-        } catch (err) {
-          derr("upload after create error:", err);
-          toast("Curso creado, pero falló la subida de imagen", "error");
-        } finally {
-          state.tempNewCourseImage = null;
-        }
-      }
-
-      toast("Curso creado", "exito");
-      closeDrawer();
-      await loadCursos();
-
-      if (newId) {
-        const re = state.data.find((x) => x.id === newId);
-        if (re)
-          openDrawer(
-            "Curso · " + re.nombre,
-            renderCursoDrawer({ id: String(re.id) })
-          );
-      }
-    } catch (e) {
-      derr("saveNewCurso error:", e);
-      toast("No se pudo crear el curso", "error");
+    const res = await postJSON(API.iCursos, payload);
+    const newId = Number(
+      (res &&
+        (res.id ||
+          res.curso_id ||
+          res.insert_id ||
+          (res.data && res.data.id))) ||
+        0
+    );
+    if (!newId) {
+      gcLog("Respuesta de iCursos sin id utilizable:", res);
+      toast("Curso creado, pero no se recibió ID", "warning");
     }
-  }
 
-  // Actualizar curso + (opcional) subir imagen si hay archivo seleccionado
-  async function saveUpdateCurso(item) {
-    try {
-      dlog("saveUpdateCurso item:", item);
-      if (!item || !item._all)
-        return toast("Sin item para actualizar", "error");
-      const payload = normalizeCursoPayload(readCursoForm(item.id));
-      await postJSON(API.uCursos, payload);
-      const res = await postJSON(API.uCursos, payload);
-      dlog("saveUpdateCurso res:", res);
-
-      const f =
-        qs("#f_curso_img") &&
-        qs("#f_curso_img").files &&
-        qs("#f_curso_img").files[0];
-      if (f) {
-        try {
-          await uploadCursoImagen(item.id, f);
-          toast("Imagen actualizada", "exito");
-        } catch (err) {
-          derr("upload image in update error:", err);
-          toast("Se guardó el curso, pero falló la imagen", "error");
-        }
+    const fileToUpload = state.tempNewCourseImage || null;
+    if (newId && fileToUpload) {
+      try {
+        await uploadCursoImagen(newId, fileToUpload);
+        toast("Imagen subida", "exito");
+      } catch (err) {
+        gcLog(err);
+        toast("Curso creado, pero falló la subida de imagen", "error");
+      } finally {
+        state.tempNewCourseImage = null;
       }
+    }
 
-      toast("Cambios guardados", "exito");
-      await loadCursos();
-      const re = state.data.find((x) => x.id === item.id);
+    toast("Curso creado", "exito");
+    closeDrawer();
+    await loadCursos();
+
+    if (newId) {
+      const re = state.data.find(function (x) {
+        return x.id === newId;
+      });
       if (re)
         openDrawer(
           "Curso · " + re.nombre,
           renderCursoDrawer({ id: String(re.id) })
         );
-    } catch (e) {
-      derr("saveUpdateCurso error:", e);
-      toast("No se pudo guardar", "error");
     }
   }
 
+  // Actualizar curso + (opcional) subir imagen
+  async function saveUpdateCurso(item) {
+    if (!item || !item._all) return toast("Sin item para actualizar", "error");
+    const payload = normalizeCursoPayload(readCursoForm(item.id));
+    await postJSON(API.uCursos, payload);
+
+    const fEl = qs("#f_curso_img");
+    const f = fEl && fEl.files && fEl.files[0];
+    if (f) {
+      try {
+        await uploadCursoImagen(item.id, f);
+        toast("Imagen actualizada", "exito");
+      } catch (err) {
+        gcLog(err);
+        toast("Se guardó el curso, pero falló la imagen", "error");
+      }
+    }
+
+    toast("Cambios guardados", "exito");
+    await loadCursos();
+    const re = state.data.find(function (x) {
+      return x.id === item.id;
+    });
+    if (re)
+      openDrawer(
+        "Curso · " + re.nombre,
+        renderCursoDrawer({ id: String(re.id) })
+      );
+  }
+
   async function softDeleteCurso(item) {
-    dlog("softDeleteCurso item:", item && item._all);
     if (!item || !item._all) throw new Error("Item inválido");
-    const base = Object.assign({}, item._all, { estatus: 0 });
-    const res = await postJSON(API.uCursos, base);
-    dlog("softDeleteCurso res:", res);
+    const base = { ...item._all, estatus: 0 };
+    const payload = normalizeCursoPayload(base);
+    await postJSON(API.uCursos, payload);
   }
 
   async function reactivateCurso(id) {
-    dlog("reactivateCurso id:", id);
-    const it = state.data.find((x) => x.id === Number(id));
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Curso no encontrado");
-    const body = Object.assign({}, it._all, { estatus: 1 });
-    const res = await postJSON(API.uCursos, body);
-    dlog("reactivateCurso res:", res);
+    const body = normalizeCursoPayload({ ...it._all, estatus: 1 });
+    await postJSON(API.uCursos, body);
   }
 
   // ---------- NOTICIAS ----------
   async function loadNoticias() {
-    dlog("loadNoticias()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Noticias";
 
@@ -1494,40 +1378,44 @@
         postJSON(API.noticias, { estatus: 0 }),
       ]);
 
-      const arr = [
-        ...(Array.isArray(activasRaw) ? activasRaw : []),
-        ...(Array.isArray(inactivasRaw) ? inactivasRaw : []),
-      ];
-
+      const arr = [].concat(
+        Array.isArray(activasRaw) ? activasRaw : [],
+        Array.isArray(inactivasRaw) ? inactivasRaw : []
+      );
       const counts = await Promise.all(
-        arr.map((n) => getCommentsCount(n.id).catch(() => 0))
+        arr.map(function (n) {
+          return getCommentsCount(n.id).catch(function () {
+            return 0;
+          });
+        })
       );
 
       state.raw = arr;
-      state.data = arr.map((n, i) => ({
-        id: n.id,
-        titulo: n.titulo,
-        fecha: n.fecha_creacion,
-        estatus: Number(n.estatus),
-        comentarios: counts[i] || 0,
-        _all: n,
-      }));
+      state.data = arr.map(function (n, i) {
+        return {
+          id: n.id,
+          titulo: n.titulo,
+          fecha: n.fecha_creacion,
+          estatus: Number(n.estatus),
+          comentarios: counts[i] || 0,
+          _all: n,
+        };
+      });
 
-      dlog("state.data noticias:", state.data);
       drawNoticias();
     } catch (err) {
-      derr("loadNoticias error:", err);
       const list = qs("#recursos-list");
       if (list)
-        list.innerHTML = `<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>`;
+        list.innerHTML =
+          '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>';
       const m = qs("#recursos-list-mobile");
       if (m) m.innerHTML = "";
+      gcLog(err);
       toast("No se pudieron cargar noticias", "error");
     }
   }
 
   async function getCommentsCount(noticiaId) {
-    dlog("getCommentsCount noticiaId:", noticiaId);
     const res = await postJSON(API.comentarios, {
       noticia_id: Number(noticiaId),
       estatus: 1,
@@ -1537,26 +1425,23 @@
     for (let i = 0; i < arr.length; i++) {
       const c = arr[i];
       total += 1;
-      if (c && Array.isArray(c.respuestas)) total += c.respuestas.length;
+      if (c && c.respuestas && Array.isArray(c.respuestas))
+        total += c.respuestas.length;
     }
-    dlog("comments count ->", total);
     return total;
   }
 
   function drawNoticias() {
-    dlog("drawNoticias() rows:", state.data.length);
     const rows = state.data;
     renderList(rows, {
       desktopRow: (it) => `
         <div class="table-row" data-id="${it.id}" data-type="noticia">
-          <div class="col-nombre">
-            <span class="name-text">${escapeHTML(it.titulo)}</span>
-          </div>
+          <div class="col-nombre"><span class="name-text">${escapeHTML(
+            it.titulo
+          )}</span></div>
           <div class="col-tutor">${it.comentarios}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">
-            ${badgeNoticia(it.estatus)}
-          </div>
+          <div class="col-status">${badgeNoticia(it.estatus)}</div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -1579,7 +1464,7 @@
         </div>`,
       drawerTitle: (d) => {
         const item = state.data.find((x) => String(x.id) === d.id);
-        return item ? `Noticia · ${item.titulo}` : "Noticia";
+        return item ? "Noticia · " + item.titulo : "Noticia";
       },
       drawerBody: (d) => renderNoticiaDrawer(d),
     });
@@ -1587,37 +1472,36 @@
 
   function badgeNoticia(estatus) {
     return Number(estatus) === 1
-      ? `<span class="gc-badge-activo">Publicada</span>`
-      : `<span class="gc-badge-inactivo">Inactiva</span>`;
+      ? '<span class="gc-badge-activo">Publicada</span>'
+      : '<span class="gc-badge-inactivo">Inactiva</span>';
   }
 
   async function inactivateNoticia(id) {
-    dlog("inactivateNoticia id:", id);
-    const it = state.data.find((x) => x.id === Number(id));
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) throw new Error("Endpoint u_noticia no configurado");
-    const body = Object.assign({}, it._all, { estatus: 0 });
-    const res = await postJSON(API.uNoticias, body);
-    dlog("inactivateNoticia res:", res);
+    const body = { ...it._all, estatus: 0 };
+    await postJSON(API.uNoticias, body);
   }
 
   async function reactivateNoticia(id) {
-    dlog("reactivateNoticia id:", id);
-    const it = state.data.find((x) => x.id === Number(id));
+    const it = state.data.find(function (x) {
+      return x.id === Number(id);
+    });
     if (!it || !it._all) throw new Error("Noticia no encontrada");
     if (!API.uNoticias) {
       toast("Falta endpoint u_noticia.php en backend", "warning", 3500);
       return false;
     }
-    const body = Object.assign({}, it._all, { estatus: 1 });
-    const res = await postJSON(API.uNoticias, body);
-    dlog("reactivateNoticia res:", res);
+    const body = { ...it._all, estatus: 1 };
+    await postJSON(API.uNoticias, body);
     return true;
   }
 
   // ---- Drawer Noticia
   function renderNoticiaDrawer(dataset) {
-    dlog("renderNoticiaDrawer dataset:", dataset);
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const n = item && item._all;
     if (!n) return "<p>No encontrado.</p>";
@@ -1633,46 +1517,32 @@
     const isInactive = Number(n.estatus) === 0;
 
     const controlsRow = isAdminUser
-      ? `
-        <div class="gc-actions">
-          ${
-            isView ? `<button class="gc-btn" id="btn-edit">Editar</button>` : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>`
-              : ""
-          }
-          ${
-            isEdit
-              ? `<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>`
-              : ""
-          }
-          ${
-            isInactive
-              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>`
-              : `<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>`
-          }
-        </div>`
+      ? '<div class="gc-actions">' +
+        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
+          : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
+          : "") +
+        (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
+        "</div>"
       : "";
 
-    let html = `
-      ${controlsRow}
-
-      ${pair("Título", n.titulo)}
-      ${pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva")}
-      ${pair("Fecha publicación", fmtDateTime(n.fecha_creacion))}
-      ${pair("Descripción (1)", n.desc_uno)}
-      ${pair("Descripción (2)", n.desc_dos)}
-      ${pair("Creado por", n.creado_por)}
-
-      <div class="field">
-        <div class="label">Imágenes</div>
-        <div class="value"><div id="media-noticia" data-id="${
-          n.id
-        }"></div></div>
-      </div>
-    `;
+    let html =
+      "" +
+      controlsRow +
+      pair("Título", n.titulo) +
+      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
+      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
+      pair("Descripción (1)", n.desc_uno) +
+      pair("Descripción (2)", n.desc_dos) +
+      pair("Creado por", n.creado_por) +
+      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
+      n.id +
+      '"></div></div></div>';
 
     if (isAdminUser) {
       html += jsonSection(
@@ -1692,97 +1562,96 @@
         "Noticia · " + (item ? item.titulo : "");
       state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
     }
-    dlog("renderNoticiaDrawer: set header and state", state.currentDrawer);
 
-    // Bind acciones
-    setTimeout(() => {
-      dlog("renderNoticiaDrawer BINDINGS start");
-      const be = qs("#btn-edit");
-      if (be)
-        be.addEventListener("click", (e) => {
-          e.stopPropagation();
-          dlog("noticia btn-edit");
-          state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-          qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-            id: String(n.id),
+    setTimeout(function () {
+      try {
+        const be = qs("#btn-edit");
+        if (be)
+          be.addEventListener("click", function (e) {
+            e.stopPropagation();
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+              id: String(n.id),
+            });
           });
-        });
 
-      const bc = qs("#btn-cancel");
-      if (bc)
-        bc.addEventListener("click", (e) => {
-          e.stopPropagation();
-          dlog("noticia btn-cancel");
-          state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-          qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-            id: String(n.id),
+        const bc = qs("#btn-cancel");
+        if (bc)
+          bc.addEventListener("click", function (e) {
+            e.stopPropagation();
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+              id: String(n.id),
+            });
           });
-        });
 
-      const bs = qs("#btn-save");
-      if (bs)
-        bs.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          dlog("noticia btn-save (noop demo)");
-          toast("Cambios guardados", "exito");
-          state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-          await loadNoticias();
-          const re = state.data.find((x) => x.id === n.id);
-          if (re)
-            openDrawer(
-              "Noticia · " + re.titulo,
-              renderNoticiaDrawer({ id: String(re.id) })
-            );
-        });
-
-      const bDel = qs("#btn-delete");
-      if (bDel)
-        bDel.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          const step = bDel.getAttribute("data-step") || "1";
-          dlog("noticia btn-delete step:", step);
-          if (step === "1") {
-            bDel.textContent = "Confirmar";
-            bDel.setAttribute("data-step", "2");
-            setTimeout(() => {
-              if (bDel.getAttribute("data-step") === "2") {
-                bDel.textContent = "Eliminar";
-                bDel.setAttribute("data-step", "1");
-              }
-            }, 4000);
-            return;
-          }
-          try {
-            await inactivateNoticia(n.id);
-            toast("Noticia eliminada (inactiva)", "exito");
-            closeDrawer();
+        const bs = qs("#btn-save");
+        if (bs)
+          bs.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            toast("Cambios guardados", "exito");
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
             await loadNoticias();
-          } catch (err) {
-            derr("inactivateNoticia error:", err);
-            toast("No se pudo eliminar", "error");
-          }
-        });
-
-      const br = qs("#btn-reactivar");
-      if (br)
-        br.addEventListener("click", async (e) => {
-          e.stopPropagation();
-          dlog("noticia btn-reactivar");
-          const ok = await reactivateNoticia(n.id);
-          if (ok) {
-            toast("Noticia reactivada", "exito");
-            await loadNoticias();
-            const re = state.data.find((x) => x.id === n.id);
+            const re = state.data.find(function (x) {
+              return x.id === n.id;
+            });
             if (re)
               openDrawer(
                 "Noticia · " + re.titulo,
                 renderNoticiaDrawer({ id: String(re.id) })
               );
-          }
-        });
+          });
 
-      disableDrawerInputs(!isEdit);
-      dlog("renderNoticiaDrawer BINDINGS end");
+        const bDel = qs("#btn-delete");
+        if (bDel)
+          bDel.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            const step = bDel.getAttribute("data-step") || "1";
+            if (step === "1") {
+              bDel.textContent = "Confirmar";
+              bDel.setAttribute("data-step", "2");
+              setTimeout(function () {
+                if (bDel.getAttribute("data-step") === "2") {
+                  bDel.textContent = "Eliminar";
+                  bDel.setAttribute("data-step", "1");
+                }
+              }, 4000);
+              return;
+            }
+            try {
+              await inactivateNoticia(n.id);
+              toast("Noticia eliminada (inactiva)", "exito");
+              closeDrawer();
+              await loadNoticias();
+            } catch (err) {
+              gcLog(err);
+              toast("No se pudo eliminar", "error");
+            }
+          });
+
+        const br = qs("#btn-reactivar");
+        if (br)
+          br.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            const ok = await reactivateNoticia(n.id);
+            if (ok) {
+              toast("Noticia reactivada", "exito");
+              await loadNoticias();
+              const re = state.data.find(function (x) {
+                return x.id === n.id;
+              });
+              if (re)
+                openDrawer(
+                  "Noticia · " + re.titulo,
+                  renderNoticiaDrawer({ id: String(re.id) })
+                );
+            }
+          });
+
+        disableDrawerInputs(!isEdit);
+      } catch (err) {
+        gcLog("renderNoticiaDrawer bindings error:", err);
+      }
     }, 0);
 
     return html;
@@ -1790,7 +1659,6 @@
 
   // ---------- CUENTAS ----------
   function drawCuentas() {
-    dlog("drawCuentas()");
     const title = qs("#mod-title");
     if (title) title.textContent = "Cuenta";
 
@@ -1804,13 +1672,13 @@
     }
 
     const desktopTable = qs(".recursos-table");
-    const mobileTable = qs(".recursos-table-mobile");
     if (desktopTable) desktopTable.style.display = "none";
+    const mobileTable = qs(".recursos-table-mobile");
     if (mobileTable) mobileTable.style.display = "none";
 
     const d = qs("#recursos-list");
-    const m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = "";
+    const m = qs("#recursos-list-mobile");
     if (m) m.innerHTML = "";
 
     const host = qs(".recursos-box");
@@ -1869,70 +1737,80 @@
         </div>
         <button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>
       </div>
-    </div>
-  `;
+    </div>`;
 
     const pag1 = qs("#pagination-controls");
-    const pag2 = qs("#pagination-mobile");
     if (pag1) pag1.innerHTML = "";
+    const pag2 = qs("#pagination-mobile");
     if (pag2) pag2.innerHTML = "";
 
-    const safeOpen = (fnName) => {
+    function safeOpen(fnName) {
       const fn = window[fnName];
       if (typeof fn === "function") fn();
       else toast("Modal no disponible aún", "warning");
-    };
+    }
 
-    mount.querySelector("#btn-delete-account") &&
-      mount
-        .querySelector("#btn-delete-account")
-        .addEventListener("click", () => safeOpen("openModalDeleteAccount"));
-    mount.querySelector("#btn-privacy") &&
-      mount
-        .querySelector("#btn-privacy")
-        .addEventListener("click", () => safeOpen("openModalPrivacy"));
-    mount.querySelector("#btn-notifications") &&
-      mount
-        .querySelector("#btn-notifications")
-        .addEventListener("click", () => safeOpen("openModalNotifications"));
-    mount.querySelector("#btn-privacy-toggles") &&
-      mount
-        .querySelector("#btn-privacy-toggles")
-        .addEventListener("click", () => safeOpen("openModalPrivacyToggles"));
-    mount.querySelector("#btn-switch-account") &&
-      mount
-        .querySelector("#btn-switch-account")
-        .addEventListener("click", () => safeOpen("openModalSwitchAccount"));
+    const del = mount.querySelector("#btn-delete-account");
+    if (del)
+      del.addEventListener("click", function () {
+        safeOpen("openModalDeleteAccount");
+      });
+    const pr = mount.querySelector("#btn-privacy");
+    if (pr)
+      pr.addEventListener("click", function () {
+        safeOpen("openModalPrivacy");
+      });
+    const no = mount.querySelector("#btn-notifications");
+    if (no)
+      no.addEventListener("click", function () {
+        safeOpen("openModalNotifications");
+      });
+    const pt = mount.querySelector("#btn-privacy-toggles");
+    if (pt)
+      pt.addEventListener("click", function () {
+        safeOpen("openModalPrivacyToggles");
+      });
+    const sw = mount.querySelector("#btn-switch-account");
+    if (sw)
+      sw.addEventListener("click", function () {
+        safeOpen("openModalSwitchAccount");
+      });
   }
 
   // ---------- Drawer base ----------
   function openDrawer(title, bodyHTML) {
-    dlog("openDrawer ->", title);
     const overlay = qs("#gc-dash-overlay");
-    if (overlay) overlay.classList.add("open");
+    if (overlay && overlay.classList) overlay.classList.add("open");
 
     const drawer = qs("#gc-drawer");
     if (!drawer) return;
-    qs("#drawer-title").textContent = title || "Detalle";
-    qs("#drawer-body").innerHTML = bodyHTML || "";
-    drawer.classList.add("open");
+    const t = qs("#drawer-title");
+    if (t) t.textContent = title || "Detalle";
+    const b = qs("#drawer-body");
+    if (b) b.innerHTML = bodyHTML || "";
+    if (drawer.classList) drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
   }
   function closeDrawer() {
-    dlog("closeDrawer");
+    // evita warning aria-hidden
+    try {
+      if (document.activeElement && document.activeElement.blur)
+        document.activeElement.blur();
+    } catch {}
     const overlay = qs("#gc-dash-overlay");
-    if (overlay) overlay.classList.remove("open");
+    if (overlay && overlay.classList) overlay.classList.remove("open");
 
     const drawer = qs("#gc-drawer");
     if (!drawer) return;
-    drawer.classList.remove("open");
+    if (drawer.classList) drawer.classList.remove("open");
     drawer.setAttribute("aria-hidden", "true");
     state.currentDrawer = null;
+    gcLog("closeDrawer");
   }
 
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
-    return String(str != null ? str : "").replace(/[&<>'"]/g, function (s) {
+    return String(str == null ? "" : str).replace(/[&<>'"]/g, function (s) {
       return {
         "&": "&amp;",
         "<": "&lt;",
@@ -1943,16 +1821,13 @@
     });
   }
   function escapeAttr(str) {
-    return String(str != null ? str : "").replace(/"/g, "&quot;");
+    return String(str == null ? "" : str).replace(/"/g, "&quot;");
   }
   function fmtDate(d) {
     if (!d) return "-";
     try {
-      const parts = String(d).split("-");
-      const y = parts[0],
-        m = parts[1],
-        day = parts[2];
-      return `${day}/${m}/${y}`;
+      const p = String(d).split("-");
+      return (p[2] || "") + "/" + (p[1] || "") + "/" + (p[0] || "");
     } catch {
       return d;
     }
@@ -1960,8 +1835,8 @@
   function fmtDateTime(dt) {
     if (!dt) return "-";
     try {
-      const parts = String(dt).split(" ");
-      return (fmtDate(parts[0]) + " " + (parts[1] || "")).trim();
+      const sp = String(dt).split(" ");
+      return (fmtDate(sp[0]) + " " + (sp[1] || "")).trim();
     } catch {
       return dt;
     }
@@ -1977,17 +1852,19 @@
     }
   }
   function pair(label, val) {
-    return `<div class="field"><div class="label">${escapeHTML(
-      label
-    )}</div><div class="value">${escapeHTML(
-      val != null ? val : "-"
-    )}</div></div>`;
+    return (
+      '<div class="field"><div class="label">' +
+      escapeHTML(label) +
+      '</div><div class="value">' +
+      escapeHTML(val != null ? val : "-") +
+      "</div></div>"
+    );
   }
 
   function withBust(url) {
     try {
       const u = new URL(url, window.location.origin);
-      u.searchParams.set("v", String(Date.now()));
+      u.searchParams.set("v", Date.now());
       return u.pathname + "?" + u.searchParams.toString();
     } catch {
       return url + (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + Date.now();
@@ -1995,24 +1872,19 @@
   }
 
   function noImageSvg() {
-    return `
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'>
-        <rect width='100%' height='100%' fill='#f3f3f3'/>
-        <path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>
-        <circle cx='52' cy='30' r='8' fill='#c9c9c9'/>
-      </svg>`;
+    return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
   }
 
   function mediaUrlsByType(type, id) {
     const nid = Number(id);
     if (type === "noticia") {
       return [
-        `/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`,
-        `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`,
+        "/ASSETS/noticia/NoticiasImg/noticia_img1_" + nid + ".png",
+        "/ASSETS/noticia/NoticiasImg/noticia_img2_" + nid + ".png",
       ];
     }
     if (type === "curso") {
-      return [`/ASSETS/cursos/img${nid}.png`];
+      return ["/ASSETS/cursos/img" + nid + ".png"];
     }
     return [];
   }
@@ -2020,24 +1892,28 @@
   // ---- Sección JSON
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj || {}, null, 2));
-    return `
-      <details class="dev-json" open style="margin-top:16px;">
-        <summary style="cursor:pointer; font-weight:600;">${escapeHTML(
-          title
-        )}</summary>
-        <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-          <button class="gc-btn" id="${btnId}">Copiar JSON</button>
-        </div>
-        <pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre>
-      </details>
-    `;
+    return (
+      '<details class="dev-json" open style="margin-top:16px;">' +
+      '<summary style="cursor:pointer; font-weight:600;">' +
+      escapeHTML(title) +
+      "</summary>" +
+      '<div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="' +
+      btnId +
+      '">Copiar JSON</button></div>' +
+      '<pre id="' +
+      preId +
+      '" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">' +
+      safe +
+      "</pre>" +
+      "</details>"
+    );
   }
 
   function bindCopyFromPre(preSel, btnSel) {
     const btn = qs(btnSel);
     const pre = qs(preSel);
     if (!btn || !pre) return;
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", async function (e) {
       e.preventDefault();
       const text = pre.textContent || "";
       if (!text) return toast("No hay JSON para copiar", "warning");
@@ -2072,16 +1948,14 @@
   // ---- Validación de imagen
   function validarImagen(file, opt) {
     opt = opt || {};
-    const maxMB = typeof opt.maxMB === "number" ? opt.maxMB : 2;
+    const maxMB = opt.maxMB || 2;
     if (!file) return { ok: false, error: "No se seleccionó archivo" };
     const allowed = ["image/jpeg", "image/png"];
-    if (allowed.indexOf(file.type) === -1) {
+    if (allowed.indexOf(file.type) === -1)
       return { ok: false, error: "Formato no permitido. Solo JPG o PNG" };
-    }
     const sizeMB = file.size / (1024 * 1024);
-    if (sizeMB > maxMB) {
+    if (sizeMB > maxMB)
       return { ok: false, error: "La imagen excede " + maxMB + "MB" };
-    }
     return { ok: true };
   }
 
@@ -2093,12 +1967,7 @@
 
   // ---- Modal / preview de imagen
   function renderPreviewUI(cardEl, file, onConfirm, onCancel) {
-    dlog(
-      "renderPreviewUI file:",
-      file && { name: file.name, size: file.size, type: file.type }
-    );
     const url = URL.createObjectURL(file);
-
     const drawer = document.getElementById("gc-drawer");
     const drawerOverlay = document.getElementById("gc-dash-overlay");
     const prev = {
@@ -2108,10 +1977,13 @@
       overlayZ:
         drawerOverlay && drawerOverlay.style ? drawerOverlay.style.zIndex : "",
       drawerAria: drawer ? drawer.getAttribute("aria-hidden") : null,
-      hadInert: drawer ? !!drawer.hasAttribute("inert") : false,
+      hadInert:
+        drawer && typeof drawer.hasAttribute === "function"
+          ? drawer.hasAttribute("inert")
+          : false,
     };
 
-    const lockScroll = () => {
+    const lockScroll = function () {
       document.body.style.overflow = "hidden";
     };
 
@@ -2120,7 +1992,7 @@
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.style.cssText =
-      "position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background: rgba(17,24,39,.55); backdrop-filter: saturate(120%) blur(2px);";
+      "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.55);backdrop-filter:saturate(120%) blur(2px);";
 
     if (drawer) {
       drawer.style.pointerEvents = "none";
@@ -2129,30 +2001,28 @@
       drawer.setAttribute("aria-hidden", "true");
       try {
         drawer.setAttribute("inert", "");
-      } catch (_) {}
+      } catch {}
     }
-    if (drawerOverlay && drawerOverlay.style) {
-      drawerOverlay.style.zIndex = "2";
-    }
+    if (drawerOverlay && drawerOverlay.style) drawerOverlay.style.zIndex = "2";
 
     const modal = document.createElement("div");
     modal.className = "gc-preview-modal";
     modal.style.cssText =
-      "background:#fff; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,.25); width:min(920px,94vw); max-height:90vh; overflow:hidden; display:flex; flex-direction:column;";
+      "background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
 
     const header = document.createElement("div");
     header.style.cssText =
-      "display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 16px; border-bottom:1px solid #eee;";
+      "display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;";
     header.innerHTML =
-      '<div style="font-weight:700; font-size:1.05rem;">Vista previa de imagen</div><button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>';
+      '<div style="font-weight:700;font-size:1.05rem;">Vista previa de imagen</div><button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>';
 
     const body = document.createElement("div");
     body.style.cssText =
-      "display:grid; grid-template-columns:1fr 280px; gap:16px; padding:16px; align-items:start;";
+      "display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px;align-items:start;";
 
     const imgWrap = document.createElement("div");
     imgWrap.style.cssText =
-      "border:1px solid #eee; border-radius:12px; padding:8px; background:#fafafa; display:flex; align-items:center; justify-content:center; min-height:320px; max-height:60vh;";
+      "border:1px solid #eee;border-radius:12px;padding:8px;background:#fafafa;display:flex;align-items:center;justify-content:center;min-height:320px;max-height:60vh;";
     imgWrap.innerHTML =
       '<img src="' +
       url +
@@ -2160,30 +2030,29 @@
 
     const side = document.createElement("div");
     side.style.cssText =
-      "border-left:1px dashed #e6e6e6; padding-left:16px; display:flex; flex-direction:column; gap:10px;";
+      "border-left:1px dashed #e6e6e6;padding-left:16px;display:flex;flex-direction:column;gap:10px;";
     side.innerHTML =
-      "" +
       '<div style="font-weight:600;">Detalles</div>' +
-      '<div style="font-size:.92rem; color:#444; line-height:1.35;">' +
-      "  <div><strong>Archivo:</strong> " +
-      escapeHTML(file.name) +
+      '<div style="font-size:.92rem;color:#444;line-height:1.35;">' +
+      "<div><strong>Archivo:</strong> " +
+      file.name +
       "</div>" +
-      "  <div><strong>Peso:</strong> " +
+      "<div><strong>Peso:</strong> " +
       humanSize(file.size) +
       "</div>" +
-      "  <div><strong>Tipo:</strong> " +
-      escapeHTML(file.type || "desconocido") +
+      "<div><strong>Tipo:</strong> " +
+      (file.type || "desconocido") +
       "</div>" +
-      '  <div style="margin-top:6px; color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
+      '<div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
       "</div>" +
-      '<div style="margin-top:auto; display:flex; gap:8px; flex-wrap:wrap;">' +
-      '  <button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>' +
-      '  <button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>' +
+      '<div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">' +
+      '<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>' +
+      '<button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>' +
       "</div>";
 
-    const mql = window.matchMedia("(max-width: 720px)");
-    const applyResponsive = () => {
-      if (mql.matches) {
+    const mql = window.matchMedia && window.matchMedia("(max-width: 720px)");
+    const applyResponsive = function () {
+      if (mql && mql.matches) {
         body.style.gridTemplateColumns = "1fr";
         side.style.borderLeft = "none";
         side.style.paddingLeft = "0";
@@ -2207,7 +2076,7 @@
     document.body.appendChild(overlay);
     lockScroll();
 
-    const cleanup = () => {
+    const cleanup = function () {
       if (drawer) {
         if (drawer.style) {
           drawer.style.pointerEvents = prev.drawerPE || "";
@@ -2219,40 +2088,43 @@
         else drawer.removeAttribute("aria-hidden");
         try {
           if (!prev.hadInert) drawer.removeAttribute("inert");
-        } catch (_) {}
+        } catch {}
       }
       if (drawerOverlay && drawerOverlay.style)
         drawerOverlay.style.zIndex = prev.overlayZ || "";
       document.body.style.overflow = "";
       try {
         URL.revokeObjectURL(url);
-      } catch (_) {}
-      overlay.remove();
+      } catch {}
+      try {
+        overlay.remove();
+      } catch {}
       document.removeEventListener("keydown", onEsc);
     };
 
-    const onEsc = (e) => {
-      if (e.key === "Escape") {
+    const onEsc = function (e) {
+      if (e && e.key === "Escape") {
         e.preventDefault();
         cleanup();
       }
     };
     document.addEventListener("keydown", onEsc);
 
-    overlay.addEventListener("click", (e) => {
+    overlay.addEventListener("click", function (e) {
       if (e.target === overlay) cleanup();
     });
-    header
-      .querySelector('[data-act="close"]')
-      .addEventListener("click", cleanup);
-    side.querySelector('[data-act="cancel"]').addEventListener("click", (e) => {
-      e.preventDefault();
-      onCancel && onCancel();
-      cleanup();
-    });
-    side
-      .querySelector('[data-act="confirm"]')
-      .addEventListener("click", async (e) => {
+    const btnClose = header.querySelector('[data-act="close"]');
+    if (btnClose) btnClose.addEventListener("click", cleanup);
+    const btnCancel = side.querySelector('[data-act="cancel"]');
+    if (btnCancel)
+      btnCancel.addEventListener("click", function (e) {
+        e.preventDefault();
+        onCancel && onCancel();
+        cleanup();
+      });
+    const btnConfirm = side.querySelector('[data-act="confirm"]');
+    if (btnConfirm)
+      btnConfirm.addEventListener("click", async function (e) {
         e.preventDefault();
         try {
           if (onConfirm) await onConfirm();
@@ -2268,11 +2140,9 @@
     const type = opt && opt.type;
     const id = opt && opt.id;
     const labels = (opt && opt.labels) || [];
-    const editableOverride = opt ? opt.editable : void 0;
-    if (!container) {
-      dwarn("mountReadOnlyMedia: missing container");
-      return;
-    }
+    const editableOverride = opt && opt.editable;
+
+    if (!container) return;
 
     const editable =
       typeof editableOverride === "boolean"
@@ -2280,71 +2150,56 @@
         : isAdminUser &&
           state.currentDrawer &&
           state.currentDrawer.mode === "edit";
-
     const urls = mediaUrlsByType(type, id);
-    dlog(
-      "mountReadOnlyMedia type:",
-      type,
-      "id:",
-      id,
-      "urls:",
-      urls,
-      "editable:",
-      editable
-    );
     const grid = document.createElement("div");
     grid.className = "media-grid";
 
-    urls.forEach((url, i) => {
+    urls.forEach(function (url, i) {
       const label = labels[i] || "Imagen " + (i + 1);
       const card = document.createElement("div");
       card.className = "media-card";
-
       const editBtnHTML = editable
-        ? `
-      <button class="icon-btn media-edit" title="Editar imagen">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-        </svg>
-      </button>`
+        ? '<button class="icon-btn media-edit" title="Editar imagen">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>' +
+          "</button>"
         : "";
 
-      card.innerHTML = `
-      <figure class="media-thumb">
-        <img alt="${escapeAttr(label)}" src="${withBust(url)}">
-        ${editBtnHTML}
-      </figure>
-      <div class="media-meta">
-        <div class="media-label">${escapeHTML(label)}</div>
-      </div>`;
+      card.innerHTML =
+        '<figure class="media-thumb"><img alt="' +
+        escapeAttr(label) +
+        '" src="' +
+        withBust(url) +
+        '">' +
+        editBtnHTML +
+        "</figure>" +
+        '<div class="media-meta"><div class="media-label">' +
+        escapeHTML(label) +
+        "</div></div>";
 
       const img = card.querySelector("img");
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg());
-      };
+      if (img)
+        img.onerror = function () {
+          img.onerror = null;
+          img.src =
+            "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg());
+        };
 
       if (editable) {
         const btnEdit = card.querySelector(".media-edit");
         if (btnEdit) {
-          btnEdit.addEventListener("click", (e) => {
+          btnEdit.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
-            dlog("media edit click -> type:", type, "id:", id, "pos:", i);
-
             const input = document.createElement("input");
             input.type = "file";
             input.accept = "image/png, image/jpeg";
             input.style.display = "none";
             document.body.appendChild(input);
-
-            input.addEventListener("change", async () => {
+            input.addEventListener("change", async function () {
               const file = input.files && input.files[0];
-              document.body.removeChild(input);
-              dlog(
-                "media picked:",
-                file && { name: file.name, size: file.size, type: file.type }
-              );
+              try {
+                document.body.removeChild(input);
+              } catch {}
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
@@ -2353,7 +2208,7 @@
               renderPreviewUI(
                 card,
                 file,
-                async () => {
+                async function () {
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD || !API_UPLOAD.cursoImg) {
@@ -2366,24 +2221,21 @@
                       const fd = new FormData();
                       fd.append("curso_id", String(id));
                       fd.append("imagen", file);
-
                       const res = await fetch(API_UPLOAD.cursoImg, {
                         method: "POST",
                         body: fd,
                       });
-                      const raw = await res.text();
-                      dlog("media upload curso <-", res.status, raw);
-                      let json = {};
-                      try {
-                        json = raw ? JSON.parse(raw) : {};
-                      } catch (e) {
-                        derr("media upload parse error:", e, raw);
-                      }
-                      if (!res.ok || (json && json.error))
+                      const text = await res.text().catch(() => "");
+                      if (!res.ok)
                         throw new Error(
-                          (json && json.error) || "HTTP " + res.status
+                          "HTTP " + res.status + " " + (text || "")
                         );
-
+                      let json;
+                      try {
+                        json = JSON.parse(text);
+                      } catch {
+                        json = { _raw: text };
+                      }
                       img.src = withBust((json && json.url) || url);
                       toast("Imagen de curso actualizada", "exito");
                       return;
@@ -2402,24 +2254,21 @@
                       fd.append("noticia_id", String(id));
                       fd.append("pos", String(pos));
                       fd.append("imagen", file);
-
                       const res = await fetch(API_UPLOAD.noticiaImg, {
                         method: "POST",
                         body: fd,
                       });
-                      const raw = await res.text();
-                      dlog("media upload noticia <-", res.status, raw);
-                      let json = {};
-                      try {
-                        json = raw ? JSON.parse(raw) : {};
-                      } catch (e) {
-                        derr("media upload parse error:", e, raw);
-                      }
-                      if (!res.ok || (json && json.error))
+                      const text = await res.text().catch(() => "");
+                      if (!res.ok)
                         throw new Error(
-                          (json && json.error) || "HTTP " + res.status
+                          "HTTP " + res.status + " " + (text || "")
                         );
-
+                      let json;
+                      try {
+                        json = JSON.parse(text);
+                      } catch {
+                        json = { _raw: text };
+                      }
                       img.src = withBust((json && json.url) || url);
                       toast(
                         "Imagen " + pos + " de noticia actualizada",
@@ -2428,16 +2277,13 @@
                       return;
                     }
                   } catch (err) {
-                    derr("media upload error:", err);
+                    gcLog(err);
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                () => {
-                  dlog("media preview cancel");
-                }
+                function () {}
               );
             });
-
             input.click();
           });
         }
@@ -2446,26 +2292,22 @@
       grid.appendChild(card);
     });
 
-    container.innerHTML = `
-    <div class="media-head">
-      <div class="media-title">Imágenes</div>
-      ${
-        editable
-          ? `<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>`
-          : `<div class="media-help" style="color:#888;">Solo lectura</div>`
-      }
-    </div>`;
+    container.innerHTML =
+      '<div class="media-head"><div class="media-title">Imágenes</div>' +
+      (editable
+        ? '<div class="media-help" style="color:#666;">Formatos: JPG/PNG · Máx 2MB</div>'
+        : '<div class="media-help" style="color:#888;">Solo lectura</div>') +
+      "</div>";
     container.appendChild(grid);
   }
   //---------------------------------- fin del bloque de imágenes
 
   // ---- Toolbar / botones
   function bindUI() {
-    dlog("bindUI()");
-    qsa(".admin-dash .admin-nav").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const route = btn.dataset.route || btn.getAttribute("href");
-        dlog("nav click ->", route);
+    qsa(".admin-dash .admin-nav").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const route =
+          btn.getAttribute("data-route") || btn.getAttribute("href");
         if (route) {
           if (location.hash !== route) location.hash = route;
           else onRouteChange();
@@ -2478,14 +2320,13 @@
 
     const overlay = document.getElementById("gc-dash-overlay");
     if (overlay)
-      overlay.addEventListener("click", (e) => {
-        if (e.target.id === "gc-dash-overlay") closeDrawer();
+      overlay.addEventListener("click", function (e) {
+        if (e && e.target && e.target.id === "gc-dash-overlay") closeDrawer();
       });
 
     const addBtn = document.getElementById("btn-add");
     if (addBtn)
-      addBtn.addEventListener("click", async () => {
-        dlog("btn-add clicked route:", state.route);
+      addBtn.addEventListener("click", async function () {
         if (!isAdminUser) return;
         if (state.route.indexOf("#/cursos") === 0) {
           await openCreateCurso();
@@ -2498,7 +2339,6 @@
   async function openCreateCurso() {
     if (!isAdminUser) return;
     try {
-      dlog("openCreateCurso()");
       await Promise.all([
         getTutorsMap(),
         getPrioridadMap(),
@@ -2510,18 +2350,16 @@
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
       openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
     } catch (e) {
-      derr("openCreateCurso error:", e);
+      gcLog(e);
       toast("No se pudo abrir el formulario", "error");
     }
   }
 
   // ---- INIT
-  document.addEventListener("DOMContentLoaded", async () => {
-    dlog("DOMContentLoaded");
+  document.addEventListener("DOMContentLoaded", async function () {
     currentUser = getUsuarioFromCookie();
     const uid = Number((currentUser && currentUser.id) || 0);
     isAdminUser = ADMIN_IDS.indexOf(uid) >= 0;
-    dlog("currentUser:", currentUser, "uid:", uid, "isAdminUser:", isAdminUser);
 
     applyAdminVisibility(isAdminUser);
     bindUI();
@@ -2536,7 +2374,7 @@
         getActividadesMap(),
       ]);
     } catch (e) {
-      derr("INIT catalogs error:", e);
+      gcLog("catálogos init error", e);
     }
 
     if (!window.location.hash)
