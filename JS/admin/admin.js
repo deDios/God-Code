@@ -5,7 +5,7 @@
     if (window.GC_DEBUG && typeof console !== "undefined")
       try {
         console.log("[GC]", ...a);
-      } catch {}
+      } catch { }
   }
 
   const setVH = () => {
@@ -73,7 +73,7 @@
     tipoEvalMap: null,
     actividadesMap: null,
 
-    currentDrawer: null, // {type:'curso'|'noticia', id:number|null, mode:'view'|'edit'|'create'}
+    currentDrawer: null, // {type:'curso'|'noticia'|'tutor', id:number|null, mode:'view'|'edit'|'create'}
     tempNewCourseImage: null,
   };
 
@@ -108,19 +108,19 @@
     try {
       var el = qs(".recursos-box.desktop-only");
       if (el && el.style) el.style.display = "none";
-    } catch {}
+    } catch { }
     try {
       var el2 = qs(".recursos-box.mobile-only");
       if (el2 && el2.style) el2.style.display = "none";
-    } catch {}
+    } catch { }
     try {
       var p1 = qs("#pagination-controls");
       if (p1 && p1.style) p1.style.display = "none";
-    } catch {}
+    } catch { }
     try {
       var p2 = qs("#pagination-mobile");
       if (p2 && p2.style) p2.style.display = "none";
-    } catch {}
+    } catch { }
 
     if (!qs("#cuenta-panel")) {
       const host = qs(".main-content") || document.body;
@@ -285,6 +285,44 @@
     }
   }
 
+  // ================== CATÁLOGO DE STATUS (para cursos, noticias, tutores)
+  const STATUS_CATALOG = {
+    tutor: [
+      { value: 1, label: "Activo", tone: "good" },
+      { value: 0, label: "Inactivo", tone: "muted" },
+      { value: 2, label: "Suspendido", tone: "warn" },
+      { value: 3, label: "Eliminado", tone: "bad" }
+    ],
+    curso: [
+      { value: 1, label: "Publicado", tone: "good" },
+      { value: 0, label: "Borrador", tone: "muted" },
+      { value: 2, label: "Oculto", tone: "warn" },
+      { value: 3, label: "Archivado", tone: "bad" }
+    ],
+    noticia: [
+      { value: 1, label: "Publicada", tone: "good" },
+      { value: 0, label: "Borrador", tone: "muted" },
+      { value: 2, label: "Revisión", tone: "warn" },
+      { value: 3, label: "Retirada", tone: "bad" }
+    ]
+  };
+  function statusLabel(mod, value) {
+    const def = (STATUS_CATALOG[mod] || []).find(s => s.value === Number(value));
+    return def ? def.label : `Estado ${value}`;
+  }
+  function statusSelectOptions(mod, value) {
+    return (STATUS_CATALOG[mod] || [])
+      .map(s => `<option value="${s.value}" ${Number(value) === s.value ? 'selected' : ''}>${s.label}</option>`)
+      .join("");
+  }
+  // Chip simple: mapea "good" a badge activo; el resto badge inactivo (para no depender de nuevos estilos)
+  function badgeGeneric(mod, value) {
+    const def = (STATUS_CATALOG[mod] || []).find(s => s.value === Number(value));
+    const cls = def && def.tone === "good" ? "gc-badge-activo" : "gc-badge-inactivo";
+    const lbl = def ? def.label : `Estado ${value}`;
+    return `<span class="${cls}">${lbl}</span>`;
+  }
+
   // ---- Route
   function setRoute(hash) {
     const target = hash || (isAdminUser ? "#/cursos" : "#/cuentas");
@@ -307,6 +345,14 @@
       a.setAttribute("aria-current", isActive ? "page" : "false");
     });
 
+    if (hash.indexOf("#/cursos/tutores") === 0) {
+      hideCuentaPanel();
+      return isAdminUser ? loadTutores() : enforceRouteGuard();
+    }
+    if (hash.indexOf("#/cursos/suscripciones") === 0) {
+      hideCuentaPanel();
+      return isAdminUser ? loadSuscripciones() : enforceRouteGuard();
+    }
     if (hash.indexOf("#/cursos") === 0) {
       hideCuentaPanel();
       return isAdminUser ? loadCursos() : enforceRouteGuard();
@@ -382,6 +428,7 @@
             mode: "view",
           };
         }
+        // Para curso/tutor/noticia el body lo delegamos al config.drawerBody
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
           const nid = Number(data.id);
@@ -504,6 +551,8 @@
   }
 
   function refreshCurrent() {
+    if (state.route.indexOf("#/cursos/tutores") === 0) return drawTutores();
+    if (state.route.indexOf("#/cursos/suscripciones") === 0) return; // placeholder no pagina
     if (state.route.indexOf("#/cursos") === 0) return drawCursos();
     if (state.route.indexOf("#/noticias") === 0) return drawNoticias();
     if (state.route.indexOf("#/cuentas") === 0) return drawCuentas();
@@ -517,8 +566,7 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 =
-        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       let c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Nombre";
@@ -621,7 +669,7 @@
         <div class="col-tutor">${escapeHTML(it.tutor)}</div>
         <div class="col-fecha">${fmtDate(it.fecha)}</div>
         <div class="col-status">
-          ${badgeCurso(it.estatus)}
+          ${badgeGeneric('curso', it.estatus)}
         </div>
       </div>`,
       mobileRow: (it) => `
@@ -635,14 +683,13 @@
         <div class="row-details">
           <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
           <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
-          <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
+          <div><strong>Status:</strong> ${statusLabel('curso', it.estatus)}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-            ${
-              Number(it.estatus) === 0
-                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
-                : ""
-            }
+            ${Number(it.estatus) === 0
+          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+          : ""
+        }
           </div>
         </div>
       </div>`,
@@ -659,14 +706,6 @@
       ? '<span class="gc-chip gray">Gratuito</span>'
       : '<span class="gc-chip gray">Con costo</span>';
   }
-  function badgeCurso(estatus) {
-    return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Activo</span>'
-      : '<span class="gc-badge-inactivo">Inactivo</span>';
-  }
-  function textCursoStatus(estatus) {
-    return Number(estatus) === 1 ? "Activo" : "Inactivo";
-  }
 
   // ---- normalizador de payload (JS only)
   function normalizeCursoPayload(p) {
@@ -682,7 +721,7 @@
       tutor: Number(p.tutor || 0),
       horas: Number(p.horas || 0),
       precio: Number(p.precio || 0),
-      estatus: Number(p.estatus != null ? p.estatus : 1),
+      estatus: Number(p.estatus != null ? p.estatus : 1), // <-- ahora toma del form
       prioridad: Number(p.prioridad || 1),
       categoria: Number(p.categoria || 1),
       calendario: Number(p.calendario || 1),
@@ -693,7 +732,7 @@
     };
   }
 
-  // ---- Drawer Curso (COMPLETO)
+  // ---- Drawer Curso (COMPLETO, ahora con "Status")
   function renderCursoDrawer(dataset) {
     const item = state.data.find((x) => String(x.id) === dataset.id);
     const mode =
@@ -830,6 +869,12 @@
         c.competencias,
         inTA("f_competencias", c.competencias, 3)
       ) +
+      // --------- NUEVO: Status
+      field(
+        "Status",
+        statusLabel("curso", c.estatus),
+        inSel("f_estatus", statusSelectOptions("curso", c.estatus))
+      ) +
       '<div class="grid-3">' +
       field(
         "Tutor",
@@ -839,7 +884,7 @@
       field(
         "Categoría",
         (state.categoriasMap && state.categoriasMap[c.categoria]) ||
-          c.categoria,
+        c.categoria,
         inSel("f_categoria", catOptions)
       ) +
       field(
@@ -852,19 +897,19 @@
       field(
         "Tipo de evaluación",
         (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) ||
-          c.tipo_evaluacion,
+        c.tipo_evaluacion,
         inSel("f_tipo_eval", tipoOptions)
       ) +
       field(
         "Actividades",
         (state.actividadesMap && state.actividadesMap[c.actividades]) ||
-          c.actividades,
+        c.actividades,
         inSel("f_actividades", actOptions)
       ) +
       field(
         "Calendario",
         (state.calendarioMap && state.calendarioMap[c.calendario]) ||
-          c.calendario,
+        c.calendario,
         inSel("f_calendario", calOptions)
       ) +
       "</div>" +
@@ -897,8 +942,8 @@
             <div class="media-card">
               <figure class="media-thumb">
                 <img id="create-media-thumb" alt="Portada" src="${withBust(
-                  "/ASSETS/cursos/img0.png"
-                )}" />
+        "/ASSETS/cursos/img0.png"
+      )}" />
                 <button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
@@ -917,8 +962,7 @@
       html += `
       <div class="field">
         <div class="label">Imágenes existentes</div>
-        <div class="value"><div id="media-curso" data-id="${
-          c.id || (item ? item.id : "")
+        <div class="value"><div id="media-curso" data-id="${c.id || (item ? item.id : "")
         }"></div></div>
       </div>`;
     }
@@ -974,7 +1018,7 @@
                 const file = input.files && input.files[0];
                 try {
                   document.body.removeChild(input);
-                } catch {}
+                } catch { }
                 if (!file) return;
                 const v = validarImagen(file, { maxMB: 2 });
                 if (!v.ok) {
@@ -989,7 +1033,7 @@
                     try {
                       if (thumb.dataset && thumb.dataset.blobUrl)
                         URL.revokeObjectURL(thumb.dataset.blobUrl);
-                    } catch {}
+                    } catch { }
                     const blobUrl = URL.createObjectURL(file);
                     if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
                     thumb.src = blobUrl;
@@ -998,7 +1042,7 @@
                       "exito"
                     );
                   },
-                  function () {}
+                  function () { }
                 );
               });
               input.click();
@@ -1211,7 +1255,7 @@
       tutor: readN("f_tutor", 0),
       horas: readN("f_horas", 0),
       precio: readN("f_precio", 0),
-      estatus: 1,
+      estatus: readN("f_estatus", 1), // <-- ahora se lee del select
       fecha_inicio: read("f_fecha"),
       prioridad: readN("f_prioridad", 1),
       categoria: readN("f_categoria", 1),
@@ -1259,7 +1303,7 @@
           res.curso_id ||
           res.insert_id ||
           (res.data && res.data.id))) ||
-        0
+      0
     );
     if (!newId) {
       gcLog("Respuesta de iCursos sin id utilizable:", res);
@@ -1341,472 +1385,7 @@
     await postJSON(API.uCursos, body);
   }
 
-  // ---------- NOTICIAS ----------
-  async function loadNoticias() {
-    const title = qs("#mod-title");
-    if (title) title.textContent = "Noticias";
-
-    const hdr = qs(".recursos-box.desktop-only .table-header");
-    if (hdr) {
-      const c1 = hdr.querySelector(".col-nombre");
-      let c2 =
-        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
-      const c3 = hdr.querySelector(".col-fecha");
-      const c4 = hdr.querySelector(".col-status");
-      if (c1) c1.textContent = "Título";
-      if (c2) {
-        c2.textContent = "Comentarios";
-        c2.classList.add("col-tipo");
-      }
-      if (c3) c3.textContent = "Fecha de publicación";
-      if (c4) c4.textContent = "Status";
-    }
-
-    const tt = qs(".tt-title");
-    if (tt) tt.textContent = "Noticias:";
-    const ttStatus = qs("#tt-status");
-    if (ttStatus) {
-      ttStatus.textContent = "Publicadas e Inactivas";
-      ttStatus.classList.remove("badge-inactivo");
-      ttStatus.classList.add("badge-activo");
-    }
-
-    showSkeletons();
-    try {
-      const [activasRaw, inactivasRaw] = await Promise.all([
-        postJSON(API.noticias, { estatus: 1 }),
-        postJSON(API.noticias, { estatus: 0 }),
-      ]);
-
-      const arr = [].concat(
-        Array.isArray(activasRaw) ? activasRaw : [],
-        Array.isArray(inactivasRaw) ? inactivasRaw : []
-      );
-      const counts = await Promise.all(
-        arr.map(function (n) {
-          return getCommentsCount(n.id).catch(function () {
-            return 0;
-          });
-        })
-      );
-
-      state.raw = arr;
-      state.data = arr.map(function (n, i) {
-        return {
-          id: n.id,
-          titulo: n.titulo,
-          fecha: n.fecha_creacion,
-          estatus: Number(n.estatus),
-          comentarios: counts[i] || 0,
-          _all: n,
-        };
-      });
-
-      drawNoticias();
-    } catch (err) {
-      const list = qs("#recursos-list");
-      if (list)
-        list.innerHTML =
-          '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>';
-      const m = qs("#recursos-list-mobile");
-      if (m) m.innerHTML = "";
-      gcLog(err);
-      toast("No se pudieron cargar noticias", "error");
-    }
-  }
-
-  async function getCommentsCount(noticiaId) {
-    const res = await postJSON(API.comentarios, {
-      noticia_id: Number(noticiaId),
-      estatus: 1,
-    });
-    const arr = Array.isArray(res) ? res : [];
-    let total = 0;
-    for (let i = 0; i < arr.length; i++) {
-      const c = arr[i];
-      total += 1;
-      if (c && c.respuestas && Array.isArray(c.respuestas))
-        total += c.respuestas.length;
-    }
-    return total;
-  }
-
-  function drawNoticias() {
-    const rows = state.data;
-    renderList(rows, {
-      desktopRow: (it) => `
-        <div class="table-row" data-id="${it.id}" data-type="noticia">
-          <div class="col-nombre"><span class="name-text">${escapeHTML(
-            it.titulo
-          )}</span></div>
-          <div class="col-tutor">${it.comentarios}</div>
-          <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">${badgeNoticia(it.estatus)}</div>
-        </div>`,
-      mobileRow: (it) => `
-        <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
-          <button class="row-toggle">
-            <div class="col-nombre">${escapeHTML(it.titulo)}</div>
-            <span class="icon-chevron">›</span>
-          </button>
-          <div class="row-details">
-            <div><strong>Comentarios:</strong> ${it.comentarios}</div>
-            <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
-            <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
-              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-              ${
-                Number(it.estatus) === 0
-                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
-                  : ""
-              }
-            </div>
-          </div>
-        </div>`,
-      drawerTitle: (d) => {
-        const item = state.data.find((x) => String(x.id) === d.id);
-        return item ? "Noticia · " + item.titulo : "Noticia";
-      },
-      drawerBody: (d) => renderNoticiaDrawer(d),
-    });
-  }
-
-  function badgeNoticia(estatus) {
-    return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Publicada</span>'
-      : '<span class="gc-badge-inactivo">Inactiva</span>';
-  }
-
-  async function inactivateNoticia(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
-    if (!it || !it._all) throw new Error("Noticia no encontrada");
-    if (!API.uNoticias) throw new Error("Endpoint u_noticia no configurado");
-    const body = { ...it._all, estatus: 0 };
-    await postJSON(API.uNoticias, body);
-  }
-
-  async function reactivateNoticia(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
-    if (!it || !it._all) throw new Error("Noticia no encontrada");
-    if (!API.uNoticias) {
-      toast("Falta endpoint u_noticia.php en backend", "warning", 3500);
-      return false;
-    }
-    const body = { ...it._all, estatus: 1 };
-    await postJSON(API.uNoticias, body);
-    return true;
-  }
-
-  // ---- Drawer Noticia
-  function renderNoticiaDrawer(dataset) {
-    const item = state.data.find((x) => String(x.id) === dataset.id);
-    const n = item && item._all;
-    if (!n) return "<p>No encontrado.</p>";
-
-    const mode =
-      state.currentDrawer &&
-      state.currentDrawer.type === "noticia" &&
-      state.currentDrawer.id === n.id
-        ? state.currentDrawer.mode
-        : "view";
-    const isEdit = mode === "edit";
-    const isView = !isEdit;
-    const isInactive = Number(n.estatus) === 0;
-
-    const controlsRow = isAdminUser
-      ? '<div class="gc-actions">' +
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
-          : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
-          : "") +
-        (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
-        "</div>"
-      : "";
-
-    let html =
-      "" +
-      controlsRow +
-      pair("Título", n.titulo) +
-      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
-      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
-      pair("Descripción (1)", n.desc_uno) +
-      pair("Descripción (2)", n.desc_dos) +
-      pair("Creado por", n.creado_por) +
-      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
-      n.id +
-      '"></div></div></div>';
-
-    if (isAdminUser) {
-      html += jsonSection(
-        n,
-        "JSON · Noticia",
-        "json-noticia",
-        "btn-copy-json-noticia"
-      );
-    }
-
-    if (isEdit) {
-      qs("#drawer-title").textContent =
-        "Noticia · " + (item ? item.titulo : "") + " (edición)";
-      state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-    } else {
-      qs("#drawer-title").textContent =
-        "Noticia · " + (item ? item.titulo : "");
-      state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-    }
-
-    setTimeout(function () {
-      try {
-        const be = qs("#btn-edit");
-        if (be)
-          be.addEventListener("click", function (e) {
-            e.stopPropagation();
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-              id: String(n.id),
-            });
-          });
-
-        const bc = qs("#btn-cancel");
-        if (bc)
-          bc.addEventListener("click", function (e) {
-            e.stopPropagation();
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-              id: String(n.id),
-            });
-          });
-
-        const bs = qs("#btn-save");
-        if (bs)
-          bs.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            toast("Cambios guardados", "exito");
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-            await loadNoticias();
-            const re = state.data.find(function (x) {
-              return x.id === n.id;
-            });
-            if (re)
-              openDrawer(
-                "Noticia · " + re.titulo,
-                renderNoticiaDrawer({ id: String(re.id) })
-              );
-          });
-
-        const bDel = qs("#btn-delete");
-        if (bDel)
-          bDel.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            const step = bDel.getAttribute("data-step") || "1";
-            if (step === "1") {
-              bDel.textContent = "Confirmar";
-              bDel.setAttribute("data-step", "2");
-              setTimeout(function () {
-                if (bDel.getAttribute("data-step") === "2") {
-                  bDel.textContent = "Eliminar";
-                  bDel.setAttribute("data-step", "1");
-                }
-              }, 4000);
-              return;
-            }
-            try {
-              await inactivateNoticia(n.id);
-              toast("Noticia eliminada (inactiva)", "exito");
-              closeDrawer();
-              await loadNoticias();
-            } catch (err) {
-              gcLog(err);
-              toast("No se pudo eliminar", "error");
-            }
-          });
-
-        const br = qs("#btn-reactivar");
-        if (br)
-          br.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            const ok = await reactivateNoticia(n.id);
-            if (ok) {
-              toast("Noticia reactivada", "exito");
-              await loadNoticias();
-              const re = state.data.find(function (x) {
-                return x.id === n.id;
-              });
-              if (re)
-                openDrawer(
-                  "Noticia · " + re.titulo,
-                  renderNoticiaDrawer({ id: String(re.id) })
-                );
-            }
-          });
-
-        disableDrawerInputs(!isEdit);
-      } catch (err) {
-        gcLog("renderNoticiaDrawer bindings error:", err);
-      }
-    }, 0);
-
-    return html;
-  }
-
-  // ---------- CUENTAS ----------
-  function drawCuentas() {
-    const title = qs("#mod-title");
-    if (title) title.textContent = "Cuenta";
-
-    const tt = qs(".tt-title");
-    if (tt) tt.textContent = "Cuentas:";
-    const ttStatus = qs("#tt-status");
-    if (ttStatus) {
-      ttStatus.textContent = "Disponible";
-      ttStatus.classList.remove("badge-inactivo");
-      ttStatus.classList.add("badge-activo");
-    }
-
-    const desktopTable = qs(".recursos-table");
-    if (desktopTable) desktopTable.style.display = "none";
-    const mobileTable = qs(".recursos-table-mobile");
-    if (mobileTable) mobileTable.style.display = "none";
-
-    const d = qs("#recursos-list");
-    if (d) d.innerHTML = "";
-    const m = qs("#recursos-list-mobile");
-    if (m) m.innerHTML = "";
-
-    const host = qs(".recursos-box");
-    if (!host) return;
-
-    let mount = document.getElementById("cuenta-menu");
-    if (!mount) {
-      mount = document.createElement("div");
-      mount.id = "cuenta-menu";
-      host.appendChild(mount);
-    }
-
-    mount.innerHTML = `
-    <div class="gc-card-grid" style="margin:12px 0 20px;">
-      <div class="gc-card">
-        <img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">
-        <div>
-          <div class="gc-card-title">Borrar cuenta</div>
-          <div class="gc-muted">Esta acción eliminará tu cuenta y todos sus datos de forma permanente.</div>
-        </div>
-        <button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>
-      </div>
-
-      <div class="gc-card">
-        <img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">
-        <div>
-          <div class="gc-card-title">Opciones de privacidad / Visibilidad</div>
-          <div class="gc-muted">Configura quién puede ver tu perfil y actividad.</div>
-        </div>
-        <button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
-      </div>
-
-      <div class="gc-card">
-        <img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">
-        <div>
-          <div class="gc-card-title">Notificaciones / Preferencias</div>
-          <div class="gc-muted">Gestiona alertas dentro de la app, correos y push.</div>
-        </div>
-        <button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
-      </div>
-
-      <div class="gc-card">
-        <img src="/ASSETS/admin/cuenta/shield.png" alt="" width="28" height="28">
-        <div>
-          <div class="gc-card-title">Ajustes de privacidad o configuraciones</div>
-          <div class="gc-muted">Ajusta visibilidad de datos y preferencias.</div>
-        </div>
-        <button id="btn-privacy-toggles" class="gc-btn gc-btn--ghost gc-card-cta">Abrir</button>
-      </div>
-
-      <div class="gc-card">
-        <img src="/ASSETS/admin/cuenta/switch.png" alt="" width="28" height="28">
-        <div>
-          <div class="gc-card-title">Cambiar de cuenta</div>
-          <div class="gc-muted">Cambia entre perfiles sin cerrar sesión.</div>
-        </div>
-        <button id="btn-switch-account" class="gc-btn gc-btn--ghost gc-card-cta">Cambiar</button>
-      </div>
-    </div>`;
-
-    const pag1 = qs("#pagination-controls");
-    if (pag1) pag1.innerHTML = "";
-    const pag2 = qs("#pagination-mobile");
-    if (pag2) pag2.innerHTML = "";
-
-    function safeOpen(fnName) {
-      const fn = window[fnName];
-      if (typeof fn === "function") fn();
-      else toast("Modal no disponible aún", "warning");
-    }
-
-    const del = mount.querySelector("#btn-delete-account");
-    if (del)
-      del.addEventListener("click", function () {
-        safeOpen("openModalDeleteAccount");
-      });
-    const pr = mount.querySelector("#btn-privacy");
-    if (pr)
-      pr.addEventListener("click", function () {
-        safeOpen("openModalPrivacy");
-      });
-    const no = mount.querySelector("#btn-notifications");
-    if (no)
-      no.addEventListener("click", function () {
-        safeOpen("openModalNotifications");
-      });
-    const pt = mount.querySelector("#btn-privacy-toggles");
-    if (pt)
-      pt.addEventListener("click", function () {
-        safeOpen("openModalPrivacyToggles");
-      });
-    const sw = mount.querySelector("#btn-switch-account");
-    if (sw)
-      sw.addEventListener("click", function () {
-        safeOpen("openModalSwitchAccount");
-      });
-  }
-
-  // ---------- Drawer base ----------
-  function openDrawer(title, bodyHTML) {
-    const overlay = qs("#gc-dash-overlay");
-    if (overlay && overlay.classList) overlay.classList.add("open");
-
-    const drawer = qs("#gc-drawer");
-    if (!drawer) return;
-    const t = qs("#drawer-title");
-    if (t) t.textContent = title || "Detalle";
-    const b = qs("#drawer-body");
-    if (b) b.innerHTML = bodyHTML || "";
-    if (drawer.classList) drawer.classList.add("open");
-    drawer.setAttribute("aria-hidden", "false");
-  }
-  function closeDrawer() {
-    // evita warning aria-hidden
-    try {
-      if (document.activeElement && document.activeElement.blur)
-        document.activeElement.blur();
-    } catch {}
-    const overlay = qs("#gc-dash-overlay");
-    if (overlay && overlay.classList) overlay.classList.remove("open");
-
-    const drawer = qs("#gc-drawer");
-    if (!drawer) return;
-    if (drawer.classList) drawer.classList.remove("open");
-    drawer.setAttribute("aria-hidden", "true");
-    state.currentDrawer = null;
-    gcLog("closeDrawer");
-  }
+  // (Las secciones de NOTICIAS, TUTORES, CUENTAS, imágenes, toolbar y INIT continúan en la PARTE 2/2)
 
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
@@ -2001,7 +1580,7 @@
       drawer.setAttribute("aria-hidden", "true");
       try {
         drawer.setAttribute("inert", "");
-      } catch {}
+      } catch { }
     }
     if (drawerOverlay && drawerOverlay.style) drawerOverlay.style.zIndex = "2";
 
@@ -2088,17 +1667,17 @@
         else drawer.removeAttribute("aria-hidden");
         try {
           if (!prev.hadInert) drawer.removeAttribute("inert");
-        } catch {}
+        } catch { }
       }
       if (drawerOverlay && drawerOverlay.style)
         drawerOverlay.style.zIndex = prev.overlayZ || "";
       document.body.style.overflow = "";
       try {
         URL.revokeObjectURL(url);
-      } catch {}
+      } catch { }
       try {
         overlay.remove();
-      } catch {}
+      } catch { }
       document.removeEventListener("keydown", onEsc);
     };
 
@@ -2148,8 +1727,8 @@
       typeof editableOverride === "boolean"
         ? editableOverride
         : isAdminUser &&
-          state.currentDrawer &&
-          state.currentDrawer.mode === "edit";
+        state.currentDrawer &&
+        state.currentDrawer.mode === "edit";
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
     grid.className = "media-grid";
@@ -2160,8 +1739,8 @@
       card.className = "media-card";
       const editBtnHTML = editable
         ? '<button class="icon-btn media-edit" title="Editar imagen">' +
-          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>' +
-          "</button>"
+        '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>' +
+        "</button>"
         : "";
 
       card.innerHTML =
@@ -2199,7 +1778,7 @@
               const file = input.files && input.files[0];
               try {
                 document.body.removeChild(input);
-              } catch {}
+              } catch { }
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
@@ -2281,7 +1860,7 @@
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                function () {}
+                function () { }
               );
             });
             input.click();
@@ -2300,85 +1879,227 @@
       "</div>";
     container.appendChild(grid);
   }
-  //---------------------------------- fin del bloque de imágenes
+  // ---------- NOTICIAS ----------
+  async function loadNoticias() {
+    const title = qs("#mod-title");
+    if (title) title.textContent = "Noticias";
 
-  // ---- Toolbar / botones
-  function bindUI() {
-    qsa(".admin-dash .admin-nav").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        const route =
-          btn.getAttribute("data-route") || btn.getAttribute("href");
-        if (route) {
-          if (location.hash !== route) location.hash = route;
-          else onRouteChange();
-        }
-      });
+    const hdr = qs(".recursos-box.desktop-only .table-header");
+    if (hdr) {
+      let c1 = hdr.querySelector(".col-nombre");
+      let c2 = hdr.querySelector(".col-fecha");
+      let c3 = hdr.querySelector(".col-status");
+      if (c1) c1.textContent = "Título";
+      if (c2) c2.textContent = "Fecha";
+      if (!c3) {
+        c3 = document.createElement("div");
+        c3.className = "col-status";
+        c3.textContent = "Status";
+        hdr.appendChild(c3);
+      } else c3.textContent = "Status";
+    }
+
+    showSkeletons();
+    try {
+      const activos = await postJSON(API.noticias, { estatus: 1 });
+      const inactivos = await postJSON(API.noticias, { estatus: 0 });
+      const raw = [].concat(
+        Array.isArray(activos) ? activos : [],
+        Array.isArray(inactivos) ? inactivos : []
+      );
+      state.raw = raw;
+      state.data = raw.map((n) => ({
+        id: n.id,
+        titulo: n.titulo,
+        desc_uno: n.desc_uno,
+        desc_dos: n.desc_dos,
+        estatus: Number(n.estatus),
+        fecha_creacion: n.fecha_creacion,
+        _all: n,
+      }));
+      drawNoticias();
+    } catch (err) {
+      gcLog(err);
+      toast("Error al cargar noticias", "error");
+    }
+  }
+
+  function drawNoticias() {
+    const rows = state.data;
+    renderList(rows, {
+      desktopRow: (it) => `
+        <div class="table-row" data-id="${it.id}" data-type="noticia">
+          <div class="col-nombre">${escapeHTML(it.titulo)}</div>
+          <div class="col-fecha">${fmtDateTime(it.fecha_creacion)}</div>
+          <div class="col-status">${badgeGeneric('noticia', it.estatus)}</div>
+        </div>`,
+      mobileRow: (it) => `
+        <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
+          <button class="row-toggle">
+            <div class="col-nombre">${escapeHTML(it.titulo)}</div>
+            <span class="icon-chevron">›</span>
+          </button>
+          <div class="row-details">
+            <div><strong>Fecha:</strong> ${fmtDateTime(it.fecha_creacion)}</div>
+            <div><strong>Status:</strong> ${statusLabel('noticia', it.estatus)}</div>
+            <div style="margin:.25rem 0;">
+              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+            </div>
+          </div>
+        </div>`,
+      drawerTitle: (d) => {
+        const item = state.data.find((x) => String(x.id) === d.id);
+        return item ? "Noticia · " + item.titulo : "Noticia";
+      },
+      drawerBody: (d) => renderNoticiaDrawer(d),
     });
-
-    const drawerClose = document.getElementById("drawer-close");
-    if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
-
-    const overlay = document.getElementById("gc-dash-overlay");
-    if (overlay)
-      overlay.addEventListener("click", function (e) {
-        if (e && e.target && e.target.id === "gc-dash-overlay") closeDrawer();
-      });
-
-    const addBtn = document.getElementById("btn-add");
-    if (addBtn)
-      addBtn.addEventListener("click", async function () {
-        if (!isAdminUser) return;
-        if (state.route.indexOf("#/cursos") === 0) {
-          await openCreateCurso();
-        } else if (state.route.indexOf("#/noticias") === 0) {
-          toast("Crear noticia: pendiente de implementar", "warning");
-        }
-      });
   }
 
-  async function openCreateCurso() {
-    if (!isAdminUser) return;
+  function renderNoticiaDrawer(dataset) {
+    const item = state.data.find((x) => String(x.id) === dataset.id);
+    if (!item) return "<p>No encontrado.</p>";
+    const n = item._all;
+
+    const field = (label, val) =>
+      `<div class="field"><div class="label">${label}</div><div class="value">${escapeHTML(val || "-")}</div></div>`;
+
+    const html =
+      field("Título", n.titulo) +
+      field("Descripción 1", n.desc_uno) +
+      field("Descripción 2", n.desc_dos) +
+      field("Status", statusLabel("noticia", n.estatus)) +
+      jsonSection(n, "JSON · Noticia", "json-noticia", "btn-copy-json-noticia");
+
+    return html;
+  }
+
+  // ---------- TUTORES ----------
+  async function loadTutores() {
+    const title = qs("#mod-title");
+    if (title) title.textContent = "Tutores";
+
+    const hdr = qs(".recursos-box.desktop-only .table-header");
+    if (hdr) {
+      let c1 = hdr.querySelector(".col-nombre");
+      let c2 = hdr.querySelector(".col-fecha");
+      let c3 = hdr.querySelector(".col-status");
+      if (c1) c1.textContent = "Nombre";
+      if (c2) c2.textContent = "Fecha creación";
+      if (!c3) {
+        c3 = document.createElement("div");
+        c3.className = "col-status";
+        c3.textContent = "Status";
+        hdr.appendChild(c3);
+      } else c3.textContent = "Status";
+    }
+
+    showSkeletons();
     try {
-      await Promise.all([
-        getTutorsMap(),
-        getPrioridadMap(),
-        getCategoriasMap(),
-        getCalendarioMap(),
-        getTipoEvalMap(),
-        getActividadesMap(),
-      ]);
-      state.currentDrawer = { type: "curso", id: null, mode: "create" };
-      openDrawer("Curso · Crear", renderCursoDrawer({ id: "" }));
-    } catch (e) {
-      gcLog(e);
-      toast("No se pudo abrir el formulario", "error");
+      const activos = await postJSON(API.tutores, { estatus: 1 });
+      const inactivos = await postJSON(API.tutores, { estatus: 0 });
+      const raw = [].concat(
+        Array.isArray(activos) ? activos : [],
+        Array.isArray(inactivos) ? inactivos : []
+      );
+      state.raw = raw;
+      state.data = raw.map((t) => ({
+        id: t.id,
+        nombre: t.nombre,
+        descripcion: t.descripcion,
+        estatus: Number(t.estatus),
+        fecha_creacion: t.fecha_creacion,
+        _all: t,
+      }));
+      drawTutores();
+    } catch (err) {
+      gcLog(err);
+      toast("Error al cargar tutores", "error");
     }
   }
 
-  // ---- INIT
-  document.addEventListener("DOMContentLoaded", async function () {
+  function drawTutores() {
+    const rows = state.data;
+    renderList(rows, {
+      desktopRow: (it) => `
+        <div class="table-row" data-id="${it.id}" data-type="tutor">
+          <div class="col-nombre">
+            <img class="gc-avatar sm" src="../ASSETS/tutor/tutor_${it.id}.png"
+                 onerror="this.onerror=null;this.src='../ASSETS/tutor/tutor_${it.id}.jpg';"
+                 alt="Tutor ${it.id}">
+            ${escapeHTML(it.nombre)}
+          </div>
+          <div class="col-fecha">${fmtDateTime(it.fecha_creacion)}</div>
+          <div class="col-status">${badgeGeneric('tutor', it.estatus)}</div>
+        </div>`,
+      mobileRow: (it) => `
+        <div class="table-row-mobile" data-id="${it.id}" data-type="tutor">
+          <button class="row-toggle">
+            <div class="col-nombre">${escapeHTML(it.nombre)}</div>
+            <span class="icon-chevron">›</span>
+          </button>
+          <div class="row-details">
+            <div><strong>Fecha:</strong> ${fmtDateTime(it.fecha_creacion)}</div>
+            <div><strong>Status:</strong> ${statusLabel('tutor', it.estatus)}</div>
+            <div style="margin:.25rem 0;">
+              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+            </div>
+          </div>
+        </div>`,
+      drawerTitle: (d) => {
+        const item = state.data.find((x) => String(x.id) === d.id);
+        return item ? "Tutor · " + item.nombre : "Tutor";
+      },
+      drawerBody: (d) => renderTutorDrawer(d),
+    });
+  }
+
+  function renderTutorDrawer(dataset) {
+    const item = state.data.find((x) => String(x.id) === dataset.id);
+    if (!item) return "<p>No encontrado.</p>";
+    const t = item._all;
+
+    const avatarPNG = `../ASSETS/tutor/tutor_${t.id}.png`;
+    const avatarJPG = `../ASSETS/tutor/tutor_${t.id}.jpg`;
+
+    const html = `
+      <div class="field center">
+        <img class="gc-avatar xl" src="${avatarPNG}" 
+             onerror="this.onerror=null;this.src='${avatarJPG}';"
+             alt="Tutor ${t.id}">
+      </div>
+      <div class="field"><div class="label">Nombre</div><div class="value">${escapeHTML(t.nombre)}</div></div>
+      <div class="field"><div class="label">Descripción</div><div class="value">${escapeHTML(t.descripcion || "-")}</div></div>
+      <div class="field"><div class="label">Status</div><div class="value">${statusLabel("tutor", t.estatus)}</div></div>
+      <div class="field"><div class="label">Fecha creación</div><div class="value">${fmtDateTime(t.fecha_creacion)}</div></div>
+      ${jsonSection(t, "JSON · Tutor", "json-tutor", "btn-copy-json-tutor")}
+    `;
+    return html;
+  }
+
+  // ---------- SUSCRIPCIONES (placeholder) ----------
+  function loadSuscripciones() {
+    const title = qs("#mod-title");
+    if (title) title.textContent = "Suscripciones";
+
+    const list = qs("#recursos-list");
+    if (list)
+      list.innerHTML = `
+        <div style="padding:2rem; text-align:center;">
+          <h3>Suscripciones (en construcción)</h3>
+          <p>Pronto podrás gestionar inscripciones de cursos aquí.</p>
+          <button class="gc-btn" onclick="setRoute('#/cursos')">Volver a Cursos</button>
+        </div>`;
+    const m = qs("#recursos-list-mobile");
+    if (m) m.innerHTML = "";
+  }
+
+  // ---------- INIT ----------
+  document.addEventListener("DOMContentLoaded", () => {
     currentUser = getUsuarioFromCookie();
-    const uid = Number((currentUser && currentUser.id) || 0);
-    isAdminUser = ADMIN_IDS.indexOf(uid) >= 0;
-
+    isAdminUser =
+      currentUser && currentUser.id && ADMIN_IDS.indexOf(currentUser.id) >= 0;
     applyAdminVisibility(isAdminUser);
-    bindUI();
 
-    try {
-      await Promise.all([
-        getTutorsMap(),
-        getPrioridadMap(),
-        getCategoriasMap(),
-        getCalendarioMap(),
-        getTipoEvalMap(),
-        getActividadesMap(),
-      ]);
-    } catch (e) {
-      gcLog("catálogos init error", e);
-    }
-
-    if (!window.location.hash)
-      window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
 })();
