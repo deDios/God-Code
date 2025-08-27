@@ -2273,6 +2273,18 @@
         getTipoEvalMap(),
         getActividadesMap(),
       ]);
+      var tries = 0;
+      var t = setInterval(function () {
+        tries++;
+        ensureTutorsButton();
+        installDrawerObserver();
+        if (qs("#btn-tutores") || tries > 40) clearInterval(t);
+      }, 200);
+
+      onReady(function () {
+        ensureTutorsButton();
+        installDrawerObserver();
+      });
     } catch (e) {
       gcLog("catálogos init error", e);
     }
@@ -2552,21 +2564,5 @@
       mo.observe(drawer, { subtree: true, childList: true, attributes: true });
       injectIfCourse();
     }
-
-    function init() {
-      var tries = 0;
-      var t = setInterval(function () {
-        tries++;
-        ensureTutorsButton();
-        installDrawerObserver();
-        if (qs("#btn-tutores") || tries > 40) clearInterval(t);
-      }, 200);
-
-      onReady(function () {
-        ensureTutorsButton();
-        installDrawerObserver();
-      });
-    }
-    init();
   })();
 })();
