@@ -1,6 +1,6 @@
 (() => {
   // ------------------------------------- este bloque es para habilitar el debug
-  window.GC_DEBUG = false; // aca colocar true o false para ver o no todos los console logs 
+  window.GC_DEBUG = true; // aca colocar true o false para ver o no todos los console logs 
   function gcLog(...a) {
     if (window.GC_DEBUG && typeof console !== "undefined")
       try {
