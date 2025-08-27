@@ -1,57 +1,39 @@
 (() => {
-  // ------------------------------------- este bloque es para habilitar el debug
-  window.GC_DEBUG = false; // aca colocar true o false para ver o no todos los console logs 
+  // ------------------------------------- DEBUG
+  window.GC_DEBUG = false; // true para ver logs
   function gcLog(...a) {
     if (window.GC_DEBUG && typeof console !== "undefined")
-      try {
-        console.log("[GC]", ...a);
-      } catch {}
+      try { console.log("[GC]", ...a); } catch { }
   }
 
   const setVH = () => {
-    document.documentElement.style.setProperty(
-      "--vh",
-      `${window.innerHeight * 0.01}px`
-    );
+    document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   };
   setVH();
   window.addEventListener("resize", setVH);
 
   // ---- ENDPOINTS
   const API = {
-    cursos:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
-    iCursos:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
-    uCursos:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
+    cursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php",
+    iCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/i_cursos.php",
+    uCursos: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursos.php",
 
-    noticias:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
-    uNoticias:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
-    comentarios:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
+    noticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php",
+    uNoticias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_noticia.php",
+    comentarios: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_comentario_noticia.php",
 
-    tutores:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
-    prioridad:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
+    tutores: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php",
+    prioridad: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_prioridad.php",
 
-    categorias:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
-    calendario:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
-    tipoEval:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
-    actividades:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
+    categorias: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_categorias.php",
+    calendario: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_dias_curso.php",
+    tipoEval: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tipo_evaluacion.php",
+    actividades: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  // --- subida de imagen de curso
+  // --- subida de imagen
   const API_UPLOAD = {
-    cursoImg:
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
+    cursoImg: "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
     // noticiaImg: "https://.../u_noticiaImg.php"
   };
 
@@ -82,15 +64,12 @@
 
   // ---- Helpers
   const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) =>
-    Array.prototype.slice.call(r.querySelectorAll(s));
+  const qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (msg, tipo = "exito", dur = 2500) =>
     window.gcToast ? window.gcToast(msg, tipo, dur) : gcLog(`[${tipo}] ${msg}`);
 
   function getUsuarioFromCookie() {
-    const row = (document.cookie || "").split("; ").find(function (r) {
-      return r.indexOf("usuario=") === 0;
-    });
+    const row = (document.cookie || "").split("; ").find(r => r.indexOf("usuario=") === 0);
     if (!row) return null;
     const raw = row.split("=")[1] || "";
     try {
@@ -103,24 +82,29 @@
     }
   }
 
+  // ====== Catálogo de Status (nuevo)
+  const STATUS_CATALOG = {
+    curso: [{ value: 1, label: "Activo", tone: "good" }, { value: 0, label: "Inactivo", tone: "muted" }],
+    noticia: [{ value: 1, label: "Publicada", tone: "good" }, { value: 0, label: "Inactiva", tone: "muted" }],
+  };
+  const statusLabel = (mod, val) => {
+    const d = (STATUS_CATALOG[mod] || []).find(s => s.value === Number(val));
+    return d ? d.label : ("Estado " + val);
+  };
+  const statusSelectOptions = (mod, value) =>
+    (STATUS_CATALOG[mod] || []).map(s => `<option value="${s.value}" ${Number(value) === s.value ? 'selected' : ''}>${s.label}</option>`).join("");
+  const badgeGeneric = (mod, value) => {
+    const d = (STATUS_CATALOG[mod] || []).find(s => s.value === Number(value));
+    const cls = d && d.tone === "good" ? "gc-badge-activo" : "gc-badge-inactivo";
+    return `<span class="${cls}">${d ? d.label : ("Estado " + value)}</span>`;
+  };
+
   // -------- Panel de cuenta
   function showCuentaPanel() {
-    try {
-      var el = qs(".recursos-box.desktop-only");
-      if (el && el.style) el.style.display = "none";
-    } catch {}
-    try {
-      var el2 = qs(".recursos-box.mobile-only");
-      if (el2 && el2.style) el2.style.display = "none";
-    } catch {}
-    try {
-      var p1 = qs("#pagination-controls");
-      if (p1 && p1.style) p1.style.display = "none";
-    } catch {}
-    try {
-      var p2 = qs("#pagination-mobile");
-      if (p2 && p2.style) p2.style.display = "none";
-    } catch {}
+    try { var el = qs(".recursos-box.desktop-only"); if (el && el.style) el.style.display = "none"; } catch { }
+    try { var el2 = qs(".recursos-box.mobile-only"); if (el2 && el2.style) el2.style.display = "none"; } catch { }
+    try { var p1 = qs("#pagination-controls"); if (p1 && p1.style) p1.style.display = "none"; } catch { }
+    try { var p2 = qs("#pagination-mobile"); if (p2 && p2.style) p2.style.display = "none"; } catch { }
 
     if (!qs("#cuenta-panel")) {
       const host = qs(".main-content") || document.body;
@@ -159,94 +143,60 @@
     gcLog("postJSON <-", url, "status:", res.status, "raw:\n", text);
     if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
     if (!text || !String(text).trim()) return {};
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { _raw: text };
-    }
+    try { return JSON.parse(text); } catch { return { _raw: text }; }
   }
 
   // ---- Catálogos (con cache)
   async function getTutorsMap() {
-    if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000)
-      return state.tutorsMap;
+    if (state.tutorsMap && Date.now() - state.tutorsMap._ts < 30 * 60 * 1000) return state.tutorsMap;
     const arr = await postJSON(API.tutores, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((t) => {
-      map[t.id] = t.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(t => { map[t.id] = t.nombre; });
     map._ts = Date.now();
     state.tutorsMap = map;
     return map;
   }
   async function getPrioridadMap() {
-    if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000)
-      return state.prioMap;
+    if (state.prioMap && Date.now() - state.prioMap._ts < 30 * 60 * 1000) return state.prioMap;
     const arr = await postJSON(API.prioridad, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((p) => {
-      map[p.id] = p.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(p => { map[p.id] = p.nombre; });
     map._ts = Date.now();
     state.prioMap = map;
     return map;
   }
   async function getCategoriasMap() {
-    if (
-      state.categoriasMap &&
-      Date.now() - state.categoriasMap._ts < 30 * 60 * 1000
-    )
-      return state.categoriasMap;
+    if (state.categoriasMap && Date.now() - state.categoriasMap._ts < 30 * 60 * 1000) return state.categoriasMap;
     const arr = await postJSON(API.categorias, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(c => { map[c.id] = c.nombre; });
     map._ts = Date.now();
     state.categoriasMap = map;
     return map;
   }
   async function getCalendarioMap() {
-    if (
-      state.calendarioMap &&
-      Date.now() - state.calendarioMap._ts < 30 * 60 * 1000
-    )
-      return state.calendarioMap;
+    if (state.calendarioMap && Date.now() - state.calendarioMap._ts < 30 * 60 * 1000) return state.calendarioMap;
     const arr = await postJSON(API.calendario, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(c => { map[c.id] = c.nombre; });
     map._ts = Date.now();
     state.calendarioMap = map;
     return map;
   }
   async function getTipoEvalMap() {
-    if (
-      state.tipoEvalMap &&
-      Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000
-    )
-      return state.tipoEvalMap;
+    if (state.tipoEvalMap && Date.now() - state.tipoEvalMap._ts < 30 * 60 * 1000) return state.tipoEvalMap;
     const arr = await postJSON(API.tipoEval, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(c => { map[c.id] = c.nombre; });
     map._ts = Date.now();
     state.tipoEvalMap = map;
     return map;
   }
   async function getActividadesMap() {
-    if (
-      state.actividadesMap &&
-      Date.now() - state.actividadesMap._ts < 30 * 60 * 1000
-    )
-      return state.actividadesMap;
+    if (state.actividadesMap && Date.now() - state.actividadesMap._ts < 30 * 60 * 1000) return state.actividadesMap;
     const arr = await postJSON(API.actividades, { estatus: 1 });
     const map = {};
-    (Array.isArray(arr) ? arr : []).forEach((c) => {
-      map[c.id] = c.nombre;
-    });
+    (Array.isArray(arr) ? arr : []).forEach(c => { map[c.id] = c.nombre; });
     map._ts = Date.now();
     state.actividadesMap = map;
     return map;
@@ -254,20 +204,15 @@
 
   // ---- Visibilidad por rol
   function isCuentasLink(el) {
-    const href = (
-      el.getAttribute("href") ||
-      el.dataset.route ||
-      ""
-    ).toLowerCase();
+    const href = (el.getAttribute("href") || el.dataset.route || "").toLowerCase();
     const txt = (el.textContent || "").toLowerCase();
     return href.indexOf("#/cuentas") >= 0 || txt.indexOf("cuenta") >= 0;
   }
 
   function applyAdminVisibility(isAdmin) {
-    qsa(".gc-side .nav-item").forEach((a) => {
+    qsa(".gc-side .nav-item").forEach(a => {
       if (!isAdmin && !isCuentasLink(a)) {
-        (a.closest && a.closest("li") ? a.closest("li") : a).style.display =
-          "none";
+        (a.closest && a.closest("li") ? a.closest("li") : a).style.display = "none";
         a.setAttribute("tabindex", "-1");
         a.setAttribute("aria-hidden", "true");
       }
@@ -296,12 +241,11 @@
   function onRouteChange() {
     enforceRouteGuard();
 
-    const hash =
-      window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
+    const hash = window.location.hash || (isAdminUser ? "#/cursos" : "#/cuentas");
     state.route = hash;
     state.page = 1;
 
-    qsa(".gc-side .nav-item").forEach((a) => {
+    qsa(".gc-side .nav-item").forEach(a => {
       const isActive = a.getAttribute("href") === hash;
       if (a.classList) a.classList.toggle("is-active", isActive);
       a.setAttribute("aria-current", isActive ? "page" : "false");
@@ -331,8 +275,7 @@
     const target = d || m;
     if (!target) return;
     for (let i = 0; i < 5; i++) {
-      target.insertAdjacentHTML(
-        "beforeend",
+      target.insertAdjacentHTML("beforeend",
         '<div class="sk-row"><div class="sk n1"></div><div class="sk n2"></div><div class="sk n3"></div></div>'
       );
     }
@@ -346,12 +289,8 @@
     if (m) m.innerHTML = "";
 
     if (!rows.length) {
-      if (d)
-        d.innerHTML =
-          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
-      if (m)
-        m.innerHTML =
-          '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+      if (d) d.innerHTML = '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+      if (m) m.innerHTML = '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
       const countEl = qs("#mod-count");
       if (countEl) countEl.textContent = "0 resultados";
       renderPagination(0);
@@ -361,26 +300,21 @@
     const start = (state.page - 1) * state.pageSize;
     const pageRows = rows.slice(start, start + state.pageSize);
 
-    pageRows.forEach((item) => {
+    pageRows.forEach(item => {
       if (d) d.insertAdjacentHTML("beforeend", config.desktopRow(item));
       if (m) m.insertAdjacentHTML("beforeend", config.mobileRow(item));
     });
 
     const countEl = qs("#mod-count");
     if (countEl)
-      countEl.textContent =
-        rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
+      countEl.textContent = rows.length + " " + (rows.length === 1 ? "elemento" : "elementos");
 
     // desktop -> drawer
-    qsa("#recursos-list .table-row").forEach((el) => {
+    qsa("#recursos-list .table-row").forEach(el => {
       el.addEventListener("click", function () {
         const data = el.dataset || {};
         if (data.type === "noticia") {
-          state.currentDrawer = {
-            type: "noticia",
-            id: Number(data.id),
-            mode: "view",
-          };
+          state.currentDrawer = { type: "noticia", id: Number(data.id), mode: "view" };
         }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
@@ -392,31 +326,26 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            if (isAdminUser)
-              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
     });
 
     // acordeón mobile
-    qsa("#recursos-list-mobile .row-toggle").forEach((el) => {
+    qsa("#recursos-list-mobile .row-toggle").forEach(el => {
       el.addEventListener("click", function () {
         const row = el.closest(".table-row-mobile");
         if (row && row.classList) row.classList.toggle("expanded");
       });
     });
-    qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
+    qsa("#recursos-list-mobile .open-drawer").forEach(btn => {
       btn.addEventListener("click", function (e) {
         e.stopPropagation();
         const host = btn.closest(".table-row-mobile");
         const data = (host && host.dataset) || {};
         if (data.type === "noticia") {
-          state.currentDrawer = {
-            type: "noticia",
-            id: Number(data.id),
-            mode: "view",
-          };
+          state.currentDrawer = { type: "noticia", id: Number(data.id), mode: "view" };
         }
         openDrawer(config.drawerTitle(data), config.drawerBody(data));
         if (data.type === "noticia") {
@@ -428,15 +357,14 @@
               id: nid,
               labels: ["Imagen 1", "Imagen 2"],
             });
-            if (isAdminUser)
-              bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+            if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
           }, 0);
         }
       });
     });
 
     // Botones Reactivar (lista)
-    qsa(".gc-reactivate").forEach((btn) => {
+    qsa(".gc-reactivate").forEach(btn => {
       btn.addEventListener("click", async function (e) {
         e.stopPropagation();
         const id = Number(btn.getAttribute("data-id"));
@@ -465,7 +393,7 @@
 
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
-    [qs("#pagination-controls"), qs("#pagination-mobile")].forEach((cont) => {
+    [qs("#pagination-controls"), qs("#pagination-mobile")].forEach(cont => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -517,15 +445,11 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 =
-        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       let c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Nombre";
-      if (c2) {
-        c2.textContent = "Tutor";
-        c2.classList.add("col-tutor");
-      }
+      if (c2) { c2.textContent = "Tutor"; c2.classList.add("col-tutor"); }
       if (c3) c3.textContent = "Fecha de inicio";
       if (!c4) {
         c4 = document.createElement("div");
@@ -610,7 +534,6 @@
 
   function drawCursos() {
     const rows = state.data;
-    gcLog("drawCursos() rows:", rows.length);
     renderList(rows, {
       desktopRow: (it) => `
       <div class="table-row" data-id="${it.id}" data-type="curso">
@@ -621,28 +544,25 @@
         <div class="col-tutor">${escapeHTML(it.tutor)}</div>
         <div class="col-fecha">${fmtDate(it.fecha)}</div>
         <div class="col-status">
-          ${badgeCurso(it.estatus)}
+          ${badgeGeneric('curso', it.estatus)}
         </div>
       </div>`,
       mobileRow: (it) => `
       <div class="table-row-mobile" data-id="${it.id}" data-type="curso">
         <button class="row-toggle">
-          <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(
-        it.precio
-      )}</div>
+          <div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(it.precio)}</div>
           <span class="icon-chevron">›</span>
         </button>
         <div class="row-details">
           <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
           <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
-          <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
+          <div><strong>Status:</strong> ${statusLabel('curso', it.estatus)}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-            ${
-              Number(it.estatus) === 0
-                ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
-                : ""
-            }
+            ${Number(it.estatus) === 0
+          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>`
+          : ""
+        }
           </div>
         </div>
       </div>`,
@@ -659,16 +579,8 @@
       ? '<span class="gc-chip gray">Gratuito</span>'
       : '<span class="gc-chip gray">Con costo</span>';
   }
-  function badgeCurso(estatus) {
-    return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Activo</span>'
-      : '<span class="gc-badge-inactivo">Inactivo</span>';
-  }
-  function textCursoStatus(estatus) {
-    return Number(estatus) === 1 ? "Activo" : "Inactivo";
-  }
 
-  // ---- normalizador de payload (JS only)
+  // ---- normalizador de payload
   function normalizeCursoPayload(p) {
     return {
       ...p,
@@ -708,74 +620,28 @@
 
     // helpers
     const inText = (id, val, ph) =>
-      '<input id="' +
-      id +
-      '" type="text" value="' +
-      escapeAttr(val || "") +
-      '" placeholder="' +
-      escapeAttr(ph || "") +
-      '" />';
+      `<input id="${id}" type="text" value="${escapeAttr(val || "")}" placeholder="${escapeAttr(ph || "")}" />`;
     const inNum = (id, val, min) =>
-      '<input id="' +
-      id +
-      '" type="number" value="' +
-      escapeAttr(val != null ? val : "") +
-      '" min="' +
-      (min || "0") +
-      '" />';
+      `<input id="${id}" type="number" value="${escapeAttr(val != null ? val : "")}" min="${min || "0"}" />`;
     const inDate = (id, val) =>
-      '<input id="' +
-      id +
-      '" type="date" value="' +
-      escapeAttr(val || "") +
-      '" />';
+      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
     const inCheck = (id, val) =>
-      '<label class="gc-inline"><input id="' +
-      id +
-      '" type="checkbox" ' +
-      (Number(val) ? "checked" : "") +
-      "/> <span>Sí</span></label>";
-    const inSel = (id, opts) => '<select id="' + id + '">' + opts + "</select>";
+      `<label class="gc-inline"><input id="${id}" type="checkbox" ${Number(val) ? "checked" : ""}/> <span>Sí</span></label>`;
+    const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
     const inTA = (id, val, rows) =>
-      '<textarea id="' +
-      id +
-      '" rows="' +
-      (rows || 4) +
-      '">' +
-      escapeHTML(val || "") +
-      "</textarea>";
+      `<textarea id="${id}" rows="${rows || 4}">${escapeHTML(val || "")}</textarea>`;
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
     const prioOptions = mapToOptions(state.prioMap, String(c.prioridad || ""));
-    const catOptions = mapToOptions(
-      state.categoriasMap,
-      String(c.categoria || "")
-    );
-    const calOptions = mapToOptions(
-      state.calendarioMap,
-      String(c.calendario || "")
-    );
-    const tipoOptions = mapToOptions(
-      state.tipoEvalMap,
-      String(c.tipo_evaluacion || "")
-    );
-    const actOptions = mapToOptions(
-      state.actividadesMap,
-      String(c.actividades || "")
-    );
+    const catOptions = mapToOptions(state.categoriasMap, String(c.categoria || ""));
+    const calOptions = mapToOptions(state.calendarioMap, String(c.calendario || ""));
+    const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
+    const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
 
-    const field = function (label, value, inputHTML) {
-      return (
-        '<div class="field"><div class="label">' +
-        escapeHTML(label) +
-        '</div><div class="value">' +
-        (isEdit || isCreate
-          ? inputHTML
-          : escapeHTML(value != null ? value : "-")) +
-        "</div></div>"
-      );
-    };
+    const field = (label, value, inputHTML) =>
+      `<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value != null ? value : "-")
+      }</div></div>`;
 
     // acciones
     let controlsRow = "";
@@ -785,107 +651,41 @@
     } else if (isAdminUser) {
       const isInactive = Number(c.estatus) === 0;
       controlsRow =
-        '<div class="gc-actions">' +
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
-          : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
-          : "") +
-        '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>' +
-        (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : "") +
-        "</div>";
+        '<div class="gc-actions">'
+        + (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "")
+        + (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : "")
+        + (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : "")
+        + '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>'
+        + (isInactive ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>' : "")
+        + "</div>";
     }
 
     // contenido
-    let html =
-      "" +
-      controlsRow +
-      field(
-        "Nombre",
-        c.nombre,
-        inText("f_nombre", c.nombre, "Nombre del curso")
-      ) +
-      field(
-        "Descripción breve",
-        c.descripcion_breve,
-        inTA("f_desc_breve", c.descripcion_breve, 3)
-      ) +
-      field(
-        "Descripción media",
-        c.descripcion_media,
-        inTA("f_desc_media", c.descripcion_media, 4)
-      ) +
-      field(
-        "Descripción del curso",
-        c.descripcion_curso,
-        inTA("f_desc_curso", c.descripcion_curso, 6)
-      ) +
-      field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3)) +
-      field(
-        "Competencias",
-        c.competencias,
-        inTA("f_competencias", c.competencias, 3)
-      ) +
-      '<div class="grid-3">' +
-      field(
-        "Tutor",
-        (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor,
-        inSel("f_tutor", tutorOptions)
-      ) +
-      field(
-        "Categoría",
-        (state.categoriasMap && state.categoriasMap[c.categoria]) ||
-          c.categoria,
-        inSel("f_categoria", catOptions)
-      ) +
-      field(
-        "Prioridad",
-        (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad,
-        inSel("f_prioridad", prioOptions)
-      ) +
-      "</div>" +
-      '<div class="grid-3">' +
-      field(
-        "Tipo de evaluación",
-        (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) ||
-          c.tipo_evaluacion,
-        inSel("f_tipo_eval", tipoOptions)
-      ) +
-      field(
-        "Actividades",
-        (state.actividadesMap && state.actividadesMap[c.actividades]) ||
-          c.actividades,
-        inSel("f_actividades", actOptions)
-      ) +
-      field(
-        "Calendario",
-        (state.calendarioMap && state.calendarioMap[c.calendario]) ||
-          c.calendario,
-        inSel("f_calendario", calOptions)
-      ) +
-      "</div>" +
-      '<div class="grid-3">' +
-      field("Horas", c.horas, inNum("f_horas", c.horas != null ? c.horas : 0)) +
-      field(
-        "Precio",
-        c.precio === 0 ? "Gratuito" : fmtMoney(c.precio),
-        inNum("f_precio", c.precio != null ? c.precio : 0)
-      ) +
-      field(
-        "Certificado",
-        Number(c.certificado) ? "Sí" : "No",
-        inCheck("f_certificado", c.certificado)
-      ) +
-      "</div>" +
-      field(
-        "Fecha de inicio",
-        c.fecha_inicio,
-        inDate("f_fecha", c.fecha_inicio)
-      );
+    let html = ""
+      + controlsRow
+      + field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso"))
+      + field("Descripción breve", c.descripcion_breve, inTA("f_desc_breve", c.descripcion_breve, 3))
+      + field("Descripción media", c.descripcion_media, inTA("f_desc_media", c.descripcion_media, 4))
+      + field("Descripción del curso", c.descripcion_curso, inTA("f_desc_curso", c.descripcion_curso, 6))
+      + field("Dirigido a", c.dirigido, inTA("f_dirigido", c.dirigido, 3))
+      + field("Competencias", c.competencias, inTA("f_competencias", c.competencias, 3))
+      + field("Status", statusLabel("curso", c.estatus), inSel("f_estatus", statusSelectOptions("curso", c.estatus)))
+      + '<div class="grid-3">'
+      + field("Tutor", (state.tutorsMap && state.tutorsMap[c.tutor]) || c.tutor, inSel("f_tutor", tutorOptions))
+      + field("Categoría", (state.categoriasMap && state.categoriasMap[c.categoria]) || c.categoria, inSel("f_categoria", catOptions))
+      + field("Prioridad", (state.prioMap && state.prioMap[c.prioridad]) || c.prioridad, inSel("f_prioridad", prioOptions))
+      + "</div>"
+      + '<div class="grid-3">'
+      + field("Tipo de evaluación", (state.tipoEvalMap && state.tipoEvalMap[c.tipo_evaluacion]) || c.tipo_evaluacion, inSel("f_tipo_eval", tipoOptions))
+      + field("Actividades", (state.actividadesMap && state.actividadesMap[c.actividades]) || c.actividades, inSel("f_actividades", actOptions))
+      + field("Calendario", (state.calendarioMap && state.calendarioMap[c.calendario]) || c.calendario, inSel("f_calendario", calOptions))
+      + "</div>"
+      + '<div class="grid-3">'
+      + field("Horas", c.horas, inNum("f_horas", c.horas != null ? c.horas : 0))
+      + field("Precio", c.precio === 0 ? "Gratuito" : fmtMoney(c.precio), inNum("f_precio", c.precio != null ? c.precio : 0))
+      + field("Certificado", Number(c.certificado) ? "Sí" : "No", inCheck("f_certificado", c.certificado))
+      + "</div>"
+      + field("Fecha de inicio", c.fecha_inicio, inDate("f_fecha", c.fecha_inicio));
 
     // imagen
     if (isCreate) {
@@ -896,9 +696,7 @@
           <div id="create-media-curso" class="media-grid">
             <div class="media-card">
               <figure class="media-thumb">
-                <img id="create-media-thumb" alt="Portada" src="${withBust(
-                  "/ASSETS/cursos/img0.png"
-                )}" />
+                <img id="create-media-thumb" alt="Portada" src="${withBust("/ASSETS/cursos/img0.png")}" />
                 <button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
@@ -917,19 +715,12 @@
       html += `
       <div class="field">
         <div class="label">Imágenes existentes</div>
-        <div class="value"><div id="media-curso" data-id="${
-          c.id || (item ? item.id : "")
-        }"></div></div>
+        <div class="value"><div id="media-curso" data-id="${c.id || (item ? item.id : "")}"></div></div>
       </div>`;
     }
 
     if (isAdminUser) {
-      html += jsonSection(
-        c,
-        "JSON · Curso",
-        "json-curso",
-        "btn-copy-json-curso"
-      );
+      html += jsonSection(c, "JSON · Curso", "json-curso", "btn-copy-json-curso");
     }
 
     // título y estado
@@ -937,20 +728,11 @@
       qs("#drawer-title").textContent = "Curso · Crear";
       state.currentDrawer = { type: "curso", id: null, mode: "create" };
     } else if (isEdit) {
-      qs("#drawer-title").textContent =
-        "Curso · " + (item ? item.nombre : "") + " (edición)";
-      state.currentDrawer = {
-        type: "curso",
-        id: item ? item.id : null,
-        mode: "edit",
-      };
+      qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : "") + " (edición)";
+      state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "edit" };
     } else {
       qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : "");
-      state.currentDrawer = {
-        type: "curso",
-        id: item ? item.id : null,
-        mode: "view",
-      };
+      state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "view" };
     }
 
     // bindings con try/catch
@@ -958,7 +740,7 @@
       try {
         disableDrawerInputs(!(isEdit || isCreate));
 
-        // CREAR: seleccionar imagen con modal preview
+        // CREAR: seleccionar imagen
         if (isCreate) {
           const card = document.getElementById("create-media-curso");
           const btn = document.getElementById("create-media-edit");
@@ -972,33 +754,24 @@
               document.body.appendChild(input);
               input.addEventListener("change", function () {
                 const file = input.files && input.files[0];
-                try {
-                  document.body.removeChild(input);
-                } catch {}
+                try { document.body.removeChild(input); } catch { }
                 if (!file) return;
                 const v = validarImagen(file, { maxMB: 2 });
-                if (!v.ok) {
-                  toast(v.error, "error");
-                  return;
-                }
+                if (!v.ok) { toast(v.error, "error"); return; }
                 renderPreviewUI(
                   card,
                   file,
                   async function () {
                     state.tempNewCourseImage = file;
                     try {
-                      if (thumb.dataset && thumb.dataset.blobUrl)
-                        URL.revokeObjectURL(thumb.dataset.blobUrl);
-                    } catch {}
+                      if (thumb.dataset && thumb.dataset.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl);
+                    } catch { }
                     const blobUrl = URL.createObjectURL(file);
                     if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
                     thumb.src = blobUrl;
-                    toast(
-                      "Imagen seleccionada (se subirá al guardar)",
-                      "exito"
-                    );
+                    toast("Imagen seleccionada (se subirá al guardar)", "exito");
                   },
-                  function () {}
+                  function () { }
                 );
               });
               input.click();
@@ -1024,14 +797,8 @@
         if (btnEdit)
           btnEdit.addEventListener("click", function (e) {
             e.stopPropagation();
-            state.currentDrawer = {
-              type: "curso",
-              id: item ? item.id : null,
-              mode: "edit",
-            };
-            qs("#drawer-body").innerHTML = renderCursoDrawer({
-              id: String(item ? item.id : ""),
-            });
+            state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "edit" };
+            qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") });
           });
 
         const btnCancel = qs("#btn-cancel");
@@ -1042,14 +809,8 @@
               state.tempNewCourseImage = null;
               closeDrawer();
             } else {
-              state.currentDrawer = {
-                type: "curso",
-                id: item ? item.id : null,
-                mode: "view",
-              };
-              qs("#drawer-body").innerHTML = renderCursoDrawer({
-                id: String(item ? item.id : ""),
-              });
+              state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "view" };
+              qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") });
             }
           });
 
@@ -1058,7 +819,6 @@
           bDel.addEventListener("click", async function (e) {
             e.stopPropagation();
             const step = bDel.getAttribute("data-step") || "1";
-            gcLog("btn-delete clicked step:", step);
             if (step === "1") {
               bDel.textContent = "Confirmar";
               bDel.setAttribute("data-step", "2");
@@ -1071,7 +831,6 @@
               return;
             }
             try {
-              gcLog("softDeleteCurso item:", item);
               await softDeleteCurso(item);
               toast("Curso eliminado (inactivo)", "exito");
               closeDrawer();
@@ -1120,7 +879,6 @@
         }
 
         if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
-        gcLog("renderCursoDrawer BINDINGS end");
       } catch (err) {
         gcLog("renderCursoDrawer bindings error:", err);
         toast("Ocurrió un error al preparar el formulario", "error");
@@ -1131,11 +889,8 @@
   }
 
   function disableDrawerInputs(disabled) {
-    qsa(
-      "#drawer-body input, #drawer-body select, #drawer-body textarea"
-    ).forEach(function (el) {
-      el.disabled = !!disabled;
-    });
+    qsa("#drawer-body input, #drawer-body select, #drawer-body textarea")
+      .forEach(el => { el.disabled = !!disabled; });
   }
 
   function getEmptyCourse() {
@@ -1164,41 +919,21 @@
   function mapToOptions(map, selectedId) {
     if (!map || typeof map !== "object") return '<option value="">—</option>';
     const pairs = Object.keys(map)
-      .filter(function (k) {
-        return k !== "_ts";
-      })
-      .map(function (k) {
-        return [k, map[k]];
-      });
+      .filter(k => k !== "_ts")
+      .map(k => [k, map[k]]);
     if (!pairs.length) return '<option value="">—</option>';
     return pairs
-      .map(function (pair) {
-        const id = pair[0],
-          name = pair[1];
+      .map(([id, name]) => {
         const sel = String(selectedId) === String(id) ? " selected" : "";
-        return (
-          '<option value="' +
-          escapeAttr(id) +
-          '"' +
-          sel +
-          ">" +
-          escapeHTML(name) +
-          "</option>"
-        );
+        return `<option value="${escapeAttr(id)}"${sel}>${escapeHTML(name)}</option>`;
       })
       .join("");
   }
 
   function readCursoForm(existingId) {
-    const read = (id) => {
-      const el = qs("#" + id);
-      return el ? el.value : "";
-    };
+    const read = (id) => (qs("#" + id) ? qs("#" + id).value : "");
     const readN = (id, def) => Number(read(id) || def || 0);
-    const readCh = (id) => {
-      const el = qs("#" + id);
-      return el && el.checked ? 1 : 0;
-    };
+    const readCh = (id) => { const el = qs("#" + id); return el && el.checked ? 1 : 0; };
 
     const payload = {
       nombre: read("f_nombre"),
@@ -1211,7 +946,7 @@
       tutor: readN("f_tutor", 0),
       horas: readN("f_horas", 0),
       precio: readN("f_precio", 0),
-      estatus: 1,
+      estatus: readN("f_estatus", 1),
       fecha_inicio: read("f_fecha"),
       prioridad: readN("f_prioridad", 1),
       categoria: readN("f_categoria", 1),
@@ -1236,11 +971,7 @@
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     const text = await res.text().catch(() => "");
     if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { _raw: text };
-    }
+    try { return JSON.parse(text); } catch { return { _raw: text }; }
   }
 
   // Crear curso + (opcional) subir imagen
@@ -1249,17 +980,11 @@
     if (!payload.nombre) return toast("Falta el nombre", "warning");
     if (!payload.tutor) return toast("Selecciona tutor", "warning");
     if (!payload.categoria) return toast("Selecciona categoría", "warning");
-    if (!payload.fecha_inicio)
-      return toast("Fecha de inicio requerida", "warning");
+    if (!payload.fecha_inicio) return toast("Fecha de inicio requerida", "warning");
 
     const res = await postJSON(API.iCursos, payload);
     const newId = Number(
-      (res &&
-        (res.id ||
-          res.curso_id ||
-          res.insert_id ||
-          (res.data && res.data.id))) ||
-        0
+      (res && (res.id || res.curso_id || res.insert_id || (res.data && res.data.id))) || 0
     );
     if (!newId) {
       gcLog("Respuesta de iCursos sin id utilizable:", res);
@@ -1284,9 +1009,7 @@
     await loadCursos();
 
     if (newId) {
-      const re = state.data.find(function (x) {
-        return x.id === newId;
-      });
+      const re = state.data.find(function (x) { return x.id === newId; });
       if (re)
         openDrawer(
           "Curso · " + re.nombre,
@@ -1315,9 +1038,7 @@
 
     toast("Cambios guardados", "exito");
     await loadCursos();
-    const re = state.data.find(function (x) {
-      return x.id === item.id;
-    });
+    const re = state.data.find(function (x) { return x.id === item.id; });
     if (re)
       openDrawer(
         "Curso · " + re.nombre,
@@ -1333,9 +1054,7 @@
   }
 
   async function reactivateCurso(id) {
-    const it = state.data.find(function (x) {
-      return x.id === Number(id);
-    });
+    const it = state.data.find(function (x) { return x.id === Number(id); });
     if (!it || !it._all) throw new Error("Curso no encontrado");
     const body = normalizeCursoPayload({ ...it._all, estatus: 1 });
     await postJSON(API.uCursos, body);
@@ -1349,15 +1068,11 @@
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       const c1 = hdr.querySelector(".col-nombre");
-      let c2 =
-        hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
+      let c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo");
       const c3 = hdr.querySelector(".col-fecha");
       const c4 = hdr.querySelector(".col-status");
       if (c1) c1.textContent = "Título";
-      if (c2) {
-        c2.textContent = "Comentarios";
-        c2.classList.add("col-tipo");
-      }
+      if (c2) { c2.textContent = "Comentarios"; c2.classList.add("col-tipo"); }
       if (c3) c3.textContent = "Fecha de publicación";
       if (c4) c4.textContent = "Status";
     }
@@ -1383,11 +1098,7 @@
         Array.isArray(inactivasRaw) ? inactivasRaw : []
       );
       const counts = await Promise.all(
-        arr.map(function (n) {
-          return getCommentsCount(n.id).catch(function () {
-            return 0;
-          });
-        })
+        arr.map(function (n) { return getCommentsCount(n.id).catch(function () { return 0; }); })
       );
 
       state.raw = arr;
@@ -1436,12 +1147,10 @@
     renderList(rows, {
       desktopRow: (it) => `
         <div class="table-row" data-id="${it.id}" data-type="noticia">
-          <div class="col-nombre"><span class="name-text">${escapeHTML(
-            it.titulo
-          )}</span></div>
+          <div class="col-nombre"><span class="name-text">${escapeHTML(it.titulo)}</span></div>
           <div class="col-tutor">${it.comentarios}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">${badgeNoticia(it.estatus)}</div>
+          <div class="col-status">${badgeGeneric('noticia', it.estatus)}</div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -1454,11 +1163,10 @@
             <div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div>
             <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
               <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-              ${
-                Number(it.estatus) === 0
-                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
-                  : ""
-              }
+              ${Number(it.estatus) === 0
+          ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>`
+          : ""
+        }
             </div>
           </div>
         </div>`,
@@ -1470,10 +1178,49 @@
     });
   }
 
-  function badgeNoticia(estatus) {
-    return Number(estatus) === 1
-      ? '<span class="gc-badge-activo">Publicada</span>'
-      : '<span class="gc-badge-inactivo">Inactiva</span>';
+  function renderNoticiaDrawer(dataset) {
+    const item = state.data.find((x) => String(x.id) === dataset.id);
+    const n = item && item._all;
+    if (!n) return "<p>No encontrado.</p>";
+
+    let html =
+      pair("Título", n.titulo) +
+      pair("Estado", statusLabel("noticia", n.estatus)) +
+      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
+      pair("Descripción (1)", n.desc_uno) +
+      pair("Descripción (2)", n.desc_dos) +
+      pair("Creado por", n.creado_por) +
+      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
+      n.id +
+      '"></div></div></div>';
+
+    if (isAdminUser) {
+      html += jsonSection(
+        n,
+        "JSON · Noticia",
+        "json-noticia",
+        "btn-copy-json-noticia"
+      );
+    }
+
+    setTimeout(function () {
+      try {
+        const cont = document.getElementById("media-noticia");
+        if (cont) {
+          mountReadOnlyMedia({
+            container: cont,
+            type: "noticia",
+            id: n.id,
+            labels: ["Imagen 1", "Imagen 2"],
+          });
+        }
+        if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
+      } catch (err) {
+        gcLog("renderNoticiaDrawer bindings error:", err);
+      }
+    }, 0);
+
+    return html;
   }
 
   async function inactivateNoticia(id) {
@@ -1498,163 +1245,6 @@
     const body = { ...it._all, estatus: 1 };
     await postJSON(API.uNoticias, body);
     return true;
-  }
-
-  // ---- Drawer Noticia
-  function renderNoticiaDrawer(dataset) {
-    const item = state.data.find((x) => String(x.id) === dataset.id);
-    const n = item && item._all;
-    if (!n) return "<p>No encontrado.</p>";
-
-    const mode =
-      state.currentDrawer &&
-      state.currentDrawer.type === "noticia" &&
-      state.currentDrawer.id === n.id
-        ? state.currentDrawer.mode
-        : "view";
-    const isEdit = mode === "edit";
-    const isView = !isEdit;
-    const isInactive = Number(n.estatus) === 0;
-
-    const controlsRow = isAdminUser
-      ? '<div class="gc-actions">' +
-        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
-          : "") +
-        (isEdit
-          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
-          : "") +
-        (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
-        "</div>"
-      : "";
-
-    let html =
-      "" +
-      controlsRow +
-      pair("Título", n.titulo) +
-      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
-      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
-      pair("Descripción (1)", n.desc_uno) +
-      pair("Descripción (2)", n.desc_dos) +
-      pair("Creado por", n.creado_por) +
-      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
-      n.id +
-      '"></div></div></div>';
-
-    if (isAdminUser) {
-      html += jsonSection(
-        n,
-        "JSON · Noticia",
-        "json-noticia",
-        "btn-copy-json-noticia"
-      );
-    }
-
-    if (isEdit) {
-      qs("#drawer-title").textContent =
-        "Noticia · " + (item ? item.titulo : "") + " (edición)";
-      state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-    } else {
-      qs("#drawer-title").textContent =
-        "Noticia · " + (item ? item.titulo : "");
-      state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-    }
-
-    setTimeout(function () {
-      try {
-        const be = qs("#btn-edit");
-        if (be)
-          be.addEventListener("click", function (e) {
-            e.stopPropagation();
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
-            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-              id: String(n.id),
-            });
-          });
-
-        const bc = qs("#btn-cancel");
-        if (bc)
-          bc.addEventListener("click", function (e) {
-            e.stopPropagation();
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
-              id: String(n.id),
-            });
-          });
-
-        const bs = qs("#btn-save");
-        if (bs)
-          bs.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            toast("Cambios guardados", "exito");
-            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
-            await loadNoticias();
-            const re = state.data.find(function (x) {
-              return x.id === n.id;
-            });
-            if (re)
-              openDrawer(
-                "Noticia · " + re.titulo,
-                renderNoticiaDrawer({ id: String(re.id) })
-              );
-          });
-
-        const bDel = qs("#btn-delete");
-        if (bDel)
-          bDel.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            const step = bDel.getAttribute("data-step") || "1";
-            if (step === "1") {
-              bDel.textContent = "Confirmar";
-              bDel.setAttribute("data-step", "2");
-              setTimeout(function () {
-                if (bDel.getAttribute("data-step") === "2") {
-                  bDel.textContent = "Eliminar";
-                  bDel.setAttribute("data-step", "1");
-                }
-              }, 4000);
-              return;
-            }
-            try {
-              await inactivateNoticia(n.id);
-              toast("Noticia eliminada (inactiva)", "exito");
-              closeDrawer();
-              await loadNoticias();
-            } catch (err) {
-              gcLog(err);
-              toast("No se pudo eliminar", "error");
-            }
-          });
-
-        const br = qs("#btn-reactivar");
-        if (br)
-          br.addEventListener("click", async function (e) {
-            e.stopPropagation();
-            const ok = await reactivateNoticia(n.id);
-            if (ok) {
-              toast("Noticia reactivada", "exito");
-              await loadNoticias();
-              const re = state.data.find(function (x) {
-                return x.id === n.id;
-              });
-              if (re)
-                openDrawer(
-                  "Noticia · " + re.titulo,
-                  renderNoticiaDrawer({ id: String(re.id) })
-                );
-            }
-          });
-
-        disableDrawerInputs(!isEdit);
-      } catch (err) {
-        gcLog("renderNoticiaDrawer bindings error:", err);
-      }
-    }, 0);
-
-    return html;
   }
 
   // ---------- CUENTAS ----------
@@ -1751,59 +1341,71 @@
     }
 
     const del = mount.querySelector("#btn-delete-account");
-    if (del)
-      del.addEventListener("click", function () {
-        safeOpen("openModalDeleteAccount");
-      });
+    if (del) del.addEventListener("click", function () { safeOpen("openModalDeleteAccount"); });
     const pr = mount.querySelector("#btn-privacy");
-    if (pr)
-      pr.addEventListener("click", function () {
-        safeOpen("openModalPrivacy");
-      });
+    if (pr) pr.addEventListener("click", function () { safeOpen("openModalPrivacy"); });
     const no = mount.querySelector("#btn-notifications");
-    if (no)
-      no.addEventListener("click", function () {
-        safeOpen("openModalNotifications");
-      });
+    if (no) no.addEventListener("click", function () { safeOpen("openModalNotifications"); });
     const pt = mount.querySelector("#btn-privacy-toggles");
-    if (pt)
-      pt.addEventListener("click", function () {
-        safeOpen("openModalPrivacyToggles");
-      });
+    if (pt) pt.addEventListener("click", function () { safeOpen("openModalPrivacyToggles"); });
     const sw = mount.querySelector("#btn-switch-account");
-    if (sw)
-      sw.addEventListener("click", function () {
-        safeOpen("openModalSwitchAccount");
-      });
+    if (sw) sw.addEventListener("click", function () { safeOpen("openModalSwitchAccount"); });
   }
 
   // ---------- Drawer base ----------
+  function ensureDrawerHost() {
+    if (!qs("#gc-dash-overlay")) {
+      const ov = document.createElement("div");
+      ov.id = "gc-dash-overlay";
+      ov.style.cssText =
+        "position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;visibility:hidden;transition:opacity .2s ease, visibility .2s ease;z-index:9998;";
+      document.body.appendChild(ov);
+    }
+    if (!qs("#gc-drawer")) {
+      const dr = document.createElement("aside");
+      dr.id = "gc-drawer";
+      dr.setAttribute("role", "dialog");
+      dr.setAttribute("aria-modal", "true");
+      dr.setAttribute("aria-hidden", "true");
+      dr.style.cssText =
+        "position:fixed;top:0;right:0;height:100vh;width:min(720px,92vw);background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .25s ease;z-index:9999;display:flex;flex-direction:column;";
+      dr.innerHTML = `
+        <header class="gc-drawer-head" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;">
+          <h3 id="drawer-title" style="margin:0;font-size:1.05rem;font-weight:700;">Detalle</h3>
+          <button id="drawer-close" class="gc-btn gc-btn--ghost" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>
+        </header>
+        <div id="drawer-body" style="padding:14px;overflow:auto;"></div>`;
+      document.body.appendChild(dr);
+    }
+  }
   function openDrawer(title, bodyHTML) {
+    ensureDrawerHost();
     const overlay = qs("#gc-dash-overlay");
-    if (overlay && overlay.classList) overlay.classList.add("open");
-
     const drawer = qs("#gc-drawer");
-    if (!drawer) return;
     const t = qs("#drawer-title");
     if (t) t.textContent = title || "Detalle";
     const b = qs("#drawer-body");
     if (b) b.innerHTML = bodyHTML || "";
-    if (drawer.classList) drawer.classList.add("open");
+    overlay.style.visibility = "visible";
+    overlay.style.opacity = "1";
     drawer.setAttribute("aria-hidden", "false");
+    drawer.style.transform = "translateX(0)";
+    const close = () => closeDrawer();
+    overlay.onclick = (e) => { if (e.target === overlay) close(); };
+    const btnClose = qs("#drawer-close");
+    if (btnClose) btnClose.onclick = close;
+    document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); } });
   }
   function closeDrawer() {
     // evita warning aria-hidden
-    try {
-      if (document.activeElement && document.activeElement.blur)
-        document.activeElement.blur();
-    } catch {}
+    try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch { }
     const overlay = qs("#gc-dash-overlay");
-    if (overlay && overlay.classList) overlay.classList.remove("open");
-
     const drawer = qs("#gc-drawer");
-    if (!drawer) return;
-    if (drawer.classList) drawer.classList.remove("open");
+    if (!overlay || !drawer) return;
+    overlay.style.opacity = "0";
+    overlay.style.visibility = "hidden";
     drawer.setAttribute("aria-hidden", "true");
+    drawer.style.transform = "translateX(100%)";
     state.currentDrawer = null;
     gcLog("closeDrawer");
   }
@@ -1811,64 +1413,31 @@
   // ---------- Helpers UI/format ----------
   function escapeHTML(str) {
     return String(str == null ? "" : str).replace(/[&<>'"]/g, function (s) {
-      return {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "'": "&#39;",
-        '"': "&quot;",
-      }[s];
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[s];
     });
   }
-  function escapeAttr(str) {
-    return String(str == null ? "" : str).replace(/"/g, "&quot;");
-  }
+  function escapeAttr(str) { return String(str == null ? "" : str).replace(/"/g, "&quot;"); }
   function fmtDate(d) {
     if (!d) return "-";
-    try {
-      const p = String(d).split("-");
-      return (p[2] || "") + "/" + (p[1] || "") + "/" + (p[0] || "");
-    } catch {
-      return d;
-    }
+    try { const p = String(d).split("-"); return (p[2] || "") + "/" + (p[1] || "") + "/" + (p[0] || ""); }
+    catch { return d; }
   }
   function fmtDateTime(dt) {
     if (!dt) return "-";
-    try {
-      const sp = String(dt).split(" ");
-      return (fmtDate(sp[0]) + " " + (sp[1] || "")).trim();
-    } catch {
-      return dt;
-    }
+    try { const sp = String(dt).split(" "); return (fmtDate(sp[0]) + " " + (sp[1] || "")).trim(); }
+    catch { return dt; }
   }
   function fmtMoney(n) {
-    try {
-      return new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-      }).format(n);
-    } catch {
-      return "$" + n;
-    }
+    try { return new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n); }
+    catch { return "$" + n; }
   }
   function pair(label, val) {
-    return (
-      '<div class="field"><div class="label">' +
-      escapeHTML(label) +
-      '</div><div class="value">' +
-      escapeHTML(val != null ? val : "-") +
-      "</div></div>"
-    );
+    return '<div class="field"><div class="label">' + escapeHTML(label) + '</div><div class="value">' + escapeHTML(val != null ? val : "-") + "</div></div>";
   }
 
   function withBust(url) {
-    try {
-      const u = new URL(url, window.location.origin);
-      u.searchParams.set("v", Date.now());
-      return u.pathname + "?" + u.searchParams.toString();
-    } catch {
-      return url + (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + Date.now();
-    }
+    try { const u = new URL(url, window.location.origin); u.searchParams.set("v", Date.now()); return u.pathname + "?" + u.searchParams.toString(); }
+    catch { return url + (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + Date.now(); }
   }
 
   function noImageSvg() {
@@ -1974,13 +1543,11 @@
       drawerPE: drawer && drawer.style ? drawer.style.pointerEvents : "",
       drawerFilter: drawer && drawer.style ? drawer.style.filter : "",
       drawerZ: drawer && drawer.style ? drawer.style.zIndex : "",
-      overlayZ:
-        drawerOverlay && drawerOverlay.style ? drawerOverlay.style.zIndex : "",
+      overlayZ: drawerOverlay && drawerOverlay.style ? drawerOverlay.style.zIndex : "",
       drawerAria: drawer ? drawer.getAttribute("aria-hidden") : null,
-      hadInert:
-        drawer && typeof drawer.hasAttribute === "function"
-          ? drawer.hasAttribute("inert")
-          : false,
+      hadInert: drawer && typeof drawer.hasAttribute === "function"
+        ? drawer.hasAttribute("inert")
+        : false,
     };
 
     const lockScroll = function () {
@@ -1999,9 +1566,7 @@
       drawer.style.filter = "blur(1px)";
       drawer.style.zIndex = "1";
       drawer.setAttribute("aria-hidden", "true");
-      try {
-        drawer.setAttribute("inert", "");
-      } catch {}
+      try { drawer.setAttribute("inert", ""); } catch { }
     }
     if (drawerOverlay && drawerOverlay.style) drawerOverlay.style.zIndex = "2";
 
@@ -2034,15 +1599,9 @@
     side.innerHTML =
       '<div style="font-weight:600;">Detalles</div>' +
       '<div style="font-size:.92rem;color:#444;line-height:1.35;">' +
-      "<div><strong>Archivo:</strong> " +
-      file.name +
-      "</div>" +
-      "<div><strong>Peso:</strong> " +
-      humanSize(file.size) +
-      "</div>" +
-      "<div><strong>Tipo:</strong> " +
-      (file.type || "desconocido") +
-      "</div>" +
+      "<div><strong>Archivo:</strong> " + file.name + "</div>" +
+      "<div><strong>Peso:</strong> " + humanSize(file.size) + "</div>" +
+      "<div><strong>Tipo:</strong> " + (file.type || "desconocido") + "</div>" +
       '<div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>' +
       "</div>" +
       '<div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">' +
@@ -2064,8 +1623,7 @@
         imgWrap.style.minHeight = "320px";
       }
     };
-    if (mql && mql.addEventListener)
-      mql.addEventListener("change", applyResponsive);
+    if (mql && mql.addEventListener) mql.addEventListener("change", applyResponsive);
     applyResponsive();
 
     body.appendChild(imgWrap);
@@ -2088,17 +1646,13 @@
         else drawer.removeAttribute("aria-hidden");
         try {
           if (!prev.hadInert) drawer.removeAttribute("inert");
-        } catch {}
+        } catch { }
       }
       if (drawerOverlay && drawerOverlay.style)
         drawerOverlay.style.zIndex = prev.overlayZ || "";
       document.body.style.overflow = "";
-      try {
-        URL.revokeObjectURL(url);
-      } catch {}
-      try {
-        overlay.remove();
-      } catch {}
+      try { URL.revokeObjectURL(url); } catch { }
+      try { overlay.remove(); } catch { }
       document.removeEventListener("keydown", onEsc);
     };
 
@@ -2126,11 +1680,8 @@
     if (btnConfirm)
       btnConfirm.addEventListener("click", async function (e) {
         e.preventDefault();
-        try {
-          if (onConfirm) await onConfirm();
-        } finally {
-          cleanup();
-        }
+        try { if (onConfirm) await onConfirm(); }
+        finally { cleanup(); }
       });
   }
 
@@ -2148,8 +1699,8 @@
       typeof editableOverride === "boolean"
         ? editableOverride
         : isAdminUser &&
-          state.currentDrawer &&
-          state.currentDrawer.mode === "edit";
+        state.currentDrawer &&
+        state.currentDrawer.mode === "edit";
     const urls = mediaUrlsByType(type, id);
     const grid = document.createElement("div");
     grid.className = "media-grid";
@@ -2160,8 +1711,8 @@
       card.className = "media-card";
       const editBtnHTML = editable
         ? '<button class="icon-btn media-edit" title="Editar imagen">' +
-          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>' +
-          "</button>"
+        '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>' +
+        "</button>"
         : "";
 
       card.innerHTML =
@@ -2197,9 +1748,7 @@
             document.body.appendChild(input);
             input.addEventListener("change", async function () {
               const file = input.files && input.files[0];
-              try {
-                document.body.removeChild(input);
-              } catch {}
+              try { document.body.removeChild(input); } catch { }
               if (!file) return;
 
               const v = validarImagen(file, { maxMB: 2 });
@@ -2212,30 +1761,17 @@
                   try {
                     if (type === "curso") {
                       if (!API_UPLOAD || !API_UPLOAD.cursoImg) {
-                        toast(
-                          "Configura API_UPLOAD.cursoImg para habilitar la subida",
-                          "warning"
-                        );
+                        toast("Configura API_UPLOAD.cursoImg para habilitar la subida", "warning");
                         return;
                       }
                       const fd = new FormData();
                       fd.append("curso_id", String(id));
                       fd.append("imagen", file);
-                      const res = await fetch(API_UPLOAD.cursoImg, {
-                        method: "POST",
-                        body: fd,
-                      });
+                      const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
                       const text = await res.text().catch(() => "");
-                      if (!res.ok)
-                        throw new Error(
-                          "HTTP " + res.status + " " + (text || "")
-                        );
+                      if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
                       let json;
-                      try {
-                        json = JSON.parse(text);
-                      } catch {
-                        json = { _raw: text };
-                      }
+                      try { json = JSON.parse(text); } catch { json = { _raw: text }; }
                       img.src = withBust((json && json.url) || url);
                       toast("Imagen de curso actualizada", "exito");
                       return;
@@ -2243,10 +1779,7 @@
 
                     if (type === "noticia") {
                       if (!API_UPLOAD || !API_UPLOAD.noticiaImg) {
-                        toast(
-                          "Configura API_UPLOAD.noticiaImg para habilitar la subida",
-                          "warning"
-                        );
+                        toast("Configura API_UPLOAD.noticiaImg para habilitar la subida", "warning");
                         return;
                       }
                       const pos = i + 1;
@@ -2254,26 +1787,13 @@
                       fd.append("noticia_id", String(id));
                       fd.append("pos", String(pos));
                       fd.append("imagen", file);
-                      const res = await fetch(API_UPLOAD.noticiaImg, {
-                        method: "POST",
-                        body: fd,
-                      });
+                      const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd });
                       const text = await res.text().catch(() => "");
-                      if (!res.ok)
-                        throw new Error(
-                          "HTTP " + res.status + " " + (text || "")
-                        );
+                      if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || ""));
                       let json;
-                      try {
-                        json = JSON.parse(text);
-                      } catch {
-                        json = { _raw: text };
-                      }
+                      try { json = JSON.parse(text); } catch { json = { _raw: text }; }
                       img.src = withBust((json && json.url) || url);
-                      toast(
-                        "Imagen " + pos + " de noticia actualizada",
-                        "exito"
-                      );
+                      toast("Imagen " + pos + " de noticia actualizada", "exito");
                       return;
                     }
                   } catch (err) {
@@ -2281,7 +1801,7 @@
                     toast("No se pudo subir la imagen", "error");
                   }
                 },
-                function () {}
+                function () { }
               );
             });
             input.click();
@@ -2302,19 +1822,8 @@
   }
   //---------------------------------- fin del bloque de imágenes
 
-  // ---- Toolbar / botones
+  // ---- Toolbar / botones (crear)
   function bindUI() {
-    qsa(".admin-dash .admin-nav").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        const route =
-          btn.getAttribute("data-route") || btn.getAttribute("href");
-        if (route) {
-          if (location.hash !== route) location.hash = route;
-          else onRouteChange();
-        }
-      });
-    });
-
     const drawerClose = document.getElementById("drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
 
@@ -2358,7 +1867,7 @@
   // ---- INIT
   document.addEventListener("DOMContentLoaded", async function () {
     currentUser = getUsuarioFromCookie();
-    const uid = Number((currentUser && currentUser.id) || 0);
+    const uid = Number((currentUser && currentUser.id) || 0); // FIX: id numérico
     isAdminUser = ADMIN_IDS.indexOf(uid) >= 0;
 
     applyAdminVisibility(isAdminUser);
