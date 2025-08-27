@@ -1,6 +1,6 @@
 (() => {
-  // ------------------------------------- DEBUG
-  window.GC_DEBUG = false; // true para ver logs
+  // ------------------------------------- este bloque es para habilitar el debug
+  window.GC_DEBUG = false; // aca colocar true o false para ver o no todos los console logs 
   function gcLog(...a) {
     if (window.GC_DEBUG && typeof console !== "undefined")
       try {
@@ -48,7 +48,7 @@
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_actividades.php",
   };
 
-  // --- subida de imagen
+  // --- subida de imagen de curso
   const API_UPLOAD = {
     cursoImg:
       "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php",
@@ -88,9 +88,9 @@
     window.gcToast ? window.gcToast(msg, tipo, dur) : gcLog(`[${tipo}] ${msg}`);
 
   function getUsuarioFromCookie() {
-    const row = (document.cookie || "")
-      .split("; ")
-      .find((r) => r.indexOf("usuario=") === 0);
+    const row = (document.cookie || "").split("; ").find(function (r) {
+      return r.indexOf("usuario=") === 0;
+    });
     if (!row) return null;
     const raw = row.split("=")[1] || "";
     try {
@@ -102,39 +102,6 @@
       return null;
     }
   }
-
-  // ====== Catálogo de Status (nuevo)
-  const STATUS_CATALOG = {
-    curso: [
-      { value: 1, label: "Activo", tone: "good" },
-      { value: 0, label: "Inactivo", tone: "muted" },
-    ],
-    noticia: [
-      { value: 1, label: "Publicada", tone: "good" },
-      { value: 0, label: "Inactiva", tone: "muted" },
-    ],
-  };
-  const statusLabel = (mod, val) => {
-    const d = (STATUS_CATALOG[mod] || []).find((s) => s.value === Number(val));
-    return d ? d.label : "Estado " + val;
-  };
-  const statusSelectOptions = (mod, value) =>
-    (STATUS_CATALOG[mod] || [])
-      .map(
-        (s) =>
-          `<option value="${s.value}" ${
-            Number(value) === s.value ? "selected" : ""
-          }>${s.label}</option>`
-      )
-      .join("");
-  const badgeGeneric = (mod, value) => {
-    const d = (STATUS_CATALOG[mod] || []).find(
-      (s) => s.value === Number(value)
-    );
-    const cls =
-      d && d.tone === "good" ? "gc-badge-activo" : "gc-badge-inactivo";
-    return `<span class="${cls}">${d ? d.label : "Estado " + value}</span>`;
-  };
 
   // -------- Panel de cuenta
   function showCuentaPanel() {
@@ -643,6 +610,7 @@
 
   function drawCursos() {
     const rows = state.data;
+    gcLog("drawCursos() rows:", rows.length);
     renderList(rows, {
       desktopRow: (it) => `
       <div class="table-row" data-id="${it.id}" data-type="curso">
@@ -653,7 +621,7 @@
         <div class="col-tutor">${escapeHTML(it.tutor)}</div>
         <div class="col-fecha">${fmtDate(it.fecha)}</div>
         <div class="col-status">
-          ${badgeGeneric("curso", it.estatus)}
+          ${badgeCurso(it.estatus)}
         </div>
       </div>`,
       mobileRow: (it) => `
@@ -667,10 +635,7 @@
         <div class="row-details">
           <div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div>
           <div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div>
-          <div><strong>Status:</strong> ${statusLabel(
-            "curso",
-            it.estatus
-          )}</div>
+          <div><strong>Status:</strong> ${textCursoStatus(it.estatus)}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
             ${
@@ -694,8 +659,16 @@
       ? '<span class="gc-chip gray">Gratuito</span>'
       : '<span class="gc-chip gray">Con costo</span>';
   }
+  function badgeCurso(estatus) {
+    return Number(estatus) === 1
+      ? '<span class="gc-badge-activo">Activo</span>'
+      : '<span class="gc-badge-inactivo">Inactivo</span>';
+  }
+  function textCursoStatus(estatus) {
+    return Number(estatus) === 1 ? "Activo" : "Inactivo";
+  }
 
-  // ---- normalizador de payload
+  // ---- normalizador de payload (JS only)
   function normalizeCursoPayload(p) {
     return {
       ...p,
@@ -735,24 +708,42 @@
 
     // helpers
     const inText = (id, val, ph) =>
-      `<input id="${id}" type="text" value="${escapeAttr(
-        val || ""
-      )}" placeholder="${escapeAttr(ph || "")}" />`;
+      '<input id="' +
+      id +
+      '" type="text" value="' +
+      escapeAttr(val || "") +
+      '" placeholder="' +
+      escapeAttr(ph || "") +
+      '" />';
     const inNum = (id, val, min) =>
-      `<input id="${id}" type="number" value="${escapeAttr(
-        val != null ? val : ""
-      )}" min="${min || "0"}" />`;
+      '<input id="' +
+      id +
+      '" type="number" value="' +
+      escapeAttr(val != null ? val : "") +
+      '" min="' +
+      (min || "0") +
+      '" />';
     const inDate = (id, val) =>
-      `<input id="${id}" type="date" value="${escapeAttr(val || "")}" />`;
+      '<input id="' +
+      id +
+      '" type="date" value="' +
+      escapeAttr(val || "") +
+      '" />';
     const inCheck = (id, val) =>
-      `<label class="gc-inline"><input id="${id}" type="checkbox" ${
-        Number(val) ? "checked" : ""
-      }/> <span>Sí</span></label>`;
-    const inSel = (id, opts) => `<select id="${id}">${opts}</select>`;
+      '<label class="gc-inline"><input id="' +
+      id +
+      '" type="checkbox" ' +
+      (Number(val) ? "checked" : "") +
+      "/> <span>Sí</span></label>";
+    const inSel = (id, opts) => '<select id="' + id + '">' + opts + "</select>";
     const inTA = (id, val, rows) =>
-      `<textarea id="${id}" rows="${rows || 4}">${escapeHTML(
-        val || ""
-      )}</textarea>`;
+      '<textarea id="' +
+      id +
+      '" rows="' +
+      (rows || 4) +
+      '">' +
+      escapeHTML(val || "") +
+      "</textarea>";
 
     // catálogos
     const tutorOptions = mapToOptions(state.tutorsMap, String(c.tutor || ""));
@@ -774,12 +765,17 @@
       String(c.actividades || "")
     );
 
-    const field = (label, value, inputHTML) =>
-      `<div class="field"><div class="label">${escapeHTML(
-        label
-      )}</div><div class="value">${
-        isEdit || isCreate ? inputHTML : escapeHTML(value != null ? value : "-")
-      }</div></div>`;
+    const field = function (label, value, inputHTML) {
+      return (
+        '<div class="field"><div class="label">' +
+        escapeHTML(label) +
+        '</div><div class="value">' +
+        (isEdit || isCreate
+          ? inputHTML
+          : escapeHTML(value != null ? value : "-")) +
+        "</div></div>"
+      );
+    };
 
     // acciones
     let controlsRow = "";
@@ -833,11 +829,6 @@
         "Competencias",
         c.competencias,
         inTA("f_competencias", c.competencias, 3)
-      ) +
-      field(
-        "Status",
-        statusLabel("curso", c.estatus),
-        inSel("f_estatus", statusSelectOptions("curso", c.estatus))
       ) +
       '<div class="grid-3">' +
       field(
@@ -967,7 +958,7 @@
       try {
         disableDrawerInputs(!(isEdit || isCreate));
 
-        // CREAR: seleccionar imagen
+        // CREAR: seleccionar imagen con modal preview
         if (isCreate) {
           const card = document.getElementById("create-media-curso");
           const btn = document.getElementById("create-media-edit");
@@ -1067,6 +1058,7 @@
           bDel.addEventListener("click", async function (e) {
             e.stopPropagation();
             const step = bDel.getAttribute("data-step") || "1";
+            gcLog("btn-delete clicked step:", step);
             if (step === "1") {
               bDel.textContent = "Confirmar";
               bDel.setAttribute("data-step", "2");
@@ -1079,6 +1071,7 @@
               return;
             }
             try {
+              gcLog("softDeleteCurso item:", item);
               await softDeleteCurso(item);
               toast("Curso eliminado (inactivo)", "exito");
               closeDrawer();
@@ -1127,6 +1120,7 @@
         }
 
         if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
+        gcLog("renderCursoDrawer BINDINGS end");
       } catch (err) {
         gcLog("renderCursoDrawer bindings error:", err);
         toast("Ocurrió un error al preparar el formulario", "error");
@@ -1139,7 +1133,7 @@
   function disableDrawerInputs(disabled) {
     qsa(
       "#drawer-body input, #drawer-body select, #drawer-body textarea"
-    ).forEach((el) => {
+    ).forEach(function (el) {
       el.disabled = !!disabled;
     });
   }
@@ -1170,21 +1164,36 @@
   function mapToOptions(map, selectedId) {
     if (!map || typeof map !== "object") return '<option value="">—</option>';
     const pairs = Object.keys(map)
-      .filter((k) => k !== "_ts")
-      .map((k) => [k, map[k]]);
+      .filter(function (k) {
+        return k !== "_ts";
+      })
+      .map(function (k) {
+        return [k, map[k]];
+      });
     if (!pairs.length) return '<option value="">—</option>';
     return pairs
-      .map(([id, name]) => {
+      .map(function (pair) {
+        const id = pair[0],
+          name = pair[1];
         const sel = String(selectedId) === String(id) ? " selected" : "";
-        return `<option value="${escapeAttr(id)}"${sel}>${escapeHTML(
-          name
-        )}</option>`;
+        return (
+          '<option value="' +
+          escapeAttr(id) +
+          '"' +
+          sel +
+          ">" +
+          escapeHTML(name) +
+          "</option>"
+        );
       })
       .join("");
   }
 
   function readCursoForm(existingId) {
-    const read = (id) => (qs("#" + id) ? qs("#" + id).value : "");
+    const read = (id) => {
+      const el = qs("#" + id);
+      return el ? el.value : "";
+    };
     const readN = (id, def) => Number(read(id) || def || 0);
     const readCh = (id) => {
       const el = qs("#" + id);
@@ -1202,7 +1211,7 @@
       tutor: readN("f_tutor", 0),
       horas: readN("f_horas", 0),
       precio: readN("f_precio", 0),
-      estatus: readN("f_estatus", 1),
+      estatus: 1,
       fecha_inicio: read("f_fecha"),
       prioridad: readN("f_prioridad", 1),
       categoria: readN("f_categoria", 1),
@@ -1432,7 +1441,7 @@
           )}</span></div>
           <div class="col-tutor">${it.comentarios}</div>
           <div class="col-fecha">${fmtDateTime(it.fecha)}</div>
-          <div class="col-status">${badgeGeneric("noticia", it.estatus)}</div>
+          <div class="col-status">${badgeNoticia(it.estatus)}</div>
         </div>`,
       mobileRow: (it) => `
         <div class="table-row-mobile" data-id="${it.id}" data-type="noticia">
@@ -1461,50 +1470,10 @@
     });
   }
 
-  function renderNoticiaDrawer(dataset) {
-    const item = state.data.find((x) => String(x.id) === dataset.id);
-    const n = item && item._all;
-    if (!n) return "<p>No encontrado.</p>";
-
-    let html =
-      pair("Título", n.titulo) +
-      pair("Estado", statusLabel("noticia", n.estatus)) +
-      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
-      pair("Descripción (1)", n.desc_uno) +
-      pair("Descripción (2)", n.desc_dos) +
-      pair("Creado por", n.creado_por) +
-      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
-      n.id +
-      '"></div></div></div>';
-
-    if (isAdminUser) {
-      html += jsonSection(
-        n,
-        "JSON · Noticia",
-        "json-noticia",
-        "btn-copy-json-noticia"
-      );
-    }
-
-    setTimeout(function () {
-      try {
-        const cont = document.getElementById("media-noticia");
-        if (cont) {
-          mountReadOnlyMedia({
-            container: cont,
-            type: "noticia",
-            id: n.id,
-            labels: ["Imagen 1", "Imagen 2"],
-          });
-        }
-        if (isAdminUser)
-          bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
-      } catch (err) {
-        gcLog("renderNoticiaDrawer bindings error:", err);
-      }
-    }, 0);
-
-    return html;
+  function badgeNoticia(estatus) {
+    return Number(estatus) === 1
+      ? '<span class="gc-badge-activo">Publicada</span>'
+      : '<span class="gc-badge-inactivo">Inactiva</span>';
   }
 
   async function inactivateNoticia(id) {
@@ -1529,6 +1498,163 @@
     const body = { ...it._all, estatus: 1 };
     await postJSON(API.uNoticias, body);
     return true;
+  }
+
+  // ---- Drawer Noticia
+  function renderNoticiaDrawer(dataset) {
+    const item = state.data.find((x) => String(x.id) === dataset.id);
+    const n = item && item._all;
+    if (!n) return "<p>No encontrado.</p>";
+
+    const mode =
+      state.currentDrawer &&
+      state.currentDrawer.type === "noticia" &&
+      state.currentDrawer.id === n.id
+        ? state.currentDrawer.mode
+        : "view";
+    const isEdit = mode === "edit";
+    const isView = !isEdit;
+    const isInactive = Number(n.estatus) === 0;
+
+    const controlsRow = isAdminUser
+      ? '<div class="gc-actions">' +
+        (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>'
+          : "") +
+        (isEdit
+          ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>'
+          : "") +
+        (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') +
+        "</div>"
+      : "";
+
+    let html =
+      "" +
+      controlsRow +
+      pair("Título", n.titulo) +
+      pair("Estado", Number(n.estatus) === 1 ? "Publicada" : "Inactiva") +
+      pair("Fecha publicación", fmtDateTime(n.fecha_creacion)) +
+      pair("Descripción (1)", n.desc_uno) +
+      pair("Descripción (2)", n.desc_dos) +
+      pair("Creado por", n.creado_por) +
+      '<div class="field"><div class="label">Imágenes</div><div class="value"><div id="media-noticia" data-id="' +
+      n.id +
+      '"></div></div></div>';
+
+    if (isAdminUser) {
+      html += jsonSection(
+        n,
+        "JSON · Noticia",
+        "json-noticia",
+        "btn-copy-json-noticia"
+      );
+    }
+
+    if (isEdit) {
+      qs("#drawer-title").textContent =
+        "Noticia · " + (item ? item.titulo : "") + " (edición)";
+      state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+    } else {
+      qs("#drawer-title").textContent =
+        "Noticia · " + (item ? item.titulo : "");
+      state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+    }
+
+    setTimeout(function () {
+      try {
+        const be = qs("#btn-edit");
+        if (be)
+          be.addEventListener("click", function (e) {
+            e.stopPropagation();
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "edit" };
+            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+              id: String(n.id),
+            });
+          });
+
+        const bc = qs("#btn-cancel");
+        if (bc)
+          bc.addEventListener("click", function (e) {
+            e.stopPropagation();
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+            qs("#drawer-body").innerHTML = renderNoticiaDrawer({
+              id: String(n.id),
+            });
+          });
+
+        const bs = qs("#btn-save");
+        if (bs)
+          bs.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            toast("Cambios guardados", "exito");
+            state.currentDrawer = { type: "noticia", id: n.id, mode: "view" };
+            await loadNoticias();
+            const re = state.data.find(function (x) {
+              return x.id === n.id;
+            });
+            if (re)
+              openDrawer(
+                "Noticia · " + re.titulo,
+                renderNoticiaDrawer({ id: String(re.id) })
+              );
+          });
+
+        const bDel = qs("#btn-delete");
+        if (bDel)
+          bDel.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            const step = bDel.getAttribute("data-step") || "1";
+            if (step === "1") {
+              bDel.textContent = "Confirmar";
+              bDel.setAttribute("data-step", "2");
+              setTimeout(function () {
+                if (bDel.getAttribute("data-step") === "2") {
+                  bDel.textContent = "Eliminar";
+                  bDel.setAttribute("data-step", "1");
+                }
+              }, 4000);
+              return;
+            }
+            try {
+              await inactivateNoticia(n.id);
+              toast("Noticia eliminada (inactiva)", "exito");
+              closeDrawer();
+              await loadNoticias();
+            } catch (err) {
+              gcLog(err);
+              toast("No se pudo eliminar", "error");
+            }
+          });
+
+        const br = qs("#btn-reactivar");
+        if (br)
+          br.addEventListener("click", async function (e) {
+            e.stopPropagation();
+            const ok = await reactivateNoticia(n.id);
+            if (ok) {
+              toast("Noticia reactivada", "exito");
+              await loadNoticias();
+              const re = state.data.find(function (x) {
+                return x.id === n.id;
+              });
+              if (re)
+                openDrawer(
+                  "Noticia · " + re.titulo,
+                  renderNoticiaDrawer({ id: String(re.id) })
+                );
+            }
+          });
+
+        disableDrawerInputs(!isEdit);
+      } catch (err) {
+        gcLog("renderNoticiaDrawer bindings error:", err);
+      }
+    }, 0);
+
+    return html;
   }
 
   // ---------- CUENTAS ----------
@@ -1652,55 +1778,18 @@
   }
 
   // ---------- Drawer base ----------
-  function ensureDrawerHost() {
-    if (!qs("#gc-dash-overlay")) {
-      const ov = document.createElement("div");
-      ov.id = "gc-dash-overlay";
-      ov.style.cssText =
-        "position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;visibility:hidden;transition:opacity .2s ease, visibility .2s ease;z-index:9998;";
-      document.body.appendChild(ov);
-    }
-    if (!qs("#gc-drawer")) {
-      const dr = document.createElement("aside");
-      dr.id = "gc-drawer";
-      dr.setAttribute("role", "dialog");
-      dr.setAttribute("aria-modal", "true");
-      dr.setAttribute("aria-hidden", "true");
-      dr.style.cssText =
-        "position:fixed;top:0;right:0;height:100vh;width:min(720px,92vw);background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.18);transform:translateX(100%);transition:transform .25s ease;z-index:9999;display:flex;flex-direction:column;";
-      dr.innerHTML = `
-        <header class="gc-drawer-head" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;">
-          <h3 id="drawer-title" style="margin:0;font-size:1.05rem;font-weight:700;">Detalle</h3>
-          <button id="drawer-close" class="gc-btn gc-btn--ghost" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>
-        </header>
-        <div id="drawer-body" style="padding:14px;overflow:auto;"></div>`;
-      document.body.appendChild(dr);
-    }
-  }
   function openDrawer(title, bodyHTML) {
-    ensureDrawerHost();
     const overlay = qs("#gc-dash-overlay");
+    if (overlay && overlay.classList) overlay.classList.add("open");
+
     const drawer = qs("#gc-drawer");
+    if (!drawer) return;
     const t = qs("#drawer-title");
     if (t) t.textContent = title || "Detalle";
     const b = qs("#drawer-body");
     if (b) b.innerHTML = bodyHTML || "";
-    overlay.style.visibility = "visible";
-    overlay.style.opacity = "1";
+    if (drawer.classList) drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
-    drawer.style.transform = "translateX(0)";
-    const close = () => closeDrawer();
-    overlay.onclick = (e) => {
-      if (e.target === overlay) close();
-    };
-    const btnClose = qs("#drawer-close");
-    if (btnClose) btnClose.onclick = close;
-    document.addEventListener("keydown", function esc(e) {
-      if (e.key === "Escape") {
-        close();
-        document.removeEventListener("keydown", esc);
-      }
-    });
   }
   function closeDrawer() {
     // evita warning aria-hidden
@@ -1709,12 +1798,12 @@
         document.activeElement.blur();
     } catch {}
     const overlay = qs("#gc-dash-overlay");
+    if (overlay && overlay.classList) overlay.classList.remove("open");
+
     const drawer = qs("#gc-drawer");
-    if (!overlay || !drawer) return;
-    overlay.style.opacity = "0";
-    overlay.style.visibility = "hidden";
+    if (!drawer) return;
+    if (drawer.classList) drawer.classList.remove("open");
     drawer.setAttribute("aria-hidden", "true");
-    drawer.style.transform = "translateX(100%)";
     state.currentDrawer = null;
     gcLog("closeDrawer");
   }
@@ -2213,8 +2302,19 @@
   }
   //---------------------------------- fin del bloque de imágenes
 
-  // ---- Toolbar / botones (crear)
+  // ---- Toolbar / botones
   function bindUI() {
+    qsa(".admin-dash .admin-nav").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const route =
+          btn.getAttribute("data-route") || btn.getAttribute("href");
+        if (route) {
+          if (location.hash !== route) location.hash = route;
+          else onRouteChange();
+        }
+      });
+    });
+
     const drawerClose = document.getElementById("drawer-close");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
 
@@ -2258,7 +2358,7 @@
   // ---- INIT
   document.addEventListener("DOMContentLoaded", async function () {
     currentUser = getUsuarioFromCookie();
-    const uid = Number((currentUser && currentUser.id) || 0); // FIX: id numérico
+    const uid = Number((currentUser && currentUser.id) || 0);
     isAdminUser = ADMIN_IDS.indexOf(uid) >= 0;
 
     applyAdminVisibility(isAdminUser);
@@ -2273,18 +2373,6 @@
         getTipoEvalMap(),
         getActividadesMap(),
       ]);
-      var tries = 0;
-      var t = setInterval(function () {
-        tries++;
-        ensureTutorsButton();
-        installDrawerObserver();
-        if (qs("#btn-tutores") || tries > 40) clearInterval(t);
-      }, 200);
-
-      onReady(function () {
-        ensureTutorsButton();
-        installDrawerObserver();
-      });
     } catch (e) {
       gcLog("catálogos init error", e);
     }
@@ -2293,276 +2381,4 @@
       window.location.hash = isAdminUser ? "#/cursos" : "#/cuentas";
     onRouteChange();
   });
-
-  (function () {
-    if (window.__GC_ADMIN_BUNDLE__) return;
-    window.__GC_ADMIN_BUNDLE__ = true;
-
-    var API_TUTORES =
-      "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_tutor.php";
-
-    // ------------------ Helpers ------------------
-    function qs(sel, r) {
-      return (r || document).querySelector(sel);
-    }
-    function qsa(sel, r) {
-      return Array.prototype.slice.call((r || document).querySelectorAll(sel));
-    }
-    function onReady(fn) {
-      if (document.readyState === "loading")
-        document.addEventListener("DOMContentLoaded", fn, { once: true });
-      else fn();
-    }
-    function toast(msg, tipo, dur) {
-      if (window.gcToast)
-        return window.gcToast(msg, tipo || "info", dur || 2200);
-      try {
-        console.log("[TOAST]", tipo || "info", msg);
-      } catch (e) {}
-    }
-    function escapeHtml(str) {
-      return String(str == null ? "" : str).replace(/[&<>'"]/g, function (s) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          "'": "&#39;",
-          '"': "&quot;",
-        }[s];
-      });
-    }
-    function normalize(text) {
-      return String(text || "")
-        .toLowerCase()
-        .trim();
-    }
-
-    // -------------- Botón "Tutores" --------------
-    function ensureTutorsButton() {
-      var addBtn = qs("#btn-add");
-      var host = addBtn
-        ? addBtn.parentElement
-        : qs(".toolbar-actions") || qs(".header-actions") || qs("header");
-      if (!host || qs("#btn-tutores")) return;
-      var btn = document.createElement("button");
-      btn.id = "btn-tutores";
-      btn.className = addBtn && addBtn.className ? addBtn.className : "gc-btn";
-      btn.style.marginLeft = "8px";
-      btn.type = "button";
-      btn.textContent = "Tutores";
-      btn.addEventListener("click", openTutorsModal);
-      host.appendChild(btn);
-    }
-
-    async function openTutorsModal() {
-      try {
-        var res = await fetch(API_TUTORES, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ estatus: 1 }),
-        });
-        var text = await res.text();
-        if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
-        var data = [];
-        try {
-          data = JSON.parse(text) || [];
-        } catch (e) {
-          data = [];
-        }
-        if (!Array.isArray(data)) data = [];
-        showTutorsModal(data);
-      } catch (e) {
-        toast("No se pudieron cargar tutores", "error", 2600);
-        try {
-          console.error(e);
-        } catch {}
-      }
-    }
-
-    function showTutorsModal(tutores) {
-      var overlay = document.createElement("div");
-      overlay.className = "gc-tut-overlay";
-      overlay.style.cssText =
-        "position:fixed;inset:0;background:rgba(17,24,39,.5);z-index:10000;display:flex;align-items:center;justify-content:center;";
-      overlay.addEventListener("click", function (e) {
-        if (e.target === overlay) {
-          try {
-            document.body.removeChild(overlay);
-          } catch (e) {}
-        }
-      });
-
-      var modal = document.createElement("div");
-      modal.className = "gc-tut-modal";
-      modal.style.cssText =
-        "background:#fff;border-radius:14px;box-shadow:0 14px 38px rgba(0,0,0,.25);width:min(680px,94vw);max-height:86vh;overflow:hidden;display:flex;flex-direction:column;";
-      modal.innerHTML =
-        "" +
-        '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee;">' +
-        '  <div style="font-weight:700;font-size:1.05rem;">Catálogo de tutores</div>' +
-        '  <div style="display:flex;gap:8px;align-items:center;">' +
-        '    <button id="gc-tut-clear" class="gc-btn gc-btn--ghost" type="button">Quitar filtro</button>' +
-        '    <button id="gc-tut-close" class="gc-btn gc-btn--ghost" type="button" aria-label="Cerrar">✕</button>' +
-        "  </div>" +
-        "</div>" +
-        '<div style="padding:12px 14px;overflow:auto;">' +
-        '  <div class="gc-tut-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px,1fr));gap:10px;"></div>' +
-        "</div>";
-
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
-
-      var grid = qs(".gc-tut-grid", modal);
-      if (!tutores.length) {
-        grid.innerHTML = '<div style="color:#666;">Sin tutores activos</div>';
-      } else {
-        tutores.forEach(function (t) {
-          var card = document.createElement("button");
-          card.type = "button";
-          card.className = "gc-btn";
-          card.style.cssText =
-            "text-align:left;display:flex;gap:10px;align-items:center;";
-          card.innerHTML =
-            "" +
-            '<div style="width:32px;height:32px;border-radius:999px;background:#e8eefb;color:#1a73e8;display:flex;align-items:center;justify-content:center;font-weight:700;">' +
-            (String(t.nombre || "")
-              .trim()
-              .slice(0, 1)
-              .toUpperCase() || "T") +
-            "</div>" +
-            "<div>" +
-            '  <div style="font-weight:600;">' +
-            escapeHtml(t.nombre || "Tutor #" + t.id) +
-            "</div>" +
-            '  <div style="font-size:.85rem;color:#666;">ID: ' +
-            t.id +
-            "</div>" +
-            "</div>";
-          card.addEventListener("click", function () {
-            tryFilterByTutorName(t.nombre);
-            toast(
-              "Filtro por tutor: " + (t.nombre || "ID " + t.id),
-              "info",
-              2200
-            );
-            try {
-              document.body.removeChild(overlay);
-            } catch (e) {}
-          });
-          grid.appendChild(card);
-        });
-      }
-
-      var btnClose = qs("#gc-tut-close", modal);
-      if (btnClose)
-        btnClose.addEventListener("click", function () {
-          try {
-            document.body.removeChild(overlay);
-          } catch (e) {}
-        });
-      var btnClear = qs("#gc-tut-clear", modal);
-      if (btnClear)
-        btnClear.addEventListener("click", function () {
-          clearTutorFilter();
-          toast("Filtro eliminado", "info");
-          try {
-            document.body.removeChild(overlay);
-          } catch (e) {}
-        });
-    }
-
-    function tryFilterByTutorName(tutorName) {
-      var n = normalize(tutorName);
-      // desktop
-      qsa("#recursos-list .table-row[data-type='curso']").forEach(function (
-        row
-      ) {
-        var col = qs(".col-tutor", row);
-        var ok = col && normalize(col.textContent).indexOf(n) >= 0;
-        row.style.display = ok ? "" : "none";
-      });
-      // mobile
-      qsa("#recursos-list-mobile .table-row-mobile[data-type='curso']").forEach(
-        function (row) {
-          var details = qs(".row-details", row);
-          var tutorLine = details
-            ? qsa("div", details).find(function (d) {
-                return /Tutor:/i.test(d.textContent || "");
-              })
-            : null;
-          var ok =
-            tutorLine && normalize(tutorLine.textContent).indexOf(n) >= 0;
-          row.style.display = ok ? "" : "none";
-        }
-      );
-      updateModCount();
-    }
-
-    function clearTutorFilter() {
-      qsa(
-        "#recursos-list .table-row[data-type='curso'], #recursos-list-mobile .table-row-mobile[data-type='curso']"
-      ).forEach(function (row) {
-        row.style.display = "";
-      });
-      updateModCount();
-    }
-
-    function updateModCount() {
-      var shownDesktop = qsa(
-        "#recursos-list .table-row[data-type='curso']"
-      ).filter(function (r) {
-        return r.style.display !== "none";
-      }).length;
-      var shownMobile = qsa(
-        "#recursos-list-mobile .table-row-mobile[data-type='curso']"
-      ).filter(function (r) {
-        return r.style.display !== "none";
-      }).length;
-      var countEl = qs("#mod-count");
-      if (countEl) {
-        var shown = shownDesktop || shownMobile;
-        if (shown)
-          countEl.textContent =
-            shown + " " + (shown === 1 ? "elemento" : "elementos");
-      }
-    }
-
-    // --------- Placeholder "Suscripciones" en Drawer de Curso ---------
-    function installDrawerObserver() {
-      var drawer = qs("#gc-drawer");
-      if (!drawer) return;
-      var body = qs("#drawer-body");
-      var title = qs("#drawer-title");
-
-      var injectIfCourse = function () {
-        if (!drawer || drawer.getAttribute("aria-hidden") === "true") return;
-        var t = title ? String(title.textContent || "") : "";
-        if (!/Curso ·|Curso · Crear|Curso/i.test(t)) return;
-        if (qs("#gc-suscripciones-placeholder", body)) return;
-
-        var box = document.createElement("section");
-        box.id = "gc-suscripciones-placeholder";
-        box.style.cssText =
-          "margin-top:14px;border-top:1px solid #eee;padding-top:12px;";
-        box.innerHTML =
-          "" +
-          '<div class="field">' +
-          '  <div class="label" style="display:flex;align-items:center;gap:6px;">' +
-          "    Suscripciones" +
-          '    <span class="gc-chip gray" style="margin-left:6px;">En preparación</span>' +
-          "  </div>" +
-          '  <div class="value" style="color:#555;line-height:1.45;">' +
-          "    Aquí aparecerá el resumen de suscripciones del curso (placeholder)." +
-          "  </div>" +
-          "</div>";
-        body.appendChild(box);
-      };
-
-      var mo = new MutationObserver(function () {
-        injectIfCourse();
-      });
-      mo.observe(drawer, { subtree: true, childList: true, attributes: true });
-      injectIfCourse();
-    }
-  })();
 })();
