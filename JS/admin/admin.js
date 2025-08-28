@@ -37,7 +37,7 @@
   const API_UPLOAD = {
     cursoImg: API_BASE + "u_cursoImg.php",
     noticiaImg: API_BASE + "u_noticiaImagenes.php",
-    tutorImg: API_BASE + "u_tutorImagen.php"
+    tutorImg: API_BASE + "u_tutorimg.php"
   };
 
   const ADMIN_IDS = [1, 12, 13];
