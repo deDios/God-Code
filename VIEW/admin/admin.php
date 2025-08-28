@@ -153,6 +153,18 @@
                     <span class="icon"><img src="../../ASSETS/Admin/noticias.png" alt="" aria-hidden="true"></span>
                     <span class="label">Noticias</span>
                 </a>
+
+                <!-- NUEVO: Tutores -->
+                <a class="nav-item" href="#/tutores" data-route="#/tutores">
+                    <span class="icon"><img src="../../ASSETS/Admin/tutores.png" alt="" aria-hidden="true"></span>
+                    <span class="label">Tutores</span>
+                </a>
+
+                <!-- NUEVO: Suscripciones -->
+                <a class="nav-item" href="#/suscripciones" data-route="#/suscripciones">
+                    <span class="icon"><img src="../../ASSETS/Admin/suscripciones.png" alt="" aria-hidden="true"></span>
+                    <span class="label">Suscripciones</span>
+                </a>
             </div>
 
             <div class="nav-group">
@@ -187,9 +199,11 @@
         <!-- Contenido principal -->
         <section class="main-content">
 
-            <!-- Toolbar superior -->
+            <!-- Toolbar -->
             <header class="dash-toolbar">
                 <div class="left">
+                    <h2 id="mod-title" class="sr-only" aria-live="polite">—</h2>
+
                     <div class="searchbox">
                         <input id="search-input" type="search" placeholder="Buscar" autocomplete="off" />
                     </div>
@@ -245,7 +259,9 @@
             </section>
 
         </section>
+
     </main>
+
 
 
 
