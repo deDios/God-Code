@@ -1,14 +1,12 @@
 (() => {
   "use strict";
 
-  /* ====== CONFIG & UTILS ====== */
   const GC_DEBUG = false;
   const gcLog = (...a) => { if (GC_DEBUG && typeof console !== "undefined") { try { console.log("[GC]", ...a) } catch { } } };
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (m, t = "exito", d = 2500) => window.gcToast ? window.gcToast(m, t, d) : gcLog(`[${t}] ${m}`);
 
-  // viewport var
   const setVH = () => document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
   setVH(); window.addEventListener("resize", setVH);
 
@@ -90,7 +88,7 @@
     try { return JSON.parse(t) } catch { return { _raw: t } }
   };
 
-  /* ====== CATALOGS (cursos) with cache ====== */
+  /* cursos */
   const cacheGuard = (obj) => obj && Date.now() - obj._ts < 30 * 60 * 1e3;
   const arrToMap = (arr) => { const m = {}; (Array.isArray(arr) ? arr : []).forEach(x => { m[x.id] = x.nombre }); m._ts = Date.now(); return m };
 
@@ -150,7 +148,7 @@
     return setRoute(isAdminUser ? "#/cursos" : "#/cuentas");
   }
 
-  /* ====== ACCOUNT PANEL ====== */
+  /*  ACCOUNT PANEL */
   function showCuentaPanel() {
     try { const el = qs(".recursos-box.desktop-only"); if (el && el.style) el.style.display = "none" } catch { }
     try { const el = qs(".recursos-box.mobile-only"); if (el && el.style) el.style.display = "none" } catch { }
@@ -173,7 +171,7 @@
     const pgm = qs("#pagination-mobile"); if (pgm) pgm.style.display = "";
   }
 
-  /* ====== LIST/RENDER CORE ====== */
+  /*  LIST/RENDER CORE  */
   function showSkeletons() {
     const d = qs("#recursos-list"), m = qs("#recursos-list-mobile");
     if (d) d.innerHTML = ""; if (m) m.innerHTML = "";
@@ -240,7 +238,7 @@
     const countEl = qs("#mod-count");
     if (countEl) countEl.textContent = filtered.length + " " + (filtered.length === 1 ? "elemento" : "elementos");
 
-    // desktop open
+    // desktop 
     qsa("#recursos-list .table-row").forEach(el => {
       el.addEventListener("click", function () {
         const data = el.dataset || {};
@@ -268,7 +266,7 @@
       });
     });
 
-    // reactivate buttons (mobile extra)
+    // botones para reactivar
     qsa(".gc-reactivate").forEach(btn => {
       btn.addEventListener("click", async e => {
         e.stopPropagation();
@@ -289,7 +287,7 @@
     return it => JSON.stringify(it).toLowerCase().indexOf(k) >= 0;
   };
 
-  /* ====== FORMAT & HELPERS ====== */
+
   const escapeHTML = s => String(s == null ? "" : s).replace(/[&<>'"]/g, s => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[s]));
   const escapeAttr = s => String(s == null ? "" : s).replace(/"/g, "&quot;");
   const fmtDate = d => { if (!d) return "-"; try { const p = String(d).split("-"); return `${p[2] || ""}/${p[1] || ""}/${p[0] || ""}` } catch { return d } };
@@ -303,7 +301,6 @@
   const statusSelect = (id, val) => `<select id="${id}">${STATUS_OPTIONS.map(o => `<option value="${o.v}"${Number(val) === Number(o.v) ? " selected" : ""}>${o.l}</option>`).join("")}</select>`;
   const withBust = url => { try { const u = new URL(url, window.location.origin); u.searchParams.set("v", Date.now()); return u.pathname + "?" + u.searchParams.toString() } catch { return url + (url.indexOf("?") >= 0 ? "&" : "?") + "v=" + Date.now() } };
 
-  /* ====== MEDIA ====== */
   function noImageSvg() {
     return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
   }
@@ -312,7 +309,7 @@
     if (type === "noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`,
     `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`];
     if (type === "curso") return [`/ASSETS/cursos/img${nid}.png`];
-    if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; // una sola imagen
+    if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; 
     return [];
   }
   function mountReadOnlyMedia(opt) {
@@ -345,7 +342,7 @@
       const img = card.querySelector("img");
       if (img) {
         img.onerror = function () {
-          // Fallback .png <-> .jpg una vez
+          // Fallback .png <-> .jpg 
           if (!img.dataset.fallbackTried) {
             img.dataset.fallbackTried = "1";
             const m = String(img.src).replace(/[?].*$/, "").match(/\.(png|jpg)$/i);
@@ -555,7 +552,7 @@
     return { ok: true };
   }
 
-  /* ====== DRAWER BASE ====== */
+  /* DRAWER BASE */
   function openDrawer(title, bodyHTML) {
     const overlay = qs("#gc-dash-overlay"); if (overlay && overlay.classList) overlay.classList.add("open");
     const drawer = qs("#gc-drawer"); if (!drawer) return;
@@ -576,7 +573,6 @@
     qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => { el.disabled = !!disabled });
   }
 
-  /* ====== JSON Dev helpers ====== */
   function jsonSection(obj, title, preId, btnId) {
     const safe = escapeHTML(JSON.stringify(obj || {}, null, 2));
     return `<details class="dev-json" open style="margin-top:16px;">
@@ -627,7 +623,7 @@
     if (s) { s.addEventListener("input", () => { state.search = s.value || ""; refreshCurrent() }) }
   }
 
-  /* ====== CURSOS ====== */
+  /*  CURSOS  */
   const badgePrecio = (precio) => Number(precio) === 0 ? '<span class="gc-chip gray">Gratuito</span>' : '<span class="gc-chip gray">Con costo</span>';
   const badgeCurso = (estatus) => statusBadge(estatus);
 
