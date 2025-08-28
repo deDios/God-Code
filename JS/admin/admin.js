@@ -44,8 +44,8 @@
   const STATUS_OPTIONS = [
     { v: 1, l: "Activo" },
     { v: 0, l: "Inactivo" },
-    { v: 2, l: "Borrador" },
-    { v: 3, l: "Archivado" }
+    { v: 2, l: "2" },
+    { v: 3, l: "3" }
   ];
 
   const state = {
