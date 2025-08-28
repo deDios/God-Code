@@ -156,7 +156,30 @@
   function drawSubs() { qs("#mod-title") && (qs("#mod-title").textContent = "Suscripciones"); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div class="empty-state" style="padding:1rem;">Módulo de Suscripciones en construcción</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = "");[qs("#pagination-controls"), qs("#pagination-mobile")].forEach(c => { c && (c.innerHTML = "") }) }
 
   // -------- Toolbar
-  function bindUI() { qsa(".admin-dash .admin-nav").forEach(btn => btn.addEventListener("click", () => { const r = btn.getAttribute("data-route") || btn.getAttribute("href"); if (r) { if (location.hash !== r) location.hash = r; else onRouteChange() } })); qs("#drawer-close") && qs("#drawer-close").addEventListener("click", closeDrawer); qs("#gc-dash-overlay") && qs("#gc-dash-overlay").addEventListener("click", e => { if (e && e.target && e.target.id === "gc-dash-overlay") closeDrawer() }); const add = qs("#btn-add"); if (add) add.addEventListener("click", async () => { if (!IS_ADMIN) return; if (S.route.indexOf("#/cursos") === 0) { await openCreateCurso() } else if (S.route.indexOf("#/tutores") === 0) { openDrawer("Tutor · Crear", renderTutorDrawer({ id: "" })) } else if (S.route.indexOf("#/noticias") === 0) { T("Crear noticia: pendiente", "warning") } }) }
+  function bindUI() {
+    qsa(".gc-side .nav-item").forEach(a => {
+      a.addEventListener("click", (e) => {
+        const route = a.getAttribute("data-route") || a.getAttribute("href");
+        if (!route) return;
+        if (location.hash !== route) { location.hash = route; }
+        else { onRouteChange(); }
+      });
+    });
+
+    const close = qs("#drawer-close");
+    close && close.addEventListener("click", closeDrawer);
+
+    const ov = qs("#gc-dash-overlay");
+    ov && ov.addEventListener("click", (e) => { if (e?.target?.id === "gc-dash-overlay") closeDrawer(); });
+
+    const add = qs("#btn-add");
+    if (add) add.addEventListener("click", async () => {
+      if (!IS_ADMIN) return;
+      if (S.route.indexOf("#/cursos") === 0) await openCreateCurso();
+      else if (S.route.indexOf("#/tutores") === 0) openDrawer("Tutor · Crear", renderTutorDrawer({ id: "" }));
+      else if (S.route.indexOf("#/noticias") === 0) T("Crear noticia: pendiente", "warning");
+    });
+  }
 
   // -------- INIT
   D.addEventListener("DOMContentLoaded", async () => { CUR_USER = getUsuarioFromCookie(); const uid = Number((CUR_USER && CUR_USER.id) || 0); IS_ADMIN = ADMIN_IDS.indexOf(uid) >= 0; applyAdminVisibility(IS_ADMIN); bindUI(); try { await Promise.all([getTMap(), getPMap(), getCMap(), getCalMap(), getTipoMap(), getActMap()]) } catch (e) { L("catalog init err", e) } if (!location.hash) location.hash = IS_ADMIN ? "#/cursos" : "#/cuentas"; onRouteChange() });
