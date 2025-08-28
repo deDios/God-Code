@@ -33,7 +33,12 @@ const API={
   categorias:API_BASE+"c_categorias.php",
   calendario:API_BASE+"c_dias_curso.php",
   tipoEval:API_BASE+"c_tipo_evaluacion.php",
-  actividades:API_BASE+"c_actividades.php"
+  actividades:API_BASE+"c_actividades.php",
+  //Usuarios
+  usuarios: API_BASE + "c_usuario.php",
+  iUsuarios: API_BASE + "i_usuario.php",
+  uUsuarios: API_BASE + "u_usuario.php",
+  uAvatar:   API_BASE + "u_avatar.php",
 };
 const API_UPLOAD={
   cursoImg:API_BASE+"u_cursoImg.php",
@@ -136,8 +141,9 @@ function onRouteChange(){
   if(hash.startsWith("#/cursos"))  { hideCuentaPanel(); return isAdminUser?loadCursos():enforceRouteGuard(); }
   if(hash.startsWith("#/noticias")){ hideCuentaPanel(); return isAdminUser?loadNoticias():enforceRouteGuard(); }
   if(hash.startsWith("#/tutores")) { hideCuentaPanel(); return isAdminUser?loadTutores():enforceRouteGuard(); }
-  if(hash.startsWith("#/cuentas")) { showCuentaPanel(); return; }
-  setRoute(isAdminUser?"#/cursos":"#/cuentas");
+  if (hash.startsWith("#/usuarios")){ hideCuentaPanel(); return isAdminUser ? loadUsuarios() : enforceRouteGuard(); }
+  if(hash.startsWith("#/cuentas")) { showCuentaPanel(); 
+  return; } setRoute(isAdminUser?"#/cursos":"#/cuentas");
 }
 
 /*  LIST CORE  */
@@ -481,11 +487,12 @@ function bindUI(){
   const overlay=qs("#gc-dash-overlay"); if(overlay) overlay.addEventListener("click",(e)=>{ if(e&&e.target&&e.target.id==="gc-dash-overlay") closeDrawer(); });
 
   const addBtn=qs("#btn-add");
-  if(addBtn) addBtn.addEventListener("click",async()=>{
+  if(addBtn) addBtn.addEventListener("click",async()=>{ //
     if(!isAdminUser) return;
     if(state.route.startsWith("#/cursos"))   await openCreateCurso();
     else if(state.route.startsWith("#/noticias")) await openCreateNoticia();
     else if(state.route.startsWith("#/tutores"))  await openCreateTutor();
+    else if (state.route.startsWith("#/usuarios")) { await openCreateUsuario(); }
   });
 
   const s=qs("#search-input");
@@ -1207,6 +1214,232 @@ function drawTutores(){
       }
     }
   });
+}
+/* ====== USUARIOS ====== */
+const isEmail = s => /\S+@\S+\.\S+/.test(String(s||"").trim());
+const digits = s => String(s||"").replace(/\D/g,"");
+
+async function loadUsuarios(){
+  const title = qs("#mod-title"); if (title) title.textContent = "Usuarios";
+  const hdr = qs(".recursos-box.desktop-only .table-header");
+  if (hdr){
+    const c1=hdr.querySelector(".col-nombre"),
+          c2=hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo"),
+          c3=hdr.querySelector(".col-fecha"),
+          c4=hdr.querySelector(".col-status");
+    if (c1) c1.textContent = "Nombre";
+    if (c2){ c2.textContent = "Correo"; c2.classList.add("col-tipo"); }
+    if (c3) c3.textContent = "Teléfono";
+    if (c4) c4.textContent = "Status";
+  }
+  const tt = qs(".tt-title"); if (tt) tt.textContent = "Usuarios:";
+  const st = qs("#tt-status"); if (st){ st.textContent = "Buscar por correo o teléfono"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo"); }
+  const s = qs("#search-input"); if (s) s.placeholder = "Buscar por correo o teléfono";
+
+  state.data = []; state.raw = [];
+  drawUsuarios(); // muestra instrucción hasta que escriban una búsqueda
+}
+
+let _usersLastQ = "";
+async function fetchUsuariosBySearch(q){
+  const body = isEmail(q) ? { correo: q.trim() } : { telefono: digits(q) };
+  const r = await postJSON(API.usuarios, body);
+  const arr = Array.isArray(r) ? r : [];
+  state.raw = arr;
+  state.data = arr.map(u => ({
+    id: u.id, nombre: u.nombre, correo: u.correo, telefono: u.telefono,
+    estatus: Number(u.estatus), _all: u
+  }));
+}
+
+function drawUsuarios(){
+  const q = (state.search||"").trim();
+  const d = qs("#recursos-list"), m = qs("#recursos-list-mobile");
+  if (!q || (!isEmail(q) && digits(q).length < 7)){
+    if (d) d.innerHTML = '<div class="empty-state" style="padding:1rem;">Escribe un <b>correo</b> o al menos <b>7 dígitos</b> del teléfono para buscar.</div>';
+    if (m) m.innerHTML = '<div class="empty-state" style="padding:1rem;">Escribe un <b>correo</b> o al menos <b>7 dígitos</b> del teléfono para buscar.</div>';
+    const c = qs("#mod-count"); if (c) c.textContent = "0 resultados";
+    renderPagination(0);
+    return;
+  }
+  if (q !== _usersLastQ){
+    _usersLastQ = q;
+    showSkeletons();
+    fetchUsuariosBySearch(q).then(()=> renderUsuariosList())
+      .catch(err=>{ gcLog(err); toast("No se pudo consultar usuarios","error"); renderUsuariosList(); });
+  } else {
+    renderUsuariosList();
+  }
+}
+
+function renderUsuariosList(){
+  const rows = state.data;
+  renderList(rows, {
+    matcher: (q)=>{ const k = norm(q); return it => norm(it.nombre).includes(k)||norm(it.correo||"").includes(k)||norm(it.telefono||"").includes(k); },
+    desktopRow: (it)=> `
+      <div class="table-row" data-id="${it.id}" data-type="usuario">
+        <div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre||"-")}</span></div>
+        <div class="col-tutor">${escapeHTML(it.correo||"-")}</div>
+        <div class="col-fecha">${escapeHTML(it.telefono||"-")}</div>
+        <div class="col-status">${statusBadge(it.estatus)}</div>
+      </div>`,
+    mobileRow: (it)=> `
+      <div class="table-row-mobile" data-id="${it.id}" data-type="usuario">
+        <button class="row-toggle">
+          <div class="col-nombre">${escapeHTML(it.nombre||"-")}</div>
+          <span class="icon-chevron">›</span>
+        </button>
+        <div class="row-details">
+          <div><strong>Correo:</strong> ${escapeHTML(it.correo||"-")}</div>
+          <div><strong>Teléfono:</strong> ${escapeHTML(it.telefono||"-")}</div>
+          <div><strong>Status:</strong> ${statusText(it.estatus)}</div>
+          <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
+            <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+            ${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>`:""}
+          </div>
+        </div>
+      </div>`,
+    drawerTitle: (d)=>{ const it = state.data.find(x=>String(x.id)===d.id); return it?("Usuario · "+(it.nombre||it.correo||("#"+it.id))):"Usuario"; },
+    drawerBody: (d)=> renderUsuarioDrawer(d),
+    afterOpen: (d)=> { /* opcional: bind copiar JSON */ }
+  });
+
+  // Reactivar usuario desde lista (reutilizamos patrón)
+  qsa(".gc-reactivate").forEach(btn=>{
+    btn.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      const id = Number(btn.getAttribute("data-id"));
+      try{
+        const it = state.data.find(x=>x.id===id);
+        if(!it || !API.uUsuarios) return toast("Endpoint u_usuario no disponible","warning");
+        await postJSON(API.uUsuarios, {...it._all, estatus:1});
+        toast("Usuario reactivado","exito");
+        _usersLastQ = ""; // fuerza refetch
+        drawUsuarios();
+      }catch(err){ gcLog(err); toast("No se pudo reactivar","error"); }
+    });
+  });
+}
+
+/* Drawer simple (ver/editar) */
+function readUsuarioForm(existing){
+  const v=id=> (qs("#"+id)?.value||"");
+  const n=id=> Number(v(id)||0);
+  const p = {
+    nombre: v("u_nombre"),
+    correo: v("u_correo"),
+    telefono: v("u_telefono"),
+    fecha_nacimiento: v("u_fnac"),
+    tipo_contacto: n("u_tcontacto"),
+    estatus: n("u_estatus")
+  };
+  if (existing && existing.id) p.id = existing.id;
+  return p;
+}
+async function saveUsuarioUpdate(item){
+  if (!item || !item._all) return toast("Sin item para actualizar","error");
+  if (!API.uUsuarios) return toast("Endpoint u_usuario no disponible","warning");
+  const p = readUsuarioForm(item._all);
+  await postJSON(API.uUsuarios, {...item._all, ...p});
+  toast("Cambios guardados","exito");
+  _usersLastQ = ""; // refetch con el mismo término
+  drawUsuarios();
+}
+async function saveUsuarioCreate(){
+  if (!API.iUsuarios) return toast("Endpoint i_usuario no disponible","warning");
+  const p = readUsuarioForm(null);
+  if (!p.nombre || !p.correo || !p.telefono) return toast("Nombre, correo y teléfono son obligatorios","warning");
+  await postJSON(API.iUsuarios, p);
+  toast("Usuario creado","exito"); closeDrawer();
+  _usersLastQ = ""; drawUsuarios();
+}
+async function softDeleteUsuario(item){
+  if (!item || !item._all) return;
+  if (!API.uUsuarios) return toast("Endpoint u_usuario no disponible","warning");
+  await postJSON(API.uUsuarios, {...item._all, estatus:0});
+}
+
+function renderUsuarioDrawer(dataset){
+  const it = state.data.find(x=>String(x.id)===dataset.id);
+  const n = it && it._all;
+  const mode = (state.currentDrawer && state.currentDrawer.type==="usuario" && state.currentDrawer.id===(n?.id)) ? state.currentDrawer.mode : "view";
+  const isEdit = mode==="edit", isView = !isEdit;
+  if (!n) return "<p>No encontrado.</p>";
+
+  const field=(label,val,input)=>`<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${isEdit?input:escapeHTML(val!=null?val:"-")}</div></div>`;
+  const controls = isAdminUser ? (
+    '<div class="gc-actions">'+
+      (isView?'<button class="gc-btn" id="btn-edit">Editar</button>':"")+
+      (isEdit?'<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>':"")+
+      (isEdit?'<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>':"")+
+      (Number(n.estatus)===0?'<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>':'<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>')+
+    '</div>'
+  ) : "";
+
+  let html = controls +
+    field("Nombre", n.nombre, `<input id="u_nombre" type="text" value="${escapeAttr(n.nombre||"")}">`) +
+    field("Correo", n.correo, `<input id="u_correo" type="email" value="${escapeAttr(n.correo||"")}">`) +
+    field("Teléfono", n.telefono, `<input id="u_telefono" type="tel" value="${escapeAttr(n.telefono||"")}">`) +
+    field("Fecha nacimiento", n.fecha_nacimiento||"", `<input id="u_fnac" type="date" value="${escapeAttr(n.fecha_nacimiento||"")}">`) +
+    field("Tipo contacto", n.tipo_contacto, `<input id="u_tcontacto" type="number" min="0" value="${escapeAttr(n.tipo_contacto||"0")}">`) +
+    field("Estatus", statusText(n.estatus), statusSelect("u_estatus", n.estatus));
+
+  // título y estado del drawer
+  if (isEdit){ qs("#drawer-title").textContent = "Usuario · "+(it?it.nombre:"")+" (edición)"; state.currentDrawer={type:"usuario",id:n.id,mode:"edit"}; }
+  else { qs("#drawer-title").textContent = "Usuario · "+(it?it.nombre:""); state.currentDrawer={type:"usuario",id:n.id,mode:"view"}; }
+
+  setTimeout(()=>{
+    try{
+      disableDrawerInputs(!isEdit);
+
+      qs("#btn-edit")?.addEventListener("click",(e)=>{ e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)}); });
+      qs("#btn-cancel")?.addEventListener("click",(e)=>{ e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)}); });
+      qs("#btn-save")?.addEventListener("click",async(e)=>{ e.stopPropagation(); await saveUsuarioUpdate(it); });
+
+      const bDel = qs("#btn-delete");
+      if (bDel) bDel.addEventListener("click", async (e)=>{
+        e.stopPropagation();
+        const step=bDel.getAttribute("data-step")||"1";
+        if (step==="1"){
+          bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2");
+          setTimeout(()=>{ if(bDel.getAttribute("data-step")==="2"){ bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1"); } }, 4000);
+          return;
+        }
+        await softDeleteUsuario(it); toast("Usuario inactivado","exito"); closeDrawer(); _usersLastQ=""; drawUsuarios();
+      });
+
+      qs("#btn-reactivar")?.addEventListener("click", async (e)=>{
+        e.stopPropagation();
+        await postJSON(API.uUsuarios, {...n, estatus:1});
+        toast("Usuario reactivado","exito");
+        closeDrawer(); _usersLastQ=""; drawUsuarios();
+      });
+    }catch(err){ gcLog("renderUsuarioDrawer error:",err); }
+  },0);
+
+  return html;
+}
+
+/* Crear usuario */
+async function openCreateUsuario(){
+  state.currentDrawer={type:"usuario",id:null,mode:"create"};
+  const html =
+    '<div class="gc-actions"><button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button><button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button></div>'+
+    '<div class="field"><div class="label">Nombre</div><div class="value"><input id="u_nombre" type="text" placeholder="Nombre completo"></div></div>'+
+    '<div class="field"><div class="label">Correo</div><div class="value"><input id="u_correo" type="email" placeholder="correo@dominio.com"></div></div>'+
+    '<div class="field"><div class="label">Teléfono</div><div class="value"><input id="u_telefono" type="tel" placeholder="555..."></div></div>'+
+    '<div class="field"><div class="label">Fecha nacimiento</div><div class="value"><input id="u_fnac" type="date"></div></div>'+
+    '<div class="field"><div class="label">Tipo contacto</div><div class="value"><input id="u_tcontacto" type="number" min="0" value="0"></div></div>'+
+    '<div class="field"><div class="label">Estatus</div><div class="value">'+statusSelect("u_estatus",1)+'</div></div>';
+
+  openDrawer("Usuario · Crear", html);
+  setTimeout(()=>{
+    qs("#btn-cancel")?.addEventListener("click", closeDrawer);
+    qs("#btn-save")?.addEventListener("click", async ()=>{
+      try{ await saveUsuarioCreate(); }catch(e){ gcLog(e); toast("Error al crear usuario","error"); }
+    });
+    disableDrawerInputs(false);
+  },0);
 }
 function readTutorForm(existing){
   const g=id=>{ const el=qs("#"+id); return el?el.value:""; };
