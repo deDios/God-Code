@@ -27,7 +27,7 @@ const ADMIN_IDS=[1,12,13];
 /* 0=Inactivo, 1=Activo, 2=Pausado, 3=Terminado */
 const STATUS_OPTIONS=[{v:1,l:"Activo"},{v:0,l:"Inactivo"},{v:2,l:"Pausado"},{v:3,l:"Terminado"}];
 const state={route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",currentDrawer:null,
-  tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null,
+  tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null, tempNewTutorImage:null,
   tutorsMap:null,prioMap:null,categoriasMap:null,calendarioMap:null,tipoEvalMap:null,actividadesMap:null};
 const cacheGuard=o=>o&&(Date.now()-o._ts<30*60*1e3);
 const arrToMap=arr=>{const m={};(Array.isArray(arr)?arr:[]).forEach(x=>m[x.id]=x.nombre);m._ts=Date.now();return m;};
@@ -621,7 +621,40 @@ function drawTutores(){
   });
 }
 function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)}; if(existing?.id) p.id=existing.id; return p;}
-async function saveTutorCreate(){const p=readTutorForm(null); if(!p.nombre) return toast("Falta el nombre","warning"); const body={...p,creado_por:Number((currentUser&&currentUser.id)||0)||1}; await postJSON(API.iTutores,body); toast("Tutor creado","exito"); closeDrawer(); await loadTutores();}
+async function saveTutorCreate(){
+  const p=readTutorForm(null);
+  if(!p.nombre) return toast("Falta el nombre","warning");
+  const body={...p,creado_por:Number((currentUser&&currentUser.id)||0)||1};
+
+  const res=await postJSON(API.iTutores,body);
+  const newId=Number((res && (res.id || res.tutor_id || res.insert_id || (res.data&&res.data.id))) || 0);
+
+  const file=state.tempNewTutorImage || null;
+  if(newId && file){
+    try{
+      const fd=new FormData();
+      fd.append("tutor_id",String(newId));
+      fd.append("imagen",file);
+      const r=await fetch(API_UPLOAD.tutorImg,{method:"POST",body:fd});
+      const txt=await r.text().catch(()=> "");
+      if(!r.ok) throw new Error("HTTP "+r.status+" "+(txt||""));
+      toast("Imagen del tutor subida","exito");
+    }catch(e){
+      gcLog(e);
+      toast("Tutor creado, pero falló la imagen","error");
+    }finally{
+      state.tempNewTutorImage=null;
+    }
+  }
+
+  toast("Tutor creado","exito");
+  closeDrawer();
+  await loadTutores();
+  if(newId){
+    const re=state.data.find(x=>x.id===newId);
+    if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));
+  }
+}
 async function saveTutorUpdate(item){if(!item||!item._all) return toast("Sin item para actualizar","error"); const p=readTutorForm(item._all); const body={...item._all,...p}; await postJSON(API.uTutores,body); toast("Cambios guardados","exito"); await loadTutores(); const re=state.data.find(x=>x.id===item.id); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}
 async function softDeleteTutor(item){if(!item||!item._all) throw new Error("Item inválido"); const body={...item._all,estatus:0}; await postJSON(API.uTutores,body);}
 async function reactivateTutor(id){const it=state.data.find(x=>x.id===Number(id)); if(!it||!it._all) throw new Error("Tutor no encontrado"); const body={...it._all,estatus:1}; await postJSON(API.uTutores,body);}
@@ -637,7 +670,34 @@ function renderTutorDrawer(dataset){
     field("Nombre",t.nombre,`<input id="f_nombre" type="text" value="${escapeAttr(t.nombre||"")}" placeholder="Nombre del tutor"/>`)+
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
     field("Estatus",statusText(t.estatus),statusSelect("f_estatus",t.estatus));
-  if(!isCreate){ html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="media-tutor" data-id="${t.id}"></div></div></div>`; }
+
+  /* Imagen: solo lectura si existe; selección cuando es crear */
+  if(isCreate){
+    html+=`
+      <div class="field">
+        <div class="label">Imagen del tutor</div>
+        <div class="value">
+          <div id="create-media-tutor" class="media-grid">
+            <div class="media-card">
+              <figure class="media-thumb">
+                <img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}" />
+                <button class="icon-btn media-edit" id="create-tutor-edit" title="Seleccionar imagen">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+                  </svg>
+                </button>
+              </figure>
+              <div class="media-meta">
+                <div class="media-label">Foto</div>
+                <div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }else{
+    html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="media-tutor" data-id="${t.id}"></div></div></div>`;
+  }
 
   /* === Secciones de cursos ligados === */
   if(!isCreate){
@@ -662,11 +722,13 @@ function renderTutorDrawer(dataset){
     disableDrawerInputs(!(isEdit||isCreate));
     qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{ if(isCreate) await saveTutorCreate(); else await saveTutorUpdate(item);}catch(err){gcLog(err); toast("Error al guardar","error");}});
     qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"edit"}; qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(item?item.id:"")});});
-    qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); if(isCreate){closeDrawer();}else{state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"view"}; qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(item?item.id:"")});}});
+    qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); if(isCreate){state.tempNewTutorImage=null; closeDrawer();}else{state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"view"}; qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(item?item.id:"")});}});
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
       try{await softDeleteTutor(item); toast("Tutor eliminado (inactivo)","exito"); closeDrawer(); await loadTutores();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}
     });
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{await reactivateTutor(Number(item&&item.id)); toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("No se pudo reactivar","error");}});
+
+    /* Imagen en modo lectura (editables en edición) */
     const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable: isEdit && isAdminUser});
     if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");
 
@@ -688,6 +750,41 @@ function renderTutorDrawer(dataset){
           });
         }catch(err){gcLog("cursos del tutor:",err);}
       })();
+    }
+
+    /* Selector de imagen cuando es crear tutor */
+    if(isCreate){
+      const card = qs("#create-media-tutor");
+      const btn  = qs("#create-tutor-edit");
+      const img  = qs("#create-tutor-thumb");
+      if(btn && img && card){
+        btn.addEventListener("click", ()=>{
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = "image/png, image/jpeg";
+          input.style.display = "none";
+          document.body.appendChild(input);
+
+          input.addEventListener("change", ()=>{
+            const file = input.files && input.files[0];
+            try{ document.body.removeChild(input); }catch{}
+            if(!file) return;
+            const v = validarImagen(file,{maxMB:2});
+            if(!v.ok){ toast(v.error,"error"); return; }
+
+            renderPreviewUI(card, file, async ()=>{
+              state.tempNewTutorImage = file;
+              try{ if(img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl); }catch{}
+              const blobUrl = URL.createObjectURL(file);
+              if(img.dataset) img.dataset.blobUrl = blobUrl;
+              img.src = blobUrl;
+              toast("Imagen seleccionada (se subirá al guardar)","exito");
+            }, ()=>{});
+          });
+
+          input.click();
+        });
+      }
     }
   }catch(err){gcLog("renderTutorDrawer bindings error:",err);}},0);
   return html;
@@ -726,7 +823,6 @@ function readUsuarioForm(existing){const v=id=>qs("#"+id)?.value||""; const n=id
 }
 async function saveUsuarioUpdate(item){ if(!item||!item._all) return toast("Sin item para actualizar","error"); if(!API.uUsuarios) return toast("Endpoint u_usuario no disponible","warning"); const p=readUsuarioForm(item._all); await postJSON(API.uUsuarios,{...item._all,...p}); toast("Cambios guardados","exito"); await loadUsuarios(); const re=state.data.find(x=>x.id===item.id); if(re) openDrawer("Usuario · "+(re.nombre||re.correo),renderUsuarioDrawer({id:String(re.id)}));}
 async function saveUsuarioCreate(){ if(!API.iUsuarios) return toast("Endpoint i_usuario no disponible","warning"); const p=readUsuarioForm(null); if(!p.nombre||!p.correo||!p.telefono) return toast("Nombre, correo y teléfono son obligatorios","warning"); const res=await postJSON(API.iUsuarios,p); const newId=Number((res&&(res.id||res.usuario_id||res.insert_id||(res.data&&res.data.id)))||0);
-  // subir avatar si hay
   const file=state.tempNewUserAvatar||null; if(newId&&file){ try{const fd=new FormData(); fd.append("usuario_id",String(newId)); fd.append("imagen",file); const r=await fetch(API.uAvatar,{method:"POST",body:fd}); if(!r.ok){const tt=await r.text(); throw new Error(tt||"upload fail");} toast("Avatar guardado","exito");}catch(e){gcLog(e); toast("Usuario creado, pero falló el avatar","error");} finally{state.tempNewUserAvatar=null;}}
   toast("Usuario creado","exito"); closeDrawer(); await loadUsuarios(); if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Usuario · "+(re.nombre||re.correo),renderUsuarioDrawer({id:String(re.id)}));}
 }
@@ -747,18 +843,95 @@ function renderUsuarioDrawer(dataset){
   if(isAdminUser) html+=jsonSection(n,"JSON · Usuario","json-usuario","btn-copy-json-usuario");
   if(isEdit){qs("#drawer-title").textContent="Usuario · "+(it?it.nombre:"")+" (edición)"; state.currentDrawer={type:"usuario",id:n.id,mode:"edit"};}
   else{qs("#drawer-title").textContent="Usuario · "+(it?it.nombre:""); state.currentDrawer={type:"usuario",id:n.id,mode:"view"};}
-  setTimeout(()=>{try{
+  setTimeout(() => {
+  try {
     disableDrawerInputs(!isEdit);
-    const cont=qs("#media-usuario"); if(cont) mountReadOnlyMedia({container:cont,type:"usuario",id:n.id,labels:["Avatar"],editable:isEdit&&isAdminUser});
-    qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)});});
-    qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)});});
-    qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); await saveUsuarioUpdate(it);});
-    const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
-      await softDeleteUsuario(it); toast("Usuario inactivado","exito"); closeDrawer(); await loadUsuarios();
+
+    const cont = qs("#media-usuario");
+    if (cont) {
+      mountReadOnlyMedia({
+        container: cont,
+        type: "usuario",
+        id: n.id,
+        labels: ["Avatar"],
+        editable: isEdit && isAdminUser
+      });
+    }
+
+    qs("#btn-edit")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.currentDrawer = { type: "usuario", id: n.id, mode: "edit" };
+      qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) });
     });
-    qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); await postJSON(API.uUsuarios,{...n,estatus:1}); toast("Usuario reactivado","exito"); closeDrawer(); await loadUsuarios();});
-    if(isAdminUser) bindCopyFromPre("#json-usuario","#btn-copy-json-usuario");
-  }catch(err){gcLog("renderUsuarioDrawer error:",err);}},0);
+
+    qs("#btn-cancel")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.currentDrawer = { type: "usuario", id: n.id, mode: "view" };
+      qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) });
+    });
+
+    qs("#btn-save")?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try {
+        await saveUsuarioUpdate(it);
+      } catch (err) {
+        gcLog(err);
+        toast("Error al guardar", "error");
+      }
+    });
+
+    const bDel = qs("#btn-delete");
+    if (bDel) {
+      bDel.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const step = bDel.getAttribute("data-step") || "1";
+        if (step === "1") {
+          bDel.textContent = "Confirmar";
+          bDel.setAttribute("data-step", "2");
+          setTimeout(() => {
+            if (!document.body.contains(bDel)) return;
+            if (bDel.getAttribute("data-step") === "2") {
+              bDel.textContent = "Eliminar";
+              bDel.setAttribute("data-step", "1");
+            }
+          }, 4000);
+          return;
+        }
+        try {
+          bDel.disabled = true;
+          await softDeleteUsuario(it);
+          toast("Usuario inactivado", "exito");
+          closeDrawer();
+          await loadUsuarios();
+        } catch (err) {
+          gcLog(err);
+          toast("No se pudo eliminar", "error");
+        } finally {
+          bDel.disabled = false;
+        }
+      });
+    }
+
+    qs("#btn-reactivar")?.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try {
+        await postJSON(API.uUsuarios, { ...n, estatus: 1 });
+        toast("Usuario reactivado", "exito");
+        closeDrawer();
+        await loadUsuarios();
+
+      } catch (err) {
+        gcLog(err);
+        toast("No se pudo reactivar", "error");
+      }
+    });
+
+    if (isAdminUser) bindCopyFromPre("#json-usuario", "#btn-copy-json-usuario");
+  } catch (err) {
+    gcLog("renderUsuarioDrawer error:", err);
+  }
+}, 0);
+
   return html;
 }
 async function openCreateUsuario(){
@@ -810,3 +983,4 @@ document.addEventListener("DOMContentLoaded",async()=>{
 });
 
 })();
+
