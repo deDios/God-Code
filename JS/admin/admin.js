@@ -20,7 +20,7 @@ const API={
   usuarios:API_BASE+"c_usuarios.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php",
   uAvatar:API_BASE+"u_avatar.php"
 };
-const API_UPLOAD={cursoImg:API_BASE+"u_cursoImg.php", noticiaImg:API_BASE+"u_noticiaImagenes.php", tutorImg:API_BASE+"u_tutorImagen.php"};
+const API_UPLOAD={cursoImg:API_BASE+"u_cursoImg.php", noticiaImg:API_BASE+"u_noticiaImagenes.php", tutorImg:API_BASE+"u_tutorImg.php"};
 
 /* ===== roles/estatus & state ===== */
 const ADMIN_IDS=[1,12,13];
