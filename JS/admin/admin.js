@@ -475,7 +475,7 @@ function renderNoticiaDrawer(dataset){
   if(isEdit){qs("#drawer-title").textContent="Noticia · "+(item?item.titulo:"")+" (edición)"; state.currentDrawer={type:"noticia",id:n.id,mode:"edit"};}
   else{qs("#drawer-title").textContent="Noticia · "+(item?item.titulo:""); state.currentDrawer={type:"noticia",id:n.id,mode:"view"};}
   setTimeout(()=>{try{
-    const cont=qs("#media-noticia"); if(cont) mountReadOnlyMedia({container:cont,type:"noticia",id:n.id,labels:["Imagen 1","Imagen 2"],editable=isEdit&&isAdminUser});
+    const cont=qs("#media-noticia"); if(cont) mountReadOnlyMedia({container:cont,type:"noticia",id:n.id,labels:["Imagen 1","Imagen 2"],editable: isEdit && isAdminUser});
     qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"noticia",id:n.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderNoticiaDrawer({id:String(n.id)});});
     qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderNoticiaDrawer({id:String(n.id)});});
     qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{const payload={...n,...readNoticiaForm(n)}; await postJSON(API.uNoticias,payload); toast("Cambios guardados","exito"); state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; await loadNoticias(); const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("Error al guardar","error");}});
@@ -534,7 +534,7 @@ function drawTutores(){
     mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="tutor"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Estatus:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="tutor" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
     drawerTitle:d=>{const item=state.data.find(x=>String(x.id)===d.id); return item?("Tutor · "+item.nombre):"Tutor"},
     drawerBody:d=>renderTutorDrawer(d),
-    afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id); if(!it) return; const cont=qs("#media-tutor"); if(cont) mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable=isAdminUser&&(state.currentDrawer&&state.currentDrawer.mode==="edit")}); if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");}}
+    afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id); if(!it) return; const cont=qs("#media-tutor"); if(cont) mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit")}); if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");}}
   });
 }
 function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)}; if(existing?.id) p.id=existing.id; return p;}
@@ -568,7 +568,7 @@ function renderTutorDrawer(dataset){
       try{await softDeleteTutor(item); toast("Tutor eliminado (inactivo)","exito"); closeDrawer(); await loadTutores();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}
     });
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{await reactivateTutor(Number(item&&item.id)); toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("No se pudo reactivar","error");}});
-    const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable=isEdit&&isAdminUser});
+    const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable: isEdit && isAdminUser});
     if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");
   }catch(err){gcLog("renderTutorDrawer bindings error:",err);}},0);
   return html;
