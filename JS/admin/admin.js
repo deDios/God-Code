@@ -24,7 +24,8 @@ const API_UPLOAD={cursoImg:API_BASE+"u_cursoImg.php", noticiaImg:API_BASE+"u_not
 
 /* ===== roles/estatus & state ===== */
 const ADMIN_IDS=[1,12,13];
-const STATUS_OPTIONS=[{v:1,l:"Activo"},{v:0,l:"Inactivo"},{v:2,l:"Borrador"},{v:3,l:"Archivado"}];
+/* 0=Inactivo, 1=Activo, 2=Pausado, 3=Terminado */
+const STATUS_OPTIONS=[{v:1,l:"Activo"},{v:0,l:"Inactivo"},{v:2,l:"Pausado"},{v:3,l:"Terminado"}];
 const state={route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",currentDrawer:null,
   tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null,
   tutorsMap:null,prioMap:null,categoriasMap:null,calendarioMap:null,tipoEvalMap:null,actividadesMap:null};
@@ -150,7 +151,14 @@ const fmtDate=d=>{if(!d)return"-";try{const p=String(d).split("-");return `${p[2
 const fmtDateTime=dt=>{if(!dt)return"-";try{const sp=String(dt).split(" ");return `${fmtDate(sp[0])} ${sp[1]||""}`.trim()}catch{return dt}};
 const fmtMoney=n=>{try{return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n)}catch{return"$"+n}};
 const pair=(l,v)=>`<div class="field"><div class="label">${escapeHTML(l)}</div><div class="value">${escapeHTML(v!=null?v:"-")}</div></div>`;
-const statusBadge=v=>Number(v)===1?'<span class="gc-badge-activo">Activo</span>':Number(v)===0?'<span class="gc-badge-inactivo">Inactivo</span>':`<span class="gc-badge-gray">Estatus ${escapeHTML(v)}</span>`;
+const statusBadge=v=>{
+  const n=Number(v);
+  if(n===1) return '<span class="gc-badge-activo">Activo</span>';
+  if(n===0) return '<span class="gc-badge-inactivo">Inactivo</span>';
+  if(n===2) return '<span class="gc-badge-gray">Pausado</span>';
+  if(n===3) return '<span class="gc-badge-gray">Terminado</span>';
+  return `<span class="gc-badge-gray">Estatus ${escapeHTML(v)}</span>`;
+};
 const statusText=v=>{const f=STATUS_OPTIONS.find(x=>Number(x.v)===Number(v)); return f?f.l:`Estatus ${v}`;};
 const statusSelect=(id,val)=>`<select id="${id}">${STATUS_OPTIONS.map(o=>`<option value="${o.v}"${Number(val)===Number(o.v)?" selected":""}>${o.l}</option>`).join("")}</select>`;
 const withBust=url=>{try{const u=new URL(url,window.location.origin); u.searchParams.set("v",Date.now()); return u.pathname+"?"+u.searchParams.toString();}catch{return url+(url.indexOf("?")>=0?"&":"?")+"v="+Date.now();}};
@@ -513,6 +521,81 @@ async function openCreateNoticia(){
   },0);
 }
 
+/* ===== Utilidades de cursos para Tutor (filtro en JS) ===== */
+const _cursosCache={list:null,ts:0};
+async function fetchAllCursosAnyStatus(){
+  if(_cursosCache.list && (Date.now()-_cursosCache.ts)<60*1000) return _cursosCache.list;
+  const [e1,e0,e2,e3]=await Promise.all([
+    postJSON(API.cursos,{estatus:1}),
+    postJSON(API.cursos,{estatus:0}),
+    postJSON(API.cursos,{estatus:2}),
+    postJSON(API.cursos,{estatus:3}),
+  ]);
+  const arr=[]
+    .concat(Array.isArray(e1)?e1:[])
+    .concat(Array.isArray(e0)?e0:[])
+    .concat(Array.isArray(e2)?e2:[])
+    .concat(Array.isArray(e3)?e3:[]);
+  _cursosCache.list=arr; _cursosCache.ts=Date.now(); return arr;
+}
+async function getCursosByTutor(tutorId){
+  const all=await fetchAllCursosAnyStatus();
+  return all.filter(c=>Number(c.tutor)===Number(tutorId));
+}
+function groupCursosPorEstatus(list){
+  const g={activos:[], pausados:[], terminados:[]};
+  for(const c of (Array.isArray(list)?list:[])){
+    const e=Number(c.estatus);
+    if(e===1) g.activos.push(c);
+    else if(e===2) g.pausados.push(c);
+    else g.terminados.push(c); // 0 o 3
+  }
+  return g;
+}
+function cursoChipHTML(c){
+  const img=(mediaUrlsByType("curso",c.id)[0])||"/ASSETS/cursos/img0.png";
+  const name=escapeHTML(c.nombre||("Curso #"+c.id));
+  return `<button class="curso-chip" data-curso-id="${c.id}" title="${name}">
+    <img src="${withBust(img)}" alt="${name}" onerror="this.onerror=null;this.src='${withBust("/ASSETS/cursos/img0.png")}'">
+    <span>${name}</span>
+  </button>`;
+}
+function renderChipList(containerSel,list){
+  const el=qs(containerSel); if(!el) return;
+  if(!list||!list.length){ el.innerHTML='<div class="chip-empty">— Sin cursos —</div>'; return; }
+  el.innerHTML=list.map(cursoChipHTML).join("");
+}
+/* Sub-drawer liviano de Curso con regresar al tutor */
+function openCursoLightFromTutor(tutorId,curso){
+  const nombre=curso?.nombre||("Curso #"+curso?.id);
+  const body=`
+    <div class="gc-actions">
+      <button class="gc-btn gc-btn--ghost" id="btn-back-tutor">← Regresar al tutor</button>
+    </div>
+    ${pair("Nombre", nombre)}
+    ${pair("Tutor", state.tutorsMap && state.tutorsMap[curso.tutor] ? state.tutorsMap[curso.tutor] : ("#"+curso.tutor))}
+    ${pair("Estatus", statusText(curso.estatus))}
+    ${pair("Fecha de inicio", fmtDate(curso.fecha_inicio))}
+    ${pair("Precio", Number(curso.precio)===0 ? "Gratuito" : fmtMoney(curso.precio))}
+    <div class="field">
+      <div class="label">Imagen</div>
+      <div class="value"><div id="media-curso-lite" data-id="${curso.id}"></div></div>
+    </div>
+  `;
+  state.currentDrawer={type:"curso-lite",id:Number(curso.id),mode:"view",parent:{type:"tutor",id:Number(tutorId)}};
+  openDrawer("Curso · "+nombre,body);
+  setTimeout(()=>{
+    const cont=qs("#media-curso-lite");
+    if(cont) mountReadOnlyMedia({container:cont,type:"curso",id:Number(curso.id),labels:["Portada"],editable:false});
+    qs("#btn-back-tutor")?.addEventListener("click",(e)=>{
+      e.preventDefault();
+      qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(tutorId)});
+      const it=state.data.find(x=>String(x.id)===String(tutorId));
+      qs("#drawer-title").textContent="Tutor · "+(it?it.nombre:"");
+    });
+  },0);
+}
+
 /* ===== Tutores ===== */
 async function loadTutores(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Tutores");
@@ -555,7 +638,23 @@ function renderTutorDrawer(dataset){
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
     field("Estatus",statusText(t.estatus),statusSelect("f_estatus",t.estatus));
   if(!isCreate){ html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="media-tutor" data-id="${t.id}"></div></div></div>`; }
+
+  /* === Secciones de cursos ligados === */
+  if(!isCreate){
+    html+=`
+      <div class="field"><div class="label">Cursos activos</div>
+        <div class="value"><div id="tutor-cursos-activos" class="tutor-cursos"></div></div>
+      </div>
+      <div class="field"><div class="label">Cursos pausados</div>
+        <div class="value"><div id="tutor-cursos-pausados" class="tutor-cursos"></div></div>
+      </div>
+      <div class="field"><div class="label">Cursos terminados</div>
+        <div class="value"><div id="tutor-cursos-terminados" class="tutor-cursos"></div></div>
+      </div>`;
+  }
+
   if(isAdminUser) html+=jsonSection(t,"JSON · Tutor","json-tutor","btn-copy-json-tutor");
+
   if(isCreate){qs("#drawer-title").textContent="Tutor · Crear"; state.currentDrawer={type:"tutor",id:null,mode:"create"};}
   else if(isEdit){qs("#drawer-title").textContent="Tutor · "+(item?item.nombre:"")+" (edición)"; state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"edit"};}
   else{qs("#drawer-title").textContent="Tutor · "+(item?item.nombre:""); state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"view"};}
@@ -570,6 +669,26 @@ function renderTutorDrawer(dataset){
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{await reactivateTutor(Number(item&&item.id)); toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("No se pudo reactivar","error");}});
     const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable: isEdit && isAdminUser});
     if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");
+
+    /* cargar y pintar chips de cursos + click -> sub-drawer */
+    if(!isCreate){
+      (async ()=>{
+        try{
+          const list=await getCursosByTutor(t.id);
+          const g=groupCursosPorEstatus(list);
+          renderChipList("#tutor-cursos-activos", g.activos);
+          renderChipList("#tutor-cursos-pausados", g.pausados);
+          renderChipList("#tutor-cursos-terminados", g.terminados);
+          qsa(".curso-chip").forEach(btn=>{
+            btn.addEventListener("click",()=>{
+              const cid=Number(btn.getAttribute("data-curso-id"));
+              const curso=list.find(x=>Number(x.id)===cid);
+              if(curso) openCursoLightFromTutor(t.id,curso);
+            });
+          });
+        }catch(err){gcLog("cursos del tutor:",err);}
+      })();
+    }
   }catch(err){gcLog("renderTutorDrawer bindings error:",err);}},0);
   return html;
 }
@@ -666,7 +785,7 @@ async function openCreateUsuario(){
   },0);
 }
 
-/* ===== Cuenta (placeholder enriquecido) ===== */
+/* ===== Cuenta (inhabilitada: solo label) ===== */
 function showCuentaPanel(){
   try{const el=qs(".recursos-box.desktop-only"); if(el&&el.style) el.style.display="none";}catch{}
   try{const el=qs(".recursos-box.mobile-only"); if(el&&el.style) el.style.display="none";}catch{}
@@ -675,29 +794,8 @@ function showCuentaPanel(){
   if(!qs("#cuenta-panel")){
     const host=qs(".main-content")||document.body; const panel=document.createElement("div");
     panel.id="cuenta-panel"; panel.style.padding="16px 18px";
-    panel.innerHTML=(window.renderCuentaOpciones?window.renderCuentaOpciones():`
-      <div class="gc-card-grid" style="margin:12px 0 20px;">
-        <div class="gc-card">
-          <img src="/ASSETS/admin/cuentaMenu/borrarCuenta.png" alt="" width="28" height="28">
-          <div><div class="gc-card-title">Borrar cuenta</div><div class="gc-muted">Elimina tu cuenta y datos de forma permanente.</div></div>
-          <button id="btn-delete-account" class="gc-btn gc-btn--danger gc-card-cta">Eliminar cuenta</button>
-        </div>
-        <div class="gc-card">
-          <img src="/ASSETS/admin/cuentaMenu/opcionesPrivacidad.png" alt="" width="28" height="28">
-          <div><div class="gc-card-title">Privacidad / Visibilidad</div><div class="gc-muted">Configura quién puede ver tu perfil.</div></div>
-          <button id="btn-privacy" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
-        </div>
-        <div class="gc-card">
-          <img src="/ASSETS/admin/cuentaMenu/notificaciones.png" alt="" width="28" height="28">
-          <div><div class="gc-card-title">Notificaciones</div><div class="gc-muted">Gestiona alertas dentro de la app y correo.</div></div>
-          <button id="btn-notifications" class="gc-btn gc-btn--primary gc-card-cta">Abrir</button>
-        </div>
-      </div>`);
+    panel.innerHTML='<div class="empty-state" style="padding:1rem;font-weight:600;">Panel de cuenta</div>';
     host.appendChild(panel);
-    const safeOpen=(fn)=>{const f=window[fn]; if(typeof f==="function") f(); else toast("Modal no disponible aún","warning");};
-    qs("#btn-delete-account")?.addEventListener("click",()=>safeOpen("openModalDeleteAccount"));
-    qs("#btn-privacy")?.addEventListener("click",()=>safeOpen("openModalPrivacy"));
-    qs("#btn-notifications")?.addEventListener("click",()=>safeOpen("openModalNotifications"));
   }
 }
 function hideCuentaPanel(){const p=qs("#cuenta-panel"); if(p) p.remove(); const d=qs(".recursos-box.desktop-only"); if(d) d.style.display="block"; const m=qs(".recursos-box.mobile-only"); if(m) m.style.display="block"; const pg=qs("#pagination-controls"); if(pg) pg.style.display=""; const pgm=qs("#pagination-mobile"); if(pgm) pgm.style.display="";}

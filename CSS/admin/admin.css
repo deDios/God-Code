@@ -1220,3 +1220,107 @@ body {
     font-size: .86rem;
   }
 }
+
+/* =========================
+   MÓDULO: CUENTA (mockup)
+   Requiere: <body class="cuenta-only"> solo en #/cuentas
+   ========================= */
+
+/* Ocultar header/buscador/listas/paginación cuando estás en Cuenta */
+body.cuenta-only #btn-add,
+body.cuenta-only #mod-title,
+body.cuenta-only .tt-title,
+body.cuenta-only #tt-status,
+body.cuenta-only #mod-count,
+body.cuenta-only #pagination-controls,
+body.cuenta-only #pagination-mobile,
+body.cuenta-only .recursos-box.desktop-only,
+body.cuenta-only .recursos-box.mobile-only,
+body.cuenta-only .list-toolbar,
+body.cuenta-only .admin-head,
+body.cuenta-only .topbar {
+  display: none !important;
+}
+
+/* Contenedor del panel Cuenta */
+#cuenta-panel { 
+  padding: 16px 18px;
+}
+
+/* Centro y ancho máximo */
+.cu-wrap {
+  max-width: 920px;
+  margin: 18px auto;
+}
+
+/* Tarjeta gris contenedora y título */
+.cu-panel {
+  background: #e9ecef;
+  border-radius: 10px;
+  padding: 22px 18px;
+}
+.cu-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 4px 0 18px;
+}
+
+/* Lista de tarjetas blancas */
+.cu-list {
+  display: grid;
+  gap: 14px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.cu-card {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: start;
+  gap: 12px;
+
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 0 rgba(0,0,0,.08);
+}
+
+.cu-click { cursor: pointer; }
+.cu-click:hover,
+.cu-click:focus {
+  box-shadow: 0 3px 0 rgba(0,0,0,.12);
+}
+.cu-click:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.cu-card .cu-ico {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  margin-top: 4px;
+}
+
+.cu-card .cu-h {
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  margin: 2px 0 4px;
+}
+.cu-card .cu-sub {
+  color: #495057;
+  font-size: .95rem;
+}
+
+.cu-card button {
+  justify-self: start;
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .cu-card { grid-template-columns: 40px 1fr; }
+  .cu-title { font-size: 1.35rem; }
+}
