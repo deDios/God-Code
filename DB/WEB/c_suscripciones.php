@@ -31,19 +31,12 @@ if (method_exists($con, 'set_charset')) {
 }
 
 $status = 1;
-if (isset($input['status'])) {
-    $status = (int)$input['status'];
-} elseif (isset($input['estatus'])) {
-    $status = (int)$input['estatus'];
-} else {
-    if (isset($_GET['status'])) {
-        $status = (int)$_GET['status'];
-    } elseif (isset($_GET['estatus'])) {
-        $status = (int)$_GET['estatus'];
-    }
-}
+if (isset($input['status']))        $status = (int)$input['status'];
+elseif (isset($input['estatus']))   $status = (int)$input['estatus'];
+elseif (isset($_GET['status']))     $status = (int)$_GET['status'];
+elseif (isset($_GET['estatus']))    $status = (int)$_GET['estatus'];
 
-$table = "god_code.gc_suscripcion";
+$table = "god_code.gc_inscripciones";
 
 $sql = "SELECT id, curso, usuario, comentario, estatus, fecha_creacion, fecha_modif
         FROM $table
