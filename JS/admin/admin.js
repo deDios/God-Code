@@ -163,7 +163,7 @@ function mediaUrlsByType(type,id){
   if(type==="noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`,`/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`];
   if(type==="curso")   return [`/ASSETS/cursos/img${nid}.png`];
   if(type==="tutor")   return [`/ASSETS/tutor/tutor_${nid}.png`];
-  if(type==="usuario") return [`/ASSETS/usuario/usuarioImg/user_${nid}.png`]; // fallback -> default avatar
+  if(type==="usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; // fallback -> default avatar
   return [];
 }
 function humanSize(bytes){if(bytes<1024)return bytes+" B"; if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB"; return (bytes/1024/1024).toFixed(2)+" MB";}
