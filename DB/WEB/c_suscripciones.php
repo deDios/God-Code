@@ -30,8 +30,10 @@ if (isset($input['status'])) {
     $status = (int)$input['estatus'];
 }
 
+$table = "god_code.gc_suscripcion";
+
 $sql = "SELECT id, curso, usuario, comentario, estatus, fecha_creacion, fecha_modif
-        FROM god_code.gc_suscripcion
+        FROM $table
         WHERE estatus = ?
         ORDER BY id DESC";
 
