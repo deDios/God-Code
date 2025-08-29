@@ -16,11 +16,18 @@ if ($path && file_exists($path)) {
     die(json_encode(["error" => "No se encontró Conexion.php en la ruta $path"]));
 }
 
-$input = json_decode(file_get_contents("php://input"), true) ?: [];
+$inputRaw = file_get_contents("php://input");
+$input = json_decode($inputRaw, true) ?: [];
 
 $con = conectar();
 if (!$con) {
     die(json_encode(["error" => "Error de conexión a la base de datos."]));
+}
+
+if (method_exists($con, 'set_charset')) {
+    $con->set_charset('utf8mb4');
+} else {
+    @mysqli_query($con, "SET NAMES 'utf8mb4'");
 }
 
 $status = 1;
@@ -28,6 +35,12 @@ if (isset($input['status'])) {
     $status = (int)$input['status'];
 } elseif (isset($input['estatus'])) {
     $status = (int)$input['estatus'];
+} else {
+    if (isset($_GET['status'])) {
+        $status = (int)$_GET['status'];
+    } elseif (isset($_GET['estatus'])) {
+        $status = (int)$_GET['estatus'];
+    }
 }
 
 $table = "god_code.gc_suscripcion";
@@ -50,11 +63,20 @@ if (!$stmt->execute()) {
 
 $res = $stmt->get_result();
 $data = [];
-while ($row = $res->fetch_assoc()) {
-    $data[] = $row;
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $data[] = $row;
+    }
 }
 
-echo json_encode($data);
+header("X-Row-Count: " . count($data));
+
+$out = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+if ($out === false) {
+    header("X-JSON-Error: " . json_last_error_msg());
+    $out = "[]";
+}
+echo $out;
 
 $stmt->close();
 $con->close();
