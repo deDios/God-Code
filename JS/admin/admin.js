@@ -13,7 +13,7 @@ const API={
   tutores:API_BASE+"c_tutor.php", iTutores:API_BASE+"i_tutor.php", uTutores:API_BASE+"u_tutor.php",
   prioridad:API_BASE+"c_prioridad.php", categorias:API_BASE+"c_categorias.php", calendario:API_BASE+"c_dias_curso.php",
   tipoEval:API_BASE+"c_tipo_evaluacion.php", actividades:API_BASE+"c_actividades.php",
-  usuarios:API_BASE+"c_usuario.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php", uAvatar:API_BASE+"u_avatar.php"
+  usuarios:API_BASE+"c_usuarios.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php", uAvatar:API_BASE+"u_avatar.php"
 };
 const API_UPLOAD={cursoImg:API_BASE+"u_cursoImg.php", noticiaImg:API_BASE+"u_noticiaImagenes.php", tutorImg:API_BASE+"u_tutorImagen.php"};
 
