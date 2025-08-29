@@ -395,13 +395,85 @@ async function loadTutores(){
 }
 function drawTutores(){
   const rows=state.data;
-  renderList(rows,{matcher:q=>{const k=norm(q);return it=>norm(it.nombre).includes(k)||norm(it.descripcion||"").includes(k)},
-    desktopRow:it=>`<div class="table-row" data-id="${it.id}" data-type="tutor"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre)}</span></div><div class="col-tutor" title="${escapeAttr(it.descripcion||"")}">${escapeHTML((it.descripcion||"").slice(0,60))}${(it.descripcion||"").length>60?"…":""}</div><div class="col-fecha"></div><div class="col-status">${statusBadge(it.estatus)}</div></div>`,
-    mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="tutor"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Estatus:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="tutor" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
-    drawerTitle:d=>{const item=state.data.find(x=>String(x.id)===d.id);return item?("Tutor · "+item.nombre):"Tutor"},
-    drawerBody:d=>renderTutorDrawer(d),
-    afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id);if(!it)return;const cont=qs("#media-tutor");if(cont)mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser&&(state.currentDrawer&&state.currentDrawer.mode==="edit")});if(isAdminUser)bindCopyFromPre("#json-tutor","#btn-copy-json-tutor")}}
-  })
+  function renderList(rows, config){
+  const d = qs("#recursos-list"), m = qs("#recursos-list-mobile");
+  if (d) d.innerHTML = "";
+  if (m) m.innerHTML = "";
+
+  const predicate = state.search
+    ? (typeof config.matcher === "function"
+        ? config.matcher(state.search)
+        : defaultMatcher(state.search))
+    : null;
+
+  const filtered = predicate ? rows.filter(predicate) : rows;
+
+  if (!filtered.length){
+    const empty = '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
+    if (d) d.innerHTML = empty;
+    if (m) m.innerHTML = empty;
+    const c = qs("#mod-count"); if (c) c.textContent = "0 resultados";
+    renderPagination(0);
+    return;
+  }
+
+  const start = (state.page - 1) * state.pageSize;
+  const pageRows = filtered.slice(start, start + state.pageSize);
+
+  pageRows.forEach(it=>{
+    if (d && typeof config.desktopRow === "function") d.insertAdjacentHTML("beforeend", config.desktopRow(it));
+    if (m && typeof config.mobileRow  === "function") m.insertAdjacentHTML("beforeend",  config.mobileRow(it));
+  });
+
+  const countEl = qs("#mod-count");
+  if (countEl) countEl.textContent = filtered.length + " " + (filtered.length === 1 ? "elemento" : "elementos");
+
+  qsa("#recursos-list .table-row").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const data = el.dataset || {};
+      state.currentDrawer = { type: data.type, id: Number(data.id), mode: "view" };
+      openDrawer(config.drawerTitle(data), config.drawerBody(data));
+      setTimeout(()=> config.afterOpen && config.afterOpen(data), 0);
+    });
+  });
+
+  qsa("#recursos-list-mobile .row-toggle").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const row = el.closest(".table-row-mobile");
+      if (row && row.classList) row.classList.toggle("expanded");
+    });
+  });
+
+  qsa("#recursos-list-mobile .open-drawer").forEach(btn=>{
+    btn.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      const host = btn.closest(".table-row-mobile");
+      const data = (host && host.dataset) || {};
+      state.currentDrawer = { type: data.type, id: Number(data.id), mode: "view" };
+      openDrawer(config.drawerTitle(data), config.drawerBody(data));
+      setTimeout(()=> config.afterOpen && config.afterOpen(data), 0);
+    });
+  });
+
+  qsa(".gc-reactivate").forEach(btn=>{
+    btn.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      const id = Number(btn.getAttribute("data-id"));
+      const t  = btn.getAttribute("data-type");
+      try{
+        if (t === "curso"){ await reactivateCurso(id); toast("Curso reactivado","exito"); await loadCursos(); }
+        else if (t === "noticia"){ const ok = await reactivateNoticia(id); if (ok){ toast("Noticia reactivada","exito"); await loadNoticias(); } }
+        else if (t === "tutor"){ await reactivateTutor(id); toast("Tutor reactivado","exito"); await loadTutores(); }
+        else if (t === "usuario"){
+          const it = state.data.find(x=>x.id===id);
+          if (it && API.uUsuarios){ await postJSON(API.uUsuarios, {...it._all, estatus:1}); toast("Usuario reactivado","exito"); await loadUsuarios(); }
+        }
+      }catch(err){ gcLog(err); toast("No se pudo reactivar","error"); }
+    });
+  });
+
+  renderPagination(filtered.length);
+}
 }
 function readTutorForm(existing){const g=id=>{const el=qs("#"+id);return el?el.value:""},gN=(id,def)=>Number(g(id)||def||0);const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)};if(existing&&existing.id)p.id=existing.id;return p}
 async function saveTutorCreate(){const p=readTutorForm(null);if(!p.nombre)return toast("Falta el nombre","warning");const body={...p,creado_por:Number((currentUser&&currentUser.id)||0)||1};await postJSON(API.iTutores,body);toast("Tutor creado","exito");closeDrawer();await loadTutores()}
