@@ -1324,3 +1324,106 @@ body.cuenta-only .topbar {
   .cu-card { grid-template-columns: 40px 1fr; }
   .cu-title { font-size: 1.35rem; }
 }
+
+
+/* ----------------------------------- css para el apartado de cursos ligados */
+#gc-drawer .tutor-cursos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 2px 0 4px;
+  margin-top: 4px;
+}
+
+#gc-drawer .tutor-cursos .chip-empty {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #f8fafc;           
+  border: 1px solid #e5e7eb;       
+  color: #64748b;                
+  font-size: 14px;
+}
+
+/* clickeable */
+#gc-drawer .tutor-cursos .curso-chip {
+  --size: 64px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #d1d5db;  
+  background: #e5e7eb;            
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .06);
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
+  outline: none;
+
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+/* imagen circular pequeña */
+#gc-drawer .tutor-cursos .curso-chip > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+#gc-drawer .tutor-cursos .curso-chip > span {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  max-width: calc(100% - 16px);
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  border-radius: 9999px;
+  background: #f3f4f6;             
+  border: 1px solid #e5e7eb;      
+  color: #111827;                  
+  pointer-events: none;            
+}
+
+#gc-drawer .tutor-cursos .curso-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, .10);
+  filter: saturate(1.02);
+}
+#gc-drawer .tutor-cursos .curso-chip:focus-visible {
+  box-shadow: 0 0 0 2px #93c5fd, 0 1px 2px rgba(16, 24, 40, .06); 
+}
+
+#gc-drawer .tutor-cursos .curso-chip.s-1 { /* activo */
+  box-shadow: 0 0 0 2px #86efac, 0 1px 2px rgba(16,24,40,.06);
+}
+#gc-drawer .tutor-cursos .curso-chip.s-2 { /* pausado */
+  box-shadow: 0 0 0 2px #fdba74, 0 1px 2px rgba(16,24,40,.06);
+}
+#gc-drawer .tutor-cursos .curso-chip.s-3 { /* terminado */
+  box-shadow: 0 0 0 2px #94a3b8, 0 1px 2px rgba(16,24,40,.06);
+}
+#gc-drawer .tutor-cursos .curso-chip.s-0 { /* inactivo */
+  box-shadow: 0 0 0 2px #fecaca, 0 1px 2px rgba(16,24,40,.06);
+  filter: grayscale(.1) opacity(.92);
+}
+
+@media (max-width: 520px) {
+  #gc-drawer .tutor-cursos { gap: 10px; }
+  #gc-drawer .tutor-cursos .curso-chip { --size: 56px; }
+  #gc-drawer .tutor-cursos .curso-chip > span {
+    top: 6px; left: 6px; padding: 3px 6px; font-size: 10.5px;
+  }
+}
