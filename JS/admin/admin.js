@@ -400,7 +400,7 @@ function drawTutores(){
     mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="tutor"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Estatus:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="tutor" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
     drawerTitle:d=>{const item=state.data.find(x=>String(x.id)===d.id);return item?("Tutor · "+item.nombre):"Tutor"},
     drawerBody:d=>renderTutorDrawer(d),
-    afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id);if(!it)return;const cont=qs("#media-tutor");if(cont)mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit")});if(isAdminUser)bindCopyFromPre("#json-tutor","#btn-copy-json-tutor")}}
+    afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id);if(!it)return;const cont=qs("#media-tutor");if(cont)mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser&&(state.currentDrawer&&state.currentDrawer.mode==="edit")});if(isAdminUser)bindCopyFromPre("#json-tutor","#btn-copy-json-tutor")}}
   })
 }
 function readTutorForm(existing){const g=id=>{const el=qs("#"+id);return el?el.value:""},gN=(id,def)=>Number(g(id)||def||0);const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)};if(existing&&existing.id)p.id=existing.id;return p}
