@@ -35,7 +35,7 @@ const API={
   tipoEval:API_BASE+"c_tipo_evaluacion.php",
   actividades:API_BASE+"c_actividades.php",
   //Usuarios
-  usuarios: API_BASE + "c_usuario.php",
+  usuarios: API_BASE + "c_usuarios.php",
   iUsuarios: API_BASE + "i_usuario.php",
   uUsuarios: API_BASE + "u_usuario.php",
   uAvatar:   API_BASE + "u_avatar.php",
@@ -1301,10 +1301,10 @@ function renderUsuariosList(){
       </div>`,
     drawerTitle: (d)=>{ const it = state.data.find(x=>String(x.id)===d.id); return it?("Usuario · "+(it.nombre||it.correo||("#"+it.id))):"Usuario"; },
     drawerBody: (d)=> renderUsuarioDrawer(d),
-    afterOpen: (d)=> { /* opcional: bind copiar JSON */ }
+    afterOpen: (d)=> { /* bind copiar JSON */ }
   });
 
-  // Reactivar usuario desde lista (reutilizamos patrón)
+  // Reactivar usuario desde lista 
   qsa(".gc-reactivate").forEach(btn=>{
     btn.addEventListener("click", async (e)=>{
       e.stopPropagation();
