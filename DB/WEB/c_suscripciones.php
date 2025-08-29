@@ -38,7 +38,7 @@ elseif (isset($input['estatus'])) $status = (int)$input['estatus'];
 elseif (isset($_GET['status']))   $status = (int)$_GET['status'];
 elseif (isset($_GET['estatus']))  $status = (int)$_GET['estatus'];
 
-$schema = "god_code";
+$schema = "god_code"; //por si acaso no le atinamos aca hay varios nombres para la tabla 
 $candidates = [
     'gc_inscripciones',
     'gc_inscripcion',
