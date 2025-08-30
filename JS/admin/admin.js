@@ -20,8 +20,8 @@ const API={
   calendario:API_BASE+"c_dias_curso.php", tipoEval:API_BASE+"c_tipo_evaluacion.php", actividades:API_BASE+"c_actividades.php",
   usuarios:API_BASE+"c_usuarios.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php",
   uAvatar:API_BASE+"u_avatar.php",
-  suscripciones:API_BASE+"c_suscripciones.php",
-  uInscripcion:API_BASE+"u_inscripcion.php"
+  // NUEVO: suscripciones (inscripciones)
+  inscripciones:API_BASE+"c_suscripciones.php", uInscripcion:API_BASE+"u_inscripcion.php"
 };
 const API_UPLOAD={
   cursoImg:API_BASE+"u_cursoImg.php",
@@ -33,15 +33,21 @@ const API_UPLOAD={
 const ADMIN_IDS=[1,12,13];
 /* 0=Inactivo, 1=Activo, 2=Pausado, 3=Terminado */
 const STATUS_OPTIONS=[{v:1,l:"Activo"},{v:0,l:"Inactivo"},{v:2,l:"Pausado"},{v:3,l:"Terminado"}];
+
 const state={
-  route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",currentDrawer:null,
-  tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null,
-  // NUEVO: imagen temporal para tutor al crear
-  tempNewTutorImage:null,
-  tutorsMap:null,prioMap:null,categoriasMap:null,calendarioMap:null,tipoEvalMap:null,actividadesMap:null
+  route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",
+  currentDrawer:null,
+  tempNewCourseImage:null,
+  tempNewNewsImages:{1:null,2:null},
+  tempNewUserAvatar:null,
+  tempNewTutorImage:null,            // NUEVO (tutor create)
+  tutorsMap:null, prioMap:null, categoriasMap:null, calendarioMap:null,
+  tipoEvalMap:null, actividadesMap:null,
+  cursosMap:null,                    // NUEVO (para suscripciones)
+  usuariosMap:null                   // NUEVO (para suscripciones)
 };
 const cacheGuard=o=>o&&(Date.now()-o._ts<30*60*1e3);
-const arrToMap=arr=>{const m={};(Array.isArray(arr)?arr:[]).forEach(x=>m[x.id]=x.nombre);m._ts=Date.now();return m;};
+const arrToMap=arr=>{const m={};(Array.isArray(arr)?arr:[]).forEach(x=>m[x.id]=x.nombre||x.titulo||(`#${x.id}`));m._ts=Date.now();return m;};
 
 let currentUser=getUsuarioFromCookie(); let isAdminUser=ADMIN_IDS.includes(Number((currentUser&&currentUser.id)||0));
 
@@ -70,6 +76,42 @@ const getCalendarioMap=async()=>{if(cacheGuard(state.calendarioMap))return state
 const getTipoEvalMap=async()=>{if(cacheGuard(state.tipoEvalMap))return state.tipoEvalMap;const a=await postJSON(API.tipoEval,{estatus:1});return state.tipoEvalMap=arrToMap(a)};
 const getActividadesMap=async()=>{if(cacheGuard(state.actividadesMap))return state.actividadesMap;const a=await postJSON(API.actividades,{estatus:1});return state.actividadesMap=arrToMap(a)};
 
+/* NUEVO: cursos/usuarios map (cualquier estatus) */
+const _usersCache={list:null,ts:0};
+async function fetchAllUsuariosAnyStatus(){
+  if(_usersCache.list && (Date.now()-_usersCache.ts)<60*1000) return _usersCache.list;
+  const [e1,e0,e2,e3]=await Promise.all([
+    postJSON(API.usuarios,{estatus:1}),
+    postJSON(API.usuarios,{estatus:0}),
+    postJSON(API.usuarios,{estatus:2}),
+    postJSON(API.usuarios,{estatus:3}),
+  ]);
+  const arr=[]
+    .concat(Array.isArray(e1)?e1:[])
+    .concat(Array.isArray(e0)?e0:[])
+    .concat(Array.isArray(e2)?e2:[])
+    .concat(Array.isArray(e3)?e3:[]);
+  _usersCache.list=arr; _usersCache.ts=Date.now(); return arr;
+}
+const _cursosCache={list:null,ts:0};
+async function fetchAllCursosAnyStatus(){
+  if(_cursosCache.list && (Date.now()-_cursosCache.ts)<60*1000) return _cursosCache.list;
+  const [e1,e0,e2,e3]=await Promise.all([
+    postJSON(API.cursos,{estatus:1}),
+    postJSON(API.cursos,{estatus:0}),
+    postJSON(API.cursos,{estatus:2}),
+    postJSON(API.cursos,{estatus:3}),
+  ]);
+  const arr=[]
+    .concat(Array.isArray(e1)?e1:[])
+    .concat(Array.isArray(e0)?e0:[])
+    .concat(Array.isArray(e2)?e2:[])
+    .concat(Array.isArray(e3)?e3:[]);
+  _cursosCache.list=arr; _cursosCache.ts=Date.now(); return arr;
+}
+async function getCursosMapAnyStatus(){ if(cacheGuard(state.cursosMap)) return state.cursosMap; const arr=await fetchAllCursosAnyStatus(); return state.cursosMap=arrToMap(arr); }
+async function getUsuariosMapAnyStatus(){ if(cacheGuard(state.usuariosMap)) return state.usuariosMap; const arr=await fetchAllUsuariosAnyStatus(); return state.usuariosMap=arrToMap(arr); }
+
 /* ===== routing/visibilidad ===== */
 function isCuentasLink(el){const href=(el.getAttribute("href")||el.dataset.route||"").toLowerCase();const txt=(el.textContent||"").toLowerCase();return href.indexOf("#/cuentas")>=0||txt.indexOf("cuenta")>=0;}
 function applyAdminVisibility(isAdmin){
@@ -90,7 +132,6 @@ function onRouteChange(){
   if(hash.startsWith("#/noticias"))       { hideCuentaPanel(); return isAdminUser?loadNoticias():enforceRouteGuard(); }
   if(hash.startsWith("#/tutores"))        { hideCuentaPanel(); return isAdminUser?loadTutores():enforceRouteGuard(); }
   if(hash.startsWith("#/usuarios"))       { hideCuentaPanel(); return isAdminUser?loadUsuarios():enforceRouteGuard(); }
-  // NUEVO: ruta suscripciones
   if(hash.startsWith("#/suscripciones"))  { hideCuentaPanel(); return isAdminUser?loadSuscripciones():enforceRouteGuard(); }
   if(hash.startsWith("#/cuentas"))        { showCuentaPanel(); return; }
   setRoute(isAdminUser?"#/cursos":"#/cuentas");
@@ -186,7 +227,7 @@ function mediaUrlsByType(type,id){
   if(type==="noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`,`/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`];
   if(type==="curso")   return [`/ASSETS/cursos/img${nid}.png`];
   if(type==="tutor")   return [`/ASSETS/tutor/tutor_${nid}.png`];
-  if(type==="usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; // fallback -> default avatar
+  if(type==="usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`];
   return [];
 }
 function humanSize(bytes){if(bytes<1024)return bytes+" B"; if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB"; return (bytes/1024/1024).toFixed(2)+" MB";}
@@ -318,7 +359,6 @@ function bindUI(){
     else if(state.route.startsWith("#/noticias")) await openCreateNoticia();
     else if(state.route.startsWith("#/tutores")) await openCreateTutor();
     else if(state.route.startsWith("#/usuarios")) await openCreateUsuario();
-    // no creamos suscripciones desde aquí (aún)
   });
   const s=qs("#search-input"); if(s){ s.addEventListener("input",()=>{ state.search=s.value||""; refreshCurrent(); }); }
 }
@@ -328,17 +368,20 @@ const badgePrecio=precio=> Number(precio)===0?'<span class="gc-chip gray">Gratui
 async function loadCursos(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Cursos");
   const hdr=qs(".recursos-box.desktop-only .table-header"); if(hdr){ const c1=hdr.querySelector(".col-nombre"),c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),c3=hdr.querySelector(".col-fecha"),c4=hdr.querySelector(".col-status"); if(c1)c1.textContent="Nombre"; if(c2){c2.textContent="Tutor"; c2.classList.add("col-tutor");} if(c3)c3.textContent="Fecha de inicio"; if(!c4){const nc=document.createElement("div"); nc.className="col-status"; nc.setAttribute("role","columnheader"); nc.textContent="Status"; hdr.appendChild(nc);} else c4.textContent="Status";}
-  qs(".tt-title")&&(qs(".tt-title").textContent="Cursos:"); const st=qs("#tt-status"); if(st){st.textContent="Activos e Inactivos/Pausados/Terminados"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  qs(".tt-title")&&(qs(".tt-title").textContent="Cursos:"); const st=qs("#tt-status"); if(st){st.textContent="Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
   setSearchPlaceholder("Buscar por nombre o tutor");
   showSkeletons();
   try{
-    const [act,inact,pause,term,tmap,pmap,cmap,calmap,temap,ammap]=await Promise.all([
-      postJSON(API.cursos,{estatus:1}), postJSON(API.cursos,{estatus:0}), postJSON(API.cursos,{estatus:2}), postJSON(API.cursos,{estatus:3}),
+    const [e1,e0,e2,e3,tmap,pmap,cmap,calmap,temap,ammap]=await Promise.all([
+      postJSON(API.cursos,{estatus:1}),
+      postJSON(API.cursos,{estatus:0}),
+      postJSON(API.cursos,{estatus:2}),
+      postJSON(API.cursos,{estatus:3}),
       getTutorsMap(), getPrioridadMap(), getCategoriasMap(), getCalendarioMap(), getTipoEvalMap(), getActividadesMap()
     ]);
-    const raw=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[], Array.isArray(pause)?pause:[], Array.isArray(term)?term:[]);
+    const raw=[].concat(e1||[],e0||[],e2||[],e3||[]);
     state.raw=raw;
-    state.data=raw.map(c=>({ id:c.id, nombre:c.nombre, tutor:(tmap&&tmap[c.tutor])||("Tutor #"+c.tutor), tutor_id:c.tutor,
+    state.data=(raw||[]).map(c=>({ id:c.id, nombre:c.nombre, tutor:(tmap&&tmap[c.tutor])||("Tutor #"+c.tutor), tutor_id:c.tutor,
       prioridad_id:c.prioridad, prioridad_nombre:(pmap&&pmap[c.prioridad])||("#"+c.prioridad),
       categoria_id:c.categoria, categoria_nombre:(cmap&&cmap[c.categoria])||("#"+c.categoria),
       calendario_id:c.calendario, calendario_nombre:(calmap&&calmap[c.calendario])||("#"+c.calendario),
@@ -365,10 +408,19 @@ function normalizeCursoPayload(p){return {...p,nombre:String(p.nombre||""),descr
 function readCursoForm(existingId){const read=id=>qs("#"+id)?.value||""; const readN=(id,def)=>Number(read(id)||def||0); const readCh=id=>qs("#"+id)?.checked?1:0;
   const payload={nombre:read("f_nombre"),descripcion_breve:read("f_desc_breve"),descripcion_curso:read("f_desc_curso"),descripcion_media:read("f_desc_media"),dirigido:read("f_dirigido"),competencias:read("f_competencias"),certificado:readCh("f_certificado"),tutor:readN("f_tutor",0),horas:readN("f_horas",0),precio:readN("f_precio",0),estatus:readN("f_estatus",1),fecha_inicio:read("f_fecha"),prioridad:readN("f_prioridad",1),categoria:readN("f_categoria",1),calendario:readN("f_calendario",1),tipo_evaluacion:readN("f_tipo_eval",1),actividades:readN("f_actividades",1),creado_por:Number((currentUser&&currentUser.id)||0)||1}; if(existingId!=null) payload.id=Number(existingId); return payload;}
 async function uploadCursoImagen(cursoId,file){const fd=new FormData(); fd.append("curso_id",String(cursoId)); fd.append("imagen",file); const res=await fetch(API_UPLOAD.cursoImg,{method:"POST",body:fd}); const text=await res.text().catch(()=> ""); if(!res.ok) throw new Error("HTTP "+res.status+" "+(text||"")); try{ return JSON.parse(text) }catch{ return {_raw:text} }}
-async function saveNewCurso(){const payload=normalizeCursoPayload(readCursoForm(null)); if(!payload.nombre) return toast("Falta el nombre","warning"); if(!payload.tutor) return toast("Selecciona tutor","warning"); if(!payload.categoria) return toast("Selecciona categoría","warning"); if(!payload.fecha_inicio) return toast("Fecha de inicio requerida","warning");
-  const res=await postJSON(API.iCursos,payload); const newId=Number((res&&(res.id||res.curso_id||res.insert_id||(res.data&&res.data.id)))||0);
-  const file=state.tempNewCourseImage||null; if(newId&&file){ try{await uploadCursoImagen(newId,file); toast("Imagen subida","exito");}catch(err){gcLog(err); toast("Curso creado, pero falló la imagen","error");} finally{state.tempNewCourseImage=null;} }
-  toast("Curso creado","exito"); closeDrawer(); await loadCursos(); if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Curso · "+re.nombre,renderCursoDrawer({id:String(re.id)}));}}
+async function saveNewCurso(){
+  const payload=normalizeCursoPayload(readCursoForm(null));
+  if(!payload.nombre) return toast("Falta el nombre","warning");
+  if(!payload.tutor) return toast("Selecciona tutor","warning");
+  if(!payload.categoria) return toast("Selecciona categoría","warning");
+  if(!payload.fecha_inicio) return toast("Fecha de inicio requerida","warning");
+  const res=await postJSON(API.iCursos,payload);
+  const newId=Number((res&&(res.id||res.curso_id||res.insert_id||(res.data&&res.data.id)))||0);
+  const file=state.tempNewCourseImage||null;
+  if(newId&&file){ try{await uploadCursoImagen(newId,file); toast("Imagen subida","exito");}catch(err){gcLog(err); toast("Curso creado, pero falló la imagen","error");} finally{state.tempNewCourseImage=null;} }
+  toast("Curso creado","exito"); closeDrawer(); await loadCursos();
+  if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Curso · "+re.nombre,renderCursoDrawer({id:String(re.id)}));}
+}
 async function saveUpdateCurso(item){if(!item||!item._all) return toast("Sin item para actualizar","error"); const payload=normalizeCursoPayload(readCursoForm(item.id)); await postJSON(API.uCursos,payload); toast("Cambios guardados","exito"); await loadCursos(); const re=state.data.find(x=>x.id===item.id); if(re) openDrawer("Curso · "+re.nombre,renderCursoDrawer({id:String(re.id)}));}
 async function softDeleteCurso(item){if(!item||!item._all) throw new Error("Item inválido"); const body=normalizeCursoPayload({...item._all,estatus:0}); await postJSON(API.uCursos,body);}
 async function reactivateCurso(id){const it=state.data.find(x=>x.id===Number(id)); if(!it||!it._all) throw new Error("Curso no encontrado"); const body=normalizeCursoPayload({...it._all,estatus:1}); await postJSON(API.uCursos,body);}
@@ -457,12 +509,17 @@ async function getCommentsCount(nid){const r=await postJSON(API.comentarios,{not
 async function loadNoticias(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Noticias");
   const hdr=qs(".recursos-box.desktop-only .table-header"); if(hdr){const c1=hdr.querySelector(".col-nombre"),c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),c3=hdr.querySelector(".col-fecha"),c4=hdr.querySelector(".col-status"); if(c1)c1.textContent="Título"; if(c2){c2.textContent="Comentarios"; c2.classList.add("col-tipo");} if(c3)c3.textContent="Fecha de publicación"; if(c4)c4.textContent="Status";}
-  qs(".tt-title")&&(qs(".tt-title").textContent="Noticias:"); const st=qs("#tt-status"); if(st){st.textContent="Publicadas e Inactivas"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  qs(".tt-title")&&(qs(".tt-title").textContent="Noticias:"); const st=qs("#tt-status"); if(st){st.textContent="Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
   setSearchPlaceholder("Buscar por título");
   showSkeletons();
   try{
-    const [act,inact]=await Promise.all([postJSON(API.noticias,{estatus:1}),postJSON(API.noticias,{estatus:0})]);
-    const arr=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]);
+    const [e1,e0,e2,e3]=await Promise.all([
+      postJSON(API.noticias,{estatus:1}),
+      postJSON(API.noticias,{estatus:0}),
+      postJSON(API.noticias,{estatus:2}),
+      postJSON(API.noticias,{estatus:3})
+    ]);
+    const arr=[].concat(Array.isArray(e1)?e1:[], Array.isArray(e0)?e0:[], Array.isArray(e2)?e2:[], Array.isArray(e3)?e3:[]);
     const counts=await Promise.all(arr.map(n=>getCommentsCount(n.id).catch(()=>0)));
     state.raw=arr; state.data=arr.map((n,i)=>({id:n.id,titulo:n.titulo,fecha:n.fecha_creacion,estatus:ntf(n.estatus),comentarios:counts[i]||0,_all:n}));
     drawNoticias();
@@ -502,7 +559,14 @@ function renderNoticiaDrawer(dataset){
     const cont=qs("#media-noticia"); if(cont) mountReadOnlyMedia({container:cont,type:"noticia",id:n.id,labels:["Imagen 1","Imagen 2"],editable: isEdit && isAdminUser});
     qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"noticia",id:n.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderNoticiaDrawer({id:String(n.id)});});
     qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderNoticiaDrawer({id:String(n.id)});});
-    qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{const payload={...n,...readNoticiaForm(n)}; await postJSON(API.uNoticias,payload); toast("Cambios guardados","exito"); state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; await loadNoticias(); const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("Error al guardar","error");}});
+    qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{
+      // Validación básica
+      const titulo=(qs("#f_tit")?.value||"").trim(); if(!titulo) return toast("El título es obligatorio","warning");
+      const payload={...n,...readNoticiaForm(n)};
+      await postJSON(API.uNoticias,payload); toast("Cambios guardados","exito");
+      state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; await loadNoticias();
+      const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));
+    }catch(err){gcLog(err); toast("Error al guardar","error");}});
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;} try{await inactivateNoticia(n.id); toast("Noticia eliminada (inactiva)","exito"); closeDrawer(); await loadNoticias();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}});
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); const ok=await reactivateNoticia(n.id); if(ok){toast("Noticia reactivada","exito"); await loadNoticias(); const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));}});
     disableDrawerInputs(!isEdit); if(isAdminUser) bindCopyFromPre("#json-noticia","#btn-copy-json-noticia");
@@ -527,9 +591,10 @@ async function openCreateNoticia(){
       }); input.click();});}}; pick(1); pick(2);
     qs("#btn-cancel")?.addEventListener("click",()=>{state.tempNewNewsImages={1:null,2:null}; closeDrawer();});
     qs("#btn-save")?.addEventListener("click",async()=>{try{
-      if(!API.iNoticias){toast("Falta endpoint i_noticia.php en backend","warning"); return;}
-      const payload={titulo:(qs("#f_tit")?.value||"").trim(), desc_uno:(qs("#f_desc1")?.value||"").trim(), desc_dos:(qs("#f_desc2")?.value||"").trim(), estatus:ntf(qs("#f_estatus")?.value||1), creado_por:Number((currentUser&&currentUser.id)||0)||1};
-      if(!payload.titulo) return toast("Falta el título","warning");
+      // Validación: al menos 1 imagen
+      if(!state.tempNewNewsImages[1] && !state.tempNewNewsImages[2]) return toast("Agrega al menos una imagen","warning");
+      const titulo=(qs("#f_tit")?.value||"").trim(); if(!titulo) return toast("Falta el título","warning");
+      const payload={titulo, desc_uno:(qs("#f_desc1")?.value||"").trim(), desc_dos:(qs("#f_desc2")?.value||"").trim(), estatus:ntf(qs("#f_estatus")?.value||1), creado_por:Number((currentUser&&currentUser.id)||0)||1};
       const res=await postJSON(API.iNoticias,payload); const newId=Number((res&&(res.id||res.noticia_id||res.insert_id||(res.data&&res.data.id)))||0);
       for(const pos of [1,2]){const f=state.tempNewNewsImages[pos]; if(newId&&f){try{const fd=new FormData(); fd.append("noticia_id",String(newId)); fd.append("pos",String(pos)); fd.append("imagen",f); await fetch(API_UPLOAD.noticiaImg,{method:"POST",body:fd});}catch(e){gcLog(e); toast(`Noticia creada, pero falló imagen ${pos}`,"error");}}}
       state.tempNewNewsImages={1:null,2:null}; toast("Noticia creada","exito"); closeDrawer(); await loadNoticias(); if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));}
@@ -537,23 +602,7 @@ async function openCreateNoticia(){
   },0);
 }
 
-/* ===== Utilidades de cursos para Tutor (filtro en JS) ===== */
-const _cursosCache={list:null,ts:0};
-async function fetchAllCursosAnyStatus(){
-  if(_cursosCache.list && (Date.now()-_cursosCache.ts)<60*1000) return _cursosCache.list;
-  const [e1,e0,e2,e3]=await Promise.all([
-    postJSON(API.cursos,{estatus:1}),
-    postJSON(API.cursos,{estatus:0}),
-    postJSON(API.cursos,{estatus:2}),
-    postJSON(API.cursos,{estatus:3}),
-  ]);
-  const arr=[]
-    .concat(Array.isArray(e1)?e1:[])
-    .concat(Array.isArray(e0)?e0:[])
-    .concat(Array.isArray(e2)?e2:[])
-    .concat(Array.isArray(e3)?e3:[]);
-  _cursosCache.list=arr; _cursosCache.ts=Date.now(); return arr;
-}
+/* ===== Cursos por tutor (chips) ===== */
 async function getCursosByTutor(tutorId){
   const all=await fetchAllCursosAnyStatus();
   return all.filter(c=>Number(c.tutor)===Number(tutorId));
@@ -581,7 +630,6 @@ function renderChipList(containerSel,list){
   if(!list||!list.length){ el.innerHTML='<div class="chip-empty">— Sin cursos —</div>'; return; }
   el.innerHTML=list.map(cursoChipHTML).join("");
 }
-/* Sub-drawer liviano de Curso con regresar al tutor */
 function openCursoLightFromTutor(tutorId,curso){
   const nombre=curso?.nombre||("Curso #"+curso?.id);
   const body=`
@@ -616,12 +664,17 @@ function openCursoLightFromTutor(tutorId,curso){
 async function loadTutores(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Tutores");
   const hdr=qs(".recursos-box.desktop-only .table-header"); if(hdr){const c1=hdr.querySelector(".col-nombre"),c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),c3=hdr.querySelector(".col-fecha"),c4=hdr.querySelector(".col-status"); if(c1)c1.textContent="Nombre"; if(c2){c2.textContent="Descripción"; c2.classList.add("col-tipo");} if(c3)c3.textContent=""; if(c4)c4.textContent="Status";}
-  qs(".tt-title")&&(qs(".tt-title").textContent="Tutores:"); const st=qs("#tt-status"); if(st){st.textContent="Activos e Inactivos"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  qs(".tt-title")&&(qs(".tt-title").textContent="Tutores:"); const st=qs("#tt-status"); if(st){st.textContent="Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
   setSearchPlaceholder("Buscar por nombre o descripción");
   showSkeletons();
   try{
-    const [act,inact]=await Promise.all([postJSON(API.tutores,{estatus:1}),postJSON(API.tutores,{estatus:0})]);
-    const raw=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]); state.raw=raw;
+    const [e1,e0,e2,e3]=await Promise.all([
+      postJSON(API.tutores,{estatus:1}),
+      postJSON(API.tutores,{estatus:0}),
+      postJSON(API.tutores,{estatus:2}),
+      postJSON(API.tutores,{estatus:3})
+    ]);
+    const raw=[].concat(Array.isArray(e1)?e1:[], Array.isArray(e0)?e0:[], Array.isArray(e2)?e2:[], Array.isArray(e3)?e3:[]); state.raw=raw;
     state.data=raw.map(t=>({id:t.id,nombre:t.nombre,descripcion:t.descripcion,estatus:ntf(t.estatus),_all:t}));
     drawTutores();
   }catch(err){gcLog(err); qs("#recursos-list")&&(qs("#recursos-list").innerHTML='<div style="padding:1rem;color:#b00020;">Error al cargar tutores</div>'); qs("#recursos-list-mobile")&&(qs("#recursos-list-mobile").innerHTML=""); toast("No se pudieron cargar tutores","error");}
@@ -636,28 +689,25 @@ function drawTutores(){
     afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id); if(!it) return; const cont=qs("#media-tutor"); if(cont) mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit")}); if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");}}
   });
 }
-
-
-function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus: gN("f_estatus", 1)}; if(existing?.id) p.id=existing.id; return p;}
-
-
-
+function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)}; if(existing?.id) p.id=existing.id; return p;}
 async function saveTutorCreate(){
-  const p=readTutorForm(null); if(!p.nombre) return toast("Falta el nombre","warning");
+  const p=readTutorForm(null);
+  if(!p.nombre) return toast("Falta el nombre","warning");
+  // imagen requerida en creación
+  const file=state.tempNewTutorImage||null;
+  if(!file) return toast("Selecciona una imagen para el tutor","warning");
   const body={...p,creado_por:Number((currentUser&&currentUser.id)||0)||1};
   const res=await postJSON(API.iTutores,body);
   const newId=Number((res&&(res.id||res.tutor_id||res.insert_id||(res.data&&res.data.id)))||0);
-  const file=state.tempNewTutorImage||null;
-  if(newId&&file){
-    try{
+  try{
+    if(newId && file){
+      const v=validarImagen(file,{maxMB:2}); if(!v.ok) return toast(v.error,"error");
       const fd=new FormData(); fd.append("tutor_id",String(newId)); fd.append("imagen",file);
-      const r=await fetch(API_UPLOAD.tutorImg,{method:"POST",body:fd}); const txt=await r.text().catch(()=> ""); if(!r.ok) throw new Error("HTTP "+r.status+" "+txt);
-      toast("Imagen de tutor guardada","exito");
-    }catch(e){gcLog(e); toast("Tutor creado, pero falló la imagen","error");}
-    finally{state.tempNewTutorImage=null;}
-  }
+      const r=await fetch(API_UPLOAD.tutorImg,{method:"POST",body:fd}); if(!r.ok){const tt=await r.text(); throw new Error(tt||"upload fail");}
+    }
+  }catch(e){gcLog(e); toast("Tutor creado, pero falló la imagen","error");}
+  finally{ state.tempNewTutorImage=null; }
   toast("Tutor creado","exito"); closeDrawer(); await loadTutores();
-  if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}
 }
 async function saveTutorUpdate(item){if(!item||!item._all) return toast("Sin item para actualizar","error"); const p=readTutorForm(item._all); const body={...item._all,...p}; await postJSON(API.uTutores,body); toast("Cambios guardados","exito"); await loadTutores(); const re=state.data.find(x=>x.id===item.id); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}
 async function softDeleteTutor(item){if(!item||!item._all) throw new Error("Item inválido"); const body={...item._all,estatus:0}; await postJSON(API.uTutores,body);}
@@ -674,26 +724,14 @@ function renderTutorDrawer(dataset){
     field("Nombre",t.nombre,`<input id="f_nombre" type="text" value="${escapeAttr(t.nombre||"")}" placeholder="Nombre del tutor"/>`)+
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
     field("Estatus",statusText(t.estatus),statusSelect("f_estatus",t.estatus));
+
   if(isCreate){
-    html+=`<div class="field"><div class="label">Imagen</div><div class="value">
-      <div id="create-media-tutor" class="media-grid">
-        <div class="media-card">
-          <figure class="media-thumb">
-            <img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}"
-              onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,${encodeURIComponent(noImageSvg())}'">
-            <button class="icon-btn media-edit" id="create-tutor-edit" title="Seleccionar imagen">
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>
-            </button>
-          </figure>
-          <div class="media-meta"><div class="media-label">Foto</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div>
-        </div>
-      </div>
-    </div></div>`;
-  } else {
+    html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="create-media-tutor" class="media-grid"><div class="media-card"><figure class="media-thumb"><img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}"/><button class="icon-btn media-edit" id="create-tutor-pick" title="Seleccionar imagen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg></button></figure><div class="media-meta"><div class="media-label">Foto</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div></div></div></div></div>`;
+  }else{
     html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="media-tutor" data-id="${t.id}"></div></div></div>`;
   }
 
-  /* === Cursos ligados (chips) === */
+  /* cursos ligados (chips) */
   if(!isCreate){
     html+=`
       <div class="field"><div class="label">Cursos activos</div>
@@ -715,11 +753,11 @@ function renderTutorDrawer(dataset){
   setTimeout(()=>{try{
     disableDrawerInputs(!(isEdit||isCreate));
     if(isCreate){
-      const card=qs("#create-media-tutor"), btn=qs("#create-tutor-edit"), thumb=qs("#create-tutor-thumb");
-      if(btn&&thumb&&card){
+      const btn=qs("#create-tutor-pick"), img=qs("#create-tutor-thumb"), wrap=qs("#create-media-tutor");
+      if(btn&&img&&wrap){
         btn.addEventListener("click",()=>{const input=document.createElement("input"); input.type="file"; input.accept="image/png, image/jpeg"; input.style.display="none"; document.body.appendChild(input);
           input.addEventListener("change",()=>{const file=input.files&&input.files[0]; try{document.body.removeChild(input);}catch{} if(!file) return; const v=validarImagen(file,{maxMB:2}); if(!v.ok){toast(v.error,"error"); return;}
-            renderPreviewUI(card,file,async()=>{state.tempNewTutorImage=file; try{if(thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl);}catch{} const blobUrl=URL.createObjectURL(file); if(thumb.dataset) thumb.dataset.blobUrl=blobUrl; thumb.src=blobUrl; toast("Imagen lista (se subirá al guardar)","exito");},()=>{});
+            renderPreviewUI(wrap,file,async()=>{state.tempNewTutorImage=file; try{if(img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl);}catch{} const blobUrl=URL.createObjectURL(file); if(img.dataset) img.dataset.blobUrl=blobUrl; img.src=blobUrl; toast("Imagen lista (se subirá al guardar)","exito");},()=>{});
           }); input.click();
         });
       }
@@ -730,21 +768,23 @@ function renderTutorDrawer(dataset){
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
       try{await softDeleteTutor(item); toast("Tutor eliminado (inactivo)","exito"); closeDrawer(); await loadTutores();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}
     });
-    qs("#btn-reactivar")?.addEventListener("click",(e)=>{e.stopPropagation(); reactivateTutor(Number(item&&item.id)).then(async()=>{toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}).catch(err=>{gcLog(err); toast("No se pudo reactivar","error");})});
+    qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{await reactivateTutor(Number(item&&item.id)); toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("No se pudo reactivar","error");}});
     const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable: isEdit && isAdminUser});
     if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");
 
     if(!isCreate){
-      (async ()=>{try{
-        const list=await getCursosByTutor(t.id);
-        const g=groupCursosPorEstatus(list);
-        renderChipList("#tutor-cursos-activos", g.activos);
-        renderChipList("#tutor-cursos-pausados", g.pausados);
-        renderChipList("#tutor-cursos-terminados", g.terminados);
-        qsa(".curso-chip").forEach(btn=>{
-          btn.addEventListener("click",()=>{const cid=Number(btn.getAttribute("data-curso-id")); const curso=list.find(x=>Number(x.id)===cid); if(curso) openCursoLightFromTutor(t.id,curso);});
-        });
-      }catch(err){gcLog("cursos del tutor:",err);}})();
+      (async ()=>{
+        try{
+          const list=await getCursosByTutor(t.id);
+          const g=groupCursosPorEstatus(list);
+          renderChipList("#tutor-cursos-activos", g.activos);
+          renderChipList("#tutor-cursos-pausados", g.pausados);
+          renderChipList("#tutor-cursos-terminados", g.terminados);
+          qsa(".curso-chip").forEach(btn=>{
+            btn.addEventListener("click",()=>{const cid=Number(btn.getAttribute("data-curso-id")); const curso=list.find(x=>Number(x.id)===cid); if(curso) openCursoLightFromTutor(t.id,curso);});
+          });
+        }catch(err){gcLog("cursos del tutor:",err);}
+      })();
     }
   }catch(err){gcLog("renderTutorDrawer bindings error:",err);}},0);
   return html;
@@ -756,12 +796,17 @@ function digits(s){return String(s||"").replace(/\D/g,"")}
 async function loadUsuarios(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Usuarios");
   const hdr=qs(".recursos-box.desktop-only .table-header"); if(hdr){const c1=hdr.querySelector(".col-nombre"),c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),c3=hdr.querySelector(".col-fecha"),c4=hdr.querySelector(".col-status"); if(c1)c1.textContent="Nombre"; if(c2){c2.textContent="Correo"; c2.classList.add("col-tipo");} if(c3)c3.textContent="Teléfono"; if(c4)c4.textContent="Status";}
-  qs(".tt-title")&&(qs(".tt-title").textContent="Usuarios:"); const st=qs("#tt-status"); if(st){st.textContent="Activos e Inactivos"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  qs(".tt-title")&&(qs(".tt-title").textContent="Usuarios:"); const st=qs("#tt-status"); if(st){st.textContent="Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
   setSearchPlaceholder("Buscar por nombre, correo o teléfono");
   showSkeletons();
   try{
-    const [act,inact]=await Promise.all([postJSON(API.usuarios,{estatus:1}),postJSON(API.usuarios,{estatus:0})]);
-    const arr=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]);
+    const [e1,e0,e2,e3]=await Promise.all([
+      postJSON(API.usuarios,{estatus:1}),
+      postJSON(API.usuarios,{estatus:0}),
+      postJSON(API.usuarios,{estatus:2}),
+      postJSON(API.usuarios,{estatus:3})
+    ]);
+    const arr=[].concat(Array.isArray(e1)?e1:[], Array.isArray(e0)?e0:[], Array.isArray(e2)?e2:[], Array.isArray(e3)?e3:[]);
     state.raw=arr; state.data=arr.map(u=>({id:u.id,nombre:u.nombre,correo:u.correo,telefono:u.telefono,estatus:Number(u.estatus),_all:u}));
     drawUsuarios();
   }catch(err){gcLog(err); qs("#recursos-list")&&(qs("#recursos-list").innerHTML='<div style="padding:1rem;color:#b00020;">Error al cargar usuarios</div>'); qs("#recursos-list-mobile")&&(qs("#recursos-list-mobile").innerHTML=""); toast("No se pudieron cargar usuarios","error");}
@@ -846,162 +891,93 @@ async function loadSuscripciones(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Suscripciones");
   const hdr=qs(".recursos-box.desktop-only .table-header");
   if(hdr){
-    const c1=hdr.querySelector(".col-nombre"), c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"), c3=hdr.querySelector(".col-fecha"), c4=hdr.querySelector(".col-status");
-    if(c1) c1.textContent="Usuario";
-    if(c2){ c2.textContent="Curso"; c2.classList.add("col-tipo"); }
-    if(c3) c3.textContent="Creación";
-    if(c4) c4.textContent="Status";
+    const c1=hdr.querySelector(".col-nombre"),
+          c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),
+          c3=hdr.querySelector(".col-fecha"),
+          c4=hdr.querySelector(".col-status");
+    if(c1)c1.textContent="Suscriptor";
+    if(c2){c2.textContent="Curso"; c2.classList.add("col-tipo");}
+    if(c3)c3.textContent="Fecha de suscripción";
+    if(c4)c4.textContent="Status";
   }
   qs(".tt-title")&&(qs(".tt-title").textContent="Suscripciones:");
-  const st=qs("#tt-status"); if(st){st.textContent="Activas e Inactivas"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
-  setSearchPlaceholder("Buscar por comentario o IDs");
+  const st=qs("#tt-status"); if(st){st.textContent="Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  setSearchPlaceholder("Buscar por suscriptor o curso");
   showSkeletons();
   try{
-    const [act,inact]=await Promise.all([postJSON(API.suscripciones,{estatus:1}), postJSON(API.suscripciones,{estatus:0})]);
-    const arr=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]);
+    const [e1,e0,e2,e3,cMap,uMap]=await Promise.all([
+      postJSON(API.inscripciones,{estatus:1}),
+      postJSON(API.inscripciones,{estatus:0}),
+      postJSON(API.inscripciones,{estatus:2}),
+      postJSON(API.inscripciones,{estatus:3}),
+      getCursosMapAnyStatus(),
+      getUsuariosMapAnyStatus()
+    ]);
+    const arr=[].concat(e1||[],e0||[],e2||[],e3||[]);
     state.raw=arr;
-    state.data=arr.map(s=>({ id:Number(s.id), usuario:Number(s.usuario), curso:Number(s.curso), comentario:s.comentario||"", estatus:ntf(s.estatus), fecha:String(s.fecha_creacion||""), _all:s }));
+    state.data=(arr||[]).map(s=>({
+      id:Number(s.id),
+      curso_id:Number(s.curso),
+      usuario_id:Number(s.usuario),
+      curso_nombre:(cMap&&cMap[s.curso])||("#"+s.curso),
+      suscriptor:(uMap&&uMap[s.usuario])||("#"+s.usuario),
+      comentario:s.comentario||"",
+      fecha:s.fecha_creacion||"",
+      estatus:ntf(s.estatus),
+      _all:s
+    }));
     drawSuscripciones();
   }catch(err){gcLog(err); qs("#recursos-list")&&(qs("#recursos-list").innerHTML='<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile")&&(qs("#recursos-list-mobile").innerHTML=""); toast("No se pudieron cargar suscripciones","error");}
 }
 function drawSuscripciones(){
   const rows=state.data;
   renderList(rows,{
-    matcher:q=>{const k=norm(q); return it=>norm(String(it.usuario)).includes(k)||norm(String(it.curso)).includes(k)||norm(it.comentario||"").includes(k);},
-    desktopRow:it=>`<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre">Usuario #${it.usuario}</div><div class="col-tutor">Curso #${it.curso}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge(it.estatus)}</div></div>`,
-    mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">Usuario #${it.usuario} · Curso #${it.curso}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Comentario:</strong> ${escapeHTML(it.comentario||"-")}</div><div><strong>Creación:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
-    drawerTitle:d=>{const it=state.data.find(x=>String(x.id)===d.id); return it?("Suscripción · #"+it.id):"Suscripción"},
+    matcher:q=>{const k=norm(q); return it=>norm(it.suscriptor).includes(k)||norm(it.curso_nombre).includes(k);},
+    desktopRow:it=>`<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge(it.estatus)}</div></div>`,
+    mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
+    drawerTitle:d=>{const it=state.data.find(x=>String(x.id)===d.id); return it?("Suscripción · "+it.curso_nombre):"Suscripción"},
     drawerBody:d=>renderSuscripcionDrawer(d),
     afterOpen:()=>{}
   });
 }
-function readSuscripcionForm(existing){
-  const v=id=>qs("#"+id)?.value||""; const n=id=>Number(v(id)||0);
-  return {
-    id: existing.id,
-    curso: n("s_curso"),
-    usuario: n("s_usuario"),
-    comentario: v("s_comentario"),
-    estatus: n("s_estatus"),
-  };
-}
-async function reactivateSuscripcion(id){
-  const it=state.data.find(x=>x.id===Number(id));
-  if(!it||!it._all) throw new Error("Suscripción no encontrada");
-  await postJSON(API.uInscripcion,{...it._all, estatus:1});
-}
+async function softDeleteSuscripcion(item){ if(!item||!item._all) return; await postJSON(API.uInscripcion,{id:item.id,estatus:0}); }
+async function reactivateSuscripcion(id){ await postJSON(API.uInscripcion,{id:Number(id),estatus:1}); }
+function readSuscripcionForm(existing){ const g=id=>qs("#"+id)?.value||""; const n=id=>Number(g(id)||0); const p={ comentario:g("s_comentario"), estatus:n("s_estatus") }; if(existing?.id) p.id=existing.id; return p; }
 function renderSuscripcionDrawer(dataset){
-  const item=state.data.find(x=>String(x.id)===dataset.id);
-  if(!item) return "<p>No encontrado.</p>";
-  const s=item._all;
-  const mode=(state.currentDrawer&&state.currentDrawer.type==="suscripcion"&&state.currentDrawer.id===item.id)
-    ? (state.currentDrawer.mode || "view")
-    : "view";
-  const isEdit=mode==="edit";
-  const isInactive=Number(s.estatus)===0;
-
-  const inNum  =(id,val,min)=>`<input id="${id}" type="number" value="${escapeAttr(val!=null?val:"")}" min="${min||0}">`;
-  const inTA   =(id,val)=>`<textarea id="${id}" rows="3">${escapeHTML(val||"")}</textarea>`;
-  const field  =(label,val,input)=>`<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${isEdit?input:escapeHTML(val!=null?val:"-")}</div></div>`;
-
-  const controls=isAdminUser?(
-    '<div class="gc-actions">'
-      + (!isEdit ? '<button class="gc-btn" id="btn-edit">Editar</button>' : '')
-      + (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : '')
-      + (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : '')
-      + (isInactive
-          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
-          : '<button class="gc-btn gc-btn--danger" id="btn-inactivar" data-step="1">Inactivar</button>')
-    + '</div>'
-  ) : '';
-
-  let html=""
-    + controls
-    + field("ID", s.id, `<div>${escapeHTML(String(s.id))}</div>`)
-    + field("Usuario", `#${s.usuario}`, inNum("s_usuario", s.usuario, 1))
-    + field("Curso", `#${s.curso}`, inNum("s_curso", s.curso, 1))
-    + field("Comentario", s.comentario||"-", inTA("s_comentario", s.comentario||""))
-    + field("Estatus", statusText(s.estatus), statusSelect("s_estatus", s.estatus))
-    + field("Creación", fmtDateTime(s.fecha_creacion), fmtDateTime(s.fecha_creacion))
-    + field("Modificación", fmtDateTime(s.fecha_modif||"-"), fmtDateTime(s.fecha_modif||"-"));
-
-  if(isAdminUser) html+=jsonSection(s,"JSON · Suscripción","json-sus","btn-copy-json-sus");
-
-  // Título + estado
-  if(isEdit){
-    qs("#drawer-title").textContent = "Suscripción · #"+s.id+" (edición)";
-    state.currentDrawer = {type:"suscripcion", id:item.id, mode:"edit"};
-  }else{
-    qs("#drawer-title").textContent = "Suscripción · #"+s.id;
-    state.currentDrawer = {type:"suscripcion", id:item.id, mode:"view"};
-  }
-
-  setTimeout(()=>{ try{
+  const it=state.data.find(x=>String(x.id)===dataset.id); if(!it) return "<p>No encontrado.</p>";
+  const mode=(state.currentDrawer&&state.currentDrawer.type==="suscripcion"&&state.currentDrawer.id===(it.id))?state.currentDrawer.mode:"view";
+  const isEdit=mode==="edit", isView=!isEdit; const s=it._all||{};
+  const field=(label,val,input)=>`<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${isEdit?input:escapeHTML(val!=null?val:"-")}</div></div>`;
+  const controls=isAdminUser?('<div class="gc-actions">'+(isView?'<button class="gc-btn" id="btn-edit">Editar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>':"")+(Number(it.estatus)===0?'<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>':'<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>')+"</div>"):"";
+  let html=controls+
+    pair("Suscriptor", it.suscriptor)+
+    pair("Curso", it.curso_nombre)+
+    field("Estatus", statusText(it.estatus), statusSelect("s_estatus", it.estatus))+
+    field("Fecha y hora de suscripción", fmtDateTime(it.fecha), fmtDateTime(it.fecha))+
+    field("Comentario", it.comentario||"", `<textarea id="s_comentario" rows="3" placeholder="Comentario u observación">${escapeHTML(it.comentario||"")}</textarea>`);
+  if(isAdminUser) html+=jsonSection({id:it.id, ...s},"JSON · Suscripción","json-sus","btn-copy-json-sus");
+  if(isEdit){qs("#drawer-title").textContent="Suscripción · "+it.curso_nombre+" (edición)"; state.currentDrawer={type:"suscripcion",id:it.id,mode:"edit"};}
+  else{qs("#drawer-title").textContent="Suscripción · "+it.curso_nombre; state.currentDrawer={type:"suscripcion",id:it.id,mode:"view"};}
+  setTimeout(()=>{try{
+    disableDrawerInputs(!isEdit);
+    qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"suscripcion",id:it.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderSuscripcionDrawer({id:String(it.id)});});
+    qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"suscripcion",id:it.id,mode:"view"}; qs("#drawer-body").innerHTML=renderSuscripcionDrawer({id:String(it.id)});});
+    qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{
+      const p=readSuscripcionForm({id:it.id});
+      await postJSON(API.uInscripcion,{id:it.id, comentario:p.comentario, estatus:p.estatus});
+      toast("Cambios guardados","exito"); await loadSuscripciones();
+      const re=state.data.find(x=>x.id===it.id); if(re) openDrawer("Suscripción · "+re.curso_nombre,renderSuscripcionDrawer({id:String(re.id)}));
+    }catch(err){gcLog(err); toast("Error al guardar","error");}});
+    const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
+      await softDeleteSuscripcion(it); toast("Suscripción inactivada","exito"); closeDrawer(); await loadSuscripciones();
+    });
+    qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); await reactivateSuscripcion(it.id); toast("Suscripción reactivada","exito"); await loadSuscripciones();});
     if(isAdminUser) bindCopyFromPre("#json-sus","#btn-copy-json-sus");
-
-    qs("#btn-edit")?.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      state.currentDrawer = {type:"suscripcion", id:item.id, mode:"edit"};
-      qs("#drawer-body").innerHTML = renderSuscripcionDrawer({id:String(item.id)});
-    });
-
-    qs("#btn-cancel")?.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      state.currentDrawer = {type:"suscripcion", id:item.id, mode:"view"};
-      qs("#drawer-body").innerHTML = renderSuscripcionDrawer({id:String(item.id)});
-    });
-
-    qs("#btn-save")?.addEventListener("click", async (e)=>{
-      e.stopPropagation();
-      try{
-        const payload = readSuscripcionForm(s);
-        await postJSON(API.uInscripcion, payload);
-        toast("Suscripción actualizada","exito");
-        closeDrawer();
-        await loadSuscripciones();
-      }catch(err){ gcLog(err); toast("No se pudo guardar","error"); }
-    });
-
-    qs("#btn-reactivar")?.addEventListener("click", async (e)=>{
-      e.stopPropagation();
-      try{
-        await postJSON(API.uInscripcion, {...s, estatus:1});
-        toast("Suscripción reactivada","exito");
-        closeDrawer(); await loadSuscripciones();
-      }catch(err){ gcLog(err); toast("No se pudo reactivar","error"); }
-    });
-
-    const bDel = qs("#btn-inactivar");
-    if(bDel){
-      bDel.addEventListener("click", async (e)=>{
-        e.stopPropagation();
-        const step=bDel.getAttribute("data-step")||"1";
-        if(step==="1"){
-          bDel.textContent="Confirmar";
-          bDel.setAttribute("data-step","2");
-          setTimeout(()=>{
-            if(document.body.contains(bDel) && bDel.getAttribute("data-step")==="2"){
-              bDel.textContent="Inactivar";
-              bDel.setAttribute("data-step","1");
-            }
-          },4000);
-          return;
-        }
-        try{
-          bDel.disabled=true;
-          await postJSON(API.uInscripcion, {...s, estatus:0});
-          toast("Suscripción inactivada","exito");
-          closeDrawer(); await loadSuscripciones();
-        }catch(err){ gcLog(err); toast("No se pudo inactivar","error"); }
-        finally{ bDel.disabled=false; }
-      });
-    }
-  }catch(e){ gcLog(e); }},0);
-
+  }catch(err){gcLog("renderSuscripcionDrawer error:",err);}},0);
   return html;
 }
 
-/* ===== Cuenta (inhabilitada: solo label) ===== */
+/* ===== Cuenta (placeholder) ===== */
 function showCuentaPanel(){
   try{const el=qs(".recursos-box.desktop-only"); if(el&&el.style) el.style.display="none";}catch{}
   try{const el=qs(".recursos-box.mobile-only"); if(el&&el.style) el.style.display="none";}catch{}
@@ -1020,7 +996,16 @@ function hideCuentaPanel(){const p=qs("#cuenta-panel"); if(p) p.remove(); const 
 document.addEventListener("DOMContentLoaded",async()=>{
   currentUser=getUsuarioFromCookie(); isAdminUser=ADMIN_IDS.includes(Number((currentUser&&currentUser.id)||0));
   applyAdminVisibility(isAdminUser); bindUI();
-  try{await Promise.all([getTutorsMap().catch(()=>{}),getPrioridadMap().catch(()=>{}),getCategoriasMap().catch(()=>{}),getCalendarioMap().catch(()=>{}),getTipoEvalMap().catch(()=>{}),getActividadesMap().catch(()=>{})]);}catch(e){gcLog("catálogos init error",e);}
+  try{await Promise.all([
+    getTutorsMap().catch(()=>{}),
+    getPrioridadMap().catch(()=>{}),
+    getCategoriasMap().catch(()=>{}),
+    getCalendarioMap().catch(()=>{}),
+    getTipoEvalMap().catch(()=>{}),
+    getActividadesMap().catch(()=>{}),
+    getCursosMapAnyStatus().catch(()=>{}),
+    getUsuariosMapAnyStatus().catch(()=>{})
+  ]);}catch(e){gcLog("catálogos init error",e);}
   if(!window.location.hash) window.location.hash=isAdminUser?"#/cursos":"#/cuentas";
   onRouteChange();
 });
