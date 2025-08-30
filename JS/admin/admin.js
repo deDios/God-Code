@@ -567,7 +567,7 @@ function renderNoticiaDrawer(dataset){
       state.currentDrawer={type:"noticia",id:n.id,mode:"view"}; await loadNoticias();
       const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));
     }catch(err){gcLog(err); toast("Error al guardar","error");}});
-    const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;} try{await inactivateNoticia(n.id); toast("Noticia eliminada (inactiva)","exito"); closeDrawer(); await loadNoticias();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}});
+    const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;} try{await inactivateNoticia(n.id); toast("Noticia eliminada","exito"); closeDrawer(); await loadNoticias();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}});
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); const ok=await reactivateNoticia(n.id); if(ok){toast("Noticia reactivada","exito"); await loadNoticias(); const re=state.data.find(x=>x.id===n.id); if(re) openDrawer("Noticia · "+re.titulo,renderNoticiaDrawer({id:String(re.id)}));}});
     disableDrawerInputs(!isEdit); if(isAdminUser) bindCopyFromPre("#json-noticia","#btn-copy-json-noticia");
   }catch(err){gcLog("renderNoticiaDrawer bindings error:",err);}},0);
@@ -855,7 +855,7 @@ function renderUsuarioDrawer(dataset){
     qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)});});
     qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); await saveUsuarioUpdate(it);});
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
-      await softDeleteUsuario(it); toast("Usuario inactivado","exito"); closeDrawer(); await loadUsuarios();
+      await softDeleteUsuario(it); toast("Usuario desactivado","exito"); closeDrawer(); await loadUsuarios();
     });
     qs("#btn-reactivar")?.addEventListener("click",async (e)=>{e.stopPropagation(); await postJSON(API.uUsuarios,{...n,estatus:1}); toast("Usuario reactivado","exito"); closeDrawer(); await loadUsuarios();});
     if(isAdminUser) bindCopyFromPre("#json-usuario","#btn-copy-json-usuario");
@@ -969,7 +969,7 @@ function renderSuscripcionDrawer(dataset){
       const re=state.data.find(x=>x.id===it.id); if(re) openDrawer("Suscripción · "+re.curso_nombre,renderSuscripcionDrawer({id:String(re.id)}));
     }catch(err){gcLog(err); toast("Error al guardar","error");}});
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
-      await softDeleteSuscripcion(it); toast("Suscripción inactivada","exito"); closeDrawer(); await loadSuscripciones();
+      await softDeleteSuscripcion(it); toast("Suscripción desactivada","exito"); closeDrawer(); await loadSuscripciones();
     });
     qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); await reactivateSuscripcion(it.id); toast("Suscripción reactivada","exito"); await loadSuscripciones();});
     if(isAdminUser) bindCopyFromPre("#json-sus","#btn-copy-json-sus");
