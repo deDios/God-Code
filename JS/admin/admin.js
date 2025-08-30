@@ -1,3 +1,4 @@
+
 (()=>{"use strict";
 
 /* ===== utils/base ===== */
@@ -18,17 +19,28 @@ const API={
   prioridad:API_BASE+"c_prioridad.php", categorias:API_BASE+"c_categorias.php",
   calendario:API_BASE+"c_dias_curso.php", tipoEval:API_BASE+"c_tipo_evaluacion.php", actividades:API_BASE+"c_actividades.php",
   usuarios:API_BASE+"c_usuarios.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php",
-  uAvatar:API_BASE+"u_avatar.php"
+  uAvatar:API_BASE+"u_avatar.php",
+  // NUEVO: suscripciones (inscripciones)
+  suscripciones:API_BASE+"c_inscripcion.php",
+  uInscripcion:API_BASE+"u_inscripcion.php"
 };
-const API_UPLOAD={cursoImg:API_BASE+"u_cursoImg.php", noticiaImg:API_BASE+"u_noticiaImagenes.php", tutorImg:API_BASE+"u_tutorImg.php"};
+const API_UPLOAD={
+  cursoImg:API_BASE+"u_cursoImg.php",
+  noticiaImg:API_BASE+"u_noticiaImagenes.php",
+  tutorImg:API_BASE+"u_tutorImg.php"
+};
 
 /* ===== roles/estatus & state ===== */
 const ADMIN_IDS=[1,12,13];
 /* 0=Inactivo, 1=Activo, 2=Pausado, 3=Terminado */
 const STATUS_OPTIONS=[{v:1,l:"Activo"},{v:0,l:"Inactivo"},{v:2,l:"Pausado"},{v:3,l:"Terminado"}];
-const state={route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",currentDrawer:null,
-  tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null, tempNewTutorImage:null,
-  tutorsMap:null,prioMap:null,categoriasMap:null,calendarioMap:null,tipoEvalMap:null,actividadesMap:null};
+const state={
+  route:"#/cursos",page:1,pageSize:10,data:[],raw:[],search:"",currentDrawer:null,
+  tempNewCourseImage:null,tempNewNewsImages:{1:null,2:null},tempNewUserAvatar:null,
+  // NUEVO: imagen temporal para tutor al crear
+  tempNewTutorImage:null,
+  tutorsMap:null,prioMap:null,categoriasMap:null,calendarioMap:null,tipoEvalMap:null,actividadesMap:null
+};
 const cacheGuard=o=>o&&(Date.now()-o._ts<30*60*1e3);
 const arrToMap=arr=>{const m={};(Array.isArray(arr)?arr:[]).forEach(x=>m[x.id]=x.nombre);m._ts=Date.now();return m;};
 
@@ -75,11 +87,13 @@ function onRouteChange(){
   const hash=window.location.hash||(isAdminUser?"#/cursos":"#/cuentas");
   state.route=hash; state.page=1;
   qsa(".gc-side .nav-item").forEach(a=>{const active=a.getAttribute("href")===hash; a.classList&&a.classList.toggle("is-active",active); a.setAttribute("aria-current",active?"page":"false");});
-  if(hash.startsWith("#/cursos"))   { hideCuentaPanel(); return isAdminUser?loadCursos():enforceRouteGuard(); }
-  if(hash.startsWith("#/noticias")) { hideCuentaPanel(); return isAdminUser?loadNoticias():enforceRouteGuard(); }
-  if(hash.startsWith("#/tutores"))  { hideCuentaPanel(); return isAdminUser?loadTutores():enforceRouteGuard(); }
-  if(hash.startsWith("#/usuarios")) { hideCuentaPanel(); return isAdminUser?loadUsuarios():enforceRouteGuard(); }
-  if(hash.startsWith("#/cuentas"))  { showCuentaPanel(); return; }
+  if(hash.startsWith("#/cursos"))         { hideCuentaPanel(); return isAdminUser?loadCursos():enforceRouteGuard(); }
+  if(hash.startsWith("#/noticias"))       { hideCuentaPanel(); return isAdminUser?loadNoticias():enforceRouteGuard(); }
+  if(hash.startsWith("#/tutores"))        { hideCuentaPanel(); return isAdminUser?loadTutores():enforceRouteGuard(); }
+  if(hash.startsWith("#/usuarios"))       { hideCuentaPanel(); return isAdminUser?loadUsuarios():enforceRouteGuard(); }
+  // NUEVO: ruta suscripciones
+  if(hash.startsWith("#/suscripciones"))  { hideCuentaPanel(); return isAdminUser?loadSuscripciones():enforceRouteGuard(); }
+  if(hash.startsWith("#/cuentas"))        { showCuentaPanel(); return; }
   setRoute(isAdminUser?"#/cursos":"#/cuentas");
 }
 
@@ -96,11 +110,12 @@ function renderPagination(total){
 }
 function refreshCurrent(){
   const h=state.route||window.location.hash||"";
-  if(h.startsWith("#/cursos"))   return drawCursos();
-  if(h.startsWith("#/noticias")) return drawNoticias();
-  if(h.startsWith("#/tutores"))  return drawTutores();
-  if(h.startsWith("#/usuarios")) return drawUsuarios();
-  if(h.startsWith("#/cuentas"))  return showCuentaPanel();
+  if(h.startsWith("#/cursos"))         return drawCursos();
+  if(h.startsWith("#/noticias"))       return drawNoticias();
+  if(h.startsWith("#/tutores"))        return drawTutores();
+  if(h.startsWith("#/usuarios"))       return drawUsuarios();
+  if(h.startsWith("#/suscripciones"))  return drawSuscripciones();
+  if(h.startsWith("#/cuentas"))        return showCuentaPanel();
 }
 function defaultMatcher(q){const k=norm(q); return it=>norm(JSON.stringify(it)).includes(k);}
 function renderList(rows,config){
@@ -137,6 +152,7 @@ function renderList(rows,config){
         else if(t==="noticia"){const ok=await reactivateNoticia(id); if(ok){toast("Noticia reactivada","exito"); await loadNoticias();}}
         else if(t==="tutor"){await reactivateTutor(id); toast("Tutor reactivado","exito"); await loadTutores();}
         else if(t==="usuario"){const it=state.data.find(x=>x.id===id); if(!it) return; await postJSON(API.uUsuarios,{...it._all,estatus:1}); toast("Usuario reactivado","exito"); await loadUsuarios();}
+        else if(t==="suscripcion"){await reactivateSuscripcion(id); toast("Suscripción reactivada","exito"); await loadSuscripciones();}
       }catch(err){gcLog(err); toast("No se pudo reactivar","error");}
     });
   });
@@ -303,6 +319,7 @@ function bindUI(){
     else if(state.route.startsWith("#/noticias")) await openCreateNoticia();
     else if(state.route.startsWith("#/tutores")) await openCreateTutor();
     else if(state.route.startsWith("#/usuarios")) await openCreateUsuario();
+    // no creamos suscripciones desde aquí (aún)
   });
   const s=qs("#search-input"); if(s){ s.addEventListener("input",()=>{ state.search=s.value||""; refreshCurrent(); }); }
 }
@@ -312,15 +329,15 @@ const badgePrecio=precio=> Number(precio)===0?'<span class="gc-chip gray">Gratui
 async function loadCursos(){
   qs("#mod-title")&&(qs("#mod-title").textContent="Cursos");
   const hdr=qs(".recursos-box.desktop-only .table-header"); if(hdr){ const c1=hdr.querySelector(".col-nombre"),c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"),c3=hdr.querySelector(".col-fecha"),c4=hdr.querySelector(".col-status"); if(c1)c1.textContent="Nombre"; if(c2){c2.textContent="Tutor"; c2.classList.add("col-tutor");} if(c3)c3.textContent="Fecha de inicio"; if(!c4){const nc=document.createElement("div"); nc.className="col-status"; nc.setAttribute("role","columnheader"); nc.textContent="Status"; hdr.appendChild(nc);} else c4.textContent="Status";}
-  qs(".tt-title")&&(qs(".tt-title").textContent="Cursos:"); const st=qs("#tt-status"); if(st){st.textContent="Activos e Inactivos"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  qs(".tt-title")&&(qs(".tt-title").textContent="Cursos:"); const st=qs("#tt-status"); if(st){st.textContent="Activos e Inactivos/Pausados/Terminados"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
   setSearchPlaceholder("Buscar por nombre o tutor");
   showSkeletons();
   try{
-    const [act,inact,tmap,pmap,cmap,calmap,temap,ammap]=await Promise.all([
-      postJSON(API.cursos,{estatus:1}), postJSON(API.cursos,{estatus:0}),
+    const [act,inact,pause,term,tmap,pmap,cmap,calmap,temap,ammap]=await Promise.all([
+      postJSON(API.cursos,{estatus:1}), postJSON(API.cursos,{estatus:0}), postJSON(API.cursos,{estatus:2}), postJSON(API.cursos,{estatus:3}),
       getTutorsMap(), getPrioridadMap(), getCategoriasMap(), getCalendarioMap(), getTipoEvalMap(), getActividadesMap()
     ]);
-    const raw=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]);
+    const raw=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[], Array.isArray(pause)?pause:[], Array.isArray(term)?term:[]);
     state.raw=raw;
     state.data=raw.map(c=>({ id:c.id, nombre:c.nombre, tutor:(tmap&&tmap[c.tutor])||("Tutor #"+c.tutor), tutor_id:c.tutor,
       prioridad_id:c.prioridad, prioridad_nombre:(pmap&&pmap[c.prioridad])||("#"+c.prioridad),
@@ -620,40 +637,28 @@ function drawTutores(){
     afterOpen:d=>{if(d.type==="tutor"){const it=state.data.find(x=>String(x.id)===d.id); if(!it) return; const cont=qs("#media-tutor"); if(cont) mountReadOnlyMedia({container:cont,type:"tutor",id:it.id,labels:["Foto"],editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit")}); if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");}}
   });
 }
-function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus:gN("f_estatus",1)}; if(existing?.id) p.id=existing.id; return p;}
+
+
+function readTutorForm(existing){const g=id=>qs("#"+id)?.value||""; const gN=(id,def)=>Number(g(id)||def||0); const p={nombre:g("f_nombre"),descripcion:g("f_desc"),estatus: gN("f_estatus", 1)}; if(existing?.id) p.id=existing.id; return p;}
+
+
+
 async function saveTutorCreate(){
-  const p=readTutorForm(null);
-  if(!p.nombre) return toast("Falta el nombre","warning");
+  const p=readTutorForm(null); if(!p.nombre) return toast("Falta el nombre","warning");
   const body={...p,creado_por:Number((currentUser&&currentUser.id)||0)||1};
-
   const res=await postJSON(API.iTutores,body);
-  const newId=Number((res && (res.id || res.tutor_id || res.insert_id || (res.data&&res.data.id))) || 0);
-
-  const file=state.tempNewTutorImage || null;
-  if(newId && file){
+  const newId=Number((res&&(res.id||res.tutor_id||res.insert_id||(res.data&&res.data.id)))||0);
+  const file=state.tempNewTutorImage||null;
+  if(newId&&file){
     try{
-      const fd=new FormData();
-      fd.append("tutor_id",String(newId));
-      fd.append("imagen",file);
-      const r=await fetch(API_UPLOAD.tutorImg,{method:"POST",body:fd});
-      const txt=await r.text().catch(()=> "");
-      if(!r.ok) throw new Error("HTTP "+r.status+" "+(txt||""));
-      toast("Imagen del tutor subida","exito");
-    }catch(e){
-      gcLog(e);
-      toast("Tutor creado, pero falló la imagen","error");
-    }finally{
-      state.tempNewTutorImage=null;
-    }
+      const fd=new FormData(); fd.append("tutor_id",String(newId)); fd.append("imagen",file);
+      const r=await fetch(API_UPLOAD.tutorImg,{method:"POST",body:fd}); const txt=await r.text().catch(()=> ""); if(!r.ok) throw new Error("HTTP "+r.status+" "+txt);
+      toast("Imagen de tutor guardada","exito");
+    }catch(e){gcLog(e); toast("Tutor creado, pero falló la imagen","error");}
+    finally{state.tempNewTutorImage=null;}
   }
-
-  toast("Tutor creado","exito");
-  closeDrawer();
-  await loadTutores();
-  if(newId){
-    const re=state.data.find(x=>x.id===newId);
-    if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));
-  }
+  toast("Tutor creado","exito"); closeDrawer(); await loadTutores();
+  if(newId){const re=state.data.find(x=>x.id===newId); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}
 }
 async function saveTutorUpdate(item){if(!item||!item._all) return toast("Sin item para actualizar","error"); const p=readTutorForm(item._all); const body={...item._all,...p}; await postJSON(API.uTutores,body); toast("Cambios guardados","exito"); await loadTutores(); const re=state.data.find(x=>x.id===item.id); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}
 async function softDeleteTutor(item){if(!item||!item._all) throw new Error("Item inválido"); const body={...item._all,estatus:0}; await postJSON(API.uTutores,body);}
@@ -670,36 +675,26 @@ function renderTutorDrawer(dataset){
     field("Nombre",t.nombre,`<input id="f_nombre" type="text" value="${escapeAttr(t.nombre||"")}" placeholder="Nombre del tutor"/>`)+
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
     field("Estatus",statusText(t.estatus),statusSelect("f_estatus",t.estatus));
-
-  /* Imagen: solo lectura si existe; selección cuando es crear */
   if(isCreate){
-    html+=`
-      <div class="field">
-        <div class="label">Imagen del tutor</div>
-        <div class="value">
-          <div id="create-media-tutor" class="media-grid">
-            <div class="media-card">
-              <figure class="media-thumb">
-                <img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}" />
-                <button class="icon-btn media-edit" id="create-tutor-edit" title="Seleccionar imagen">
-                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-                  </svg>
-                </button>
-              </figure>
-              <div class="media-meta">
-                <div class="media-label">Foto</div>
-                <div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div>
-              </div>
-            </div>
-          </div>
+    html+=`<div class="field"><div class="label">Imagen</div><div class="value">
+      <div id="create-media-tutor" class="media-grid">
+        <div class="media-card">
+          <figure class="media-thumb">
+            <img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}"
+              onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,${encodeURIComponent(noImageSvg())}'">
+            <button class="icon-btn media-edit" id="create-tutor-edit" title="Seleccionar imagen">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>
+            </button>
+          </figure>
+          <div class="media-meta"><div class="media-label">Foto</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div>
         </div>
-      </div>`;
-  }else{
+      </div>
+    </div></div>`;
+  } else {
     html+=`<div class="field"><div class="label">Imagen</div><div class="value"><div id="media-tutor" data-id="${t.id}"></div></div></div>`;
   }
 
-  /* === Secciones de cursos ligados === */
+  /* === Cursos ligados (chips) === */
   if(!isCreate){
     html+=`
       <div class="field"><div class="label">Cursos activos</div>
@@ -720,71 +715,37 @@ function renderTutorDrawer(dataset){
   else{qs("#drawer-title").textContent="Tutor · "+(item?item.nombre:""); state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"view"};}
   setTimeout(()=>{try{
     disableDrawerInputs(!(isEdit||isCreate));
+    if(isCreate){
+      const card=qs("#create-media-tutor"), btn=qs("#create-tutor-edit"), thumb=qs("#create-tutor-thumb");
+      if(btn&&thumb&&card){
+        btn.addEventListener("click",()=>{const input=document.createElement("input"); input.type="file"; input.accept="image/png, image/jpeg"; input.style.display="none"; document.body.appendChild(input);
+          input.addEventListener("change",()=>{const file=input.files&&input.files[0]; try{document.body.removeChild(input);}catch{} if(!file) return; const v=validarImagen(file,{maxMB:2}); if(!v.ok){toast(v.error,"error"); return;}
+            renderPreviewUI(card,file,async()=>{state.tempNewTutorImage=file; try{if(thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl);}catch{} const blobUrl=URL.createObjectURL(file); if(thumb.dataset) thumb.dataset.blobUrl=blobUrl; thumb.src=blobUrl; toast("Imagen lista (se subirá al guardar)","exito");},()=>{});
+          }); input.click();
+        });
+      }
+    }
     qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{ if(isCreate) await saveTutorCreate(); else await saveTutorUpdate(item);}catch(err){gcLog(err); toast("Error al guardar","error");}});
     qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"edit"}; qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(item?item.id:"")});});
     qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); if(isCreate){state.tempNewTutorImage=null; closeDrawer();}else{state.currentDrawer={type:"tutor",id:item?item.id:null,mode:"view"}; qs("#drawer-body").innerHTML=renderTutorDrawer({id:String(item?item.id:"")});}});
     const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
       try{await softDeleteTutor(item); toast("Tutor eliminado (inactivo)","exito"); closeDrawer(); await loadTutores();}catch(err){gcLog(err); toast("No se pudo eliminar","error");}
     });
-    qs("#btn-reactivar")?.addEventListener("click",async(e)=>{e.stopPropagation(); try{await reactivateTutor(Number(item&&item.id)); toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}catch(err){gcLog(err); toast("No se pudo reactivar","error");}});
-
-    /* Imagen en modo lectura (editables en edición) */
+    qs("#btn-reactivar")?.addEventListener("click",(e)=>{e.stopPropagation(); reactivateTutor(Number(item&&item.id)).then(async()=>{toast("Tutor reactivado","exito"); await loadTutores(); const re=state.data.find(x=>x.id===(item&&item.id)); if(re) openDrawer("Tutor · "+re.nombre,renderTutorDrawer({id:String(re.id)}));}).catch(err=>{gcLog(err); toast("No se pudo reactivar","error");})});
     const cont=qs("#media-tutor"); if(cont && t.id) mountReadOnlyMedia({container:cont,type:"tutor",id:t.id,labels:["Foto"],editable: isEdit && isAdminUser});
     if(isAdminUser) bindCopyFromPre("#json-tutor","#btn-copy-json-tutor");
 
-    /* cargar y pintar chips de cursos + click -> sub-drawer */
     if(!isCreate){
-      (async ()=>{
-        try{
-          const list=await getCursosByTutor(t.id);
-          const g=groupCursosPorEstatus(list);
-          renderChipList("#tutor-cursos-activos", g.activos);
-          renderChipList("#tutor-cursos-pausados", g.pausados);
-          renderChipList("#tutor-cursos-terminados", g.terminados);
-          qsa(".curso-chip").forEach(btn=>{
-            btn.addEventListener("click",()=>{
-              const cid=Number(btn.getAttribute("data-curso-id"));
-              const curso=list.find(x=>Number(x.id)===cid);
-              if(curso) openCursoLightFromTutor(t.id,curso);
-            });
-          });
-        }catch(err){gcLog("cursos del tutor:",err);}
-      })();
-    }
-
-    /* Selector de imagen cuando es crear tutor */
-    if(isCreate){
-      const card = qs("#create-media-tutor");
-      const btn  = qs("#create-tutor-edit");
-      const img  = qs("#create-tutor-thumb");
-      if(btn && img && card){
-        btn.addEventListener("click", ()=>{
-          const input = document.createElement("input");
-          input.type = "file";
-          input.accept = "image/png, image/jpeg";
-          input.style.display = "none";
-          document.body.appendChild(input);
-
-          input.addEventListener("change", ()=>{
-            const file = input.files && input.files[0];
-            try{ document.body.removeChild(input); }catch{}
-            if(!file) return;
-            const v = validarImagen(file,{maxMB:2});
-            if(!v.ok){ toast(v.error,"error"); return; }
-
-            renderPreviewUI(card, file, async ()=>{
-              state.tempNewTutorImage = file;
-              try{ if(img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl); }catch{}
-              const blobUrl = URL.createObjectURL(file);
-              if(img.dataset) img.dataset.blobUrl = blobUrl;
-              img.src = blobUrl;
-              toast("Imagen seleccionada (se subirá al guardar)","exito");
-            }, ()=>{});
-          });
-
-          input.click();
+      (async ()=>{try{
+        const list=await getCursosByTutor(t.id);
+        const g=groupCursosPorEstatus(list);
+        renderChipList("#tutor-cursos-activos", g.activos);
+        renderChipList("#tutor-cursos-pausados", g.pausados);
+        renderChipList("#tutor-cursos-terminados", g.terminados);
+        qsa(".curso-chip").forEach(btn=>{
+          btn.addEventListener("click",()=>{const cid=Number(btn.getAttribute("data-curso-id")); const curso=list.find(x=>Number(x.id)===cid); if(curso) openCursoLightFromTutor(t.id,curso);});
         });
-      }
+      }catch(err){gcLog("cursos del tutor:",err);}})();
     }
   }catch(err){gcLog("renderTutorDrawer bindings error:",err);}},0);
   return html;
@@ -843,95 +804,18 @@ function renderUsuarioDrawer(dataset){
   if(isAdminUser) html+=jsonSection(n,"JSON · Usuario","json-usuario","btn-copy-json-usuario");
   if(isEdit){qs("#drawer-title").textContent="Usuario · "+(it?it.nombre:"")+" (edición)"; state.currentDrawer={type:"usuario",id:n.id,mode:"edit"};}
   else{qs("#drawer-title").textContent="Usuario · "+(it?it.nombre:""); state.currentDrawer={type:"usuario",id:n.id,mode:"view"};}
-  setTimeout(() => {
-  try {
+  setTimeout(()=>{try{
     disableDrawerInputs(!isEdit);
-
-    const cont = qs("#media-usuario");
-    if (cont) {
-      mountReadOnlyMedia({
-        container: cont,
-        type: "usuario",
-        id: n.id,
-        labels: ["Avatar"],
-        editable: isEdit && isAdminUser
-      });
-    }
-
-    qs("#btn-edit")?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      state.currentDrawer = { type: "usuario", id: n.id, mode: "edit" };
-      qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) });
+    const cont=qs("#media-usuario"); if(cont) mountReadOnlyMedia({container:cont,type:"usuario",id:n.id,labels:["Avatar"],editable:isEdit&&isAdminUser});
+    qs("#btn-edit")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"edit"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)});});
+    qs("#btn-cancel")?.addEventListener("click",(e)=>{e.stopPropagation(); state.currentDrawer={type:"usuario",id:n.id,mode:"view"}; qs("#drawer-body").innerHTML=renderUsuarioDrawer({id:String(n.id)});});
+    qs("#btn-save")?.addEventListener("click",async(e)=>{e.stopPropagation(); await saveUsuarioUpdate(it);});
+    const bDel=qs("#btn-delete"); if(bDel) bDel.addEventListener("click",async(e)=>{e.stopPropagation(); const step=bDel.getAttribute("data-step")||"1"; if(step==="1"){bDel.textContent="Confirmar"; bDel.setAttribute("data-step","2"); setTimeout(()=>{if(bDel.getAttribute("data-step")==="2"){bDel.textContent="Eliminar"; bDel.setAttribute("data-step","1");}},4000); return;}
+      await softDeleteUsuario(it); toast("Usuario inactivado","exito"); closeDrawer(); await loadUsuarios();
     });
-
-    qs("#btn-cancel")?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      state.currentDrawer = { type: "usuario", id: n.id, mode: "view" };
-      qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) });
-    });
-
-    qs("#btn-save")?.addEventListener("click", async (e) => {
-      e.stopPropagation();
-      try {
-        await saveUsuarioUpdate(it);
-      } catch (err) {
-        gcLog(err);
-        toast("Error al guardar", "error");
-      }
-    });
-
-    const bDel = qs("#btn-delete");
-    if (bDel) {
-      bDel.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const step = bDel.getAttribute("data-step") || "1";
-        if (step === "1") {
-          bDel.textContent = "Confirmar";
-          bDel.setAttribute("data-step", "2");
-          setTimeout(() => {
-            if (!document.body.contains(bDel)) return;
-            if (bDel.getAttribute("data-step") === "2") {
-              bDel.textContent = "Eliminar";
-              bDel.setAttribute("data-step", "1");
-            }
-          }, 4000);
-          return;
-        }
-        try {
-          bDel.disabled = true;
-          await softDeleteUsuario(it);
-          toast("Usuario inactivado", "exito");
-          closeDrawer();
-          await loadUsuarios();
-        } catch (err) {
-          gcLog(err);
-          toast("No se pudo eliminar", "error");
-        } finally {
-          bDel.disabled = false;
-        }
-      });
-    }
-
-    qs("#btn-reactivar")?.addEventListener("click", async (e) => {
-      e.stopPropagation();
-      try {
-        await postJSON(API.uUsuarios, { ...n, estatus: 1 });
-        toast("Usuario reactivado", "exito");
-        closeDrawer();
-        await loadUsuarios();
-
-      } catch (err) {
-        gcLog(err);
-        toast("No se pudo reactivar", "error");
-      }
-    });
-
-    if (isAdminUser) bindCopyFromPre("#json-usuario", "#btn-copy-json-usuario");
-  } catch (err) {
-    gcLog("renderUsuarioDrawer error:", err);
-  }
-}, 0);
-
+    qs("#btn-reactivar")?.addEventListener("click",async (e)=>{e.stopPropagation(); await postJSON(API.uUsuarios,{...n,estatus:1}); toast("Usuario reactivado","exito"); closeDrawer(); await loadUsuarios();});
+    if(isAdminUser) bindCopyFromPre("#json-usuario","#btn-copy-json-usuario");
+  }catch(err){gcLog("renderUsuarioDrawer error:",err);}},0);
   return html;
 }
 async function openCreateUsuario(){
@@ -956,6 +840,166 @@ async function openCreateUsuario(){
     qs("#btn-cancel")?.addEventListener("click",()=>{state.tempNewUserAvatar=null; closeDrawer();});
     qs("#btn-save")?.addEventListener("click",async()=>{try{await saveUsuarioCreate();}catch(e){gcLog(e); toast("Error al crear usuario","error");}});
   },0);
+}
+
+/* ===== Suscripciones (Inscripciones) ===== */
+async function loadSuscripciones(){
+  qs("#mod-title")&&(qs("#mod-title").textContent="Suscripciones");
+  const hdr=qs(".recursos-box.desktop-only .table-header");
+  if(hdr){
+    const c1=hdr.querySelector(".col-nombre"), c2=hdr.querySelector(".col-tutor")||hdr.querySelector(".col-tipo"), c3=hdr.querySelector(".col-fecha"), c4=hdr.querySelector(".col-status");
+    if(c1) c1.textContent="Usuario";
+    if(c2){ c2.textContent="Curso"; c2.classList.add("col-tipo"); }
+    if(c3) c3.textContent="Creación";
+    if(c4) c4.textContent="Status";
+  }
+  qs(".tt-title")&&(qs(".tt-title").textContent="Suscripciones:");
+  const st=qs("#tt-status"); if(st){st.textContent="Activas e Inactivas"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo");}
+  setSearchPlaceholder("Buscar por comentario o IDs");
+  showSkeletons();
+  try{
+    const [act,inact]=await Promise.all([postJSON(API.suscripciones,{estatus:1}), postJSON(API.suscripciones,{estatus:0})]);
+    const arr=[].concat(Array.isArray(act)?act:[], Array.isArray(inact)?inact:[]);
+    state.raw=arr;
+    state.data=arr.map(s=>({ id:Number(s.id), usuario:Number(s.usuario), curso:Number(s.curso), comentario:s.comentario||"", estatus:ntf(s.estatus), fecha:String(s.fecha_creacion||""), _all:s }));
+    drawSuscripciones();
+  }catch(err){gcLog(err); qs("#recursos-list")&&(qs("#recursos-list").innerHTML='<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile")&&(qs("#recursos-list-mobile").innerHTML=""); toast("No se pudieron cargar suscripciones","error");}
+}
+function drawSuscripciones(){
+  const rows=state.data;
+  renderList(rows,{
+    matcher:q=>{const k=norm(q); return it=>norm(String(it.usuario)).includes(k)||norm(String(it.curso)).includes(k)||norm(it.comentario||"").includes(k);},
+    desktopRow:it=>`<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre">Usuario #${it.usuario}</div><div class="col-tutor">Curso #${it.curso}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge(it.estatus)}</div></div>`,
+    mobileRow:it=>`<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">Usuario #${it.usuario} · Curso #${it.curso}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Comentario:</strong> ${escapeHTML(it.comentario||"-")}</div><div><strong>Creación:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusText(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus)===0?`<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>`:""}</div></div></div>`,
+    drawerTitle:d=>{const it=state.data.find(x=>String(x.id)===d.id); return it?("Suscripción · #"+it.id):"Suscripción"},
+    drawerBody:d=>renderSuscripcionDrawer(d),
+    afterOpen:()=>{}
+  });
+}
+function readSuscripcionForm(existing){
+  const v=id=>qs("#"+id)?.value||""; const n=id=>Number(v(id)||0);
+  return {
+    id: existing.id,
+    curso: n("s_curso"),
+    usuario: n("s_usuario"),
+    comentario: v("s_comentario"),
+    estatus: n("s_estatus"),
+  };
+}
+async function reactivateSuscripcion(id){
+  const it=state.data.find(x=>x.id===Number(id));
+  if(!it||!it._all) throw new Error("Suscripción no encontrada");
+  await postJSON(API.uInscripcion,{...it._all, estatus:1});
+}
+function renderSuscripcionDrawer(dataset){
+  const item=state.data.find(x=>String(x.id)===dataset.id);
+  if(!item) return "<p>No encontrado.</p>";
+  const s=item._all;
+  const mode=(state.currentDrawer&&state.currentDrawer.type==="suscripcion"&&state.currentDrawer.id===item.id)
+    ? (state.currentDrawer.mode || "view")
+    : "view";
+  const isEdit=mode==="edit";
+  const isInactive=Number(s.estatus)===0;
+
+  const inNum  =(id,val,min)=>`<input id="${id}" type="number" value="${escapeAttr(val!=null?val:"")}" min="${min||0}">`;
+  const inTA   =(id,val)=>`<textarea id="${id}" rows="3">${escapeHTML(val||"")}</textarea>`;
+  const field  =(label,val,input)=>`<div class="field"><div class="label">${escapeHTML(label)}</div><div class="value">${isEdit?input:escapeHTML(val!=null?val:"-")}</div></div>`;
+
+  const controls=isAdminUser?(
+    '<div class="gc-actions">'
+      + (!isEdit ? '<button class="gc-btn" id="btn-edit">Editar</button>' : '')
+      + (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : '')
+      + (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : '')
+      + (isInactive
+          ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>'
+          : '<button class="gc-btn gc-btn--danger" id="btn-inactivar" data-step="1">Inactivar</button>')
+    + '</div>'
+  ) : '';
+
+  let html=""
+    + controls
+    + field("ID", s.id, `<div>${escapeHTML(String(s.id))}</div>`)
+    + field("Usuario", `#${s.usuario}`, inNum("s_usuario", s.usuario, 1))
+    + field("Curso", `#${s.curso}`, inNum("s_curso", s.curso, 1))
+    + field("Comentario", s.comentario||"-", inTA("s_comentario", s.comentario||""))
+    + field("Estatus", statusText(s.estatus), statusSelect("s_estatus", s.estatus))
+    + field("Creación", fmtDateTime(s.fecha_creacion), fmtDateTime(s.fecha_creacion))
+    + field("Modificación", fmtDateTime(s.fecha_modif||"-"), fmtDateTime(s.fecha_modif||"-"));
+
+  if(isAdminUser) html+=jsonSection(s,"JSON · Suscripción","json-sus","btn-copy-json-sus");
+
+  // Título + estado
+  if(isEdit){
+    qs("#drawer-title").textContent = "Suscripción · #"+s.id+" (edición)";
+    state.currentDrawer = {type:"suscripcion", id:item.id, mode:"edit"};
+  }else{
+    qs("#drawer-title").textContent = "Suscripción · #"+s.id;
+    state.currentDrawer = {type:"suscripcion", id:item.id, mode:"view"};
+  }
+
+  setTimeout(()=>{ try{
+    if(isAdminUser) bindCopyFromPre("#json-sus","#btn-copy-json-sus");
+
+    qs("#btn-edit")?.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      state.currentDrawer = {type:"suscripcion", id:item.id, mode:"edit"};
+      qs("#drawer-body").innerHTML = renderSuscripcionDrawer({id:String(item.id)});
+    });
+
+    qs("#btn-cancel")?.addEventListener("click",(e)=>{
+      e.stopPropagation();
+      state.currentDrawer = {type:"suscripcion", id:item.id, mode:"view"};
+      qs("#drawer-body").innerHTML = renderSuscripcionDrawer({id:String(item.id)});
+    });
+
+    qs("#btn-save")?.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      try{
+        const payload = readSuscripcionForm(s);
+        await postJSON(API.uInscripcion, payload);
+        toast("Suscripción actualizada","exito");
+        closeDrawer();
+        await loadSuscripciones();
+      }catch(err){ gcLog(err); toast("No se pudo guardar","error"); }
+    });
+
+    qs("#btn-reactivar")?.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      try{
+        await postJSON(API.uInscripcion, {...s, estatus:1});
+        toast("Suscripción reactivada","exito");
+        closeDrawer(); await loadSuscripciones();
+      }catch(err){ gcLog(err); toast("No se pudo reactivar","error"); }
+    });
+
+    const bDel = qs("#btn-inactivar");
+    if(bDel){
+      bDel.addEventListener("click", async (e)=>{
+        e.stopPropagation();
+        const step=bDel.getAttribute("data-step")||"1";
+        if(step==="1"){
+          bDel.textContent="Confirmar";
+          bDel.setAttribute("data-step","2");
+          setTimeout(()=>{
+            if(document.body.contains(bDel) && bDel.getAttribute("data-step")==="2"){
+              bDel.textContent="Inactivar";
+              bDel.setAttribute("data-step","1");
+            }
+          },4000);
+          return;
+        }
+        try{
+          bDel.disabled=true;
+          await postJSON(API.uInscripcion, {...s, estatus:0});
+          toast("Suscripción inactivada","exito");
+          closeDrawer(); await loadSuscripciones();
+        }catch(err){ gcLog(err); toast("No se pudo inactivar","error"); }
+        finally{ bDel.disabled=false; }
+      });
+    }
+  }catch(e){ gcLog(e); }},0);
+
+  return html;
 }
 
 /* ===== Cuenta (inhabilitada: solo label) ===== */
@@ -983,4 +1027,3 @@ document.addEventListener("DOMContentLoaded",async()=>{
 });
 
 })();
-
