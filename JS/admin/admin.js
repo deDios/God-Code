@@ -20,8 +20,7 @@ const API={
   calendario:API_BASE+"c_dias_curso.php", tipoEval:API_BASE+"c_tipo_evaluacion.php", actividades:API_BASE+"c_actividades.php",
   usuarios:API_BASE+"c_usuarios.php", iUsuarios:API_BASE+"i_usuario.php", uUsuarios:API_BASE+"u_usuario.php",
   uAvatar:API_BASE+"u_avatar.php",
-  // NUEVO: suscripciones (inscripciones)
-  suscripciones:API_BASE+"c_inscripcion.php",
+  suscripciones:API_BASE+"c_suscripciones.php",
   uInscripcion:API_BASE+"u_inscripcion.php"
 };
 const API_UPLOAD={
