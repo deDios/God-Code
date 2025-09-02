@@ -40,6 +40,12 @@ const STATUS_LABELS={
   usuario:{1:"Activo",0:"Inactivo"},                 // <-- agregar
   suscripcion:{1:"Activa",0:"Cancelada",2:"Suscrito",3:"Terminada"}
 };
+
+function statusTextModule(m,v){
+  const t=STATUS_LABELS[m]||{};
+  return (v in t)? t[v] : ("Estatus "+v);
+}
+
 function statusChip(m,v){
   const n=Number(v);
   const M={
