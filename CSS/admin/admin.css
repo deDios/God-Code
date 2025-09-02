@@ -456,6 +456,42 @@ body {
   display: inline-block;
 }
 
+/* --------------------- Badges extra (estados) --------------------- */
+
+/* ——— Badges por color  ——— */
+.gc-badge-blue,
+.gc-badge-yellow,
+.gc-badge-gray {
+  display: inline-block;
+  line-height: 1;
+  padding: .28em .7em;
+  border-radius: 999px;
+  font-size: .85em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Azul (Temporal, En curso, Suscrito, etc.) */
+.gc-badge-blue {
+  color: #0b57d0;
+  background: #e8f0fe;
+  border: 1px solid #c6dafc;
+}
+
+/* Amarillo (En pausa) */
+.gc-badge-yellow {
+  color: #7a4f01;
+  background: #fef7e0;
+  border: 1px solid #f1e6b3;
+}
+
+/* Gris (Pausado, Cancelado en Noticias, Terminado en Suscriptores) */
+.gc-badge-gray {
+  color: #455a64;
+  background: #eceff1;
+  border: 1px solid #dde3e8;
+}
+
 /* --------------------- Tablas (desktop) --------------------- */
 .recursos-box {
   padding: 10px 18px 0;
