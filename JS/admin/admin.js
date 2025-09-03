@@ -39,6 +39,13 @@ async function postJSON(url,body){gcLog("postJSON ->",url,body);const r=await fe
 /* ---------- SELECT DE ESTATUS (por módulo) ---------- */
 /* Valores backend: 1 Activo · 0 Inactivo/Cancelado · 2 Pausado/Suscrito · 3 Terminado/Temporal/En curso (según módulo) */
 
+function statusLabel(entity, v) {
+  const ent = (entity||"").toLowerCase();
+  const opts = STATUS_SELECT_BY_ENTITY[ent] || STATUS_SELECT_GENERIC;
+  const found = opts.find(o => Number(o.v) === Number(v));
+  return found ? found.l : statusTextGeneric(v);
+}
+
 const STATUS_SELECT_BY_ENTITY = Object.freeze({
   cursos: [
     { v: 1, l: "Activo" },
