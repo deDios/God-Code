@@ -36,6 +36,78 @@ let currentUser=getUsuarioFromCookie();let isAdminUser=ADMIN_IDS.includes(Number
 function getUsuarioFromCookie(){const row=(document.cookie||"").split("; ").find(r=>r.indexOf("usuario=")===0);if(!row)return null;try{const raw=row.split("=")[1]||"",once=decodeURIComponent(raw);const maybe=/\%7B|\%22/.test(once)?decodeURIComponent(once):once;return JSON.parse(maybe)}catch(e){gcLog("cookie parse fail",e);return null}}
 async function postJSON(url,body){gcLog("postJSON ->",url,body);const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});const t=await r.text().catch(()=> "");gcLog("postJSON <-",url,r.status,t);if(!r.ok)throw new Error("HTTP "+r.status+" "+(t||""));if(!t.trim())return {};try{return JSON.parse(t)}catch{return{_raw:t}}}
 
+/* ---------- SELECT DE ESTATUS (por módulo) ---------- */
+/* Valores backend: 1 Activo · 0 Inactivo/Cancelado · 2 Pausado/Suscrito · 3 Terminado/Temporal/En curso (según módulo) */
+
+const STATUS_SELECT_BY_ENTITY = Object.freeze({
+  cursos: [
+    { v: 1, l: "Activo" },
+    { v: 2, l: "Pausado" },
+    { v: 3, l: "Terminado" },     // “En curso” y “Terminado” comparten tono (azul) en badges
+    { v: 0, l: "Inactivo" }       // “Cancelado” (rojo) se mapea a 0
+  ],
+  noticias: [
+    { v: 1, l: "Activo" },
+    { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris)
+    { v: 3, l: "Temporal" },      // azul
+    { v: 0, l: "Inactivo" }       // rojo
+  ],
+  tutores: [
+    { v: 1, l: "Activo" },
+    { v: 2, l: "Pausado" },       // gris
+    { v: 0, l: "Inactivo" }       // rojo
+  ],
+  // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
+  suscripciones: [
+    { v: 2, l: "Suscrito" },      // azul
+    { v: 1, l: "Activo" },        // verde
+    { v: 3, l: "Terminado" },     // gris
+    { v: 0, l: "Cancelado" }      // rojo
+  ]
+});
+
+// Opciones genéricas (fallback)
+const STATUS_SELECT_GENERIC = Object.freeze([
+  { v: 1, l: "Activo" },
+  { v: 2, l: "Pausado" },
+  { v: 3, l: "Terminado" },
+  { v: 0, l: "Inactivo" }
+]);
+
+function inferEntityForSelect() {
+  const t = state?.currentDrawer?.type || "";
+  if (t === "curso" || t === "curso-lite") return "cursos";
+  if (t === "noticia") return "noticias";
+  if (t === "tutor") return "tutores";
+  if (t === "suscripcion") return "suscripciones";
+  if (t === "usuario") return "suscripciones"; // mismos labels que suscripciones
+  return null;
+}
+
+/**
+ * Crea un <select> con labels/valores específicos por módulo.
+ * @param {string} id - id del select
+ * @param {number|string} val - valor actual
+ * @param {string=} entity - "cursos" | "noticias" | "tutores" | "suscripciones"
+ */
+function statusSelect(id, val, entity) {
+  const v = Number(val);
+  const ent = (entity || inferEntityForSelect() || "").toLowerCase();
+  const options = (STATUS_SELECT_BY_ENTITY[ent] || STATUS_SELECT_GENERIC);
+
+  // Si llega un valor que no está en la lista (p.ej. datos viejos), lo mostramos para no perderlo.
+  const has = options.some(o => Number(o.v) === v);
+  const extra = !has && !Number.isNaN(v)
+    ? [{ v, l: `(${v})` }]
+    : [];
+
+  const all = options.concat(extra);
+
+  return `<select id="${id}" data-entity="${ent || 'generic'}" aria-label="Estatus">
+    ${all.map(o => `<option value="${o.v}"${Number(o.v)===v ? " selected": ""}>${o.l}</option>`).join("")}
+  </select>`;
+}
+
 /* ====================== catálogos ====================== */
 const getTutorsMap=async()=>{if(cacheGuard(state.tutorsMap))return state.tutorsMap;const a=await postJSON(API.tutores,{estatus:1});return state.tutorsMap=arrToMap(a)};
 const getPrioridadMap=async()=>{if(cacheGuard(state.prioMap))return state.prioMap;const a=await postJSON(API.prioridad,{estatus:1});return state.prioMap=arrToMap(a)};
@@ -133,6 +205,7 @@ function toneFor(entity,status){
   return"grey";
 }
 function statusTextGeneric(v){const f=STATUS_OPTIONS.find(x=>Number(x.v)===Number(v));return f?f.l:String(v)}
+
 function statusBadge(entity,v,label){
   const tone=toneFor(entity,v);
   const text=label||statusTextGeneric(v);
@@ -339,7 +412,7 @@ function renderNoticiaDrawer(dataset){
   const controls=isAdminUser?('<div class="gc-actions">'+(isView?'<button class="gc-btn" id="btn-edit">Editar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>':"")+(isInactive?'<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>':'<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>')+"</div>"):"";
   let html=""+controls+
     field("Título",n.titulo,`<input id="f_tit" type="text" value="${escapeAttr(n.titulo||"")}"/>`)+
-    `<div class="field"><div class="label">Estatus</div><div class="value">${isEdit?statusSelect("f_estatus",n.estatus):badgeNoticia(n.estatus)}</div></div>`+
+    `<div class="field"><div class="label">Estatus</div><div class="value">${isEdit ? statusSelect("f_estatus", n.estatus, "noticias") : badgeNoticia(n.estatus)}</div></div>`+
     pair("Fecha publicación",fmtDateTime(n.fecha_creacion))+
     field("Descripción (1)",n.desc_uno,`<textarea id="f_desc1" rows="3">${escapeHTML(n.desc_uno||"")}</textarea>`)+
     field("Descripción (2)",n.desc_dos,`<textarea id="f_desc2" rows="3">${escapeHTML(n.desc_dos||"")}</textarea>`)+
@@ -438,7 +511,9 @@ function renderTutorDrawer(dataset){
   let html=""+controls+
     field("Nombre",t.nombre,`<input id="f_nombre" type="text" value="${escapeAttr(t.nombre||"")}" placeholder="Nombre del tutor"/>`)+
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
-    `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit||isCreate)?statusSelect("f_estatus",t.estatus):statusBadge("tutores",t.estatus)}</div></div>`;
+    `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit||isCreate) 
+  ? statusSelect("f_estatus", t.estatus, "tutores") 
+  : statusBadge("tutores", t.estatus)}</div></div>`;
   if(isCreate){
     html+=`<div class="field"><div class="label">Imagen <span class="req">*</span></div><div class="value"><div id="create-media-tutor" class="media-grid"><div class="media-card"><figure class="media-thumb"><img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}"/><button class="icon-btn media-edit" id="create-tutor-pick" title="Seleccionar imagen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg></button></figure><div class="media-meta"><div class="media-label">Foto</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div></div></div></div></div>`;
   }else{
