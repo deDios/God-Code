@@ -51,18 +51,22 @@
   const STATUS_SELECT_BY_ENTITY = Object.freeze({
     cursos: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "Pausado" },
-      { v: 3, l: "Terminado" },     // “En curso” y “Terminado” comparten tono (azul) en badges
-      { v: 0, l: "Inactivo" }       // “Cancelado” (rojo) se mapea a 0
+      { v: 2, l: "Pausado" },       // deberia ser gris
+      { v: 3, l: "Terminado" },     // (azul fuerte) falta hacer el cambio
+      { v: 0, l: "Inactivo" },      // (rojo) 
+      // canceado rojo rojo         // PENDIENTES
+      // en curso azul              // PENDIENTES
+      { v: 0, l: "Cancelado" }, 
+      { v: 0, l: "En curso" }, 
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris)
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
       { v: 3, l: "Temporal" },      // azul
-      { v: 0, l: "Inactivo" }       // rojo
+      { v: 0, l: "Cancelado" }      // rojo
     ],
     tutores: [
-      { v: 1, l: "Activo" },
+      { v: 1, l: "Activo" },        // deberia ser verde  
       { v: 2, l: "Pausado" },       // gris
       { v: 0, l: "Inactivo" }       // rojo
     ],
@@ -188,12 +192,15 @@
       "1": "green", "activo": "green",
       "2": "grey", "pausado": "grey", "en pausa": "grey",
       "3": "blue", "terminado": "blue", "en curso": "blue",
-      "0": "red", "inactivo": "red", "cancelado": "red"
+      "0": "red", "inactivo": "red", "cancelado": "red" //esto dodavia esta en face de pruebas 
     },
     noticias: {
       "1": "green", "activo": "green",
       "0": "red", "inactivo": "red",
-      "cancelado": "grey", "en pausa": "amber", "temporal": "blue", "pausado": "grey",
+      "cancelado": "grey", 
+      "en pausa": "amber", 
+      "temporal": "blue", 
+      "pausado": "grey",
       "2": "amber",
       "3": "blue"
     },
