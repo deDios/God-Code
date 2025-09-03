@@ -206,6 +206,7 @@ function toneFor(entity,status){
 }
 function statusTextGeneric(v){const f=STATUS_OPTIONS.find(x=>Number(x.v)===Number(v));return f?f.l:String(v)}
 
+//------------------------------------ PENDIENTE AJUSTAR PARA QUE NO CONTAGIE EL CSS AL DRAWER BANDERA1
 function statusBadge(entity,v,label){
   const tone=toneFor(entity,v);
   const text=label||statusTextGeneric(v);
@@ -353,7 +354,7 @@ function renderCursoDrawer(dataset){
      `<div class="field"><div class="label">Certificado</div><div class="value">${(isEdit||isCreate)?inCheck("f_certificado",c.certificado):(Number(c.certificado)?"Sí":"No")}</div></div>`+
    '</div>'+
    field("Fecha de inicio",c.fecha_inicio,inDate("f_fecha",c.fecha_inicio))+
-   `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit||isCreate)?statusSelect("f_estatus",c.estatus):statusBadge("cursos",c.estatus)}</div></div>`;
+   `<div class="field"><div class="label">Estatus</div><div class="value">${ (isEdit||isCreate) ? statusSelect("f_estatus", c.estatus, "cursos") : escapeHTML(statusLabel("cursos", c.estatus)) }</div></div>`;
   if(isCreate){
     html+=`<div class="field"><div class="label">Imagen del curso <span class="req">*</span></div><div class="value"><div id="create-media-curso" class="media-grid"><div class="media-card"><figure class="media-thumb"><img id="create-media-thumb" alt="Portada" src="${withBust("/ASSETS/cursos/img0.png")}" /><button class="icon-btn media-edit" id="create-media-edit" title="Seleccionar imagen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg></button></figure><div class="media-meta"><div class="media-label">Portada</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div></div></div></div></div>`;
   }else{
@@ -412,7 +413,7 @@ function renderNoticiaDrawer(dataset){
   const controls=isAdminUser?('<div class="gc-actions">'+(isView?'<button class="gc-btn" id="btn-edit">Editar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>':"")+(isEdit?'<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>':"")+(isInactive?'<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>':'<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>')+"</div>"):"";
   let html=""+controls+
     field("Título",n.titulo,`<input id="f_tit" type="text" value="${escapeAttr(n.titulo||"")}"/>`)+
-    `<div class="field"><div class="label">Estatus</div><div class="value">${isEdit ? statusSelect("f_estatus", n.estatus, "noticias") : badgeNoticia(n.estatus)}</div></div>`+
+    `<div class="field"><div class="label">Estatus</div><div class="value">${ isEdit ? statusSelect("f_estatus", n.estatus, "noticias") : escapeHTML(statusLabel("noticias", n.estatus)) }</div></div>`+
     pair("Fecha publicación",fmtDateTime(n.fecha_creacion))+
     field("Descripción (1)",n.desc_uno,`<textarea id="f_desc1" rows="3">${escapeHTML(n.desc_uno||"")}</textarea>`)+
     field("Descripción (2)",n.desc_dos,`<textarea id="f_desc2" rows="3">${escapeHTML(n.desc_dos||"")}</textarea>`)+
@@ -511,9 +512,7 @@ function renderTutorDrawer(dataset){
   let html=""+controls+
     field("Nombre",t.nombre,`<input id="f_nombre" type="text" value="${escapeAttr(t.nombre||"")}" placeholder="Nombre del tutor"/>`)+
     field("Descripción",t.descripcion,`<textarea id="f_desc" rows="4" placeholder="Descripción del perfil">${escapeHTML(t.descripcion||"")}</textarea>`)+
-    `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit||isCreate) 
-  ? statusSelect("f_estatus", t.estatus, "tutores") 
-  : statusBadge("tutores", t.estatus)}</div></div>`;
+    `<div class="field"><div class="label">Estatus</div><div class="value">${ (isEdit||isCreate) ? statusSelect("f_estatus", t.estatus, "tutores") : escapeHTML(statusLabel("tutores", t.estatus)) }</div></div>`;
   if(isCreate){
     html+=`<div class="field"><div class="label">Imagen <span class="req">*</span></div><div class="value"><div id="create-media-tutor" class="media-grid"><div class="media-card"><figure class="media-thumb"><img id="create-tutor-thumb" alt="Foto" src="${withBust("/ASSETS/tutor/tutor_0.png")}"/><button class="icon-btn media-edit" id="create-tutor-pick" title="Seleccionar imagen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg></button></figure><div class="media-meta"><div class="media-label">Foto</div><div class="media-help" style="color:#666;">JPG/PNG · Máx 2MB</div></div></div></div></div></div>`;
   }else{
@@ -573,7 +572,7 @@ function renderUsuarioDrawer(dataset){
    field("Teléfono",n.telefono,`<input id="u_telefono" type="tel" value="${escapeAttr(n.telefono||"")}">`)+
    `<div class="field"><div class="label">Fecha nacimiento</div><div class="value">${(isEdit?`<input id="u_fnac" type="date" value="${escapeAttr(n.fecha_nacimiento||"")}">`:escapeHTML(n.fecha_nacimiento||""))}</div></div>`+
    `<div class="field"><div class="label">Tipo contacto</div><div class="value">${(isEdit?`<input id="u_tcontacto" type="number" min="0" value="${escapeAttr(n.tipo_contacto||"0")}">`:escapeHTML(n.tipo_contacto||""))}</div></div>`+
-   `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit?statusSelect("u_estatus",n.estatus):statusBadge("suscripciones",n.estatus===1?"activo":(n.estatus===0?"cancelado":n.estatus)))}</div></div>`+
+   `<div class="field"><div class="label">Estatus</div><div class="value">${ (isEdit) ? statusSelect("u_estatus", n.estatus, "suscripciones") : escapeHTML(statusLabel("suscripciones", n.estatus)) }</div></div>`+
    `<div class="field"><div class="label">Avatar <span class="req">*</span></div><div class="value"><div id="media-usuario" data-id="${n.id}"></div><div class="hint" style="color:#666;margin-top:.35rem;">Debe existir un avatar válido.</div></div></div>`;
   if(isAdminUser)html+=jsonSection(n,"JSON · Usuario","json-usuario","btn-copy-json-usuario");
   if(isEdit){qs("#drawer-title").textContent="Usuario · "+(it?it.nombre:"")+" (edición)";state.currentDrawer={type:"usuario",id:n.id,mode:"edit"};}
