@@ -102,7 +102,6 @@ function statusSelect(id, val, entity) {
   const ent = (entity || inferEntityForSelect() || "").toLowerCase();
   const options = (STATUS_SELECT_BY_ENTITY[ent] || STATUS_SELECT_GENERIC);
 
-  // Si llega un valor que no está en la lista (p.ej. datos viejos), lo mostramos para no perderlo.
   const has = options.some(o => Number(o.v) === v);
   const extra = !has && !Number.isNaN(v)
     ? [{ v, l: `(${v})` }]
@@ -478,7 +477,7 @@ function openCursoLightFromTutor(tutorId,curso){const nombre=curso?.nombre||("Cu
     <div class="gc-actions"><button class="gc-btn gc-btn--ghost" id="btn-back-tutor">← Regresar al tutor</button></div>
     ${pair("Nombre", nombre)}
     ${pair("Tutor", state.tutorsMap && state.tutorsMap[curso.tutor] ? state.tutorsMap[curso.tutor] : ("#"+curso.tutor))}
-    ${pair("Estatus", statusBadge("cursos", curso.estatus))}
+    ${pair("Estatus", escapeHTML(statusLabel("cursos", curso.estatus)))}
     ${pair("Fecha de inicio", fmtDate(curso.fecha_inicio))}
     ${pair("Precio", Number(curso.precio)===0 ? "Gratuito" : fmtMoney(curso.precio))}
     <div class="field"><div class="label">Imagen</div><div class="value"><div id="media-curso-lite" data-id="${curso.id}"></div></div></div>
