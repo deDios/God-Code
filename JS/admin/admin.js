@@ -18,7 +18,7 @@
     calendario: API_BASE + "c_dias_curso.php", tipoEval: API_BASE + "c_tipo_evaluacion.php", actividades: API_BASE + "c_actividades.php",
     usuarios: API_BASE + "c_usuarios.php", iUsuarios: API_BASE + "i_usuario.php", uUsuarios: API_BASE + "u_usuario.php",
     uAvatar: API_BASE + "u_avatar.php",
-    inscripciones: API_BASE + "c_suscripciones.php", iInscripcion: API_BASE + "i_inscripcion.php", uInscripcion: API_BASE + "u_inscripcion.php"
+    inscripciones: API_BASE + "c_suscripciones.php", iInscripcion: API_BASE + "i_inscripcion.php", uInscripcion: API_BASE + "u_inscripcion.php", userLookup: API_BASE + "c_usuario.php"
   };
   const API_UPLOAD = { cursoImg: API_BASE + "u_cursoImg.php", noticiaImg: API_BASE + "u_noticiaImagenes.php", tutorImg: API_BASE + "u_tutorImg.php" };
 
@@ -51,33 +51,30 @@
   const STATUS_SELECT_BY_ENTITY = Object.freeze({
     cursos: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "Pausado" },       // deberia ser gris
-      { v: 3, l: "Terminado" },     // (azul fuerte) falta hacer el cambio
-      { v: 0, l: "Inactivo" },      // (rojo) 
-      // canceado rojo rojo         // PENDIENTES
-      // en curso azul              // PENDIENTES
-      { v: 0, l: "Cancelado" }, 
-      { v: 0, l: "En curso" }, 
+      { v: 2, l: "Pausado" },
+      { v: 4, l: "En curso" },
+      { v: 3, l: "Terminado" },
+      { v: 0, l: "Inactivo" },
+      { v: 5, l: "Cancelado" }
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
-      { v: 3, l: "Temporal" },      // azul
-      { v: 0, l: "Cancelado" }      // rojo
+      { v: 2, l: "En pausa" },
+      { v: 3, l: "Temporal" },
+      { v: 0, l: "Cancelado" }
     ],
     tutores: [
-      { v: 1, l: "Activo" },        // deberia ser verde  
-      { v: 2, l: "Pausado" },       // gris
-      { v: 0, l: "Inactivo" }       // rojo
+      { v: 1, l: "Activo" },
+      { v: 2, l: "Pausado" },
+      { v: 0, l: "Inactivo" }
     ],
-    // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
     suscripciones: [
-      { v: 2, l: "Suscrito" },      // azul
-      { v: 1, l: "Activo" },        // verde
-      { v: 3, l: "Terminado" },     // gris
-      { v: 0, l: "Cancelado" }      // rojo
+      { v: 2, l: "Suscrito" },
+      { v: 1, l: "Activo" },
+      { v: 3, l: "Terminado" },
+      { v: 0, l: "Cancelado" }
     ]
-  });
+});
 
   // Opciones genéricas (fallback)
   const STATUS_SELECT_GENERIC = Object.freeze([
@@ -188,32 +185,32 @@
 
   /* ---------- BADGES  ---------- */
   const STATUS_TONE = Object.freeze({
-    cursos: { // admite números y strings
+    cursos: {
       "1": "green", "activo": "green",
-      "2": "grey", "pausado": "grey", "en pausa": "grey",
-      "3": "blue", "terminado": "blue", "en curso": "blue",
-      "0": "red", "inactivo": "red", "cancelado": "red" //esto dodavia esta en face de pruebas 
+      "2": "grey",  "pausado": "grey", "en pausa": "grey",
+      "4": "blue",  "en curso": "blue",
+      "3": "grey",  "terminado": "blue",
+      "0": "red",   "inactivo": "red", "cancelado": "red",
+      "5": "red",   "cancelado": "red", "cancelado": "red"      
     },
     noticias: {
       "1": "green", "activo": "green",
-      "0": "red", "inactivo": "red",
-      "cancelado": "grey", 
-      "en pausa": "amber", 
-      "temporal": "blue", 
-      "pausado": "grey",
-      "2": "amber",
-      "3": "blue"
+      "2": "amber", "en pausa": "amber",
+      "3": "blue",  "temporal": "blue",
+      "0": "red",   "cancelado": "red", "inactivo": "red"
     },
     tutores: {
       "1": "green", "activo": "green",
-      "0": "red", "inactivo": "red",
-      "2": "grey", "pausado": "grey"
+      "2": "grey",  "pausado": "grey",
+      "0": "red",   "inactivo": "red"
     },
     suscripciones: {
-      "activo": "green", "suscrito": "blue", "cancelado": "red", "terminado": "grey",
-      "1": "green", "2": "blue", "3": "grey", "0": "red"
+      "2": "blue",  "suscrito": "blue",
+      "1": "green", "activo": "green",
+      "3": "grey",  "terminado": "grey",
+      "0": "red",   "cancelado": "red"
     }
-  });
+});
   function toneFor(entity, status) {
     const e = (entity || "").toLowerCase(); const raw = (status == null ? "" : String(status)).toLowerCase().trim();
     const map = STATUS_TONE[e] || {};
@@ -229,7 +226,6 @@
   }
   function statusTextGeneric(v) { const f = STATUS_OPTIONS.find(x => Number(x.v) === Number(v)); return f ? f.l : String(v) }
 
-  //------------------------------------ PENDIENTE AJUSTAR PARA QUE NO CONTAGIE EL CSS AL DRAWER BANDERA1
   function statusBadge(entity, v, label) {
     const tone = toneFor(entity, v);
     const text = label || statusTextGeneric(v);
@@ -318,6 +314,58 @@
       else if (state.route.startsWith("#/suscripciones")) await openCreateSuscripcion();
     });
     const s = qs("#search-input"); if (s) { s.addEventListener("input", () => { state.search = s.value || ""; refreshCurrent() }) }
+  }
+
+  
+  /* ====================== Suscripciones · helpers ====================== */
+  async function consultUsuario({ correo, telefono }) {
+    try {
+      const res = await fetch(API.userLookup, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo: (correo || "").toLowerCase().trim(), telefono: (telefono || "").trim() })
+      });
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      gcToast("No se pudo consultar usuario.", "error");
+      return [];
+    }
+  }
+  function validarFormatoCampo(tipo, valor) {
+    const v = String(valor || "").trim();
+    if (tipo === "telefono") return /^\d{10,13}$/.test(v);
+    if (tipo === "correo") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.toLowerCase());
+    return !!v;
+  }
+  function setIcono(container, ok, msgOk, msgWarn) {
+    const icono = container?.querySelector?.(".icono-alerta");
+    if (!icono) return;
+    if (ok) {
+      container.classList.remove("alerta");
+      icono.textContent = "✅";
+      icono.classList.add("valido");
+      icono.title = msgOk || "Campo válido.";
+    } else {
+      container.classList.add("alerta");
+      icono.textContent = "⚠️";
+      icono.classList.remove("valido");
+      icono.title = msgWarn || "Revisa este campo.";
+    }
+  }
+  function obtenerTipoContactoDesdeChecks(root) {
+    const checks = root.querySelectorAll('input[name="suscr-medios-contacto"]:checked');
+    const vals = Array.from(checks).map(cb => cb.value);
+    if (vals.includes("telefono") && vals.includes("correo")) return 3;
+    if (vals.includes("telefono")) return 1;
+    if (vals.includes("correo")) return 2;
+    return 0;
+  }
+  function toggleDisabled(el, disabled) {
+    if (!el) return;
+    el.disabled = !!disabled;
+    el.classList.toggle("disabled", !!disabled);
+    if ("readOnly" in el) el.readOnly = !!disabled;
   }
 
   /* ====================== Cursos ====================== */
@@ -963,7 +1011,261 @@
       drawSuscripciones()
     } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); toast("No se pudieron cargar suscripciones", "error") }
   }
-  function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
+  
+  async function openCreateSuscripcion() {
+    // Pre-cargar cursos (cualquier estatus) para permitir inscripción a cursos activos principalmente
+    const cursosMap = await getCursosMapAnyStatus();
+    const cursoOptions = Object.entries(cursosMap || {}).map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`).join("");
+
+    const body = `
+      <div class="gc-actions">
+        <button class="gc-btn gc-btn-ghost" id="btn-cancel">Cancelar</button>
+        <button class="gc-btn gc-btn-primary" id="btn-save">Inscribir</button>
+      </div>
+
+      <div class="field">
+        <div class="label">Curso <span class="req">*</span></div>
+        <div class="value">
+          <select id="suscr-curso">${cursoOptions}</select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="suscr-ya-cuenta" style="display:flex;align-items:center;gap:.5rem;">
+          <input type="checkbox" id="suscr-ya-cuenta"> Ya tiene cuenta
+        </label>
+      </div>
+
+      <div id="suscr-zone-login" class="field" style="display:none;">
+        <div class="label">Buscar cuenta (teléfono o correo)</div>
+        <div class="value">
+          <div class="input-alerta-container">
+            <input id="suscr-login-identificador" type="text" placeholder="correo o teléfono" />
+            <span class="icono-alerta" title=""></span>
+          </div>
+          <div style="margin-top:.5rem; display:flex; gap:.5rem;">
+            <button class="gc-btn" id="suscr-buscar">Buscar</button>
+            <a href="#" id="suscr-volver" class="gc-btn gc-btn-ghost" style="display:none;">Volver a registro</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="suscr-zone-registro">
+        <div class="field">
+          <div class="label">Nombre <span class="req">*</span></div>
+          <div class="value"><input id="suscr-nombre" type="text" placeholder="Nombre completo" /></div>
+        </div>
+
+        <div class="field">
+          <div class="label">Teléfono <span class="req">*</span></div>
+          <div class="value">
+            <div class="input-alerta-container">
+              <input id="suscr-telefono" type="tel" placeholder="10 a 13 dígitos" />
+              <span class="icono-alerta" title=""></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Correo <span class="req">*</span></div>
+          <div class="value">
+            <div class="input-alerta-container">
+              <input id="suscr-correo" type="email" placeholder="correo@dominio.com" />
+              <span class="icono-alerta" title=""></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Fecha de nacimiento <span class="req">*</span></div>
+          <div class="value">
+            <input id="suscr-fecha" type="date" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label">Medios de contacto <span class="req">*</span></div>
+          <div class="value" id="suscr-medios">
+            <label><input type="checkbox" name="suscr-medios-contacto" value="telefono" /> Teléfono</label>
+            <label style="margin-left:1rem;"><input type="checkbox" name="suscr-medios-contacto" value="correo" /> Correo</label>
+          </div>
+        </div>
+      </div>
+    `;
+
+    openDrawer("Suscripción · Crear", body);
+    qs("#drawer-title").textContent = "Suscripción · Crear";
+    state.currentDrawer = { type: "suscripcion", mode: "create" };
+
+    // Wiring
+    const zoneLogin = qs("#suscr-zone-login");
+    const zoneRegistro = qs("#suscr-zone-registro");
+    const chk = qs("#suscr-ya-cuenta");
+    const btnBuscar = qs("#suscr-buscar");
+    const aVolver = qs("#suscr-volver");
+    const btnSave = qs("#btn-save");
+    const btnCancel = qs("#btn-cancel");
+
+    const inNombre = qs("#suscr-nombre");
+    const inTel = qs("#suscr-telefono");
+    const inMail = qs("#suscr-correo");
+    const inFecha = qs("#suscr-fecha");
+    const inIdent = qs("#suscr-login-identificador");
+    const selCurso = qs("#suscr-curso");
+    let usuarioEncontrado = null; // {id, nombre, telefono, correo, fecha_nacimiento, tipo_contacto}
+
+    function toggleLogin(on) {
+      zoneLogin.style.display = on ? "" : "none";
+      zoneRegistro.style.display = on ? "none" : "";
+      aVolver.style.display = on ? "" : "none";
+      usuarioEncontrado = null;
+      // limpiar íconos de alerta
+      qsAll(".input-alerta-container .icono-alerta", qs("#gc-drawer")).forEach(el => { el.textContent = ""; el.classList.remove("valido"); el.removeAttribute("title") });
+      qsAll(".input-alerta-container", qs("#gc-drawer")).forEach(c => c.classList.remove("alerta"));
+      // habilitar edición
+      [inNombre, inTel, inMail, inFecha].forEach(el => toggleDisabled(el, false));
+    }
+
+    chk.addEventListener("change", () => toggleLogin(chk.checked));
+    aVolver.addEventListener("click", (e) => { e.preventDefault(); chk.checked = false; toggleLogin(false) });
+
+    // Validaciones registro
+    function onValidate(inputEl) {
+      if (!inputEl) return;
+      let tipo = inputEl === inTel ? "telefono" : (inputEl === inMail ? "correo" : "texto");
+      const cont = inputEl.closest(".input-alerta-container");
+      const ok = tipo === "texto" ? !!inputEl.value.trim() : validarFormatoCampo(tipo, inputEl.value);
+      if (cont) setIcono(cont, ok, "Campo válido.", tipo === "telefono" ? "Teléfono de 10–13 dígitos." : "Correo inválido.");
+      refreshSaveState();
+    }
+    [inTel, inMail].forEach(el => {
+      el.addEventListener("input", () => onValidate(el));
+      el.addEventListener("blur", () => onValidate(el));
+    });
+
+    async function validarDuplicados() {
+      // Solo en modo registro
+      if (chk.checked) return true;
+      const tel = inTel.value.trim();
+      const mail = inMail.value.trim().toLowerCase();
+      if (!tel && !mail) return true;
+      const data = await consultUsuario({ correo: mail, telefono: tel });
+      let ok = true;
+      if (data && data.length) {
+        // marcar coincidencias
+        data.forEach(u => {
+          if (u?.telefono && tel && String(u.telefono) == String(tel)) {
+            const c = inTel.closest(".input-alerta-container"); setIcono(c, false, "", "Ya existe una cuenta con este teléfono."); gcToast("Ya existe una cuenta con ese teléfono.", "warning"); ok = false;
+          }
+          if (u?.correo && mail && String(u.correo).toLowerCase() == mail) {
+            const c = inMail.closest(".input-alerta-container"); setIcono(c, false, "", "Ya existe una cuenta con este correo."); gcToast("Ya existe una cuenta con ese correo.", "warning"); ok = false;
+          }
+        });
+      }
+      return ok;
+    }
+
+    // Buscar cuenta (modo ya tiene cuenta)
+    btnBuscar.addEventListener("click", async () => {
+      const ident = (inIdent.value || "").trim().toLowerCase();
+      if (!ident) { gcToast("Ingresa un correo o teléfono.", "warning"); return; }
+      const found = await consultUsuario({ correo: ident, telefono: ident });
+      if (found && found.length) {
+        usuarioEncontrado = found[0];
+        gcToast("Cuenta encontrada correctamente.", "exito");
+        // Prefill y bloquear
+        inNombre.value = usuarioEncontrado.nombre || "";
+        inTel.value = usuarioEncontrado.telefono || "";
+        inMail.value = (usuarioEncontrado.correo || "").toLowerCase();
+        let f = usuarioEncontrado.fecha_nacimiento || "";
+        if (typeof f === "string") {
+          if (f.includes("T")) f = f.split("T")[0];
+          else if (f.includes(" ")) f = f.split(" ")[0];
+          else if (f.includes("/")) { const p = f.split("/"); if (p.length === 3) f = `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`; }
+        }
+        inFecha.value = f || "";
+        [inNombre, inTel, inMail, inFecha].forEach(el => toggleDisabled(el, true));
+        // checks de medios
+        const t = Number(usuarioEncontrado.tipo_contacto || 0);
+        const chkTel = qs('#suscr-medios input[value="telefono"]'); const chkMail = qs('#suscr-medios input[value="correo"]');
+        if (chkTel) chkTel.checked = (t === 1 || t === 3);
+        if (chkMail) chkMail.checked = (t === 2 || t === 3);
+      } else {
+        usuarioEncontrado = null;
+        gcToast("No encontramos la cuenta.", "warning");
+      }
+      refreshSaveState();
+    });
+
+    function camposRegistroCompletos() {
+      return !!(inNombre.value.trim() && validarFormatoCampo("telefono", inTel.value) && validarFormatoCampo("correo", inMail.value) && inFecha.value);
+    }
+    function refreshSaveState() {
+      const cursoOk = !!selCurso.value;
+      const mediosOk = obtenerTipoContactoDesdeChecks(qs("#gc-drawer")) !== 0;
+      let listo = cursoOk && mediosOk;
+      if (chk.checked) {
+        // requiere haber encontrado usuario
+        listo = listo && !!usuarioEncontrado;
+      } else {
+        listo = listo && camposRegistroCompletos();
+      }
+      toggleDisabled(btnSave, !listo);
+    }
+    qs('#suscr-medios')?.addEventListener('change', refreshSaveState);
+    selCurso?.addEventListener('change', refreshSaveState);
+    refreshSaveState();
+
+    btnCancel.addEventListener("click", (e) => { e.preventDefault(); closeDrawer(); });
+
+    btnSave.addEventListener("click", async (e) => {
+      e.preventDefault();
+      // Validaciones finales
+      if (!selCurso?.value) { gcToast("Selecciona un curso.", "warning"); return; }
+      const tipo_contacto = obtenerTipoContactoDesdeChecks(qs("#gc-drawer"));
+      if (!tipo_contacto) { gcToast("Selecciona al menos un medio de contacto.", "warning"); return; }
+
+      let usuarioId = null;
+      try {
+        if (chk.checked) {
+          if (!usuarioEncontrado?.id) { gcToast("Busca y selecciona una cuenta válida.", "warning"); return; }
+          usuarioId = Number(usuarioEncontrado.id);
+        } else {
+          // validar duplicados antes de crear
+          if (!(await validarDuplicados())) return;
+          const payloadUser = {
+            nombre: inNombre.value.trim(),
+            correo: inMail.value.trim().toLowerCase(),
+            telefono: inTel.value.trim(),
+            fecha_nacimiento: inFecha.value,
+            tipo_contacto,
+            password: "godcode123"
+          };
+          const ins = await fetch(API.iUsuarios, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadUser) });
+          const resIns = await ins.json();
+          if (!(resIns?.mensaje || "").toLowerCase().includes("usuario")) {
+            throw new Error(resIns?.mensaje || "No se pudo registrar el usuario.");
+          }
+          // Consultar para obtener ID
+          const nuevo = await consultUsuario({ correo: payloadUser.correo, telefono: payloadUser.telefono });
+          usuarioId = nuevo[0]?.id ? Number(nuevo[0].id) : null;
+          if (!usuarioId) throw new Error("No se pudo obtener el ID del usuario creado.");
+        }
+
+        // Crear inscripción
+        const payloadIns = { curso: Number(selCurso.value), usuario: Number(usuarioId), comentario: "" };
+        const insc = await fetch(API.iInscripcion, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadIns) });
+        const resInsc = await insc.json();
+        gcToast(resInsc?.mensaje || "Inscripción realizada correctamente", "exito", 6000);
+        closeDrawer();
+        await loadSuscripciones();
+      } catch (err) {
+        console.error("Error en inscripción:", err);
+        gcToast(err?.message || "Hubo un error al procesar la inscripción.", "error");
+      }
+    });
+  }
+function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
   async function softDeleteSuscripcion(item) { if (!item || !item._all) return; await postJSON(API.uInscripcion, { id: item.id, estatus: 0 }) }
   async function reactivateSuscripcion(id) { await postJSON(API.uInscripcion, { id: Number(id), estatus: 1 }) }
   function readSuscripcionForm(existing) { const g = id => qs("#" + id)?.value || ""; const n = id => Number(g(id) || 0); const p = { comentario: g("s_comentario"), estatus: n("s_estatus") }; if (existing?.id) p.id = existing.id; return p }
