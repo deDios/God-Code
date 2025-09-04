@@ -186,12 +186,12 @@
     qsa(".gc-reactivate").forEach(btn => {
       btn.addEventListener("click", async (e) => {
         e.stopPropagation(); const id = Number(btn.getAttribute("data-id")); const t = btn.getAttribute("data-type"); try {
-          if (t === "curso") { await reactivateCurso(id); toast("Curso reactivado", "exito"); await loadCursos() }
-          else if (t === "noticia") { const ok = await reactivateNoticia(id); if (ok) { toast("Noticia reactivada", "exito"); await loadNoticias() } }
-          else if (t === "tutor") { await reactivateTutor(id); toast("Tutor reactivado", "exito"); await loadTutores() }
-          else if (t === "usuario") { const it = state.data.find(x => x.id === id); if (!it) return; await postJSON(API.uUsuarios, { ...it._all, estatus: 1 }); toast("Usuario reactivado", "exito"); await loadUsuarios() }
-          else if (t === "suscripcion") { await reactivateSuscripcion(id); toast("Suscripción reactivada", "exito"); await loadSuscripciones() }
-        } catch (err) { gcLog(err); toast("No se pudo reactivar", "error") }
+          if (t === "curso") { await reactivateCurso(id); gcToast("Curso reactivado", "exito"); await loadCursos() }
+          else if (t === "noticia") { const ok = await reactivateNoticia(id); if (ok) { gcToast("Noticia reactivada", "exito"); await loadNoticias() } }
+          else if (t === "tutor") { await reactivateTutor(id); gcToast("Tutor reactivado", "exito"); await loadTutores() }
+          else if (t === "usuario") { const it = state.data.find(x => x.id === id); if (!it) return; await postJSON(API.uUsuarios, { ...it._all, estatus: 1 }); gcToast("Usuario reactivado", "exito"); await loadUsuarios() }
+          else if (t === "suscripcion") { await reactivateSuscripcion(id); gcToast("Suscripción reactivada", "exito"); await loadSuscripciones() }
+        } catch (err) { gcLog(err); gcToast("No se pudo reactivar", "error") }
       })
     });
     renderPagination(filtered.length)
@@ -298,14 +298,14 @@
           btnEdit.addEventListener("click", (e) => {
             e.preventDefault(); e.stopPropagation(); const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
             input.addEventListener("change", async function () {
-              const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return toast(v.error, "error");
+              const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error");
               renderPreviewUI(card, file, async () => {
                 try {
-                  if (type === "curso") { const fd = new FormData(); fd.append("curso_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); toast("Imagen de curso actualizada", "exito"); return }
-                  if (type === "noticia") { const fd = new FormData(); fd.append("noticia_id", String(id)); fd.append("pos", String(i + 1)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); toast("Imagen de noticia actualizada", "exito"); return }
-                  if (type === "tutor") { const fd = new FormData(); fd.append("tutor_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); toast("Imagen de tutor actualizada", "exito"); return }
-                  if (type === "usuario") { const fd = new FormData(); fd.append("usuario_id", String(id)); fd.append("imagen", file); const res = await fetch(API.uAvatar, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); toast("Avatar actualizado", "exito"); return }
-                } catch (err) { gcLog(err); toast("No se pudo subir la imagen", "error") }
+                  if (type === "curso") { const fd = new FormData(); fd.append("curso_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de curso actualizada", "exito"); return }
+                  if (type === "noticia") { const fd = new FormData(); fd.append("noticia_id", String(id)); fd.append("pos", String(i + 1)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de noticia actualizada", "exito"); return }
+                  if (type === "tutor") { const fd = new FormData(); fd.append("tutor_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de tutor actualizada", "exito"); return }
+                  if (type === "usuario") { const fd = new FormData(); fd.append("usuario_id", String(id)); fd.append("imagen", file); const res = await fetch(API.uAvatar, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Avatar actualizado", "exito"); return }
+                } catch (err) { gcLog(err); gcToast("No se pudo subir la imagen", "error") }
               }, () => { });
             }); input.click()
           })
@@ -322,7 +322,7 @@
   function closeDrawer() { try { document.activeElement?.blur?.() } catch { } const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.remove("open"); const dw = qs("#gc-drawer"); if (!dw) return; dw.classList && dw.classList.remove("open"); dw.setAttribute("aria-hidden", "true"); state.currentDrawer = null }
   function disableDrawerInputs(disabled) { qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => el.disabled = !!disabled) }
   function jsonSection(obj, title, preId, btnId) { const safe = escapeHTML(JSON.stringify(obj || {}, null, 2)); return `<details class="dev-json" open style="margin-top:16px;"><summary style="cursor:pointer;font-weight:600;">${escapeHTML(title)}</summary><div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="${btnId}">Copiar JSON</button></div><pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre></details>` }
-  function bindCopyFromPre(preSel, btnSel) { const btn = qs(btnSel), pre = qs(preSel); if (!btn || !pre) return; btn.addEventListener("click", async (e) => { e.preventDefault(); const text = pre.textContent || ""; if (!text) return toast("No hay JSON para copiar", "warning"); try { await navigator.clipboard.writeText(text); toast("JSON copiado", "exito") } catch { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.left = "-9999px"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); toast("JSON copiado", "exito") } catch { alert("No se pudo copiar") } } }) }
+  function bindCopyFromPre(preSel, btnSel) { const btn = qs(btnSel), pre = qs(preSel); if (!btn || !pre) return; btn.addEventListener("click", async (e) => { e.preventDefault(); const text = pre.textContent || ""; if (!text) return gcToast("No hay JSON para copiar", "warning"); try { await navigator.clipboard.writeText(text); gcToast("JSON copiado", "exito") } catch { try { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.left = "-9999px"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); gcToast("JSON copiado", "exito") } catch { alert("No se pudo copiar") } } }) }
 
   /* ====================== toolbar/search/add ====================== */
   function setSearchPlaceholder(txt) { const s = qs("#search-input"); if (s) s.placeholder = txt || "Buscar..." }
@@ -353,7 +353,7 @@
       const raw = [].concat(e1 || [], e0 || [], e2 || [], e3 || []); state.raw = raw;
       state.data = (raw || []).map(c => ({ id: c.id, nombre: c.nombre, tutor: (tmap && tmap[c.tutor]) || ("Tutor #" + c.tutor), tutor_id: c.tutor, prioridad_id: c.prioridad, prioridad_nombre: (pmap && pmap[c.prioridad]) || ("#" + c.prioridad), categoria_id: c.categoria, categoria_nombre: (cmap && cmap[c.categoria]) || ("#" + c.categoria), calendario_id: c.calendario, calendario_nombre: (calmap && calmap[c.calendario]) || ("#" + c.calendario), tipo_eval_id: c.tipo_evaluacion, tipo_eval_nombre: (temap && temap[c.tipo_evaluacion]) || ("#" + c.tipo_evaluacion), actividades_id: c.actividades, actividades_nombre: (ammap && ammap[c.actividades]) || ("#" + c.actividades), precio: c.precio, certificado: !!c.certificado, fecha: c.fecha_inicio, estatus: ntf(c.estatus), _all: c }));
       drawCursos()
-    } catch (err) { gcLog(err); const list = qs("#recursos-list"); if (list) list.innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>'; qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); toast("No se pudieron cargar cursos", "error") }
+    } catch (err) { gcLog(err); const list = qs("#recursos-list"); if (list) list.innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar cursos</div>'; qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); gcToast("No se pudieron cargar cursos", "error") }
   }
   function drawCursos() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre).includes(k) || norm(it.tutor).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="curso"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre)}</span> ${badgePrecio(it.precio)}</div><div class="col-tutor">${escapeHTML(it.tutor)}</div><div class="col-fecha">${fmtDate(it.fecha)}</div><div class="col-status">${statusBadge("cursos", it.estatus)}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="curso"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre)} ${badgePrecio(it.precio)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Tutor:</strong> ${escapeHTML(it.tutor)}</div><div><strong>Inicio:</strong> ${fmtDate(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("cursos", it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="curso" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const item = state.data.find(x => String(x.id) === d.id); return item ? ("Curso · " + item.nombre) : "Curso" }, drawerBody: d => renderCursoDrawer(d), afterOpen: d => { if (d.type === "curso") { const it = state.data.find(x => String(x.id) === d.id); if (!it) return; const cont = qs("#media-curso"); if (cont) mountReadOnlyMedia({ container: cont, type: "curso", id: it.id, labels: ["Portada"], editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit") }); if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso") } } }) }
   function mapToOptions(map, selectedId) { if (!map || typeof map !== "object") return '<option value="">—</option>'; const pairs = Object.keys(map).filter(k => k !== "_ts").map(k => [k, map[k]]); if (!pairs.length) return '<option value="">—</option>'; return pairs.map(([id, name]) => `<option value="${escapeAttr(id)}"${String(selectedId) === String(id) ? " selected" : ""}>${escapeHTML(name)}</option>`).join("") }
@@ -370,14 +370,14 @@
   }
 
   async function saveNewCurso() {
-    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return toast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) return toast("Selecciona la imagen del curso", "warning");
+    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) return gcToast("Selecciona la imagen del curso", "warning");
     const res = await postJSON(API.iCursos, payload); const newId = Number((res && (res.id || res.curso_id || res.insert_id || (res.data && res.data.id))) || 0); const file = state.tempNewCourseImage || null;
-    if (newId && file) { try { await uploadCursoImagen(newId, file); toast("Imagen subida", "exito") } catch (err) { gcLog(err); toast("Curso creado, pero falló la imagen", "error") } finally { state.tempNewCourseImage = null } }
-    toast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
+    if (newId && file) { try { await uploadCursoImagen(newId, file); gcToast("Imagen subida", "exito") } catch (err) { gcLog(err); gcToast("Curso creado, pero falló la imagen", "error") } finally { state.tempNewCourseImage = null } }
+    gcToast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
   }
   async function saveUpdateCurso(item) {
-    if (!item || !item._all) return toast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return toast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if (!okImg) return toast("La portada del curso es obligatoria", "warning");
-    await postJSON(API.uCursos, payload); toast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if (!okImg) return gcToast("La portada del curso es obligatoria", "warning");
+    await postJSON(API.uCursos, payload); gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
   }
   async function softDeleteCurso(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = normalizeCursoPayload({ ...item._all, estatus: 0 }); await postJSON(API.uCursos, body) }
   async function reactivateCurso(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Curso no encontrado"); const body = normalizeCursoPayload({ ...it._all, estatus: 1 }); await postJSON(API.uCursos, body) }
@@ -444,23 +444,23 @@
             btn.addEventListener("click", () => {
               const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
-                const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { toast(v.error, "error"); return }
-                renderPreviewUI(card, file, async () => { state.tempNewCourseImage = file; try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (thumb.dataset) thumb.dataset.blobUrl = blobUrl; thumb.src = blobUrl; toast("Imagen seleccionada (se subirá al guardar)", "exito") }, () => { })
+                const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
+                renderPreviewUI(card, file, async () => { state.tempNewCourseImage = file; try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (thumb.dataset) thumb.dataset.blobUrl = blobUrl; thumb.src = blobUrl; gcToast("Imagen seleccionada (se subirá al guardar)", "exito") }, () => { })
               }); input.click()
             })
           }
         }
-        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { if (isCreate) await saveNewCurso(); else await saveUpdateCurso(item) } catch (err) { gcLog(err); toast("Error al guardar", "error") } });
+        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { if (isCreate) await saveNewCurso(); else await saveUpdateCurso(item) } catch (err) { gcLog(err); gcToast("Error al guardar", "error") } });
         qs("#btn-edit")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "edit" }; qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") }) });
         qs("#btn-cancel")?.addEventListener("click", (e) => { e.stopPropagation(); if (isCreate) { state.tempNewCourseImage = null; closeDrawer() } else { state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "view" }; qs("#drawer-body").innerHTML = renderCursoDrawer({ id: String(item ? item.id : "") }) } });
         const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => {
           e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return }
-          try { await softDeleteCurso(item); toast("Curso eliminado (inactivo)", "exito"); closeDrawer(); await loadCursos() } catch (err) { gcLog(err); toast("No se pudo eliminar", "error") }
+          try { await softDeleteCurso(item); gcToast("Curso eliminado (inactivo)", "exito"); closeDrawer(); await loadCursos() } catch (err) { gcLog(err); gcToast("No se pudo eliminar", "error") }
         });
-        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); try { await reactivateCurso(Number(item && item.id)); toast("Curso reactivado", "exito"); await loadCursos(); const re = state.data.find(x => x.id === (item && item.id)); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); toast("No se pudo reactivar", "error") } });
+        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); try { await reactivateCurso(Number(item && item.id)); gcToast("Curso reactivado", "exito"); await loadCursos(); const re = state.data.find(x => x.id === (item && item.id)); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); gcToast("No se pudo reactivar", "error") } });
         const contCurso = qs("#media-curso"); if (contCurso) { const cid = Number(c.id || (item ? item.id : 0)); if (!isNaN(cid) && cid) { mountReadOnlyMedia({ container: contCurso, type: "curso", id: cid, labels: ["Portada"], editable: isEdit && isAdminUser }) } }
         if (isAdminUser) bindCopyFromPre("#json-curso", "#btn-copy-json-curso");
-      } catch (err) { gcLog("renderCursoDrawer bindings error:", err); toast("Ocurrió un error al preparar el formulario", "error") }
+      } catch (err) { gcLog("renderCursoDrawer bindings error:", err); gcToast("Ocurrió un error al preparar el formulario", "error") }
     }, 0);
     return html;
   }
@@ -477,11 +477,11 @@
       const [e1, e0, e2, e3] = await Promise.all([postJSON(API.noticias, { estatus: 1 }), postJSON(API.noticias, { estatus: 0 }), postJSON(API.noticias, { estatus: 2 }), postJSON(API.noticias, { estatus: 3 })]);
       const arr = [].concat(Array.isArray(e1) ? e1 : [], Array.isArray(e0) ? e0 : [], Array.isArray(e2) ? e2 : [], Array.isArray(e3) ? e3 : []); const counts = await Promise.all(arr.map(n => getCommentsCount(n.id).catch(() => 0)));
       state.raw = arr; state.data = arr.map((n, i) => ({ id: n.id, titulo: n.titulo, fecha: n.fecha_creacion, estatus: ntf(n.estatus), comentarios: counts[i] || 0, _all: n })); drawNoticias()
-    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); toast("No se pudieron cargar noticias", "error") }
+    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar noticias</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); gcToast("No se pudieron cargar noticias", "error") }
   }
   function drawNoticias() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.titulo).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="noticia"><div class="col-nombre"><span class="name-text">${escapeHTML(it.titulo)}</span></div><div class="col-tutor">${it.comentarios}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("noticias", it.estatus, statusLabel("noticias", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="noticia"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.titulo)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Comentarios:</strong> ${it.comentarios}</div><div><strong>Publicada:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${badgeNoticia(it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="noticia" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const item = state.data.find(x => String(x.id) === d.id); return item ? ("Noticia · " + item.titulo) : "Noticia" }, drawerBody: d => renderNoticiaDrawer(d), afterOpen: d => { if (d.type === "noticia") { const nid = Number(d.id), cont = qs("#media-noticia"); if (cont) mountReadOnlyMedia({ container: cont, type: "noticia", id: nid, labels: ["Imagen 1", "Imagen 2"], editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit") }); if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia") } } }) }
   async function inactivateNoticia(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Noticia no encontrada"); const body = { ...it._all, estatus: 0 }; await postJSON(API.uNoticias, body) }
-  async function reactivateNoticia(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Noticia no encontrada"); if (!API.uNoticias) { toast("Falta endpoint u_noticia.php en backend", "warning", 3500); return false } const body = { ...it._all, estatus: 1 }; await postJSON(API.uNoticias, body); return true }
+  async function reactivateNoticia(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Noticia no encontrada"); if (!API.uNoticias) { gcToast("Falta endpoint u_noticia.php en backend", "warning", 3500); return false } const body = { ...it._all, estatus: 1 }; await postJSON(API.uNoticias, body); return true }
   function readNoticiaForm(n) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); return { id: n.id, titulo: g("f_tit"), desc_uno: g("f_desc1"), desc_dos: g("f_desc2"), estatus: gN("f_estatus", 1), creado_por: n.creado_por } }
   function validateNoticiaRequired(p) { const errs = []; if (!String(p.titulo || "").trim()) errs.push("Título"); if (!String(p.desc_uno || "").trim()) errs.push("Descripción (1)"); if (!String(p.desc_dos || "").trim()) errs.push("Descripción (2)"); return errs }
   async function ensureNoticiaImagenes({ isEdit, id }) {
@@ -515,13 +515,13 @@
         qs("#btn-cancel")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "noticia", id: n.id, mode: "view" }; qs("#drawer-body").innerHTML = renderNoticiaDrawer({ id: String(n.id) }) });
         qs("#btn-save")?.addEventListener("click", async (e) => {
           e.stopPropagation(); try {
-            const payload = { ...n, ...readNoticiaForm(n) }; const miss = validateNoticiaRequired(payload); if (miss.length) return toast("Campos requeridos: " + miss.join(", "), "warning");
-            const imgsOk = await ensureNoticiaImagenes({ isEdit: true, id: n.id }); if (!imgsOk) return toast("Debes tener cargadas las 2 imágenes", "warning");
-            await postJSON(API.uNoticias, payload); toast("Cambios guardados", "exito"); state.currentDrawer = { type: "noticia", id: n.id, mode: "view" }; await loadNoticias(); const re = state.data.find(x => x.id === n.id); if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) }))
-          } catch (err) { gcLog(err); toast("Error al guardar", "error") }
+            const payload = { ...n, ...readNoticiaForm(n) }; const miss = validateNoticiaRequired(payload); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning");
+            const imgsOk = await ensureNoticiaImagenes({ isEdit: true, id: n.id }); if (!imgsOk) return gcToast("Debes tener cargadas las 2 imágenes", "warning");
+            await postJSON(API.uNoticias, payload); gcToast("Cambios guardados", "exito"); state.currentDrawer = { type: "noticia", id: n.id, mode: "view" }; await loadNoticias(); const re = state.data.find(x => x.id === n.id); if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) }))
+          } catch (err) { gcLog(err); gcToast("Error al guardar", "error") }
         });
-        const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => { e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return } try { await inactivateNoticia(n.id); toast("Noticia eliminada", "exito"); closeDrawer(); await loadNoticias() } catch (err) { gcLog(err); toast("No se pudo eliminar", "error") } });
-        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); const ok = await reactivateNoticia(n.id); if (ok) { toast("Noticia reactivada", "exito"); await loadNoticias(); const re = state.data.find(x => x.id === n.id); if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) })) } });
+        const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => { e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return } try { await inactivateNoticia(n.id); gcToast("Noticia eliminada", "exito"); closeDrawer(); await loadNoticias() } catch (err) { gcLog(err); gcToast("No se pudo eliminar", "error") } });
+        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); const ok = await reactivateNoticia(n.id); if (ok) { gcToast("Noticia reactivada", "exito"); await loadNoticias(); const re = state.data.find(x => x.id === n.id); if (re) openDrawer("Noticia · " + re.titulo, renderNoticiaDrawer({ id: String(re.id) })) } });
         disableDrawerInputs(!isEdit); if (isAdminUser) bindCopyFromPre("#json-noticia", "#btn-copy-json-noticia");
       } catch (err) { gcLog("renderNoticiaDrawer bindings error:", err) }
     }, 0);
@@ -604,7 +604,7 @@
               try { document.body.removeChild(input) } catch { }
               if (!file) return;
               const v = validarImagen(file, { maxMB: 2 });
-              if (!v.ok) { toast(v.error, "error"); return }
+              if (!v.ok) { gcToast(v.error, "error"); return }
               renderPreviewUI(
                 wrap,
                 file,
@@ -614,7 +614,7 @@
                   const blobUrl = URL.createObjectURL(file);
                   if (img.dataset) img.dataset.blobUrl = blobUrl;
                   img.src = blobUrl;
-                  toast(`Imagen ${pos} lista (se subirá al guardar)`, "exito");
+                  gcToast(`Imagen ${pos} lista (se subirá al guardar)`, "exito");
                 },
                 () => { }
               );
@@ -647,10 +647,10 @@
           };
 
           const miss = validateNoticiaRequired(payload);
-          if (miss.length) { toast("Campos requeridos: " + miss.join(", "), "warning"); return }
+          if (miss.length) { gcToast("Campos requeridos: " + miss.join(", "), "warning"); return }
 
           if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) {
-            toast("Debes subir las 2 imágenes", "warning"); return;
+            gcToast("Debes subir las 2 imágenes", "warning"); return;
           }
 
           const res = await postJSON(API.iNoticias, payload);
@@ -667,12 +667,12 @@
                 await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd });
               } catch (e) {
                 gcLog(e);
-                toast(`Noticia creada, pero falló imagen ${pos}`, "error");
+                gcToast(`Noticia creada, pero falló imagen ${pos}`, "error");
               }
             }
           }
 
-          toast("Noticia creada", "exito");
+          gcToast("Noticia creada", "exito");
           closeDrawer();
           await loadNoticias();
           if (newId) {
@@ -681,7 +681,7 @@
           }
         } catch (err) {
           gcLog(err);
-          toast("Error al crear noticia", "error");
+          gcToast("Error al crear noticia", "error");
         } finally {
           if (btn) { btn.disabled = false; btn.textContent = "Guardar"; }
           state.tempNewNewsImages = { 1: null, 2: null };
@@ -722,20 +722,20 @@
       const [e1, e0, e2, e3] = await Promise.all([postJSON(API.tutores, { estatus: 1 }), postJSON(API.tutores, { estatus: 0 }), postJSON(API.tutores, { estatus: 2 }), postJSON(API.tutores, { estatus: 3 })]);
       const raw = [].concat(Array.isArray(e1) ? e1 : [], Array.isArray(e0) ? e0 : [], Array.isArray(e2) ? e2 : [], Array.isArray(e3) ? e3 : []); state.raw = raw;
       state.data = raw.map(t => ({ id: t.id, nombre: t.nombre, descripcion: t.descripcion, estatus: ntf(t.estatus), _all: t })); drawTutores()
-    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar tutores</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); toast("No se pudieron cargar tutores", "error") }
+    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar tutores</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); gcToast("No se pudieron cargar tutores", "error") }
   }
   function drawTutores() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre).includes(k) || norm(it.descripcion || "").includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="tutor"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre)}</span></div><div class="col-tutor" title="${escapeAttr(it.descripcion || "")}">${escapeHTML((it.descripcion || "").slice(0, 60))}${(it.descripcion || "").length > 60 ? "…" : ""}</div><div class="col-fecha"></div><div class="col-status">${statusBadge("tutores", it.estatus)}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="tutor"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Estatus:</strong> ${statusBadge("tutores", it.estatus)}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="tutor" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const item = state.data.find(x => String(x.id) === d.id); return item ? ("Tutor · " + item.nombre) : "Tutor" }, drawerBody: d => renderTutorDrawer(d), afterOpen: d => { if (d.type === "tutor") { const it = state.data.find(x => String(x.id) === d.id); if (!it) return; const cont = qs("#media-tutor"); if (cont) mountReadOnlyMedia({ container: cont, type: "tutor", id: it.id, labels: ["Foto"], editable: isAdminUser && (state.currentDrawer && state.currentDrawer.mode === "edit") }); if (isAdminUser) bindCopyFromPre("#json-tutor", "#btn-copy-json-tutor") } } }) }
   function readTutorForm(existing) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); const p = { nombre: g("f_nombre"), descripcion: g("f_desc"), estatus: gN("f_estatus", 1) }; if (existing?.id) p.id = existing.id; return p }
   function validateTutorRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!String(p.descripcion || "").trim()) e.push("Descripción"); return e }
   async function saveTutorCreate() {
-    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return toast("Campos requeridos: " + miss.join(", "), "warning"); const file = state.tempNewTutorImage || null; if (!file) return toast("Selecciona una imagen para el tutor", "warning");
+    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const file = state.tempNewTutorImage || null; if (!file) return gcToast("Selecciona una imagen para el tutor", "warning");
     const body = { ...p, creado_por: Number((currentUser && currentUser.id) || 0) || 1 }; const res = await postJSON(API.iTutores, body); const newId = Number((res && (res.id || res.tutor_id || res.insert_id || (res.data && res.data.id))) || 0);
-    try { if (newId && file) { const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return toast(v.error, "error"); const fd = new FormData(); fd.append("tutor_id", String(newId)); fd.append("imagen", file); const r = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } } } catch (e) { gcLog(e); toast("Tutor creado, pero falló la imagen", "error") } finally { state.tempNewTutorImage = null }
-    toast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
+    try { if (newId && file) { const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error"); const fd = new FormData(); fd.append("tutor_id", String(newId)); fd.append("imagen", file); const r = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } } } catch (e) { gcLog(e); gcToast("Tutor creado, pero falló la imagen", "error") } finally { state.tempNewTutorImage = null }
+    gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return toast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return toast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return toast("La foto del tutor es obligatoria", "warning");
-    const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); toast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return gcToast("La foto del tutor es obligatoria", "warning");
+    const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
   async function reactivateTutor(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Tutor no encontrado"); const body = { ...it._all, estatus: 1 }; await postJSON(API.uTutores, body) }
@@ -770,20 +770,20 @@
             btn.addEventListener("click", () => {
               const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
-                const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { toast(v.error, "error"); return }
-                renderPreviewUI(wrap, file, async () => { state.tempNewTutorImage = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; toast("Imagen lista (se subirá al guardar)", "exito") }, () => { })
+                const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
+                renderPreviewUI(wrap, file, async () => { state.tempNewTutorImage = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Imagen lista (se subirá al guardar)", "exito") }, () => { })
               }); input.click()
             })
           }
         }
-        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { if (isCreate) await saveTutorCreate(); else await saveTutorUpdate(item) } catch (err) { gcLog(err); toast("Error al guardar", "error") } });
+        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { if (isCreate) await saveTutorCreate(); else await saveTutorUpdate(item) } catch (err) { gcLog(err); gcToast("Error al guardar", "error") } });
         qs("#btn-edit")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "tutor", id: item ? item.id : null, mode: "edit" }; qs("#drawer-body").innerHTML = renderTutorDrawer({ id: String(item ? item.id : "") }) });
         qs("#btn-cancel")?.addEventListener("click", (e) => { e.stopPropagation(); if (isCreate) { state.tempNewTutorImage = null; closeDrawer() } else { state.currentDrawer = { type: "tutor", id: item ? item.id : null, mode: "view" }; qs("#drawer-body").innerHTML = renderTutorDrawer({ id: String(item ? item.id : "") }) } });
         const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => {
           e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return }
-          try { await softDeleteTutor(item); toast("Tutor eliminado (inactivo)", "exito"); closeDrawer(); await loadTutores() } catch (err) { gcLog(err); toast("No se pudo eliminar", "error") }
+          try { await softDeleteTutor(item); gcToast("Tutor eliminado (inactivo)", "exito"); closeDrawer(); await loadTutores() } catch (err) { gcLog(err); gcToast("No se pudo eliminar", "error") }
         });
-        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); try { await reactivateTutor(Number(item && item.id)); toast("Tutor reactivado", "exito"); await loadTutores(); const re = state.data.find(x => x.id === (item && item.id)); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); toast("No se pudo reactivar", "error") } });
+        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); try { await reactivateTutor(Number(item && item.id)); gcToast("Tutor reactivado", "exito"); await loadTutores(); const re = state.data.find(x => x.id === (item && item.id)); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); gcToast("No se pudo reactivar", "error") } });
         const cont = qs("#media-tutor"); if (cont && t.id) mountReadOnlyMedia({ container: cont, type: "tutor", id: t.id, labels: ["Foto"], editable: isEdit && isAdminUser });
         if (isAdminUser) bindCopyFromPre("#json-tutor", "#btn-copy-json-tutor");
         if (!isCreate) { (async () => { try { const list = await getCursosByTutor(t.id); const g = groupCursosPorEstatus(list); renderChipList("#tutor-cursos-activos", g.activos); renderChipList("#tutor-cursos-pausados", g.pausados); renderChipList("#tutor-cursos-terminados", g.terminados); qsa(".curso-chip").forEach(btn => { btn.addEventListener("click", () => { const cid = Number(btn.getAttribute("data-curso-id")); const curso = list.find(x => Number(x.id) === cid); if (curso) openCursoLightFromTutor(t.id, curso) }) }) } catch (err) { gcLog("cursos del tutor:", err) } })() }
@@ -855,7 +855,7 @@
       gcLog(err);
       qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar usuarios</div>');
       qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = "");
-      toast("No se pudieron cargar usuarios", "error");
+      gcToast("No se pudieron cargar usuarios", "error");
     }
   }
 
@@ -900,14 +900,14 @@
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    if (!item || !item._all) return toast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return toast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar) return toast("El avatar es obligatorio", "warning");
-    await postJSON(API.uUsuarios, { ...item._all, ...p }); toast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar) return gcToast("El avatar es obligatorio", "warning");
+    await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
-    const p = readUsuarioForm(null); const miss = validateUsuarioRequired(p); if (miss.length) return toast("Campos requeridos: " + miss.join(", "), "warning"); if (!state.tempNewUserAvatar) return toast("Selecciona un avatar", "warning");
+    const p = readUsuarioForm(null); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); if (!state.tempNewUserAvatar) return gcToast("Selecciona un avatar", "warning");
     const res = await postJSON(API.iUsuarios, p); const newId = Number((res && (res.id || res.usuario_id || res.insert_id || (res.data && res.data.id))) || 0);
-    const file = state.tempNewUserAvatar || null; if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } toast("Avatar guardado", "exito") } catch (e) { gcLog(e); toast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
-    toast("Usuario creado", "exito"); closeDrawer(); await loadUsuarios(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) })) }
+    const file = state.tempNewUserAvatar || null; if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } gcToast("Avatar guardado", "exito") } catch (e) { gcLog(e); gcToast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
+    gcToast("Usuario creado", "exito"); closeDrawer(); await loadUsuarios(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) })) }
   }
   async function softDeleteUsuario(item) { if (!item || !item._all) return; await postJSON(API.uUsuarios, { ...item._all, estatus: 0 }) }
   function renderUsuarioDrawer(dataset) {
@@ -934,9 +934,9 @@
         qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); await saveUsuarioUpdate(it) });
         const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => {
           e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return }
-          await softDeleteUsuario(it); toast("Usuario desactivado", "exito"); closeDrawer(); await loadUsuarios()
+          await softDeleteUsuario(it); gcToast("Usuario desactivado", "exito"); closeDrawer(); await loadUsuarios()
         });
-        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); await postJSON(API.uUsuarios, { ...n, estatus: 1 }); toast("Usuario reactivado", "exito"); closeDrawer(); await loadUsuarios() });
+        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); await postJSON(API.uUsuarios, { ...n, estatus: 1 }); gcToast("Usuario reactivado", "exito"); closeDrawer(); await loadUsuarios() });
         if (isAdminUser) bindCopyFromPre("#json-usuario", "#btn-copy-json-usuario");
       } catch (err) { gcLog("renderUsuarioDrawer error:", err) }
     }, 0);
@@ -961,13 +961,13 @@
         btn.addEventListener("click", () => {
           const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
           input.addEventListener("change", () => {
-            const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { toast(v.error, "error"); return }
-            renderPreviewUI(wrap, file, async () => { state.tempNewUserAvatar = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; toast("Avatar listo (se subirá al guardar)", "exito") }, () => { })
+            const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
+            renderPreviewUI(wrap, file, async () => { state.tempNewUserAvatar = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Avatar listo (se subirá al guardar)", "exito") }, () => { })
           }); input.click()
         })
       }
       qs("#btn-cancel")?.addEventListener("click", () => { state.tempNewUserAvatar = null; closeDrawer() });
-      qs("#btn-save")?.addEventListener("click", async () => { try { await saveUsuarioCreate() } catch (e) { gcLog(e); toast("Error al crear usuario", "error") } });
+      qs("#btn-save")?.addEventListener("click", async () => { try { await saveUsuarioCreate() } catch (e) { gcLog(e); gcToast("Error al crear usuario", "error") } });
     }, 0)
   }
 
@@ -996,246 +996,194 @@
       const arr = [].concat(e1 || [], e0 || [], e2 || [], e3 || []); state.raw = arr;
       state.data = (arr || []).map(s => ({ id: Number(s.id), curso_id: Number(s.curso), usuario_id: Number(s.usuario), curso_nombre: (cMap && cMap[s.curso]) || ("#" + s.curso), suscriptor: (uMap && uMap[s.usuario]) || ("#" + s.usuario), comentario: s.comentario || "", fecha: s.fecha_creacion || "", estatus: ntf(s.estatus), _all: s }));
       drawSuscripciones()
-    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); toast("No se pudieron cargar suscripciones", "error") }
+    } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); gcToast("No se pudieron cargar suscripciones", "error") }
   }
   
   async function openCreateSuscripcion() {
-    // Construir select de cursos (1,2,4)
-    const cursosMap = await getCursosMapParaInscribir();
-    const cursoOptions = Object.entries(cursosMap || {})
-      .map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`)
-      .join("");
+  // Construir select de cursos (1 Activo, 2 Pausado, 4 En curso)
+  const cursosMap = await getCursosMapParaInscribir();
+  const cursoOptions = Object.entries(cursosMap || {})
+    .map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`)
+    .join("");
 
-    const body = `
-      <div class="gc-actions">
-        <button class="gc-btn gc-btn-ghost" id="btn-cancel">Cancelar</button>
-        <button class="gc-btn gc-btn-primary" id="btn-save" disabled>Inscribir</button>
+  const body = `
+    <div class="gc-actions">
+      <button class="gc-btn gc-btn-ghost" id="btn-cancel">Cancelar</button>
+      <button class="gc-btn gc-btn-primary" id="btn-save" disabled>Inscribir</button>
+    </div>
+
+    <div class="field">
+      <div class="label">Curso <span class="req">*</span></div>
+      <div class="value">
+        <select id="suscr-curso">${cursoOptions}</select>
       </div>
+    </div>
 
+    <div class="field">
+      <div class="label">Buscar cuenta (teléfono o correo) <span class="req">*</span></div>
+      <div class="value">
+        <div class="input-alerta-container">
+          <input id="suscr-login-identificador" type="text" placeholder="correo o teléfono" />
+          <span class="icono-alerta" title=""></span>
+        </div>
+        <div style="margin-top:.5rem; display:flex; gap:.5rem;">
+          <button class="gc-btn" id="suscr-buscar">Buscar</button>
+          <button class="gc-btn gc-btn-ghost" id="suscr-limpiar" style="display:none;">Cambiar usuario</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="suscr-user-panel" style="display:none;">
       <div class="field">
-        <div class="label">Curso <span class="req">*</span></div>
-        <div class="value">
-          <select id="suscr-curso">${cursoOptions}</select>
-        </div>
+        <div class="label">Nombre</div>
+        <div class="value" id="suscr-u-nombre">—</div>
       </div>
-
       <div class="field">
-        <label class="label" for="suscr-ya-cuenta" style="display:flex;align-items:center;gap:.5rem;">
-          <input type="checkbox" id="suscr-ya-cuenta"> Ya tiene cuenta
-        </label>
+        <div class="label">Correo</div>
+        <div class="value" id="suscr-u-correo">—</div>
+      </div>
+      <div class="field">
+        <div class="label">Teléfono</div>
+        <div class="value" id="suscr-u-tel">—</div>
+      </div>
+      <div class="field">
+        <div class="label">Fecha de nacimiento</div>
+        <div class="value" id="suscr-u-fecha">—</div>
+      </div>
+    
+      <div class="field">
+        <div class="label">Medios de contacto</div>
+        <div class="value" id="suscr-user-medios">
+          <label><input type="checkbox" id="suscr-u-mtel" disabled /> Teléfono</label>
+          <label style="margin-left:1rem;"><input type="checkbox" id="suscr-u-mmail" disabled /> Correo</label>
+        </div>
       </div>
 
-      <div id="suscr-zone-login" class="field" style="display:none;">
-        <div class="label">Buscar cuenta (teléfono o correo)</div>
-        <div class="value">
-          <div class="input-alerta-container">
-            <input id="suscr-login-identificador" type="text" placeholder="correo o teléfono" />
-            <span class="icono-alerta" title=""></span>
-          </div>
-          <div style="margin-top:.5rem; display:flex; gap:.5rem;">
-            <button class="gc-btn" id="suscr-buscar">Buscar</button>
-          </div>
-        </div>
-      </div>
+    </div>
+  `;
 
-      <div id="suscr-zone-registro">
-        <div class="field">
-          <div class="label">Nombre <span class="req">*</span></div>
-          <div class="value"><input id="suscr-nombre" type="text" placeholder="Nombre completo" /></div>
-        </div>
+  openDrawer("Suscripción · Crear", body);
+  const root = qs("#gc-drawer");
+  const pick = (sel) => root ? root.querySelector(sel) : null;
 
-        <div class="field">
-          <div class="label">Teléfono <span class="req">*</span></div>
-          <div class="value">
-            <div class="input-alerta-container">
-              <input id="suscr-telefono" type="tel" placeholder="10 a 13 dígitos" />
-              <span class="icono-alerta" title=""></span>
-            </div>
-          </div>
-        </div>
+  const selCurso     = pick("#suscr-curso");
+  const inIdent      = pick("#suscr-login-identificador");
+  const btnBuscar    = pick("#suscr-buscar");
+  const btnLimpiar   = pick("#suscr-limpiar");
+  const btnSave      = pick("#btn-save");
+  const btnCancel    = pick("#btn-cancel");
 
-        <div class="field">
-          <div class="label">Correo <span class="req">*</span></div>
-          <div class="value">
-            <div class="input-alerta-container">
-              <input id="suscr-correo" type="email" placeholder="correo@dominio.com" />
-              <span class="icono-alerta" title=""></span>
-            </div>
-          </div>
-        </div>
+  const pnlUser      = pick("#suscr-user-panel");
+  const uNombre      = pick("#suscr-u-nombre");
+  const uCorreo      = pick("#suscr-u-correo");
+  const uTel         = pick("#suscr-u-tel");
+  const uFecha       = pick("#suscr-u-fecha");
+  const mTel        = pick("#suscr-u-mtel");
+  const mMail       = pick("#suscr-u-mmail");
 
-        <div class="field">
-          <div class="label">Fecha de nacimiento <span class="req">*</span></div>
-          <div class="value">
-            <input id="suscr-fecha" type="date" />
-          </div>
-        </div>
+  let usuarioEncontrado = null;
 
-        <div class="field">
-          <div class="label">Medios de contacto <span class="req">*</span></div>
-          <div class="value" id="suscr-medios">
-            <label><input type="checkbox" name="suscr-medios-contacto" value="telefono" /> Teléfono</label>
-            <label style="margin-left:1rem;"><input type="checkbox" name="suscr-medios-contacto" value="correo" /> Correo</label>
-          </div>
-        </div>
-      </div>
-    `;
-
-    openDrawer("Suscripción · Crear", body);
-    const root = qs("#gc-drawer");
-    const qsR = (sel) => root ? root.querySelector(sel) : null;
-
-    const selCurso = qsR("#suscr-curso");
-    const chkYaCuenta = qsR("#suscr-ya-cuenta");
-    const zoneLogin = qsR("#suscr-zone-login");
-    const zoneRegistro = qsR("#suscr-zone-registro");
-    const inIdent = qsR("#suscr-login-identificador");
-    const btnBuscar = qsR("#suscr-buscar");
-    const btnSave = qsR("#btn-save");
-    const btnCancel = qsR("#btn-cancel");
-
-    const inNombre = qsR("#suscr-nombre");
-    const inTel = qsR("#suscr-telefono");
-    const inMail = qsR("#suscr-correo");
-    const inFecha = qsR("#suscr-fecha");
-
-    let usuarioEncontrado = null;
-
-    function validarFormato(tipo, valor) {
-      const v = String(valor || "").trim();
-      if (tipo === "telefono") return /^\d{10,13}$/.test(v);
-      if (tipo === "correo") return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v.toLowerCase());
-      return !!v;
+  function setInscribirReady(on) {
+    if (!btnSave) return;
+    btnSave.disabled = !on;
+    btnSave.classList.toggle("gc-btn--success", !!on);
+    btnSave.classList.toggle("gc-btn-primary", !on);
+    // CTA contextual
+    if (on && usuarioEncontrado) {
+      const nombre = usuarioEncontrado?.nombre || "el usuario";
+      const cursoTxt = selCurso?.selectedOptions?.[0]?.textContent || "el curso";
+      btnSave.textContent = `Inscribir a ${nombre} en ${cursoTxt}`;
+    } else {
+      btnSave.textContent = "Inscribir";
     }
-    function obtenerTipoContacto() {
-      const checks = root.querySelectorAll('input[name="suscr-medios-contacto"]:checked');
-      const vals = Array.from(checks).map(cb => cb.value);
-      if (vals.includes("telefono") && vals.includes("correo")) return 3;
-      if (vals.includes("telefono")) return 1;
-      if (vals.includes("correo")) return 2;
-      return 0;
-    }
-    function setInscribirReady(on) {
-      if (!btnSave) return;
-      btnSave.disabled = !on;
-      btnSave.classList.toggle("gc-btn--success", !!on);
-      btnSave.classList.toggle("gc-btn-primary", !on);
-    }
-    function isCursoOk() { return !!selCurso?.value; }
-    function isMediosOk() { return obtenerTipoContacto() !== 0; }
-    function isCamposRegistroCompletos() {
-      return !!(inNombre?.value.trim() && validarFormato("telefono", inTel?.value) && validarFormato("correo", inMail?.value) && inFecha?.value);
-    }
-    function refreshSaveState() {
-      const ready = isCursoOk() && isMediosOk() && (chkYaCuenta?.checked ? !!usuarioEncontrado : isCamposRegistroCompletos());
-      setInscribirReady(ready);
-    }
+  }
 
-    function bloquearCampos(b) {
-      [inNombre, inTel, inMail, inFecha].forEach(el => { if(!el) return; el.readOnly = !!b; el.disabled = !!b; });
+  function refreshSaveState() {
+    const ready = !!selCurso?.value && !!usuarioEncontrado?.id;
+    setInscribirReady(ready);
+  }
+
+  function normalizarFecha(f) {
+    if (!f) return "";
+    if (typeof f !== "string") return "";
+    if (f.includes("T")) return f.split("T")[0];
+    if (f.includes(" ")) return f.split(" ")[0];
+    if (f.includes("/")) {
+      const p = f.split("/");
+      if (p.length === 3) return `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`;
     }
-    function toggleLogin(on) {
-      if (!zoneLogin || !zoneRegistro) return;
-      zoneLogin.style.display = on ? "" : "none";
-      zoneRegistro.style.display = on ? "none" : "";
-      if (!on) { usuarioEncontrado = null; bloquearCampos(false); }
+    return f;
+  }
+
+  btnCancel?.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); });
+  selCurso?.addEventListener("change", refreshSaveState);
+
+  btnBuscar?.addEventListener("click", async () => {
+    const ident = (inIdent?.value || "").trim().toLowerCase();
+    if (!ident) { gcToast("Ingresa un correo o teléfono.", "warning"); return; }
+    try {
+      const res = await postJSON(API.usuarios, { correo: ident, telefono: ident });
+      const data = Array.isArray(res) ? res : [];
+      if (!data.length) {
+        usuarioEncontrado = null;
+        pnlUser.style.display = "none";
+        btnLimpiar.style.display = "none";
+        gcToast("No encontramos la cuenta.", "warning");
+      } else {
+        usuarioEncontrado = data[0];
+        // Pintar panel con datos (solo lectura)
+        uNombre.textContent = usuarioEncontrado?.nombre || "—";
+        uCorreo.textContent = (usuarioEncontrado?.correo || "").toLowerCase() || "—";
+        uTel.textContent    = usuarioEncontrado?.telefono || "—";
+        const f = normalizarFecha(usuarioEncontrado?.fecha_nacimiento || "");
+        uFecha.textContent  = f || "—";
+        
+        // Medios de contacto (solo mostrar marcados)
+        const t = Number(usuarioEncontrado?.tipo_contacto || 0);
+        if (mTel)  mTel.checked  = (t === 1 || t === 3);
+        if (mMail) mMail.checked = (t === 2 || t === 3);
+pnlUser.style.display = "";
+        btnLimpiar.style.display = "";
+        gcToast("Cuenta encontrada correctamente.", "exito");
+      }
+    } catch (err) {
+      usuarioEncontrado = null;
+      pnlUser.style.display = "none";
+      btnLimpiar.style.display = "none";
+      gcToast("Error al consultar la cuenta.", "error");
+    } finally {
       refreshSaveState();
     }
+  });
 
-    chkYaCuenta?.addEventListener("change", () => toggleLogin(chkYaCuenta.checked));
-    selCurso?.addEventListener("change", refreshSaveState);
-    root.querySelector("#suscr-medios")?.addEventListener("change", refreshSaveState);
-    [inNombre, inTel, inMail, inFecha].forEach(el => { el?.addEventListener("input", refreshSaveState); el?.addEventListener("blur", refreshSaveState); });
-    btnCancel?.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); });
-
-    // Buscar cuenta existente (API.usuarios con filtro)
-    btnBuscar?.addEventListener("click", async () => {
-      const ident = (inIdent?.value || "").trim().toLowerCase();
-      if (!ident) { toast("Ingresa un correo o teléfono.", "warning"); return; }
-      try {
-        const res = await postJSON(API.usuarios, { correo: ident, telefono: ident });
-        const data = Array.isArray(res) ? res : [];
-        if (data.length) {
-          usuarioEncontrado = data[0] || null;
-          // Prefill
-          if (usuarioEncontrado) {
-            inNombre.value = usuarioEncontrado.nombre || "";
-            inTel.value = usuarioEncontrado.telefono || "";
-            inMail.value = (usuarioEncontrado.correo || "").toLowerCase();
-            let f = usuarioEncontrado.fecha_nacimiento || "";
-            if (typeof f === "string") {
-              if (f.includes("T")) f = f.split("T")[0];
-              else if (f.includes(" ")) f = f.split(" ")[0];
-              else if (f.includes("/")) { const p = f.split("/"); if (p.length === 3) f = `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`; }
-            }
-            inFecha.value = f || "";
-            bloquearCampos(true);
-            // medios
-            const t = Number(usuarioEncontrado.tipo_contacto || 0);
-            const chkTel  = root.querySelector('#suscr-medios input[value="telefono"]');
-            const chkMail = root.querySelector('#suscr-medios input[value="correo"]');
-            if (chkTel)  chkTel.checked  = (t === 1 || t === 3);
-            if (chkMail) chkMail.checked = (t === 2 || t === 3);
-            toast("Cuenta encontrada correctamente.", "success");
-          }
-        } else {
-          usuarioEncontrado = null;
-          bloquearCampos(false);
-          toast("No encontramos la cuenta.", "warning");
-        }
-      } catch (err) {
-        usuarioEncontrado = null;
-        bloquearCampos(false);
-        toast("Error al consultar la cuenta.", "error");
-      } finally {
-        refreshSaveState();
-      }
-    });
-
-    // Guardar (crear usuario si aplica + inscribir)
-    btnSave?.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const cursoId = Number(selCurso?.value || 0);
-      const tipo_contacto = obtenerTipoContacto();
-      if (!cursoId) { toast("Selecciona un curso.", "warning"); return; }
-      if (!tipo_contacto) { toast("Selecciona al menos un medio de contacto.", "warning"); return; }
-      try {
-        let usuarioId = null;
-        if (chkYaCuenta?.checked) {
-          if (!usuarioEncontrado?.id) { toast("Busca y selecciona una cuenta válida.", "warning"); return; }
-          usuarioId = Number(usuarioEncontrado.id);
-        } else {
-          // Doble check de duplicado
-          const check = await postJSON(API.usuarios, { correo: (inMail.value||'').toLowerCase().trim(), telefono: (inTel.value||'').trim() });
-          if (Array.isArray(check) && check.length) { toast("Ya existe una cuenta con ese teléfono/correo.", "warning"); return; }
-          // Crear usuario
-          const payloadUser = {
-            nombre: inNombre.value.trim(),
-            correo: (inMail.value||'').toLowerCase().trim(),
-            telefono: (inTel.value||'').trim(),
-            fecha_nacimiento: inFecha.value,
-            tipo_contacto,
-            password: "godcode123"
-          };
-          const ins = await postJSON(API.iUsuarios, payloadUser);
-          // Obtener id
-          const again = await postJSON(API.usuarios, { correo: payloadUser.correo, telefono: payloadUser.telefono });
-          usuarioId = again && Array.isArray(again) && again[0]?.id ? Number(again[0].id) : null;
-          if (!usuarioId) throw new Error("No se pudo obtener el ID del usuario creado.");
-        }
-        // Crear inscripción
-        const inscRes = await postJSON(API.iInscripcion, { curso: cursoId, usuario: usuarioId, comentario: "" });
-        toast((inscRes && inscRes.mensaje) || "Inscripción realizada correctamente", "success");
-        closeDrawer();
-        await loadSuscripciones();
-      } catch (err) {
-        console.error(err);
-        toast(err?.message || "Hubo un error al procesar la inscripción.", "error");
-      }
-    });
-
+  btnLimpiar?.addEventListener("click", (e) => {
+    e.preventDefault();
+    usuarioEncontrado = null;
+    pnlUser.style.display = "none";
+    btnLimpiar.style.display = "none";
+    if (mTel) mTel.checked = false;
+    if (mMail) mMail.checked = false;
     refreshSaveState();
-  }
+  });
+
+  btnSave?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const cursoId = Number(selCurso?.value || 0);
+    if (!cursoId) { gcToast("Selecciona un curso.", "warning"); return; }
+    if (!usuarioEncontrado?.id) { gcToast("Primero busca y selecciona una cuenta válida.", "warning"); return; }
+    try {
+      const inscRes = await postJSON(API.iInscripcion, { curso: cursoId, usuario: Number(usuarioEncontrado.id), comentario: "" });
+      gcToast((inscRes && inscRes.mensaje) || "Inscripción realizada correctamente", "exito", 6000);
+      closeDrawer();
+      await loadSuscripciones();
+    } catch (err) {
+      console.error(err);
+      gcToast(err?.message || "Hubo un error al procesar la inscripción.", "error");
+    }
+  });
+
+  refreshSaveState();
+}
 function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
   async function softDeleteSuscripcion(item) { if (!item || !item._all) return; await postJSON(API.uInscripcion, { id: item.id, estatus: 0 }) }
   async function reactivateSuscripcion(id) { await postJSON(API.uInscripcion, { id: Number(id), estatus: 1 }) }
@@ -1259,12 +1207,12 @@ function drawSuscripciones() { const rows = state.data; renderList(rows, { match
         disableDrawerInputs(!isEdit);
         qs("#btn-edit")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "suscripcion", id: it.id, mode: "edit" }; qs("#drawer-body").innerHTML = renderSuscripcionDrawer({ id: String(it.id) }) });
         qs("#btn-cancel")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "suscripcion", id: it.id, mode: "view" }; qs("#drawer-body").innerHTML = renderSuscripcionDrawer({ id: String(it.id) }) });
-        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { const p = readSuscripcionForm({ id: it.id }); await postJSON(API.uInscripcion, { id: it.id, comentario: p.comentario, estatus: p.estatus }); toast("Cambios guardados", "exito"); await loadSuscripciones(); const re = state.data.find(x => x.id === it.id); if (re) openDrawer("Suscripción · " + re.curso_nombre, renderSuscripcionDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); toast("Error al guardar", "error") } });
+        qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); try { const p = readSuscripcionForm({ id: it.id }); await postJSON(API.uInscripcion, { id: it.id, comentario: p.comentario, estatus: p.estatus }); gcToast("Cambios guardados", "exito"); await loadSuscripciones(); const re = state.data.find(x => x.id === it.id); if (re) openDrawer("Suscripción · " + re.curso_nombre, renderSuscripcionDrawer({ id: String(re.id) })) } catch (err) { gcLog(err); gcToast("Error al guardar", "error") } });
         const bDel = qs("#btn-delete"); if (bDel) bDel.addEventListener("click", async (e) => {
           e.stopPropagation(); const step = bDel.getAttribute("data-step") || "1"; if (step === "1") { bDel.textContent = "Confirmar"; bDel.setAttribute("data-step", "2"); setTimeout(() => { if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1") } }, 4000); return }
-          await softDeleteSuscripcion(it); toast("Suscripción desactivada", "exito"); closeDrawer(); await loadSuscripciones()
+          await softDeleteSuscripcion(it); gcToast("Suscripción desactivada", "exito"); closeDrawer(); await loadSuscripciones()
         });
-        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); await reactivateSuscripcion(it.id); toast("Suscripción reactivada", "exito"); await loadSuscripciones() });
+        qs("#btn-reactivar")?.addEventListener("click", async (e) => { e.stopPropagation(); await reactivateSuscripcion(it.id); gcToast("Suscripción reactivada", "exito"); await loadSuscripciones() });
         if (isAdminUser) bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
       } catch (err) { gcLog("renderSuscripcionDrawer error:", err) }
     }, 0);
