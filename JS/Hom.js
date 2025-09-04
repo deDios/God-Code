@@ -275,19 +275,6 @@ async function loadRecursos(usuarioId){
   }
 }
 
-/* Boot*/
-document.addEventListener("DOMContentLoaded",async()=>{
-  const usuario=getUsuarioFromCookie();
-  if(!usuario){ window.location.href="../VIEW/Login.php"; return; }
-  renderPerfil(usuario);
-  initAvatarUpload(usuario.id);
-  showSkeletons();
-  await loadRecursos(usuario.id);
-  disableLinks();
-
-
-});
-
 // Inhabilita enlaces/botones específicos (cursos/recursos)
 function disableLinks() {
   document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
@@ -315,3 +302,169 @@ function refreshAvatarEverywhere(url){
   const avatarImg=$("#avatar-img"); if(avatarImg) avatarImg.src=bust;
   $$(".actions .img-perfil, .user-icon-mobile img").forEach(el=>{ el.src=bust; });
 }
+
+/*--------------------------------- modal para administra perfil ------------------------------*/
+async function fetchUsuario(correo, telefono, estatus) {
+  const res = await fetch(ENDPOINT_USUARIO_FETCH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ correo, telefono, estatus }),
+  });
+  if (!res.ok) throw new Error("No se pudo cargar perfil");
+  return res.json();
+}
+
+// normaliza a YYYY-MM-DD para <input type="date">
+function normalizarFecha(fechaRaw) {
+  if (!fechaRaw) return "";
+  const s = String(fechaRaw);
+  if (s.includes("T")) return s.split("T")[0];
+  if (s.includes(" ")) return s.split(" ")[0];
+  if (s.includes("/")) {
+    const p = s.split("/");
+    if (p.length === 3) return `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`;
+  }
+  return s;
+}
+
+let perfilModalIniciado = false;
+
+function initModalPerfil() {
+  if (perfilModalIniciado) return;
+  perfilModalIniciado = true;
+
+  const editBtn = document.querySelector(".edit-profile"); // opcional
+  const modal   = document.getElementById("modal-perfil");
+  if (!modal) { console.warn("[perfil] Falta #modal-perfil en el DOM"); return; }
+
+  const closeBtn = modal.querySelector(".modal-close");
+  const form     = document.getElementById("form-perfil");
+  if (!form) { console.warn("[perfil] Falta #form-perfil en el DOM"); return; }
+
+  const inp = {
+    nombre:     document.getElementById("perfil-nombre"),
+    correo:     document.getElementById("perfil-email"),
+    pass:       document.getElementById("perfil-password"),
+    pass2:      document.getElementById("perfil-password2"),
+    telefono:   document.getElementById("perfil-telefono"),
+    nacimiento: document.getElementById("perfil-nacimiento"),
+  };
+
+  let usuarioCookie = getUsuarioFromCookie();
+  let usuarioActual = null;
+
+  async function abrirYPrefill() {
+    try {
+      const lista = await fetchUsuario(
+        usuarioCookie?.correo,
+        usuarioCookie?.telefono,
+        usuarioCookie?.estatus
+      );
+      usuarioActual = Array.isArray(lista)
+        ? (lista.find((u) => +u.id === +usuarioCookie.id) || lista[0])
+        : null;
+
+      if (!usuarioActual) throw new Error("No se encontró el usuario.");
+
+      inp.nombre.value     = usuarioActual.nombre || "";
+      inp.correo.value     = (usuarioActual.correo || "").toLowerCase();
+      inp.telefono.value   = usuarioActual.telefono || "";
+      inp.nacimiento.value = normalizarFecha(usuarioActual.fecha_nacimiento || "");
+      inp.pass.value = inp.pass2.value = "";
+
+      modal.classList.add("active");
+      document.body.classList.add("modal-abierto");
+    } catch (e) {
+      console.error(e);
+      gcToast("Error al cargar datos de perfil.", "error");
+    }
+  }
+
+  // Si existe el trigger en la vista:
+  if (editBtn) {
+    editBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      usuarioCookie = getUsuarioFromCookie();
+      if (!usuarioCookie) return gcToast("Debes iniciar sesión.", "warning");
+      abrirYPrefill();
+    });
+  }
+
+  // Exponer apertura programática (por si no usas .edit-profile)
+  window.openPerfilModal = function() {
+    usuarioCookie = getUsuarioFromCookie();
+    if (!usuarioCookie) return gcToast("Debes iniciar sesión.", "warning");
+    abrirYPrefill();
+  };
+
+  const cerrar = () => {
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-abierto");
+  };
+
+  closeBtn?.addEventListener("click", cerrar);
+  modal.addEventListener("click", (e) => { if (e.target === modal) cerrar(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("active")) cerrar();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!usuarioActual) return;
+
+    if (inp.pass.value !== inp.pass2.value) {
+      gcToast("Las contraseñas no coinciden.", "warning");
+      return;
+    }
+
+    const payload = {
+      id: usuarioActual.id,
+      nombre:   (inp.nombre.value || "").trim(),
+      correo:   (inp.correo.value || "").trim().toLowerCase(),
+      telefono: (inp.telefono.value || "").trim(),
+      fecha_nacimiento: inp.nacimiento.value,
+      tipo_contacto: usuarioActual.tipo_contacto, // se mantiene
+      estatus: usuarioActual.estatus,            // se mantiene
+      ...(inp.pass.value ? { password: inp.pass.value } : {}),
+    };
+
+    try {
+      const res = await fetch(ENDPOINT_USUARIO_UPDATE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (data?.mensaje) gcToast(data.mensaje, "exito");
+      // sincroniza cookie mínima
+      usuarioCookie = { ...usuarioCookie, ...payload };
+      document.cookie =
+        "usuario=" +
+        encodeURIComponent(JSON.stringify(usuarioCookie)) +
+        "; path=/; max-age=86400";
+
+      // refresca UI enlazada
+      renderPerfil(usuarioCookie);
+      initAvatarUpload(usuarioCookie.id);
+    } catch (err) {
+      console.error(err);
+      gcToast("Error al actualizar perfil.", "error");
+    } finally {
+      cerrar();
+    }
+  });
+}
+
+/* --------------------------------------- init ------------------------------------- */
+document.addEventListener("DOMContentLoaded",async()=>{
+  const usuario=getUsuarioFromCookie();
+  if(!usuario){ window.location.href="../VIEW/Login.php"; return; }
+  renderPerfil(usuario);
+  initAvatarUpload(usuario.id);
+  showSkeletons();
+  await loadRecursos(usuario.id);
+  disableLinks();
+  document.addEventListener("DOMContentLoaded", initModalPerfil);
+
+});
