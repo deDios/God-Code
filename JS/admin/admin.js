@@ -23,7 +23,7 @@
   const API_UPLOAD = { cursoImg: API_BASE + "u_cursoImg.php", noticiaImg: API_BASE + "u_noticiaImagenes.php", tutorImg: API_BASE + "u_tutorImg.php" };
 
   /* ====================== roles/estatus & state ====================== */
-  const ADMIN_IDS = [1, 12, 13];
+  const ADMIN_IDS = [1, 12, 13, 17, 18];
   const STATUS_OPTIONS = [{ v: 1, l: "Activo" }, { v: 0, l: "Inactivo" }, { v: 2, l: "Pausado" }, { v: 3, l: "Terminado" }];
 
   const state = {
