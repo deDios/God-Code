@@ -1088,11 +1088,9 @@
     btnSave.disabled = !on;
     btnSave.classList.toggle("gc-btn--success", !!on);
     btnSave.classList.toggle("gc-btn-primary", !on);
-    // CTA contextual
+    // indicar al usuario final que ya esta listo para inscribir al cliente
     if (on && usuarioEncontrado) {
-      const nombre = usuarioEncontrado?.nombre || "el usuario";
-      const cursoTxt = selCurso?.selectedOptions?.[0]?.textContent || "el curso";
-      btnSave.textContent = `Inscribir a ${nombre} en ${cursoTxt}`;
+      btnSave.textContent = `Inscribir`;
     } else {
       btnSave.textContent = "Inscribir";
     }

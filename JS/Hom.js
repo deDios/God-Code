@@ -402,16 +402,16 @@ function renderMisCursos(inscripciones) {
 
     a.append(title, date);
     switch (String(ins.estatus)) {
-      case "1":
+      case "2":
         conts.inscritos.appendChild(a);
         break;
-      case "2":
+      case "1":
         conts.activos.appendChild(a);
         break;
-      case "3":
+      case "0":
         conts.cancelados.appendChild(a);
         break;
-      case "4":
+      case "3":
         conts.terminados.appendChild(a);
         break;
     }
