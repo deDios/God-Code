@@ -41,24 +41,41 @@ function setAvatarSrc(imgEl,usuario){
 }
 
 function renderPerfil(usuario){
-  const profile=$(".user-profile"); if(!profile) return;
+  const profile=document.querySelector(".user-profile"); if(!profile) return;
   profile.innerHTML="";
+
   const shell=document.createElement("div"); shell.className="avatar-shell";
-  const circle=document.createElement("div"); circle.className="avatar-circle";
+  const avatarCircle=document.createElement("div"); avatarCircle.className="avatar-circle";
   const img=document.createElement("img"); img.id="avatar-img"; img.alt=usuario.nombre||"Foto de perfil";
-  circle.appendChild(img);
+  avatarCircle.appendChild(img);
 
-  const editBtn=document.createElement("button");
-  editBtn.type="button"; editBtn.className="icon-btn avatar-edit";
-  editBtn.setAttribute("aria-label","Cambiar foto"); editBtn.title="Cambiar foto";
-  editBtn.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>`;
+  const editAvatarBtn=document.createElement("button");
+  editAvatarBtn.type="button"; editAvatarBtn.className="icon-btn avatar-edit";
+  editAvatarBtn.setAttribute("aria-label","Cambiar foto");
+  editAvatarBtn.title="Cambiar foto";
+  editAvatarBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+    </svg>`;
 
-  const info=document.createElement("div"); info.className="user-info";
-  const nameDiv=document.createElement("div"); nameDiv.id="user-name"; nameDiv.textContent=usuario.nombre||"Usuario";
-  info.append(nameDiv);
+  shell.append(avatarCircle, editAvatarBtn);
 
-  shell.append(circle,editBtn); profile.append(shell,info);
-  setAvatarSrc(img,usuario);
+  const userInfo=document.createElement("div");
+  userInfo.className="user-info";
+
+  const nameDiv=document.createElement("div");
+  nameDiv.id="user-name";
+  nameDiv.textContent=usuario.nombre||"Usuario";
+
+  const editProfileBtn=document.createElement("button");
+  editProfileBtn.type="button";
+  editProfileBtn.className="gc-btn gc-btn-ghost edit-profile";
+  editProfileBtn.textContent="Administrar perfil ›";
+
+  userInfo.append(nameDiv, editProfileBtn);
+  profile.append(shell, userInfo);
+
+  setAvatarSrc(img, usuario);
 }
 
 async function uploadAvatarFile(file,usuarioId){
@@ -465,6 +482,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
   showSkeletons();
   await loadRecursos(usuario.id);
   disableLinks();
-  document.addEventListener("DOMContentLoaded", initModalPerfil);
+  if (typeof initModalPerfil === "function") initModalPerfil();
 
 });
