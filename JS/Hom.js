@@ -283,7 +283,30 @@ document.addEventListener("DOMContentLoaded",async()=>{
   initAvatarUpload(usuario.id);
   showSkeletons();
   await loadRecursos(usuario.id);
+  disableLinks();
+
+
 });
+
+// Inhabilita enlaces/botones específicos (cursos/recursos)
+function disableLinks() {
+  document.querySelectorAll(".recurso-link, .curso-card").forEach((el) => {
+    // si es <a>, quita navegación
+    if (el.tagName === "A") el.removeAttribute("href");
+
+    // aria / estado visual accesible
+    el.setAttribute("aria-disabled", "true");
+    el.classList.add("is-disabled");
+
+    // bloquea interacción
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      gcToast("Función deshabilitada", "warning");
+      return false;
+    }, { passive: false });
+  });
+}
 
 /* Avatar refresh global */
 function refreshAvatarEverywhere(url){
