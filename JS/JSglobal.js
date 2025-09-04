@@ -585,3 +585,73 @@
     });
   });
 })();
+
+//------------------------- js para rescribir el footer
+(function () {
+  const DEFAULTS = {
+    selector: "footer",
+    createIfMissing: true,
+    extraClasses: "",
+
+    // ---- Contenido personalizable ----
+    contactTitle: "Contacto",
+    phoneLabel: "Teléfono:",
+    phone: "+52 1 33 1977 4088",
+    locationLabel: "Ubicación:",
+    location: "Francisco Madero 1C, Ixtlahuacán de los Membrillos",
+
+    hoursTitle: "Horarios de servicio",
+    hoursLines: ["Lunes a Viernes", "De 9:00AM a 9:00PM"],
+  };
+
+  const getConfig = () => Object.assign({}, DEFAULTS, window.GCFooterConfig || {});
+
+  function buildFooterInnerHTML(cfg) {
+    const telHref = "tel:" + String(cfg.phone || "").replace(/\s+/g, "");
+    return `
+      <div>
+        <strong>${cfg.contactTitle}</strong>
+        <small>${cfg.phoneLabel} <a href="${telHref}">${cfg.phone}</a></small>
+        <small>${cfg.locationLabel} ${cfg.location}</small>
+      </div>
+      <div>
+        <strong>${cfg.hoursTitle}</strong>
+        ${cfg.hoursLines.map(l => `<small>${l}</small>`).join("")}
+      </div>
+    `;
+  }
+
+  function replaceFooter() {
+    const cfg = getConfig();
+    let footer = document.querySelector(cfg.selector);
+
+    if (!footer) {
+      if (!cfg.createIfMissing) return;
+      footer = document.createElement("footer");
+      document.body.appendChild(footer);
+    }
+
+    if (cfg.extraClasses) {
+      cfg.extraClasses.split(/\s+/).filter(Boolean).forEach(c => footer.classList.add(c));
+    }
+    footer.classList.add("gc-footer");
+
+    footer.innerHTML = buildFooterInnerHTML(cfg);
+  }
+
+  function init() {
+    replaceFooter();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  // window.updateGCFooter({ phone: "..." })
+  window.updateGCFooter = function (patch = {}) {
+    window.GCFooterConfig = Object.assign({}, window.GCFooterConfig || {}, patch);
+    replaceFooter();
+  };
+})();
