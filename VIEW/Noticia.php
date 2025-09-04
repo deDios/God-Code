@@ -133,7 +133,7 @@
     </header>
 
 
-    <main>
+    <main class="noticias-main">
         <!--------- seccion 1 ----------->
         <section id="noticia-detalle" class="noticia-detalle">
 

@@ -669,12 +669,14 @@
     }
 
     #noticia-detalle .overlay-titulo {
-        padding: 1.2rem 1rem;
+        width: max-content;        
+        max-width: 100%;          
     }
 
     #noticia-detalle .overlay-titulo h1 {
-        font-size: 1.4rem;
+        font-size: 1rem;
         line-height: 1.3;
+      
     }
 
     #noticia-detalle,
@@ -726,16 +728,6 @@
     }
 }
 
-@media screen and (max-width: 768px) {
-    #noticia-detalle .overlay-titulo {
-        font-size: 1.3rem;
-        padding: 1rem 1.5rem;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    #noticia-detalle .overlay-titulo {
-        font-size: 1.1rem;
-        padding: 0.8rem 1rem;
-    }
+.noticias-main {
+  padding-top: 3rem;
 }

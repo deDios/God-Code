@@ -611,7 +611,7 @@
     return `
       <div>
         <strong>${cfg.contactTitle}</strong>
-        <small>${cfg.phoneLabel} <a href="${telHref}">${cfg.phone}</a></small>
+        <small>${cfg.phoneLabel} <a>${cfg.phone}</a></small>
         <small>${cfg.locationLabel} ${cfg.location}</small>
       </div>
       <div>
