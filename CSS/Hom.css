@@ -64,16 +64,38 @@ body {
   margin-bottom: 2px;
 }
 
-.edit-profile {
-  font-size: 0.86rem;
+gc-btn.edit-profile,
+button.edit-profile {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 2px 0 0;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline;             
+  font: inherit;
   color: #1565c0;
+  cursor: pointer;
   text-decoration: none;
-  transition: color .2s;
+  line-height: 1.2;
 }
 
-.edit-profile:hover {
+.gc-btn.edit-profile:hover,
+button.edit-profile:hover {
   color: #0a4596;
   text-decoration: underline;
+  background: transparent;
+}
+
+.gc-btn.edit-profile:focus {
+  outline: none;
+}
+.gc-btn.edit-profile:focus-visible {
+  outline: 2px solid #c7dafc;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .aprender-hoy {
