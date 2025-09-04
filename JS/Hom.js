@@ -1,10 +1,10 @@
 "use strict";
 
 /*  ENDPOINTS  */
-const ENDPOINT_INSCRIPCIONES = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php";
-const ENDPOINT_AVATAR        = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_avatar.php";
-const ENDPOINT_USUARIO_FETCH  = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
-const ENDPOINT_USUARIO_UPDATE = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
+const ENDPOINT_INSCRIPCIONES   = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_inscripcion.php";
+const ENDPOINT_AVATAR          = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_avatar.php";
+const ENDPOINT_USUARIO_FETCH   = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_usuario.php";
+const ENDPOINT_USUARIO_UPDATE  = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_usuario.php";
 
 /*  Estado de Recursos  */
 const itemsPerPage = 6;
@@ -783,7 +783,6 @@ function initModalPerfil() {
   if (perfilModalIniciado) return;
   perfilModalIniciado = true;
 
-  const editBtn = document.querySelector(".edit-profile");
   const modal   = document.getElementById("modal-perfil");
   if (!modal) { console.warn("[perfil] Falta #modal-perfil en el DOM"); return; }
 
@@ -823,14 +822,14 @@ function initModalPerfil() {
     }
   }
 
-  if (editBtn) {
-    editBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      usuarioCookie = getUsuarioFromCookie();
-      if (!usuarioCookie) return gcToast("Debes iniciar sesión.", "warning");
-      abrirYPrefill();
-    });
-  }
+  document.addEventListener("click", (ev) => {
+    const trg = ev.target.closest(".edit-profile");
+    if (!trg) return;
+    ev.preventDefault();
+    usuarioCookie = getUsuarioFromCookie();
+    if (!usuarioCookie) return gcToast("Debes iniciar sesión.", "warning");
+    abrirYPrefill();
+  });
 
   window.openPerfilModal = function() {
     usuarioCookie = getUsuarioFromCookie();
@@ -923,7 +922,7 @@ document.addEventListener("DOMContentLoaded", async ()=>{
   showSkeletons();
   await loadRecursos(usuario.id);
 
-   disableLinks();
+  disableLinks();
 
   if (typeof initModalPerfil === "function") initModalPerfil();
 });
