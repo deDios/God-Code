@@ -18,7 +18,7 @@
     calendario: API_BASE + "c_dias_curso.php", tipoEval: API_BASE + "c_tipo_evaluacion.php", actividades: API_BASE + "c_actividades.php",
     usuarios: API_BASE + "c_usuarios.php", iUsuarios: API_BASE + "i_usuario.php", uUsuarios: API_BASE + "u_usuario.php",
     uAvatar: API_BASE + "u_avatar.php",
-    inscripciones: API_BASE + "c_suscripciones.php", iInscripcion: API_BASE + "i_inscripcion.php", uInscripcion: API_BASE + "u_inscripcion.php", userLookup: API_BASE + "c_usuario.php"
+    inscripciones: API_BASE + "c_suscripciones.php", iInscripcion: API_BASE + "i_inscripcion.php", uInscripcion: API_BASE + "u_inscripcion.php"
   };
   const API_UPLOAD = { cursoImg: API_BASE + "u_cursoImg.php", noticiaImg: API_BASE + "u_noticiaImagenes.php", tutorImg: API_BASE + "u_tutorImg.php" };
 
@@ -59,22 +59,23 @@
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },
-      { v: 3, l: "Temporal" },
-      { v: 0, l: "Cancelado" }
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
+      { v: 3, l: "Temporal" },      // azul
+      { v: 0, l: "Cancelado" }      // rojo
     ],
     tutores: [
-      { v: 1, l: "Activo" },
-      { v: 2, l: "Pausado" },
-      { v: 0, l: "Inactivo" }
+      { v: 1, l: "Activo" },        // deberia ser verde  
+      { v: 2, l: "Pausado" },       // gris
+      { v: 0, l: "Inactivo" }       // rojo
     ],
+    // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
     suscripciones: [
-      { v: 2, l: "Suscrito" },
-      { v: 1, l: "Activo" },
-      { v: 3, l: "Terminado" },
-      { v: 0, l: "Cancelado" }
+      { v: 2, l: "Suscrito" },      // azul
+      { v: 1, l: "Activo" },        // verde
+      { v: 3, l: "Terminado" },     // gris
+      { v: 0, l: "Cancelado" }      // rojo
     ]
-});
+  });
 
   // Opciones genéricas (fallback)
   const STATUS_SELECT_GENERIC = Object.freeze([
@@ -127,7 +128,28 @@
 
   /* ====== cursos/usuarios map (cualquier estatus) ====== */
   const _usersCache = { list: null, ts: 0 }; async function fetchAllUsuariosAnyStatus() { if (_usersCache.list && (Date.now() - _usersCache.ts) < 60 * 1000) return _usersCache.list; const [e1, e0, e2, e3] = await Promise.all([postJSON(API.usuarios, { estatus: 1 }), postJSON(API.usuarios, { estatus: 0 }), postJSON(API.usuarios, { estatus: 2 }), postJSON(API.usuarios, { estatus: 3 })]); const arr = [].concat(Array.isArray(e1) ? e1 : [], Array.isArray(e0) ? e0 : [], Array.isArray(e2) ? e2 : [], Array.isArray(e3) ? e3 : []); _usersCache.list = arr; _usersCache.ts = Date.now(); return arr }
-  const _cursosCache = { list: null, ts: 0 }; async function fetchAllCursosAnyStatus() { if (_cursosCache.list && (Date.now() - _cursosCache.ts) < 60 * 1000) return _cursosCache.list; const [e1, e0, e2, e3] = await Promise.all([postJSON(API.cursos, { estatus: 1 }), postJSON(API.cursos, { estatus: 0 }), postJSON(API.cursos, { estatus: 2 }), postJSON(API.cursos, { estatus: 3 })]); const arr = [].concat(Array.isArray(e1) ? e1 : [], Array.isArray(e0) ? e0 : [], Array.isArray(e2) ? e2 : [], Array.isArray(e3) ? e3 : []); _cursosCache.list = arr; _cursosCache.ts = Date.now(); return arr }
+  const _cursosCache = { list: null, ts: 0 }; async function fetchAllCursosAnyStatus() {
+  if (_cursosCache.list && (Date.now() - _cursosCache.ts) < 60 * 1000) return _cursosCache.list;
+  const [e1, e0, e2, e3, e4, e5] = await Promise.all([
+    postJSON(API.cursos, { estatus: 1 }),
+    postJSON(API.cursos, { estatus: 0 }),
+    postJSON(API.cursos, { estatus: 2 }),
+    postJSON(API.cursos, { estatus: 3 }),
+    postJSON(API.cursos, { estatus: 4 }),
+    postJSON(API.cursos, { estatus: 5 })
+  ]);
+  const arr = [].concat(
+    Array.isArray(e1) ? e1 : [],
+    Array.isArray(e0) ? e0 : [],
+    Array.isArray(e2) ? e2 : [],
+    Array.isArray(e3) ? e3 : [],
+    Array.isArray(e4) ? e4 : [],
+    Array.isArray(e5) ? e5 : []
+  );
+  _cursosCache.list = arr;
+  _cursosCache.ts = Date.now();
+  return arr;
+}
   async function getCursosMapAnyStatus() { if (cacheGuard(state.cursosMap)) return state.cursosMap; const arr = await fetchAllCursosAnyStatus(); return state.cursosMap = arrToMap(arr) }
   async function getUsuariosMapAnyStatus() { if (cacheGuard(state.usuariosMap)) return state.usuariosMap; const arr = await fetchAllUsuariosAnyStatus(); return state.usuariosMap = arrToMap(arr) }
 
@@ -189,28 +211,30 @@
       "1": "green", "activo": "green",
       "2": "grey",  "pausado": "grey", "en pausa": "grey",
       "4": "blue",  "en curso": "blue",
-      "3": "grey",  "terminado": "blue",
-      "0": "red",   "inactivo": "red", "cancelado": "red",
-      "5": "red",   "cancelado": "red", "cancelado": "red"      
+      "3": "blue",  "terminado": "blue",
+      "0": "red",   "inactivo": "red",
+      "5": "red",   "cancelado": "red"
     },
     noticias: {
       "1": "green", "activo": "green",
-      "2": "amber", "en pausa": "amber",
-      "3": "blue",  "temporal": "blue",
-      "0": "red",   "cancelado": "red", "inactivo": "red"
+      "0": "red", "inactivo": "red",
+      "cancelado": "grey", 
+      "en pausa": "amber", 
+      "temporal": "blue", 
+      "pausado": "grey",
+      "2": "amber",
+      "3": "blue"
     },
     tutores: {
       "1": "green", "activo": "green",
-      "2": "grey",  "pausado": "grey",
-      "0": "red",   "inactivo": "red"
+      "0": "red", "inactivo": "red",
+      "2": "grey", "pausado": "grey"
     },
     suscripciones: {
-      "2": "blue",  "suscrito": "blue",
-      "1": "green", "activo": "green",
-      "3": "grey",  "terminado": "grey",
-      "0": "red",   "cancelado": "red"
+      "activo": "green", "suscrito": "blue", "cancelado": "red", "terminado": "grey",
+      "1": "green", "2": "blue", "3": "grey", "0": "red"
     }
-});
+  });
   function toneFor(entity, status) {
     const e = (entity || "").toLowerCase(); const raw = (status == null ? "" : String(status)).toLowerCase().trim();
     const map = STATUS_TONE[e] || {};
@@ -226,6 +250,7 @@
   }
   function statusTextGeneric(v) { const f = STATUS_OPTIONS.find(x => Number(x.v) === Number(v)); return f ? f.l : String(v) }
 
+  //------------------------------------ PENDIENTE AJUSTAR PARA QUE NO CONTAGIE EL CSS AL DRAWER BANDERA1
   function statusBadge(entity, v, label) {
     const tone = toneFor(entity, v);
     const text = label || statusTextGeneric(v);
@@ -314,58 +339,6 @@
       else if (state.route.startsWith("#/suscripciones")) await openCreateSuscripcion();
     });
     const s = qs("#search-input"); if (s) { s.addEventListener("input", () => { state.search = s.value || ""; refreshCurrent() }) }
-  }
-
-  
-  /* ====================== Suscripciones · helpers ====================== */
-  async function consultUsuario({ correo, telefono }) {
-    try {
-      const res = await fetch(API.userLookup, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: (correo || "").toLowerCase().trim(), telefono: (telefono || "").trim() })
-      });
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
-    } catch (e) {
-      gcToast("No se pudo consultar usuario.", "error");
-      return [];
-    }
-  }
-  function validarFormatoCampo(tipo, valor) {
-    const v = String(valor || "").trim();
-    if (tipo === "telefono") return /^\d{10,13}$/.test(v);
-    if (tipo === "correo") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.toLowerCase());
-    return !!v;
-  }
-  function setIcono(container, ok, msgOk, msgWarn) {
-    const icono = container?.querySelector?.(".icono-alerta");
-    if (!icono) return;
-    if (ok) {
-      container.classList.remove("alerta");
-      icono.textContent = "✅";
-      icono.classList.add("valido");
-      icono.title = msgOk || "Campo válido.";
-    } else {
-      container.classList.add("alerta");
-      icono.textContent = "⚠️";
-      icono.classList.remove("valido");
-      icono.title = msgWarn || "Revisa este campo.";
-    }
-  }
-  function obtenerTipoContactoDesdeChecks(root) {
-    const checks = root.querySelectorAll('input[name="suscr-medios-contacto"]:checked');
-    const vals = Array.from(checks).map(cb => cb.value);
-    if (vals.includes("telefono") && vals.includes("correo")) return 3;
-    if (vals.includes("telefono")) return 1;
-    if (vals.includes("correo")) return 2;
-    return 0;
-  }
-  function toggleDisabled(el, disabled) {
-    if (!el) return;
-    el.disabled = !!disabled;
-    el.classList.toggle("disabled", !!disabled);
-    if ("readOnly" in el) el.readOnly = !!disabled;
   }
 
   /* ====================== Cursos ====================== */
@@ -998,7 +971,21 @@
     }, 0)
   }
 
-  /* ====================== Suscripciones ====================== */
+  
+  // Cursos disponibles para inscribir: Activo(1), Pausado(2), En curso(4)
+  async function getCursosMapParaInscribir() {
+    const [e1, e2, e4] = await Promise.all([
+      postJSON(API.cursos, { estatus: 1 }),
+      postJSON(API.cursos, { estatus: 2 }),
+      postJSON(API.cursos, { estatus: 4 })
+    ]);
+    const arr = []
+      .concat(Array.isArray(e1) ? e1 : [])
+      .concat(Array.isArray(e2) ? e2 : [])
+      .concat(Array.isArray(e4) ? e4 : []);
+    return arr.reduce((acc, c) => { acc[String(c.id)] = c.nombre; return acc; }, {});
+  }
+/* ====================== Suscripciones ====================== */
   async function loadSuscripciones() {
     qs("#mod-title") && (qs("#mod-title").textContent = "Suscripciones");
     const hdr = qs(".recursos-box.desktop-only .table-header"); if (hdr) { const c1 = hdr.querySelector(".col-nombre"), c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo"), c3 = hdr.querySelector(".col-fecha"), c4 = hdr.querySelector(".col-status"); if (c1) c1.textContent = "Suscriptor"; if (c2) { c2.textContent = "Curso"; c2.classList.add("col-tipo") } if (c3) c3.textContent = "Fecha de suscripción"; if (c4) c4.textContent = "Status" }
@@ -1013,14 +1000,16 @@
   }
   
   async function openCreateSuscripcion() {
-    // Pre-cargar cursos (cualquier estatus) para permitir inscripción a cursos activos principalmente
-    const cursosMap = await getCursosMapAnyStatus();
-    const cursoOptions = Object.entries(cursosMap || {}).map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`).join("");
+    // Construir select de cursos (1,2,4)
+    const cursosMap = await getCursosMapParaInscribir();
+    const cursoOptions = Object.entries(cursosMap || {})
+      .map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`)
+      .join("");
 
     const body = `
       <div class="gc-actions">
         <button class="gc-btn gc-btn-ghost" id="btn-cancel">Cancelar</button>
-        <button class="gc-btn gc-btn-primary" id="btn-save">Inscribir</button>
+        <button class="gc-btn gc-btn-primary" id="btn-save" disabled>Inscribir</button>
       </div>
 
       <div class="field">
@@ -1045,7 +1034,6 @@
           </div>
           <div style="margin-top:.5rem; display:flex; gap:.5rem;">
             <button class="gc-btn" id="suscr-buscar">Buscar</button>
-            <a href="#" id="suscr-volver" class="gc-btn gc-btn-ghost" style="display:none;">Volver a registro</a>
           </div>
         </div>
       </div>
@@ -1094,176 +1082,159 @@
     `;
 
     openDrawer("Suscripción · Crear", body);
-    qs("#drawer-title").textContent = "Suscripción · Crear";
-    state.currentDrawer = { type: "suscripcion", mode: "create" };
+    const root = qs("#gc-drawer");
+    const qsR = (sel) => root ? root.querySelector(sel) : null;
 
-    // Wiring
-    const zoneLogin = qs("#suscr-zone-login");
-    const zoneRegistro = qs("#suscr-zone-registro");
-    const chk = qs("#suscr-ya-cuenta");
-    const btnBuscar = qs("#suscr-buscar");
-    const aVolver = qs("#suscr-volver");
-    const btnSave = qs("#btn-save");
-    const btnCancel = qs("#btn-cancel");
+    const selCurso = qsR("#suscr-curso");
+    const chkYaCuenta = qsR("#suscr-ya-cuenta");
+    const zoneLogin = qsR("#suscr-zone-login");
+    const zoneRegistro = qsR("#suscr-zone-registro");
+    const inIdent = qsR("#suscr-login-identificador");
+    const btnBuscar = qsR("#suscr-buscar");
+    const btnSave = qsR("#btn-save");
+    const btnCancel = qsR("#btn-cancel");
 
-    const inNombre = qs("#suscr-nombre");
-    const inTel = qs("#suscr-telefono");
-    const inMail = qs("#suscr-correo");
-    const inFecha = qs("#suscr-fecha");
-    const inIdent = qs("#suscr-login-identificador");
-    const selCurso = qs("#suscr-curso");
-    let usuarioEncontrado = null; // {id, nombre, telefono, correo, fecha_nacimiento, tipo_contacto}
+    const inNombre = qsR("#suscr-nombre");
+    const inTel = qsR("#suscr-telefono");
+    const inMail = qsR("#suscr-correo");
+    const inFecha = qsR("#suscr-fecha");
 
-    function toggleLogin(on) {
-      zoneLogin.style.display = on ? "" : "none";
-      zoneRegistro.style.display = on ? "none" : "";
-      aVolver.style.display = on ? "" : "none";
-      usuarioEncontrado = null;
-      // limpiar íconos de alerta
-      qsAll(".input-alerta-container .icono-alerta", qs("#gc-drawer")).forEach(el => { el.textContent = ""; el.classList.remove("valido"); el.removeAttribute("title") });
-      qsAll(".input-alerta-container", qs("#gc-drawer")).forEach(c => c.classList.remove("alerta"));
-      // habilitar edición
-      [inNombre, inTel, inMail, inFecha].forEach(el => toggleDisabled(el, false));
+    let usuarioEncontrado = null;
+
+    function validarFormato(tipo, valor) {
+      const v = String(valor || "").trim();
+      if (tipo === "telefono") return /^\d{10,13}$/.test(v);
+      if (tipo === "correo") return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(v.toLowerCase());
+      return !!v;
     }
-
-    chk.addEventListener("change", () => toggleLogin(chk.checked));
-    aVolver.addEventListener("click", (e) => { e.preventDefault(); chk.checked = false; toggleLogin(false) });
-
-    // Validaciones registro
-    function onValidate(inputEl) {
-      if (!inputEl) return;
-      let tipo = inputEl === inTel ? "telefono" : (inputEl === inMail ? "correo" : "texto");
-      const cont = inputEl.closest(".input-alerta-container");
-      const ok = tipo === "texto" ? !!inputEl.value.trim() : validarFormatoCampo(tipo, inputEl.value);
-      if (cont) setIcono(cont, ok, "Campo válido.", tipo === "telefono" ? "Teléfono de 10–13 dígitos." : "Correo inválido.");
-      refreshSaveState();
+    function obtenerTipoContacto() {
+      const checks = root.querySelectorAll('input[name="suscr-medios-contacto"]:checked');
+      const vals = Array.from(checks).map(cb => cb.value);
+      if (vals.includes("telefono") && vals.includes("correo")) return 3;
+      if (vals.includes("telefono")) return 1;
+      if (vals.includes("correo")) return 2;
+      return 0;
     }
-    [inTel, inMail].forEach(el => {
-      el.addEventListener("input", () => onValidate(el));
-      el.addEventListener("blur", () => onValidate(el));
-    });
-
-    async function validarDuplicados() {
-      // Solo en modo registro
-      if (chk.checked) return true;
-      const tel = inTel.value.trim();
-      const mail = inMail.value.trim().toLowerCase();
-      if (!tel && !mail) return true;
-      const data = await consultUsuario({ correo: mail, telefono: tel });
-      let ok = true;
-      if (data && data.length) {
-        // marcar coincidencias
-        data.forEach(u => {
-          if (u?.telefono && tel && String(u.telefono) == String(tel)) {
-            const c = inTel.closest(".input-alerta-container"); setIcono(c, false, "", "Ya existe una cuenta con este teléfono."); gcToast("Ya existe una cuenta con ese teléfono.", "warning"); ok = false;
-          }
-          if (u?.correo && mail && String(u.correo).toLowerCase() == mail) {
-            const c = inMail.closest(".input-alerta-container"); setIcono(c, false, "", "Ya existe una cuenta con este correo."); gcToast("Ya existe una cuenta con ese correo.", "warning"); ok = false;
-          }
-        });
-      }
-      return ok;
+    function setInscribirReady(on) {
+      if (!btnSave) return;
+      btnSave.disabled = !on;
+      btnSave.classList.toggle("gc-btn--success", !!on);
+      btnSave.classList.toggle("gc-btn-primary", !on);
     }
-
-    // Buscar cuenta (modo ya tiene cuenta)
-    btnBuscar.addEventListener("click", async () => {
-      const ident = (inIdent.value || "").trim().toLowerCase();
-      if (!ident) { gcToast("Ingresa un correo o teléfono.", "warning"); return; }
-      const found = await consultUsuario({ correo: ident, telefono: ident });
-      if (found && found.length) {
-        usuarioEncontrado = found[0];
-        gcToast("Cuenta encontrada correctamente.", "exito");
-        // Prefill y bloquear
-        inNombre.value = usuarioEncontrado.nombre || "";
-        inTel.value = usuarioEncontrado.telefono || "";
-        inMail.value = (usuarioEncontrado.correo || "").toLowerCase();
-        let f = usuarioEncontrado.fecha_nacimiento || "";
-        if (typeof f === "string") {
-          if (f.includes("T")) f = f.split("T")[0];
-          else if (f.includes(" ")) f = f.split(" ")[0];
-          else if (f.includes("/")) { const p = f.split("/"); if (p.length === 3) f = `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`; }
-        }
-        inFecha.value = f || "";
-        [inNombre, inTel, inMail, inFecha].forEach(el => toggleDisabled(el, true));
-        // checks de medios
-        const t = Number(usuarioEncontrado.tipo_contacto || 0);
-        const chkTel = qs('#suscr-medios input[value="telefono"]'); const chkMail = qs('#suscr-medios input[value="correo"]');
-        if (chkTel) chkTel.checked = (t === 1 || t === 3);
-        if (chkMail) chkMail.checked = (t === 2 || t === 3);
-      } else {
-        usuarioEncontrado = null;
-        gcToast("No encontramos la cuenta.", "warning");
-      }
-      refreshSaveState();
-    });
-
-    function camposRegistroCompletos() {
-      return !!(inNombre.value.trim() && validarFormatoCampo("telefono", inTel.value) && validarFormatoCampo("correo", inMail.value) && inFecha.value);
+    function isCursoOk() { return !!selCurso?.value; }
+    function isMediosOk() { return obtenerTipoContacto() !== 0; }
+    function isCamposRegistroCompletos() {
+      return !!(inNombre?.value.trim() && validarFormato("telefono", inTel?.value) && validarFormato("correo", inMail?.value) && inFecha?.value);
     }
     function refreshSaveState() {
-      const cursoOk = !!selCurso.value;
-      const mediosOk = obtenerTipoContactoDesdeChecks(qs("#gc-drawer")) !== 0;
-      let listo = cursoOk && mediosOk;
-      if (chk.checked) {
-        // requiere haber encontrado usuario
-        listo = listo && !!usuarioEncontrado;
-      } else {
-        listo = listo && camposRegistroCompletos();
-      }
-      toggleDisabled(btnSave, !listo);
+      const ready = isCursoOk() && isMediosOk() && (chkYaCuenta?.checked ? !!usuarioEncontrado : isCamposRegistroCompletos());
+      setInscribirReady(ready);
     }
-    qs('#suscr-medios')?.addEventListener('change', refreshSaveState);
-    selCurso?.addEventListener('change', refreshSaveState);
-    refreshSaveState();
 
-    btnCancel.addEventListener("click", (e) => { e.preventDefault(); closeDrawer(); });
+    function bloquearCampos(b) {
+      [inNombre, inTel, inMail, inFecha].forEach(el => { if(!el) return; el.readOnly = !!b; el.disabled = !!b; });
+    }
+    function toggleLogin(on) {
+      if (!zoneLogin || !zoneRegistro) return;
+      zoneLogin.style.display = on ? "" : "none";
+      zoneRegistro.style.display = on ? "none" : "";
+      if (!on) { usuarioEncontrado = null; bloquearCampos(false); }
+      refreshSaveState();
+    }
 
-    btnSave.addEventListener("click", async (e) => {
-      e.preventDefault();
-      // Validaciones finales
-      if (!selCurso?.value) { gcToast("Selecciona un curso.", "warning"); return; }
-      const tipo_contacto = obtenerTipoContactoDesdeChecks(qs("#gc-drawer"));
-      if (!tipo_contacto) { gcToast("Selecciona al menos un medio de contacto.", "warning"); return; }
+    chkYaCuenta?.addEventListener("change", () => toggleLogin(chkYaCuenta.checked));
+    selCurso?.addEventListener("change", refreshSaveState);
+    root.querySelector("#suscr-medios")?.addEventListener("change", refreshSaveState);
+    [inNombre, inTel, inMail, inFecha].forEach(el => { el?.addEventListener("input", refreshSaveState); el?.addEventListener("blur", refreshSaveState); });
+    btnCancel?.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); });
 
-      let usuarioId = null;
+    // Buscar cuenta existente (API.usuarios con filtro)
+    btnBuscar?.addEventListener("click", async () => {
+      const ident = (inIdent?.value || "").trim().toLowerCase();
+      if (!ident) { toast("Ingresa un correo o teléfono.", "warning"); return; }
       try {
-        if (chk.checked) {
-          if (!usuarioEncontrado?.id) { gcToast("Busca y selecciona una cuenta válida.", "warning"); return; }
+        const res = await postJSON(API.usuarios, { correo: ident, telefono: ident });
+        const data = Array.isArray(res) ? res : [];
+        if (data.length) {
+          usuarioEncontrado = data[0] || null;
+          // Prefill
+          if (usuarioEncontrado) {
+            inNombre.value = usuarioEncontrado.nombre || "";
+            inTel.value = usuarioEncontrado.telefono || "";
+            inMail.value = (usuarioEncontrado.correo || "").toLowerCase();
+            let f = usuarioEncontrado.fecha_nacimiento || "";
+            if (typeof f === "string") {
+              if (f.includes("T")) f = f.split("T")[0];
+              else if (f.includes(" ")) f = f.split(" ")[0];
+              else if (f.includes("/")) { const p = f.split("/"); if (p.length === 3) f = `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`; }
+            }
+            inFecha.value = f || "";
+            bloquearCampos(true);
+            // medios
+            const t = Number(usuarioEncontrado.tipo_contacto || 0);
+            const chkTel  = root.querySelector('#suscr-medios input[value="telefono"]');
+            const chkMail = root.querySelector('#suscr-medios input[value="correo"]');
+            if (chkTel)  chkTel.checked  = (t === 1 || t === 3);
+            if (chkMail) chkMail.checked = (t === 2 || t === 3);
+            toast("Cuenta encontrada correctamente.", "success");
+          }
+        } else {
+          usuarioEncontrado = null;
+          bloquearCampos(false);
+          toast("No encontramos la cuenta.", "warning");
+        }
+      } catch (err) {
+        usuarioEncontrado = null;
+        bloquearCampos(false);
+        toast("Error al consultar la cuenta.", "error");
+      } finally {
+        refreshSaveState();
+      }
+    });
+
+    // Guardar (crear usuario si aplica + inscribir)
+    btnSave?.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const cursoId = Number(selCurso?.value || 0);
+      const tipo_contacto = obtenerTipoContacto();
+      if (!cursoId) { toast("Selecciona un curso.", "warning"); return; }
+      if (!tipo_contacto) { toast("Selecciona al menos un medio de contacto.", "warning"); return; }
+      try {
+        let usuarioId = null;
+        if (chkYaCuenta?.checked) {
+          if (!usuarioEncontrado?.id) { toast("Busca y selecciona una cuenta válida.", "warning"); return; }
           usuarioId = Number(usuarioEncontrado.id);
         } else {
-          // validar duplicados antes de crear
-          if (!(await validarDuplicados())) return;
+          // Doble check de duplicado
+          const check = await postJSON(API.usuarios, { correo: (inMail.value||'').toLowerCase().trim(), telefono: (inTel.value||'').trim() });
+          if (Array.isArray(check) && check.length) { toast("Ya existe una cuenta con ese teléfono/correo.", "warning"); return; }
+          // Crear usuario
           const payloadUser = {
             nombre: inNombre.value.trim(),
-            correo: inMail.value.trim().toLowerCase(),
-            telefono: inTel.value.trim(),
+            correo: (inMail.value||'').toLowerCase().trim(),
+            telefono: (inTel.value||'').trim(),
             fecha_nacimiento: inFecha.value,
             tipo_contacto,
             password: "godcode123"
           };
-          const ins = await fetch(API.iUsuarios, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadUser) });
-          const resIns = await ins.json();
-          if (!(resIns?.mensaje || "").toLowerCase().includes("usuario")) {
-            throw new Error(resIns?.mensaje || "No se pudo registrar el usuario.");
-          }
-          // Consultar para obtener ID
-          const nuevo = await consultUsuario({ correo: payloadUser.correo, telefono: payloadUser.telefono });
-          usuarioId = nuevo[0]?.id ? Number(nuevo[0].id) : null;
+          const ins = await postJSON(API.iUsuarios, payloadUser);
+          // Obtener id
+          const again = await postJSON(API.usuarios, { correo: payloadUser.correo, telefono: payloadUser.telefono });
+          usuarioId = again && Array.isArray(again) && again[0]?.id ? Number(again[0].id) : null;
           if (!usuarioId) throw new Error("No se pudo obtener el ID del usuario creado.");
         }
-
         // Crear inscripción
-        const payloadIns = { curso: Number(selCurso.value), usuario: Number(usuarioId), comentario: "" };
-        const insc = await fetch(API.iInscripcion, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payloadIns) });
-        const resInsc = await insc.json();
-        gcToast(resInsc?.mensaje || "Inscripción realizada correctamente", "exito", 6000);
+        const inscRes = await postJSON(API.iInscripcion, { curso: cursoId, usuario: usuarioId, comentario: "" });
+        toast((inscRes && inscRes.mensaje) || "Inscripción realizada correctamente", "success");
         closeDrawer();
         await loadSuscripciones();
       } catch (err) {
-        console.error("Error en inscripción:", err);
-        gcToast(err?.message || "Hubo un error al procesar la inscripción.", "error");
+        console.error(err);
+        toast(err?.message || "Hubo un error al procesar la inscripción.", "error");
       }
     });
+
+    refreshSaveState();
   }
 function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
   async function softDeleteSuscripcion(item) { if (!item || !item._all) return; await postJSON(API.uInscripcion, { id: item.id, estatus: 0 }) }
