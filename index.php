@@ -7,6 +7,7 @@
     <title>GodCode</title>
     <link rel="stylesheet" href="CSS/index.css">
     <link rel="stylesheet" href="/CSS/plantilla.css">
+    <link rel="icon" href="/favicon.ico">
 </head>
 
 <body>
