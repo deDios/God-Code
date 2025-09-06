@@ -27,7 +27,7 @@
   const STATUS_OPTIONS = [{ v: 1, l: "Activo" }, { v: 0, l: "Inactivo" }, { v: 2, l: "Pausado" }, { v: 3, l: "Terminado" }];
 
   const state = {
-    route: "#/cursos", page: 1, pageSize: 10, data: [], raw: [], search: "",
+    route: "#/cursos", page: 1, pageSize: 7, data: [], raw: [], search: "",
     currentDrawer: null, tempNewCourseImage: null, tempNewNewsImages: { 1: null, 2: null }, tempNewUserAvatar: null, tempNewTutorImage: null,
     tutorsMap: null, prioMap: null, categoriasMap: null, calendarioMap: null, tipoEvalMap: null, actividadesMap: null, cursosMap: null, usuariosMap: null
   };
