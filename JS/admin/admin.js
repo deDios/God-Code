@@ -1,6 +1,48 @@
 (() => {
   "use strict";
   /* ====================== utils/base ====================== */
+/* === GC PATCH: media helpers for existing image detection === */
+function gcDOMHasExisting(selector) {
+  try {
+    const el = (typeof selector === 'string') ? document.querySelector(selector) : null;
+    let imgs = [];
+    if (el) {
+      const im = el.querySelector('img') || (el.tagName === 'IMG' ? el : null);
+      if (im) imgs.push(im);
+      if (!im) {
+        const im2 = document.querySelector(selector.includes('img') ? selector : (selector + ' img'));
+        if (im2) imgs.push(im2);
+      }
+    }
+    // Heurística: si no hay contenedor, intentar por pista del tipo en el selector
+    if (!imgs.length && typeof selector === 'string') {
+      const hintMatch = selector.match(/(tutor|usuario|curso)/i);
+      if (hintMatch) {
+        const hint = hintMatch[1].toLowerCase();
+        const hintPath = hint === 'tutor' ? '/ASSETS/tutor/' : (hint === 'usuario' ? '/ASSETS/usuario/' : (hint === 'curso' ? '/ASSETS/curso/' : null));
+        if (hintPath) {
+          document.querySelectorAll('img').forEach(im => {
+            const s = im.currentSrc || im.src || '';
+            if (s && s.indexOf(hintPath) !== -1) imgs.push(im);
+          });
+        }
+      }
+    }
+    const isReal = (im) => {
+      if (!im) return false;
+      const src = im.currentSrc || im.src || '';
+      if (!src) return false;
+      if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
+      return !!(im.complete && im.naturalWidth > 1);
+    };
+    return imgs.some(isReal);
+  } catch (e) { return false; }
+}
+function gcHasNewFile(inputSelector) {
+  const i = document.querySelector(inputSelector);
+  return !!(i && i.files && i.files.length);
+}
+/* === END GC PATCH === */
   const GC_DEBUG = false, gcLog = (...a) => { if (GC_DEBUG && typeof console !== "undefined") { try { console.log("[GC]", ...a) } catch { } } };
   const qs = (s, r = document) => r.querySelector(s), qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (m, t = "exito", d = 2500) => window.gcToast ? window.gcToast(m, t, d) : gcLog(`[${t}] ${m}`);
@@ -436,33 +478,7 @@
     else { qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : ""); state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "view" }; }
 
     setTimeout(() => {
-
-      // ---- Fecha default + Apple iOS/macOS interaction hack ----
       try {
-        const dateInput = qs("#f_fecha");
-        if (dateInput && !dateInput.value) {
-          const today = new Date().toISOString().slice(0,10);
-          dateInput.value = today;
-          dateInput.setAttribute("placeholder", today);
-        }
-        // iOS/macOS Safari sometimes doesn’t open native date pickers inside drawers.
-        // Workaround: toggle type on focus/blur to force the picker; keep value as YYYY-MM-DD.
-        const ua = navigator.userAgent || "";
-        const isApple = /iP(hone|ad|od)|Macintosh/.test(ua);
-        if (isApple && dateInput) {
-          dateInput.addEventListener("focus", () => {
-            try { dateInput.type = "date"; } catch(_) {}
-          }, { once: false });
-          dateInput.addEventListener("blur", () => {
-            try { /* keep as date; Safari ok. If you prefer text mask: uncomment next line */ /* dateInput.type = "text"; */ } catch(_) {}
-          });
-          // Also allow clicking the label/row to focus the input
-          const row = dateInput.closest(".field, .row, .pair, .gc-field") || dateInput.parentElement;
-          if (row) row.addEventListener("click", (e) => { if (e.target !== dateInput) dateInput.focus(); });
-        }
-      } catch(_e) {}
-      // ---- end fecha hack ----
-              try {
         disableDrawerInputs(!(isEdit || isCreate));
         if (isCreate) {
           const card = qs("#create-media-curso"), btn = qs("#create-media-edit"), thumb = qs("#create-media-thumb");
@@ -760,15 +776,7 @@
     gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item?._all || null);
-  // Fallback: allow update without new image if an existing image is already present
-  let hasExisting = false;
-  try {
-    const cont = qs("#media-tutor");
-    const img = cont && cont.querySelector("img");
-    if (img && img.naturalWidth > 0) hasExisting = true;
-  } catch (_e) {}
-  const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return gcToast("La foto del tutor es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage && !gcDOMHasExisting("#media-tutor") && !gcDOMHasExisting("#media-usuario")) return gcToast("La foto del tutor es obligatoria", "warning");
     const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
@@ -906,7 +914,7 @@
         <div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div>
         <div class="col-correo">${escapeHTML(it.correo || "-")}</div>
         <div class="col-telefono">${escapeHTML(it.telefono || "-")}</div>
-        <div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div>
+        <div class="col-status">${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div>
       </div>`,
       mobileRow: it => `
       <div class="table-row-mobile" data-id="${it.id}" data-type="usuario">
@@ -914,7 +922,7 @@
         <div class="row-details">
           <div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div>
           <div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div>
-          <div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div>
+          <div><strong>Status:</strong> ${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
             ${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}
@@ -930,11 +938,11 @@
     });
   }
 
-  function drawUsuarios() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre || "").includes(k) || norm(it.correo || "").includes(k) || norm(it.telefono || "").includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="usuario"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div><div class="col-tutor">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="usuario"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre || "-")}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div><div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div><div style="display:flex; gap:8px; margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Usuario · " + (it.nombre || it.correo || ("#" + it.id))) : "Usuario" }, drawerBody: d => renderUsuarioDrawer(d), afterOpen: () => { } }) }
+  function drawUsuarios() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre || "").includes(k) || norm(it.correo || "").includes(k) || norm(it.telefono || "").includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="usuario"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div><div class="col-tutor">${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="usuario"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre || "-")}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div><div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div><div><strong>Status:</strong> ${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div><div style="display:flex; gap:8px; margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Usuario · " + (it.nombre || it.correo || ("#" + it.id))) : "Usuario" }, drawerBody: d => renderUsuarioDrawer(d), afterOpen: () => { } }) }
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin imagen para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar) return gcToast("El avatar es obligatorio", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar && !gcDOMHasExisting("#media-usuario") && !gcDOMHasExisting("#media-tutor")) return gcToast("El avatar es obligatorio", "warning");
     await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
@@ -954,7 +962,7 @@
       field("Teléfono", n.telefono, `<input id="u_telefono" type="tel" value="${escapeAttr(n.telefono || "")}">`) +
       `<div class="field"><div class="label">Fecha nacimiento</div><div class="value">${(isEdit ? `<input id="u_fnac" type="date" value="${escapeAttr(n.fecha_nacimiento || "")}">` : escapeHTML(n.fecha_nacimiento || ""))}</div></div>` +
       `<div class="field"><div class="label">Tipo contacto</div><div class="value">${(isEdit ? `<input id="u_tcontacto" type="number" min="0" value="${escapeAttr(n.tipo_contacto || "0")}">` : escapeHTML(n.tipo_contacto || ""))}</div></div>` +
-      `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit) ? statusSelect("u_estatus", n.estatus, "suscripciones") : escapeHTML(statusLabel("suscripciones", n.estatus))}</div></div>` +
+      `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit) ? statusSelect("u_estatus", n.estatus, "suscripciones") : escapeHTML(statusLabel("usuarios", n.estatus))}</div></div>` +
       `<div class="field"><div class="label">Avatar <span class="req">*</span></div><div class="value"><div id="media-usuario" data-id="${n.id}"></div><div class="hint" style="color:#666;margin-top:.35rem;">Debe existir un avatar válido.</div></div></div>`;
     if (isAdminUser) html += jsonSection(n, "JSON · Usuario", "json-usuario", "btn-copy-json-usuario");
     if (isEdit) { qs("#drawer-title").textContent = "Usuario · " + (it ? it.nombre : "") + " (edición)"; state.currentDrawer = { type: "usuario", id: n.id, mode: "edit" }; }
