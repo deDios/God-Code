@@ -398,16 +398,7 @@
     const tipoOptions = mapToOptions(state.tipoEvalMap, String(c.tipo_evaluacion || ""));
     const actOptions = mapToOptions(state.actividadesMap, String(c.actividades || ""));
     const field = (label, value, inputHTML) => `<div class="field"><div class="label">${escapeHTML(label)} <span class="req">*</span></div><div class="value">${(isEdit || isCreate) ? inputHTML : escapeHTML(value != null ? value : "-")}</div></div>`;
-    let controls = ""; if (isCreate) { controls = '<div class="gc-actions"><button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button><button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button></div>'; 
-          // ahora agrega una fecha, en este caso la de "now" porque en tabletas habia un par de problemas
-          try {
-            const _d = qs("#f_fecha");
-            if (_d && !_d.value) {
-              const _now = new Date();
-              _d.value = _now.toISOString().slice(0,10);
-            }
-          } catch {}
-}
+    let controls = ""; if (isCreate) { controls = '<div class="gc-actions"><button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button><button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button></div>'; }
     else if (isAdminUser) { const isInactive = Number(c.estatus) === 0; controls = '<div class="gc-actions">' + (isView ? '<button class="gc-btn" id="btn-edit">Editar</button>' : "") + (isEdit ? '<button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>' : "") + (isEdit ? '<button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>' : "") + (isInactive ? '<button class="gc-btn gc-btn--success" id="btn-reactivar">Reactivar</button>' : '<button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>') + "</div>"; }
     let html = "" + controls +
       field("Nombre", c.nombre, inText("f_nombre", c.nombre, "Nombre del curso")) +
@@ -445,7 +436,33 @@
     else { qs("#drawer-title").textContent = "Curso · " + (item ? item.nombre : ""); state.currentDrawer = { type: "curso", id: item ? item.id : null, mode: "view" }; }
 
     setTimeout(() => {
+
+      // ---- Fecha default + Apple iOS/macOS interaction hack ----
       try {
+        const dateInput = qs("#f_fecha");
+        if (dateInput && !dateInput.value) {
+          const today = new Date().toISOString().slice(0,10);
+          dateInput.value = today;
+          dateInput.setAttribute("placeholder", today);
+        }
+        // iOS/macOS Safari sometimes doesn’t open native date pickers inside drawers.
+        // Workaround: toggle type on focus/blur to force the picker; keep value as YYYY-MM-DD.
+        const ua = navigator.userAgent || "";
+        const isApple = /iP(hone|ad|od)|Macintosh/.test(ua);
+        if (isApple && dateInput) {
+          dateInput.addEventListener("focus", () => {
+            try { dateInput.type = "date"; } catch(_) {}
+          }, { once: false });
+          dateInput.addEventListener("blur", () => {
+            try { /* keep as date; Safari ok. If you prefer text mask: uncomment next line */ /* dateInput.type = "text"; */ } catch(_) {}
+          });
+          // Also allow clicking the label/row to focus the input
+          const row = dateInput.closest(".field, .row, .pair, .gc-field") || dateInput.parentElement;
+          if (row) row.addEventListener("click", (e) => { if (e.target !== dateInput) dateInput.focus(); });
+        }
+      } catch(_e) {}
+      // ---- end fecha hack ----
+              try {
         disableDrawerInputs(!(isEdit || isCreate));
         if (isCreate) {
           const card = qs("#create-media-curso"), btn = qs("#create-media-edit"), thumb = qs("#create-media-thumb");
@@ -743,7 +760,15 @@
     gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return gcToast("La foto del tutor es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item?._all || null);
+  // Fallback: allow update without new image if an existing image is already present
+  let hasExisting = false;
+  try {
+    const cont = qs("#media-tutor");
+    const img = cont && cont.querySelector("img");
+    if (img && img.naturalWidth > 0) hasExisting = true;
+  } catch (_e) {}
+  const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return gcToast("La foto del tutor es obligatoria", "warning");
     const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
@@ -909,11 +934,7 @@
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    // si algo truena revisar aca
-    if (!item || !item._all) return gcToast("Sin imagen para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); {
-      const _hasExisting = (typeof state.editUserHasAvatar === "boolean" ? state.editUserHasAvatar : okAvatar);
-      if (!_hasExisting && !state.tempNewUserAvatar) return gcToast("El avatar es obligatorio", "warning");
-    }
+    if (!item || !item._all) return gcToast("Sin imagen para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar) return gcToast("El avatar es obligatorio", "warning");
     await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
@@ -942,23 +963,6 @@
       try {
         disableDrawerInputs(!isEdit);
         const cont = qs("#media-usuario"); if (cont) mountReadOnlyMedia({ container: cont, type: "usuario", id: n.id, labels: ["Avatar"], editable: isEdit && isAdminUser });
-        // Patch: detect existing avatar to avoid forcing new upload on update
-        try {
-          if (isEdit) {
-            state.editUserHasAvatar = false;
-            const _img = cont ? cont.querySelector("img") : null;
-            const mark = () => {
-              try {
-                if (_img && _img.src && !String(_img.src).startsWith("data:image/svg+xml")) {
-                  state.editUserHasAvatar = true;
-                  if (_img.dataset) _img.dataset.exists = "1";
-                }
-              } catch {}
-            };
-            if (_img) { if (_img.complete) mark(); else _img.addEventListener("load", mark, { once: true }); }
-          }
-        } catch {}
-
         qs("#btn-edit")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "usuario", id: n.id, mode: "edit" }; qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) }) });
         qs("#btn-cancel")?.addEventListener("click", (e) => { e.stopPropagation(); state.currentDrawer = { type: "usuario", id: n.id, mode: "view" }; qs("#drawer-body").innerHTML = renderUsuarioDrawer({ id: String(n.id) }) });
         qs("#btn-save")?.addEventListener("click", async (e) => { e.stopPropagation(); await saveUsuarioUpdate(it) });
