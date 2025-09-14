@@ -2,7 +2,7 @@
 <?php
 function conectar() {
     $con = mysqli_init();
-    mysqli_ssl_set($con, NULL, NULL, "/home/site/wwwroot/db/conn/DigiCertGlobalRootCA.crt.pem", NULL, NULL);
+    mysqli_ssl_set($con, NULL, NULL, "/home/site/wwwroot/db/conn/DigiCertGlobalRootG2.crt.pem", NULL, NULL);
 
     if (!mysqli_real_connect(
         $con,
