@@ -1,45 +1,46 @@
 (() => {
   "use strict";
   /* ====================== utils/base ====================== */
-
-function gcIsRealImage(img) {
+/* === GC PATCH: media helpers for existing image detection === */
+function gcDOMHasExisting(selector) {
   try {
-    if (!img) return false;
-    const src = img.currentSrc || img.src || "";
-    if (!src) return false;
-    if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
-    return !!(img.complete && img.naturalWidth > 1);
-  } catch { return false; }
+    const el = (typeof selector === 'string') ? document.querySelector(selector) : null;
+    let imgs = [];
+    if (el) {
+      const im = el.querySelector('img') || (el.tagName === 'IMG' ? el : null);
+      if (im) imgs.push(im);
+      if (!im) {
+        const im2 = document.querySelector(selector.includes('img') ? selector : (selector + ' img'));
+        if (im2) imgs.push(im2);
+      }
+    }
+    // Heurística: si no hay contenedor, intentar por pista del tipo en el selector
+    if (!imgs.length && typeof selector === 'string') {
+      const hintMatch = selector.match(/(tutor|usuario|curso)/i);
+      if (hintMatch) {
+        const hint = hintMatch[1].toLowerCase();
+        const hintPath = hint === 'tutor' ? '/ASSETS/tutor/' : (hint === 'usuario' ? '/ASSETS/usuario/' : (hint === 'curso' ? '/ASSETS/curso/' : null));
+        if (hintPath) {
+          document.querySelectorAll('img').forEach(im => {
+            const s = im.currentSrc || im.src || '';
+            if (s && s.indexOf(hintPath) !== -1) imgs.push(im);
+          });
+        }
+      }
+    }
+    const isReal = (im) => {
+      if (!im) return false;
+      const src = im.currentSrc || im.src || '';
+      if (!src) return false;
+      if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
+      return !!(im.complete && im.naturalWidth > 1);
+    };
+    return imgs.some(isReal);
+  } catch (e) { return false; }
 }
-function gcDOMHasValidImages(selector, minCount) {
-  try {
-    const root = document.querySelector(selector);
-    if (!root) return false;
-    const imgs = Array.prototype.slice.call(root.querySelectorAll("img"));
-    let ok = 0;
-    for (const im of imgs) if (gcIsRealImage(im)) ok++;
-    return ok >= (minCount || 1);
-  } catch { return false; }
-}
-async function gcRecoverFileFromImgEl(img, fallbackName) {
-  try {
-    if (!img) return null;
-    const url = (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) || img.currentSrc || img.src || "";
-    if (!url) return null;
-    if (!(url.startsWith("blob:") || url.startsWith("data:") || url.startsWith("/") || url.startsWith("./"))) return null;
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const ext = (blob.type && blob.type.split("/")[1]) || "png";
-    const safeExt = (ext || "png").replace(/[^a-z0-9]+/ig, "").slice(0,6) || "png";
-    const name = (fallbackName || "upload") + "." + safeExt;
-    return new File([blob], name, { type: blob.type || "image/png" });
-  } catch { return null; }
-}
-async function gcRecoverFileFromSelector(selector, fallbackName) {
-  try {
-    const el = document.querySelector(selector);
-    return await gcRecoverFileFromImgEl(el, fallbackName);
-  } catch { return null; }
+function gcHasNewFile(inputSelector) {
+  const i = document.querySelector(inputSelector);
+  return !!(i && i.files && i.files.length);
 }
 /* === END GC PATCH === */
   const GC_DEBUG = false, gcLog = (...a) => { if (GC_DEBUG && typeof console !== "undefined") { try { console.log("[GC]", ...a) } catch { } } };
@@ -411,13 +412,13 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
   }
 
   async function saveNewCurso() {
-    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) { const __rec = await gcRecoverFileFromSelector('#create-media-curso img, #create-media-thumb', 'curso-portada'); if (__rec) { state.tempNewCourseImage = __rec; } } if (!state.tempNewCourseImage) return gcToast("Selecciona la imagen del curso", "warning");
+    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) return gcToast("Selecciona la imagen del curso", "warning");
     const res = await postJSON(API.iCursos, payload); const newId = Number((res && (res.id || res.curso_id || res.insert_id || (res.data && res.data.id))) || 0); const file = state.tempNewCourseImage || null;
     if (newId && file) { try { await uploadCursoImagen(newId, file); gcToast("Imagen subida", "exito") } catch (err) { gcLog(err); gcToast("Curso creado, pero falló la imagen", "error") } finally { state.tempNewCourseImage = null } }
     gcToast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
   }
   async function saveUpdateCurso(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if ((!okImg) && !gcDOMHasValidImages("#media-curso",1) && !gcDOMHasValidImages("#media-curso-lite",1)) return gcToast("La portada del curso es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if (!okImg) return gcToast("La portada del curso es obligatoria", "warning");
     await postJSON(API.uCursos, payload); gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
   }
   async function softDeleteCurso(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = normalizeCursoPayload({ ...item._all, estatus: 0 }); await postJSON(API.uCursos, body) }
@@ -526,15 +527,11 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
   function readNoticiaForm(n) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); return { id: n.id, titulo: g("f_tit"), desc_uno: g("f_desc1"), desc_dos: g("f_desc2"), estatus: gN("f_estatus", 1), creado_por: n.creado_por } }
   function validateNoticiaRequired(p) { const errs = []; if (!String(p.titulo || "").trim()) errs.push("Título"); if (!String(p.desc_uno || "").trim()) errs.push("Descripción (1)"); if (!String(p.desc_dos || "").trim()) errs.push("Descripción (2)"); return errs }
   async function ensureNoticiaImagenes({ isEdit, id }) {
-    if (state.tempNewNewsImages[1] || state.tempNewNewsImages[2]) {
-      if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) return false;
-      return true;
+    if (state.tempNewNewsImages[1] || state.tempNewNewsImages[2]) { // si cargó nuevas, require ambas
+      if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) return false; return true
     }
     if (!isEdit) return false; // create: exige ambas nuevas
-    if (!id) return false;
-    const server = await requireNewsImages(id);
-    const domOk = gcDOMHasValidImages("#media-noticia", 2);
-    return server || domOk;
+    if (!id) return false; return await requireNewsImages(id)
   }
 
   function renderNoticiaDrawer(dataset) {
@@ -694,7 +691,9 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
           const miss = validateNoticiaRequired(payload);
           if (miss.length) { gcToast("Campos requeridos: " + miss.join(", "), "warning"); return }
 
-          if (!state.tempNewNewsImages[1]) { const __recN1 = await gcRecoverFileFromSelector('#create-news-thumb-1', 'noticia_img1'); if (__recN1) state.tempNewNewsImages[1] = __recN1; } if (!state.tempNewNewsImages[2]) { const __recN2 = await gcRecoverFileFromSelector('#create-news-thumb-2', 'noticia_img2'); if (__recN2) state.tempNewNewsImages[2] = __recN2; } if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) { gcToast("Debes subir las 2 imágenes", "warning"); return; }
+          if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) {
+            gcToast("Debes subir las 2 imágenes", "warning"); return;
+          }
 
           const res = await postJSON(API.iNoticias, payload);
           const newId = Number((res && (res.id || res.noticia_id || res.insert_id || (res.data && res.data.id))) || 0);
@@ -771,13 +770,13 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
   function readTutorForm(existing) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); const p = { nombre: g("f_nombre"), descripcion: g("f_desc"), estatus: gN("f_estatus", 1) }; if (existing?.id) p.id = existing.id; return p }
   function validateTutorRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!String(p.descripcion || "").trim()) e.push("Descripción"); return e }
   async function saveTutorCreate() {
-    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); let file = state.tempNewTutorImage || null; if (!file) { const __recTF = await gcRecoverFileFromSelector('#create-media-tutor img, #create-tutor-thumb', 'tutor-foto'); if (__recTF) { file = __recTF; state.tempNewTutorImage = __recTF; } } if (!file) return gcToast("Selecciona una imagen para el tutor", "warning");
+    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const file = state.tempNewTutorImage || null; if (!file) return gcToast("Selecciona una imagen para el tutor", "warning");
     const body = { ...p, creado_por: Number((currentUser && currentUser.id) || 0) || 1 }; const res = await postJSON(API.iTutores, body); const newId = Number((res && (res.id || res.tutor_id || res.insert_id || (res.data && res.data.id))) || 0);
     try { if (newId && file) { const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error"); const fd = new FormData(); fd.append("tutor_id", String(newId)); fd.append("imagen", file); const r = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } } } catch (e) { gcLog(e); gcToast("Tutor creado, pero falló la imagen", "error") } finally { state.tempNewTutorImage = null }
     gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if ((!okImg && !state.tempNewTutorImage) && !gcDOMHasValidImages("#media-tutor",1) && !gcDOMHasValidImages("#media-usuario",1)) return gcToast("La foto del tutor es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage && !gcDOMHasExisting("#media-tutor") && !gcDOMHasExisting("#media-usuario")) return gcToast("La foto del tutor es obligatoria", "warning");
     const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
@@ -915,7 +914,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
         <div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div>
         <div class="col-correo">${escapeHTML(it.correo || "-")}</div>
         <div class="col-telefono">${escapeHTML(it.telefono || "-")}</div>
-        <div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div>
+        <div class="col-status">${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div>
       </div>`,
       mobileRow: it => `
       <div class="table-row-mobile" data-id="${it.id}" data-type="usuario">
@@ -923,7 +922,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
         <div class="row-details">
           <div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div>
           <div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div>
-          <div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div>
+          <div><strong>Status:</strong> ${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div>
           <div style="display:flex; gap:8px; margin:.25rem 0 .5rem;">
             <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
             ${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}
@@ -939,17 +938,17 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     });
   }
 
-  function drawUsuarios() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre || "").includes(k) || norm(it.correo || "").includes(k) || norm(it.telefono || "").includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="usuario"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div><div class="col-tutor">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="usuario"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre || "-")}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div><div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div><div style="display:flex; gap:8px; margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Usuario · " + (it.nombre || it.correo || ("#" + it.id))) : "Usuario" }, drawerBody: d => renderUsuarioDrawer(d), afterOpen: () => { } }) }
+  function drawUsuarios() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.nombre || "").includes(k) || norm(it.correo || "").includes(k) || norm(it.telefono || "").includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="usuario"><div class="col-nombre"><span class="name-text">${escapeHTML(it.nombre || "-")}</span></div><div class="col-tutor">${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="usuario"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.nombre || "-")}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Correo:</strong> ${escapeHTML(it.correo || "-")}</div><div><strong>Teléfono:</strong> ${escapeHTML(it.telefono || "-")}</div><div><strong>Status:</strong> ${statusBadge("usuarios", it.estatus, statusLabel("usuarios", it.estatus))}</div><div style="display:flex; gap:8px; margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="usuario" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Usuario · " + (it.nombre || it.correo || ("#" + it.id))) : "Usuario" }, drawerBody: d => renderUsuarioDrawer(d), afterOpen: () => { } }) }
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if ((!okAvatar && !state.tempNewUserAvatar) && !gcDOMHasValidImages("#media-usuario",1) && !gcDOMHasValidImages("#media-tutor",1)) return gcToast("El avatar es obligatorio", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar && !gcDOMHasExisting("#media-usuario") && !gcDOMHasExisting("#media-tutor")) return gcToast("El avatar es obligatorio", "warning");
     await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
     const p = readUsuarioForm(null); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); if (!state.tempNewUserAvatar) return gcToast("Selecciona un avatar", "warning");
     const res = await postJSON(API.iUsuarios, p); const newId = Number((res && (res.id || res.usuario_id || res.insert_id || (res.data && res.data.id))) || 0);
-    let file = state.tempNewUserAvatar || null; if (!file) { const __recUA = await gcRecoverFileFromSelector('#create-media-usuario img, #create-user-avatar', 'usuario-avatar'); if (__recUA) { file = __recUA; state.tempNewUserAvatar = __recUA; } } if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } gcToast("Avatar guardado", "exito") } catch (e) { gcLog(e); gcToast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
+    const file = state.tempNewUserAvatar || null; if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } gcToast("Avatar guardado", "exito") } catch (e) { gcLog(e); gcToast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
     gcToast("Usuario creado", "exito"); closeDrawer(); await loadUsuarios(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) })) }
   }
   async function softDeleteUsuario(item) { if (!item || !item._all) return; await postJSON(API.uUsuarios, { ...item._all, estatus: 0 }) }
@@ -963,7 +962,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
       field("Teléfono", n.telefono, `<input id="u_telefono" type="tel" value="${escapeAttr(n.telefono || "")}">`) +
       `<div class="field"><div class="label">Fecha nacimiento</div><div class="value">${(isEdit ? `<input id="u_fnac" type="date" value="${escapeAttr(n.fecha_nacimiento || "")}">` : escapeHTML(n.fecha_nacimiento || ""))}</div></div>` +
       `<div class="field"><div class="label">Tipo contacto</div><div class="value">${(isEdit ? `<input id="u_tcontacto" type="number" min="0" value="${escapeAttr(n.tipo_contacto || "0")}">` : escapeHTML(n.tipo_contacto || ""))}</div></div>` +
-      `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit) ? statusSelect("u_estatus", n.estatus, "suscripciones") : escapeHTML(statusLabel("suscripciones", n.estatus))}</div></div>` +
+      `<div class="field"><div class="label">Estatus</div><div class="value">${(isEdit) ? statusSelect("u_estatus", n.estatus, "suscripciones") : escapeHTML(statusLabel("usuarios", n.estatus))}</div></div>` +
       `<div class="field"><div class="label">Avatar <span class="req">*</span></div><div class="value"><div id="media-usuario" data-id="${n.id}"></div><div class="hint" style="color:#666;margin-top:.35rem;">Debe existir un avatar válido.</div></div></div>`;
     if (isAdminUser) html += jsonSection(n, "JSON · Usuario", "json-usuario", "btn-copy-json-usuario");
     if (isEdit) { qs("#drawer-title").textContent = "Usuario · " + (it ? it.nombre : "") + " (edición)"; state.currentDrawer = { type: "usuario", id: n.id, mode: "edit" }; }

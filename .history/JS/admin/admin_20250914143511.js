@@ -2,6 +2,7 @@
   "use strict";
   /* ====================== utils/base ====================== */
 
+/* === GC PATCH: media + recovery helpers (non-breaking) === */
 function gcIsRealImage(img) {
   try {
     if (!img) return false;
