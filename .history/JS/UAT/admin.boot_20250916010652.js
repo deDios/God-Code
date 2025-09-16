@@ -115,6 +115,8 @@ function initAdminBoot() {
     }
   }
 
+  // No montamos features de admin aquí; eso lo hace el router.
+  // Montamos SIEMPRE "Cuenta" (idempotente) para que no-admin tenga vista.
   try { Cuenta.mount?.(); } catch(e){ console.error('Cuenta.mount', e); }
   applyRoleVisibility();
   enforceRouteGuard();

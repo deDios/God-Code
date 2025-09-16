@@ -41,6 +41,7 @@ function initAdminBoot() {
     return;
   }
 
+  // Fallbacks de drawer (scoped a #admin-root)
   function ensureDrawerHost(){
     let host = root.querySelector('#gc-drawer-host');
     if (!host){
@@ -63,6 +64,7 @@ function initAdminBoot() {
     };
   }
 
+  // Usuario desde cookie/localStorage (fallback a uat)
   const currentUser = getUsuarioFromCookie();
   window.Admin = window.Admin || {};
   window.Admin.user = currentUser || { id: 1, name: 'uat' };
@@ -115,6 +117,8 @@ function initAdminBoot() {
     }
   }
 
+  // No montamos features de admin aquí; eso lo hace el router.
+  // Montamos SIEMPRE "Cuenta" (idempotente) para que no-admin tenga vista.
   try { Cuenta.mount?.(); } catch(e){ console.error('Cuenta.mount', e); }
   applyRoleVisibility();
   enforceRouteGuard();

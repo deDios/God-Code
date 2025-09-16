@@ -14,17 +14,21 @@ function getUsuarioFromCookie() {
 
   try {
     const raw = row.split("=")[1] || "";
+    // 1er decode (URL encoded)
     const once = decodeURIComponent(raw);
+    // si aún huele a %7B o %22, decodifica otra vez
     const maybe = /%7B|%22/i.test(once) ? decodeURIComponent(once) : once;
 
     const obj = JSON.parse(maybe);
 
+    // Normaliza a las claves que usa el front
     const id    = Number(obj.id || obj.usuario_id || obj.user_id || 0);
     const name  = obj.name || obj.nombre || obj.fullname || "";
     const email = obj.email || obj.correo || "";
 
     return { ...obj, id, name, email };
   } catch (e) {
+    // (opcional) fallback si alguna vez viniera base64
     try {
       const b64 = (row.split("=")[1] || "").replace(/-/g,"+").replace(/_/g,"/");
       return JSON.parse(atob(b64));
@@ -41,6 +45,7 @@ function initAdminBoot() {
     return;
   }
 
+  // Fallbacks de drawer (scoped a #admin-root)
   function ensureDrawerHost(){
     let host = root.querySelector('#gc-drawer-host');
     if (!host){
@@ -63,6 +68,7 @@ function initAdminBoot() {
     };
   }
 
+  // Usuario desde cookie/localStorage (fallback a uat)
   const currentUser = getUsuarioFromCookie();
   window.Admin = window.Admin || {};
   window.Admin.user = currentUser || { id: 1, name: 'uat' };
@@ -115,6 +121,8 @@ function initAdminBoot() {
     }
   }
 
+  // No montamos features de admin aquí; eso lo hace el router.
+  // Montamos SIEMPRE "Cuenta" (idempotente) para que no-admin tenga vista.
   try { Cuenta.mount?.(); } catch(e){ console.error('Cuenta.mount', e); }
   applyRoleVisibility();
   enforceRouteGuard();
