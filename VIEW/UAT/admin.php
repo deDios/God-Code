@@ -281,7 +281,7 @@
                 <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
             </div>
 
-            <!--  MODO VISTA  -->
+            <!----------------------------------  MODO VISTA  ---------------------------------------------->
             <section id="curso-view" class="mode-view">
                 <div class="field">
                     <div class="label">Nombre <span class="req">*</span></div>
@@ -372,7 +372,9 @@
                 <div class="field">
                     <div class="label">Imágenes existentes <span class="req">*</span></div>
                     <div class="value">
-                        <div id="media-curso"><!-- mountReadOnlyMedia({ type:'curso', id, editable }) --></div>
+                        <div id="media-curso">
+                            <!-- mountReadOnlyMedia({ type:'curso', id, editable }) -->
+                        </div>
                         <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
                     </div>
                 </div>
@@ -383,11 +385,12 @@
                     <div style="display:flex;gap:.5rem;margin:.5rem 0;">
                         <button class="gc-btn" id="btn-copy-json-curso">Copiar JSON</button>
                     </div>
-                    <pre id="json-curso" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
+                    <pre id="json-curso" class="value"
+                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
                 </details>
             </section>
 
-            <!-- MODO EDICIÓN  -->
+            <!-------------------------------------------- MODO EDICIÓN  ---------------------------------->
             <section id="curso-edit" class="mode-edit" hidden>
                 <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="field" style="grid-column:1 / -1;">
@@ -425,7 +428,8 @@
                         <input id="f_certificado" type="checkbox" />
                     </div>
 
-                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+                    <div class="grid-3"
+                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
                             <label for="f_tutor">Tutor <span class="req">*</span></label>
                             <select id="f_tutor"></select>
@@ -440,7 +444,8 @@
                         </div>
                     </div>
 
-                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+                    <div class="grid-3"
+                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
                             <label for="f_estatus">Estatus</label>
                             <select id="f_estatus"></select>
@@ -455,7 +460,8 @@
                         </div>
                     </div>
 
-                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+                    <div class="grid-3"
+                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
                             <label for="f_categoria">Categoría <span class="req">*</span></label>
                             <select id="f_categoria"></select>
@@ -493,218 +499,32 @@
         </div>
     </aside>
 
-
-    <!-- Drawer: Noticia (IDs según admin.js: f_tit, f_desc1, f_desc2, f_estatus) -->
-    <aside class="gc-drawer" id="drawer-noticia" role="dialog" aria-modal="true" aria-labelledby="drawer-noticia-title"
-        aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <h2 class="drawer-title" id="drawer-noticia-title">Noticia</h2>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-noticia-close" aria-label="Cerrar">Cerrar</button>
-            </div>
-        </div>
-
-        <div class="drawer-body" id="drawer-noticia-body">
-            <section class="form-grid">
-                <div id="media-noticia" class="media-zone" aria-label="Imágenes"></div>
-
-                <div class="fields">
-                    <div class="field">
-                        <label for="f_tit">Título</label>
-                        <input id="f_tit" type="text" maxlength="160" data-max="160" />
-                        <small class="char-counter" data-for="f_tit"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_desc1">Descripción (1)</label>
-                        <textarea id="f_desc1" rows="4" maxlength="1000" data-max="1000"></textarea>
-                        <small class="char-counter" data-for="f_desc1"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_desc2">Descripción (2)</label>
-                        <textarea id="f_desc2" rows="4" maxlength="1000" data-max="1000"></textarea>
-                        <small class="char-counter" data-for="f_desc2"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_estatus">Estatus</label>
-                        <select id="f_estatus"></select>
-                    </div>
-                </div>
-            </section>
-
-            <footer class="drawer-footer">
-                <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                <button class="gc-btn gc-btn--primary" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
-            </footer>
-        </div>
-    </aside>
-
-    <!-- Drawer: Tutor (IDs según admin.js: f_nombre, f_desc, f_estatus) -->
-    <aside class="gc-drawer" id="drawer-tutor" role="dialog" aria-modal="true" aria-labelledby="drawer-tutor-title"
-        aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <h2 class="drawer-title" id="drawer-tutor-title">Tutor</h2>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-tutor-close" aria-label="Cerrar">Cerrar</button>
-            </div>
-        </div>
-
-        <div class="drawer-body" id="drawer-tutor-body">
-            <section class="form-grid">
-                <div id="media-tutor" class="media-zone" aria-label="Imágenes"></div>
-
-                <div class="fields">
-                    <div class="field">
-                        <label for="f_nombre">Nombre</label>
-                        <input id="f_nombre" type="text" maxlength="120" data-max="120" />
-                        <small class="char-counter" data-for="f_nombre"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_desc">Descripción</label>
-                        <textarea id="f_desc" rows="4" maxlength="1000" data-max="1000"></textarea>
-                        <small class="char-counter" data-for="f_desc"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_estatus">Estatus</label>
-                        <select id="f_estatus"></select>
-                    </div>
-                </div>
-            </section>
-
-            <footer class="drawer-footer">
-                <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                <button class="gc-btn gc-btn--primary" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
-            </footer>
-        </div>
-    </aside>
-
-    <!-- Drawer: Usuario (IDs según admin.js: u_* + media-usuario) -->
-    <aside class="gc-drawer" id="drawer-usuario" role="dialog" aria-modal="true" aria-labelledby="drawer-usuario-title"
-        aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <h2 class="drawer-title" id="drawer-usuario-title">Usuario</h2>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-usuario-close" aria-label="Cerrar">Cerrar</button>
-            </div>
-        </div>
-
-        <div class="drawer-body" id="drawer-usuario-body">
-            <section class="form-grid">
-                <div id="media-usuario" class="media-zone" aria-label="Avatar"></div>
-
-                <div class="fields">
-                    <div class="field">
-                        <label for="u_nombre">Nombre</label>
-                        <input id="u_nombre" type="text" maxlength="120" data-max="120" />
-                        <small class="char-counter" data-for="u_nombre"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="u_correo">Correo</label>
-                        <input id="u_correo" type="email" maxlength="160" data-max="160" />
-                        <small class="char-counter" data-for="u_correo"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="u_telefono">Teléfono</label>
-                        <input id="u_telefono" type="tel" maxlength="20" data-max="20" />
-                        <small class="char-counter" data-for="u_telefono"></small>
-                    </div>
-
-                    <div class="grid-3">
-                        <div class="field">
-                            <label for="u_fnac">Fecha de nacimiento</label>
-                            <input id="u_fnac" type="date" />
-                        </div>
-                        <div class="field">
-                            <label for="u_tcontacto">Tiempo de contacto</label>
-                            <input id="u_tcontacto" type="text" maxlength="60" data-max="60" />
-                            <small class="char-counter" data-for="u_tcontacto"></small>
-                        </div>
-                        <div class="field">
-                            <label for="u_estatus">Estatus</label>
-                            <select id="u_estatus"></select>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <footer class="drawer-footer">
-                <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                <button class="gc-btn gc-btn--primary" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
-            </footer>
-        </div>
-    </aside>
-
-    <!-- Drawer: Suscripción (IDs según admin.js: s_comentario, s_estatus) -->
-    <aside class="gc-drawer" id="drawer-suscripcion" role="dialog" aria-modal="true"
-        aria-labelledby="drawer-suscripcion-title" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <h2 class="drawer-title" id="drawer-suscripcion-title">Suscripción</h2>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-suscripcion-close" aria-label="Cerrar">Cerrar</button>
-            </div>
-        </div>
-
-        <div class="drawer-body" id="drawer-suscripcion-body">
-            <section class="form-grid">
-                <div id="media-suscripcion" class="media-zone" aria-label="Imágenes"></div>
-
-                <div class="fields">
-                    <div class="field">
-                        <label for="s_comentario">Comentario</label>
-                        <textarea id="s_comentario" rows="3" maxlength="500" data-max="500"></textarea>
-                        <small class="char-counter" data-for="s_comentario"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="s_estatus">Estatus</label>
-                        <select id="s_estatus"></select>
-                    </div>
-                </div>
-            </section>
-
-            <footer class="drawer-footer">
-                <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                <button class="gc-btn gc-btn--primary" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
-            </footer>
-        </div>
-    </aside>
-
     <!-- Contadores de caracteres sencillo -->
     <script>
-        (function() {
-            function updateOne(el) {
-                var max = Number(el.getAttribute('data-max') || 0);
-                if (!max) return;
-                var id = el.id;
-                var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
-                if (!cc) return;
-                var v = (el.value || "");
-                cc.textContent = v.length + "/" + max;
-                if (v.length > max) cc.classList.add('over');
-                else cc.classList.remove('over');
-            }
+    (function() {
+        function updateOne(el) {
+            var max = Number(el.getAttribute('data-max') || 0);
+            if (!max) return;
+            var id = el.id;
+            var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
+            if (!cc) return;
+            var v = (el.value || "");
+            cc.textContent = v.length + "/" + max;
+            if (v.length > max) cc.classList.add('over');
+            else cc.classList.remove('over');
+        }
 
-            function bind(el) {
-                if (!el) return;
+        function bind(el) {
+            if (!el) return;
+            updateOne(el);
+            el.addEventListener('input', function() {
                 updateOne(el);
-                el.addEventListener('input', function() {
-                    updateOne(el);
-                });
-            }
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('[data-max]').forEach(bind);
             });
-        })();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-max]').forEach(bind);
+        });
+    })();
     </script>
 
 

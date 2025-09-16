@@ -1,130 +1,123 @@
 (()=>{"use strict";
+/* ========= Config opcional ========= */
+const API_UPLOAD_CURSOS = window.GC_API_UPLOAD_CURSOS || "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_cursoImg.php";
+const SHOW_TOAST = (m,t="info")=> (window.gcToast?window.gcToast(m,t):alert(m));
+const byId = id => document.getElementById(id);
+const qs = (s,r=document)=>r.querySelector(s);
+const qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const bust=u=>{try{const x=new URL(u,location.origin);x.searchParams.set("v",Date.now());return x.pathname+"?"+x.searchParams.toString()}catch{return u+(u.includes("?")?"&":"?")+"v="+Date.now()}};
+const fmtMoney=n=>{try{return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(+n||0)}catch{return "$"+(+n||0)}};
+/* ========= Estado local ========= */
+const elDrawer = byId("drawer-curso");
+const elOverlay = byId("gc-dash-overlay");
+if(!elDrawer) return;
 
-/* =============== Utils base =============== */
-const qs=(s,r=document)=>r.querySelector(s),qsa=(s,r=document)=>Array.prototype.slice.call(r.querySelectorAll(s));
-const gcLog=(...a)=>{ /* toggle si quieres debug */ /* console.log("[GC]",...a); */ };
-const toast=(m,t="exito",d=2400)=>window.gcToast?window.gcToast(m,t,d):console.log(`[${t}] ${m}`);
-const escapeAttr=s=>String(s??"").replace(/"/g,"&quot;");
-const escapeHTML=s=>String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
-const withBust=url=>{try{const u=new URL(url,location.origin);u.searchParams.set("v",Date.now());return u.pathname+"?"+u.searchParams.toString()}catch{return url+(url.includes("?")?"&":"?")+"v="+Date.now()}};
-const humanSize=b=>b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(2)+" MB";
-const fmtMoney=n=>{try{return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n)}catch{return "$"+n}};
-const fmtDate=d=>{if(!d) return "-"; try{const p=String(d).split("-");return `${p[2]||""}/${p[1]||""}/${p[0]||""}`}catch{return d}};
-const postJSON=async(u,b)=>{const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b||{})});const t=await r.text().catch(()=>(""));if(!r.ok) throw new Error("HTTP "+r.status+" "+t); if(!t.trim()) return {}; try{return JSON.parse(t)}catch{return{_raw:t}}};
-
-/* =============== API (solo cursos) =============== */
-const API_BASE="https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/";
-const API={ cursos:API_BASE+"c_cursos.php", iCursos:API_BASE+"i_cursos.php", uCursos:API_BASE+"u_cursos.php" };
-const API_UPLOAD={ cursoImg:API_BASE+"u_cursoImg.php" };
-
-/* =============== Estado local del drawer =============== */
-const DrawerState={
-  el:null, overlay:null,
-  mode:"view",                   // 'view' | 'edit' | 'create'
-  curso:null,                    // objeto curso actual
-  isAdmin:true                   // si necesitas, pon lógica real aquí
+const UI = {
+  title: byId("drawer-curso-title"),
+  close: byId("drawer-curso-close"),
+  view: byId("curso-view"),
+  edit: byId("curso-edit"),
+  actionsView: byId("curso-actions-view"),
+  btnEdit: byId("btn-edit"),
+  btnDelete: byId("btn-delete"),
+  btnSave: byId("btn-save"),
+  btnCancel: byId("btn-cancel"),
+  media: byId("media-curso"),
+  jsonBox: byId("curso-json-box"),
+  jsonPre: byId("json-curso"),
+  copyJson: byId("btn-copy-json-curso"),
 };
 
-/* =============== Validaciones simples =============== */
-const validarImagen=(file,opt)=>{opt=opt||{};const maxMB=Number(opt.maxMB||2);if(!file) return {ok:false,error:"No se seleccionó archivo"};const allowed=["image/jpeg","image/png"];if(!allowed.includes(file.type)) return {ok:false,error:"Formato no permitido. Solo JPG o PNG"};const sizeMB=file.size/1024/1024;if(sizeMB>maxMB) return {ok:false,error:"La imagen excede "+maxMB+"MB"};return{ok:true}};
-const validarCurso=(c)=>{
-  const req=["nombre","descripcion_breve","descripcion_media","descripcion_curso","dirigido","competencias","tutor","categoria","prioridad","tipo_evaluacion","actividades","calendario","horas","fecha_inicio"];
-  const faltan=req.filter(k=>c[k]==null || String(c[k]).trim()==="");
-  if(faltan.length) return {ok:false,error:"Campos requeridos: "+faltan.join(", ")};
+const state = {
+  mode: "view",
+  curso: null,         // objeto curso plano (backend)
+  maps: window.GC_MAPS || null, // opcional: {tutores: {id:nombre}, ...}
+};
+
+/* ========= Helpers DOM ========= */
+function show(el){ if(el){ el.hidden=false; el.setAttribute("aria-hidden","false"); } }
+function hide(el){ if(el){ el.hidden=true; el.setAttribute("aria-hidden","true"); } }
+function togg(el, on){ if(!el) return; on?show(el):hide(el); }
+function text(el, val){ if(el!=null) el.innerHTML = (val==null||val==="")?"—":String(val); }
+function valOrDash(v){ return (v==null||v==="")?"—":String(v); }
+function opt(v,l){ return `<option value="${String(v)}">${String(l)}</option>` }
+function getMapName(map, id){ if(!map) return id; const k=String(id); return map[k] ?? id; }
+
+/* ========= Imágenes ========= */
+function validarImagen(file, maxMB=2){
+  if(!file) return {ok:false, error:"No se seleccionó archivo"};
+  const allowed=["image/jpeg","image/png"];
+  if(!allowed.includes(file.type)) return {ok:false, error:"Formato no permitido. Usa JPG o PNG"};
+  const sizeMB = file.size/1024/1024;
+  if(sizeMB>maxMB) return {ok:false, error:`La imagen excede ${maxMB}MB`};
   return {ok:true};
-};
-
-/* =============== Imágenes curso =============== */
-const mediaUrlsByType=(type,id)=>type==="curso"?[`/ASSETS/cursos/img${Number(id)}.png`]:[];
-const imgExists=url=>new Promise(res=>{try{const i=new Image();i.onload=()=>res(true);i.onerror=()=>res(false);i.src=withBust(url)}catch{res(false)}});
-async function requireCourseImage(id){ const u=mediaUrlsByType("curso",id)[0]; return await imgExists(u); }
-
-/* Modal previa simple y segura */
-function renderPreviewUI(host,file,onConfirm,onCancel){
-  const url=URL.createObjectURL(file);
-  const overlay=document.createElement("div");
-  overlay.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1.5px);";
-  const card=document.createElement("div");
-  card.style.cssText="background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
-  card.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eee;">
-      <strong>Vista previa</strong>
-      <button type="button" data-act="x" class="gc-btn gc-btn--ghost" style="padding:.35rem .6rem">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px;align-items:start;">
-      <div style="border:1px solid #eee;border-radius:12px;background:#fafafa;display:flex;align-items:center;justify-content:center;min-height:320px;max-height:60vh;">
-        <img src="${escapeAttr(url)}" alt="Vista previa" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px">
-      </div>
-      <div style="border-left:1px dashed #e6e6e6;padding-left:16px;display:flex;flex-direction:column;gap:8px">
-        <div><strong>Archivo:</strong> ${escapeHTML(file.name)}</div>
-        <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
-        <div><strong>Tipo:</strong> ${escapeHTML(file.type||"")}</div>
-        <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" class="gc-btn gc-btn--primary" data-act="ok">Subir</button>
-          <button type="button" class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>
-        </div>
-      </div>
-    </div>`;
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-  const cleanup=()=>{URL.revokeObjectURL(url); overlay.remove()};
-  overlay.addEventListener("click",(e)=>{ if(e.target===overlay) cleanup(); });
-  card.querySelector('[data-act="x"]')?.addEventListener("click",cleanup);
-  card.querySelector('[data-act="cancel"]')?.addEventListener("click",()=>{onCancel&&onCancel(); cleanup();});
-  card.querySelector('[data-act="ok"]')?.addEventListener("click",async()=>{ try{ await onConfirm?.() } finally { cleanup(); }});
 }
+function noImageSvg(){
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/>"+
+    "<path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/>"+
+    "<circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>"
+  );
+}
+function courseImgUrl(id){ return `/ASSETS/cursos/img${Number(id||0)}.png`; }
 
-/* Render del bloque de imágenes (lápiz solo en edición) */
-function mountReadOnlyMedia({container,id,editable}){
+function mountMediaCourse(container, cursoId, editable){
   if(!container) return;
-  const url=mediaUrlsByType("curso",id)[0];
-  container.innerHTML=`
+  const url = courseImgUrl(cursoId);
+  container.innerHTML = `
     <div class="media-head">
       <div class="media-title">Imágenes</div>
-      <div class="media-help" style="color:${editable?"#666":"#888"}">${editable?"JPG/PNG · Máx 2MB":"Solo lectura"}</div>
+      <div class="media-help" style="color:${editable?"#666":"#888"};">${editable?"Formatos: JPG/PNG · Máx 2MB":"Solo lectura"}</div>
     </div>
     <div class="media-grid">
       <div class="media-card">
         <figure class="media-thumb">
-          <img alt="Portada" src="${escapeAttr(withBust(url))}">
-          ${editable?`
-            <button class="icon-btn media-edit" title="Editar imagen" aria-label="Editar">
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0L15.13 5.12l3.75 3.75 1.83-1.83z" fill="currentColor"/>
-              </svg>
-            </button>`:""}
+          <img alt="Portada" id="curso-thumb" src="${bust(url)}">
+          ${editable?`<button class="icon-btn media-edit" id="btn-img-edit" title="Editar imagen" aria-label="Editar imagen">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>
+          </button>`:""}
         </figure>
         <div class="media-meta"><div class="media-label">Portada</div></div>
       </div>
-    </div>`;
-  const img=container.querySelector("img");
+    </div>
+  `;
+  const img = byId("curso-thumb");
   if(img){
-    img.onerror=()=>{ img.onerror=null; img.src=withBust(url.replace(".png",".jpg")); };
+    img.onerror = ()=>{ img.onerror=null; img.src=noImageSvg(); };
   }
   if(editable){
-    const btn=container.querySelector(".media-edit");
-    if(btn && !btn._gcBound){
-      btn._gcBound=true;
-      btn.addEventListener("click",()=>{ 
-        const input=document.createElement("input");
+    const btn = byId("btn-img-edit");
+    if(btn && !btn._bound){
+      btn._bound=true;
+      btn.addEventListener("click", async (e)=>{
+        e.preventDefault();
+        const input = document.createElement("input");
         input.type="file"; input.accept="image/png,image/jpeg"; input.style.display="none";
         document.body.appendChild(input);
-        input.addEventListener("change",async()=>{
-          const file=input.files&&input.files[0]; input.remove(); if(!file) return;
-          const v=validarImagen(file,{maxMB:2}); if(!v.ok) return toast(v.error,"error");
-          renderPreviewUI(container,file,async()=>{
-            try{
-              const fd=new FormData();
-              fd.append("curso_id",String(id));
-              fd.append("imagen",file);
-              const r=await fetch(API_UPLOAD.cursoImg,{method:"POST",body:fd});
-              const tx=await r.text().catch(()=>("")); if(!r.ok) throw new Error("HTTP "+r.status+" "+tx);
-              let json; try{json=JSON.parse(tx)}catch{json={_raw:tx}};
-              const newURL=(json&&json.url)?json.url:url;
-              img.src=withBust(newURL);
-              toast("Imagen actualizada","exito");
-            }catch(e){ gcLog(e); toast("No se pudo subir la imagen","error"); }
-          },()=>{});
+        input.addEventListener("change", async ()=>{
+          const file = input.files && input.files[0];
+          try{ document.body.removeChild(input);}catch{}
+          if(!file) return;
+          const v = validarImagen(file, 2);
+          if(!v.ok) return SHOW_TOAST(v.error,"error");
+
+          // Confirmación simple (si quieres, aquí podríamos abrir un modal preview)
+          if(!confirm("¿Subir esta portada para el curso?")) return;
+
+          try{
+            const fd = new FormData();
+            fd.append("curso_id", String(cursoId));
+            fd.append("imagen", file);
+            const res = await fetch(API_UPLOAD_CURSOS, { method:"POST", body:fd });
+            const text = await res.text().catch(()=> "");
+            if(!res.ok) throw new Error(`HTTP ${res.status} ${text||""}`);
+            let json; try{ json=JSON.parse(text);}catch{ json={_raw:text}; }
+            img.src = bust((json && json.url) || url);
+            SHOW_TOAST("Imagen actualizada","exito");
+          }catch(err){
+            console.error(err);
+            SHOW_TOAST("No se pudo subir la imagen","error");
+          }
         });
         input.click();
       });
@@ -132,199 +125,193 @@ function mountReadOnlyMedia({container,id,editable}){
   }
 }
 
-/* =============== Relleno de vistas (view/edit) =============== */
-function paintView(c){
-  const root=DrawerState.el; if(!root) return;
-  // Título
-  const title=qs("#drawer-title",root);
-  if(title) title.textContent="Curso · "+(c?.nombre||"—");
+/* ========= Pintar VISTA ========= */
+function renderView(c){
+  // título
+  if(UI.title) UI.title.textContent = `Curso · ${valOrDash(c.nombre)}`;
 
-  // Pares de texto (div.value) — usa ids "v_*"
-  const set=(id,val,fmt)=>{ const el=qs("#"+id,root); if(!el) return; el.textContent=fmt?fmt(val):String(val??"-"); };
-  set("v_nombre",c.nombre);
-  set("v_desc_breve",c.descripcion_breve);
-  set("v_desc_media",c.descripcion_media);
-  set("v_desc_curso",c.descripcion_curso);
-  set("v_dirigido",c.dirigido);
-  set("v_competencias",c.competencias);
-  set("v_tutor",c.tutor_nombre||c.tutor||"-");
-  set("v_categoria",c.categoria_nombre||c.categoria||"-");
-  set("v_prioridad",c.prioridad_nombre||c.prioridad||"-");
-  set("v_tipo_eval",c.tipo_eval_nombre||c.tipo_evaluacion||"-");
-  set("v_actividades",c.actividades_nombre||c.actividades||"-");
-  set("v_calendario",c.calendario_nombre||c.calendario||"-");
-  set("v_horas",c.horas);
-  set("v_precio",c.precio,fmtMoney);
-  set("v_certificado",c.certificado? "Sí":"No");
-  set("v_fecha",c.fecha_inicio,fmtDate);
-  set("v_estatus",c.estatus==1?"Activo":(c.estatus==2?"Pausado":(c.estatus==3?"Terminado":"Inactivo")));
+  // campos (lectura)
+  text(byId("v_nombre"), c.nombre);
+  text(byId("v_desc_breve"), c.descripcion_breve);
+  text(byId("v_desc_media"), c.descripcion_media);
+  text(byId("v_desc_curso"), c.descripcion_curso);
+  text(byId("v_dirigido"), c.dirigido);
+  text(byId("v_competencias"), c.competencias);
 
-  // JSON debug
-  const j=qs("#json-curso",root);
-  if(j) j.textContent=JSON.stringify(c,null,2);
+  const maps = state.maps || {};
+  text(byId("v_tutor"), getMapName(maps.tutores, c.tutor));
+  text(byId("v_categoria"), getMapName(maps.categorias, c.categoria));
+  text(byId("v_prioridad"), getMapName(maps.prioridad, c.prioridad));
+  text(byId("v_tipo_eval"), getMapName(maps.tipo_evaluacion, c.tipo_evaluacion));
+  text(byId("v_actividades"), getMapName(maps.actividades, c.actividades));
+  text(byId("v_calendario"), getMapName(maps.calendario, c.calendario));
 
-  // Media (abajo del todo, antes del JSON)
-  const media=qs("#media-curso",root);
-  if(media){ media.innerHTML=""; mountReadOnlyMedia({container:media,id:c.id,editable:false}); }
-}
+  text(byId("v_horas"), c.horas!=null?String(c.horas):"—");
+  text(byId("v_precio"), c.precio!=null?fmtMoney(c.precio):"—");
+  text(byId("v_certificado"), c.certificado? "Sí":"No");
+  text(byId("v_fecha"), c.fecha_inicio || "—");
+  text(byId("v_estatus"), c.estatus!=null?String(c.estatus):"—");
 
-function paintEdit(c){
-  const root=DrawerState.el; if(!root) return;
-  const set=(id,val)=>{ const el=qs("#"+id,root); if(!el) return; if(el.type==="checkbox") el.checked=!!Number(val); else el.value=(val??""); };
-  set("f_nombre",c.nombre);
-  set("f_desc_breve",c.descripcion_breve);
-  set("f_desc_media",c.descripcion_media);
-  set("f_desc_curso",c.descripcion_curso);
-  set("f_dirigido",c.dirigido);
-  set("f_competencias",c.competencias);
-  set("f_tutor",c.tutor);
-  set("f_categoria",c.categoria);
-  set("f_prioridad",c.prioridad);
-  set("f_tipo_eval",c.tipo_evaluacion);
-  set("f_actividades",c.actividades);
-  set("f_calendario",c.calendario);
-  set("f_horas",c.horas);
-  set("f_precio",c.precio);
-  set("f_certificado",c.certificado?1:0);
-  set("f_fecha",c.fecha_inicio);
-  set("f_estatus",c.estatus);
-
-  // Media editable (con lápiz)
-  const media=qs("#media-curso",root);
-  if(media){ media.innerHTML=""; mountReadOnlyMedia({container:media,id:c.id,editable:true}); }
-}
-
-/* =============== Alternar modo =============== */
-function setMode(mode){
-  DrawerState.mode=mode;
-  const root=DrawerState.el; if(!root) return;
-  const V=qs("#curso-view",root), E=qs("#curso-edit",root);
-  if(V) V.hidden = (mode!=="view");
-  if(E) E.hidden = (mode==="view");
-
-  // botones estándar
-  const bEdit=qs("#btn-edit",root), bSave=qs("#btn-save",root), bCancel=qs("#btn-cancel",root);
-  if(bEdit)   bEdit.style.display   = (mode==="view")?"":"none";
-  if(bSave)   bSave.style.display   = (mode==="view")?"none":"";
-  if(bCancel) bCancel.style.display = "";
-
-  if(DrawerState.curso){
-    if(mode==="view") paintView(DrawerState.curso);
-    else paintEdit(DrawerState.curso);
+  // imágenes
+  mountMediaCourse(UI.media, c.id, state.mode==="edit");
+  // JSON dev
+  if(UI.jsonPre){
+    try{ UI.jsonPre.textContent = JSON.stringify(c, null, 2); }catch{}
   }
 }
 
-/* =============== Leer datos del form edición =============== */
+/* ========= Pintar FORM ========= */
+function renderEdit(c){
+  setVal("f_nombre", c.nombre);
+  setVal("f_desc_breve", c.descripcion_breve);
+  setVal("f_desc_curso", c.descripcion_curso);
+  setVal("f_desc_media", c.descripcion_media);
+  setVal("f_dirigido", c.dirigido);
+  setVal("f_competencias", c.competencias);
+  const chk = byId("f_certificado");
+  if(chk) chk.checked = !!c.certificado;
+
+  setVal("f_horas", c.horas);
+  setVal("f_precio", c.precio);
+  setVal("f_fecha", c.fecha_inicio);
+
+  // selects (si hay mapas, pintarlos; si no, dejar como texto/única opción)
+  fillSelect("f_tutor", state.maps?.tutores, c.tutor);
+  fillSelect("f_prioridad", state.maps?.prioridad, c.prioridad);
+  fillSelect("f_categoria", state.maps?.categorias, c.categoria);
+  fillSelect("f_calendario", state.maps?.calendario, c.calendario);
+  fillSelect("f_tipo_eval", state.maps?.tipo_evaluacion, c.tipo_evaluacion);
+  fillSelect("f_actividades", state.maps?.actividades, c.actividades);
+  // estatus – dejamos opciones comunes 1/0/2/3 si no hay mapa específico
+  fillSelect("f_estatus", state.maps?.estatusCursos || {"1":"Activo","2":"Pausado","4":"En curso","3":"Terminado","0":"Inactivo","5":"Cancelado"}, c.estatus);
+}
+function setVal(id, v){ const el=byId(id); if(!el) return; el.value = v==null? "": v; }
+function fillSelect(id, map, value){
+  const el = byId(id);
+  if(!el) return;
+  if(map && typeof map==="object"){
+    el.innerHTML = Object.entries(map).map(([k,lab])=>opt(k,lab)).join("");
+  }else{
+    // fallback: deja la opción actual o crea una
+    if(!el.innerHTML.trim()) el.innerHTML = opt(value??"", value??"—");
+  }
+  el.value = value!=null? String(value) : "";
+}
 function readForm(){
-  const root=DrawerState.el;
-  const get=id=>{const el=qs("#"+id,root); if(!el) return null; if(el.type==="checkbox") return el.checked?1:0; return el.value;};
-  const c={ ...DrawerState.curso,
-    nombre:get("f_nombre"),
-    descripcion_breve:get("f_desc_breve"),
-    descripcion_media:get("f_desc_media"),
-    descripcion_curso:get("f_desc_curso"),
-    dirigido:get("f_dirigido"),
-    competencias:get("f_competencias"),
-    tutor:Number(get("f_tutor")||0),
-    categoria:Number(get("f_categoria")||0),
-    prioridad:Number(get("f_prioridad")||0),
-    tipo_evaluacion:Number(get("f_tipo_eval")||0),
-    actividades:Number(get("f_actividades")||0),
-    calendario:Number(get("f_calendario")||0),
-    horas:Number(get("f_horas")||0),
-    precio:Number(get("f_precio")||0),
-    certificado:Number(get("f_certificado")||0)?1:0,
-    fecha_inicio:get("f_fecha"),
-    estatus:Number(get("f_estatus")||1)
+  const get=(id)=>{const x=byId(id); return x? x.value : "";};
+  return {
+    id: state.curso?.id ?? null,
+    nombre: get("f_nombre"),
+    descripcion_breve: get("f_desc_breve"),
+    descripcion_curso: get("f_desc_curso"),
+    descripcion_media: get("f_desc_media"),
+    dirigido: get("f_dirigido"),
+    competencias: get("f_competencias"),
+    certificado: !!(byId("f_certificado")?.checked),
+    tutor: numOrNull(get("f_tutor")),
+    horas: numOrNull(get("f_horas")),
+    precio: numOrNull(get("f_precio")),
+    fecha_inicio: get("f_fecha") || null,
+    prioridad: numOrNull(get("f_prioridad")),
+    categoria: numOrNull(get("f_categoria")),
+    calendario: numOrNull(get("f_calendario")),
+    tipo_evaluacion: numOrNull(get("f_tipo_eval")),
+    actividades: numOrNull(get("f_actividades")),
+    estatus: numOrNull(get("f_estatus")),
   };
-  return c;
+}
+function numOrNull(v){ const n=Number(v); return Number.isFinite(n)? n : null; }
+
+/* ========= Modo & flujo ========= */
+function setMode(mode){
+  state.mode = (mode==="edit") ? "edit" : "view";
+  const isEdit = state.mode==="edit";
+  togg(UI.view, !isEdit);
+  togg(UI.actionsView, !isEdit);
+  togg(UI.edit, isEdit);
+  togg(UI.btnSave, isEdit);
+  togg(UI.btnCancel, isEdit);
+  if(UI.btnEdit) UI.btnEdit.style.display = isEdit? "none":"";
+  // remonta imágenes con/ sin lápiz
+  if(state.curso) mountMediaCourse(UI.media, state.curso.id, isEdit);
+}
+function setCurso(curso, maps){
+  state.curso = {...curso};
+  if(maps) state.maps = maps;
+  renderView(state.curso);
+  renderEdit(state.curso);
 }
 
-/* =============== Guardar =============== */
-async function guardarCurso(){
-  const data=readForm();
-  const v=validarCurso(data);
-  if(!v.ok) return toast(v.error,"error");
-  try{
-    const isCreate = !data.id;
-    const url=isCreate?API.iCursos:API.uCursos;
-    const res=await postJSON(url,data);
-    // actualiza id si viene del insert
-    if(isCreate && res?.id) data.id=res.id;
-    DrawerState.curso=data;
-    toast("Curso guardado","exito");
-    setMode("view");
-  }catch(e){ gcLog(e); toast("No se pudo guardar","error"); }
-}
-
-/* =============== Abrir / Cerrar drawer =============== */
+/* ========= Open / Close ========= */
 function openDrawer(){
-  const el=DrawerState.el, ov=DrawerState.overlay;
-  if(ov){ ov.classList.add("open"); }
-  if(el){ el.classList.add("open"); el.setAttribute("aria-hidden","false"); el.removeAttribute("hidden"); }
+  if(elOverlay) elOverlay.classList.add("open");
+  elDrawer.classList.add("open");
+  elDrawer.hidden=false; elDrawer.setAttribute("aria-hidden","false");
 }
 function closeDrawer(){
-  const el=DrawerState.el, ov=DrawerState.overlay;
-  if(ov){ ov.classList.remove("open"); }
-  if(el){ el.classList.remove("open"); el.setAttribute("aria-hidden","true"); el.setAttribute("hidden",""); }
-  DrawerState.mode="view"; DrawerState.curso=null;
+  if(elOverlay) elOverlay.classList.remove("open");
+  elDrawer.classList.remove("open");
+  elDrawer.hidden=true; elDrawer.setAttribute("aria-hidden","true");
 }
 
-/* =============== API pública para abrir el drawer =============== */
-async function openCursoDrawer(cursoOrId){
-  let c=cursoOrId;
-  if(typeof cursoOrId==="number"){
-    // intenta pedir por id (si tu backend lo permite), si no, podrías traer por estatus y filtrar
-    try{
-      const arr=await postJSON(API.cursos,{ id:cursoOrId });
-      if(Array.isArray(arr) && arr.length) c=arr[0];
-      else if(arr && typeof arr==="object") c=arr;
-    }catch(e){ gcLog(e); }
+/* ========= Bind ========= */
+function bind(){
+  if(UI.close && !UI.close._b){ UI.close._b=true; UI.close.addEventListener("click", closeDrawer); }
+  if(UI.btnEdit && !UI.btnEdit._b){ UI.btnEdit._b=true; UI.btnEdit.addEventListener("click", ()=>setMode("edit")); }
+  if(UI.btnCancel && !UI.btnCancel._b){ UI.btnCancel._b=true; UI.btnCancel.addEventListener("click", ()=>{ setMode("view"); renderView(state.curso||{}); }); }
+  if(UI.btnSave && !UI.btnSave._b){
+    UI.btnSave._b=true;
+    UI.btnSave.addEventListener("click", async ()=>{
+      const payload = readForm();
+      // Hook para que tu capa de datos guarde
+      if(typeof window.onCursoSave === "function"){
+        try{
+          await window.onCursoSave(payload, state.curso);
+          state.curso = {...state.curso, ...payload};
+          SHOW_TOAST("Curso guardado","exito");
+          setMode("view"); renderView(state.curso);
+        }catch(e){
+          console.error(e); SHOW_TOAST("No se pudo guardar","error");
+        }
+      }else{
+        // Por defecto: solo refleja y vuelve a vista
+        state.curso = {...state.curso, ...payload};
+        SHOW_TOAST("Guardado (mock)","exito");
+        setMode("view"); renderView(state.curso);
+      }
+    });
   }
-  if(!c || typeof c!=="object"){ toast("No se pudo abrir el curso","error"); return; }
-  DrawerState.curso=c;
-  openDrawer();
-  setMode("view"); // por defecto abre en lectura
-}
-
-/* =============== Binding de eventos =============== */
-function bindEvents(){
-  const root=DrawerState.el; if(!root) return;
-
-  // Botones header/acciones
-  qs("#drawer-close",root)?.addEventListener("click",closeDrawer);
-  qs("#btn-edit",root)?.addEventListener("click",()=>setMode("edit"));
-  qs("#btn-cancel",root)?.addEventListener("click",()=>setMode("view"));
-  qs("#btn-save",root)?.addEventListener("click",guardarCurso);
-
-  // Copiar JSON
-  const copyBtn=qs("#btn-copy-json-curso",root);
-  if(copyBtn && !copyBtn._gcBound){
-    copyBtn._gcBound=true;
-    copyBtn.addEventListener("click",async()=>{
-      const pre=qs("#json-curso",root); if(!pre) return;
-      try{ await navigator.clipboard.writeText(pre.textContent||""); toast("JSON copiado","exito"); }
-      catch{ toast("No se pudo copiar","error"); }
+  if(UI.copyJson && !UI.copyJson._b){
+    UI.copyJson._b=true;
+    UI.copyJson.addEventListener("click", async ()=>{
+      const txt = UI.jsonPre?.textContent || "";
+      try{ await navigator.clipboard.writeText(txt); SHOW_TOAST("JSON copiado","exito"); }catch{ SHOW_TOAST("No se pudo copiar","error"); }
     });
   }
 }
 
-/* =============== Init =============== */
-document.addEventListener("DOMContentLoaded",()=>{
-  DrawerState.el=qs("#gc-drawer");
-  DrawerState.overlay=qs("#gc-dash-overlay");
-  if(!DrawerState.el){ gcLog("Drawer #gc-drawer no encontrado"); return; }
-  bindEvents();
+/* ========= Bootstrap ========= */
+document.addEventListener("DOMContentLoaded", ()=>{
+  bind();
+  // Si el drawer ya está visible, asegúrate de montar imágenes acorde a view
+  if(elDrawer.classList.contains("open")) setMode("view");
 
-  // Si el drawer ya viene abierto con datos (como tu ejemplo), intenta leer JSON del <pre>:
-  const pre=qs("#json-curso",DrawerState.el);
-  if(pre && pre.textContent.trim()){
-    try{ DrawerState.curso=JSON.parse(pre.textContent); setMode("view"); }
-    catch{ /* ignore */ }
-  }
-
-  // Expón una API mínima para que la lista pueda abrir el drawer:
-  window.GC_CursoDrawer={ open:openCursoDrawer, setMode, getData:()=>DrawerState.curso };
+  // Si hay JSON en #json-curso con un curso real, úsalo para pintar:
+  try{
+    const raw = UI.jsonPre?.textContent?.trim();
+    if(raw && raw.startsWith("{")){
+      const c = JSON.parse(raw);
+      if(c && (c.id!=null)){ setCurso(c); }
+    }
+  }catch{}
 });
 
+/* ========= API pública para tu lista ========= */
+window.GC_CursoDrawer = {
+  open: (curso, maps)=>{ setCurso(curso||{}, maps); setMode("view"); openDrawer(); },
+  close: closeDrawer,
+  setMode,
+  setData: setCurso,
+  getData: ()=>({...state.curso}),
+};
 })();
