@@ -100,7 +100,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // Pausado/Cancelado (gris) 
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
       { v: 3, l: "Temporal" },      // azul
       { v: 0, l: "Cancelado" }      // rojo
     ],

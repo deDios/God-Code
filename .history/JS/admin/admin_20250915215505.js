@@ -100,7 +100,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // Pausado/Cancelado (gris) 
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
       { v: 3, l: "Temporal" },      // azul
       { v: 0, l: "Cancelado" }      // rojo
     ],
@@ -109,6 +109,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
       { v: 2, l: "Pausado" },       // gris
       { v: 0, l: "Inactivo" }       // rojo
     ],
+    // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
     suscripciones: [
       { v: 2, l: "Suscrito" },      // azul
       { v: 1, l: "Activo" },        // verde
@@ -357,6 +358,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     container.appendChild(grid)
   }
 
+  // === GC patch: remove max-char limiters in drawer ===
 function removeMaxCharLimiters(root) {
   try {
     root = root || document;
@@ -369,6 +371,7 @@ function removeMaxCharLimiters(root) {
       var nodes = scope.querySelectorAll ? scope.querySelectorAll("[" + a + "]") : [];
       for (var j = 0; j < nodes.length; j++) { try { nodes[j].removeAttribute(a); } catch(e){} }
     }
+    // remove inline limiter handlers (slice/length checks)
     var handlerAttrs = ["oninput","onkeyup"];
     for (var h = 0; h < handlerAttrs.length; h++) {
       var attr = handlerAttrs[h];

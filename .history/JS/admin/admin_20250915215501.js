@@ -100,7 +100,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // Pausado/Cancelado (gris) 
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
       { v: 3, l: "Temporal" },      // azul
       { v: 0, l: "Cancelado" }      // rojo
     ],
@@ -109,6 +109,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
       { v: 2, l: "Pausado" },       // gris
       { v: 0, l: "Inactivo" }       // rojo
     ],
+    // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
     suscripciones: [
       { v: 2, l: "Suscrito" },      // azul
       { v: 1, l: "Activo" },        // verde
@@ -357,6 +358,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     container.appendChild(grid)
   }
 
+  // === GC patch: remove max-char limiters in drawer ===
 function removeMaxCharLimiters(root) {
   try {
     root = root || document;
@@ -369,6 +371,7 @@ function removeMaxCharLimiters(root) {
       var nodes = scope.querySelectorAll ? scope.querySelectorAll("[" + a + "]") : [];
       for (var j = 0; j < nodes.length; j++) { try { nodes[j].removeAttribute(a); } catch(e){} }
     }
+    // remove inline limiter handlers (slice/length checks)
     var handlerAttrs = ["oninput","onkeyup"];
     for (var h = 0; h < handlerAttrs.length; h++) {
       var attr = handlerAttrs[h];
@@ -1285,7 +1288,7 @@ function drawSuscripciones() { const rows = state.data; renderList(rows, { match
     return html;
   }
 
-  /* ====================== Cuenta  ====================== */
+  /* ====================== Cuenta (placeholder) ====================== */
   function showCuentaPanel() { try { const el = qs(".recursos-box.desktop-only"); if (el && el.style) el.style.display = "none" } catch { } try { const el = qs(".recursos-box.mobile-only"); if (el && el.style) el.style.display = "none" } catch { } try { const p = qs("#pagination-controls"); if (p && p.style) p.style.display = "none" } catch { } try { const p = qs("#pagination-mobile"); if (p && p.style) p.style.display = "none" } catch { } if (!qs("#cuenta-panel")) { const host = qs(".main-content") || document.body; const panel = document.createElement("div"); panel.id = "cuenta-panel"; panel.style.padding = "16px 18px"; panel.innerHTML = '<div class="empty-state" style="padding:1rem;font-weight:600;">Panel de cuenta</div>'; host.appendChild(panel) } }
   function hideCuentaPanel() { const p = qs("#cuenta-panel"); if (p) p.remove(); const d = qs(".recursos-box.desktop-only"); if (d) d.style.display = "block"; const m = qs(".recursos-box.mobile-only"); if (m) m.style.display = "block"; const pc = qs("#pagination-controls"); if (pc) pc.style.display = ""; const pm = qs("#pagination-mobile"); if (pm) pm.style.display = "" }
 

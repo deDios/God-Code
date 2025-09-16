@@ -100,7 +100,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     ],
     noticias: [
       { v: 1, l: "Activo" },
-      { v: 2, l: "En pausa" },      // Pausado/Cancelado (gris) 
+      { v: 2, l: "En pausa" },      // también cubre “Pausado/Cancelado” (gris) esto debe ser amarillo pollo
       { v: 3, l: "Temporal" },      // azul
       { v: 0, l: "Cancelado" }      // rojo
     ],
@@ -109,6 +109,7 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
       { v: 2, l: "Pausado" },       // gris
       { v: 0, l: "Inactivo" }       // rojo
     ],
+    // Para “Suscripciones” (y Usuarios cuando uses ese estatus visual):
     suscripciones: [
       { v: 2, l: "Suscrito" },      // azul
       { v: 1, l: "Activo" },        // verde
@@ -357,34 +358,8 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
     container.appendChild(grid)
   }
 
-function removeMaxCharLimiters(root) {
-  try {
-    root = root || document;
-    var scope = (root.querySelector ? root : document);
-    var dels = scope.querySelectorAll ? scope.querySelectorAll("input[maxlength], textarea[maxlength]") : [];
-    for (var i = 0; i < dels.length; i++) { try { dels[i].removeAttribute("maxlength"); } catch(e){} }
-    var dataAttrs = ["data-maxlength","data-maxlen","max-char","max-chars"];
-    for (var k = 0; k < dataAttrs.length; k++) {
-      var a = dataAttrs[k];
-      var nodes = scope.querySelectorAll ? scope.querySelectorAll("[" + a + "]") : [];
-      for (var j = 0; j < nodes.length; j++) { try { nodes[j].removeAttribute(a); } catch(e){} }
-    }
-    var handlerAttrs = ["oninput","onkeyup"];
-    for (var h = 0; h < handlerAttrs.length; h++) {
-      var attr = handlerAttrs[h];
-      var els = scope.querySelectorAll ? scope.querySelectorAll("[" + attr + "]") : [];
-      for (var t = 0; t < els.length; t++) {
-        try {
-          var v = (els[t].getAttribute && els[t].getAttribute(attr)) || "";
-          if (/slice\(\s*0\s*,\s*\d+/.test(v) || /length\s*[<>]=?\s*\d+/.test(v)) els[t].removeAttribute(attr);
-        } catch(e){}
-      }
-    }
-  } catch(e) { try { console && console.warn && console.warn("removeMaxCharLimiters error", e); } catch {} }
-}
-
   /* ====================== drawer base + dev json ====================== */
-  function openDrawer(title, bodyHTML) { const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.add("open"); const dw = qs("#gc-drawer"); if (!dw) return; qs("#drawer-title") && (qs("#drawer-title").textContent = title || "Detalle"); const b = qs("#drawer-body"); if (b) { b.innerHTML = bodyHTML || ""; removeMaxCharLimiters(b); } dw.classList && dw.classList.add("open"); dw.setAttribute("aria-hidden", "false") }
+  function openDrawer(title, bodyHTML) { const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.add("open"); const dw = qs("#gc-drawer"); if (!dw) return; qs("#drawer-title") && (qs("#drawer-title").textContent = title || "Detalle"); const b = qs("#drawer-body"); if (b) b.innerHTML = bodyHTML || ""; dw.classList && dw.classList.add("open"); dw.setAttribute("aria-hidden", "false") }
   function closeDrawer() { try { document.activeElement?.blur?.() } catch { } const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.remove("open"); const dw = qs("#gc-drawer"); if (!dw) return; dw.classList && dw.classList.remove("open"); dw.setAttribute("aria-hidden", "true"); state.currentDrawer = null }
   function disableDrawerInputs(disabled) { qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => el.disabled = !!disabled) }
   function jsonSection(obj, title, preId, btnId) { const safe = escapeHTML(JSON.stringify(obj || {}, null, 2)); return `<details class="dev-json" open style="margin-top:16px;"><summary style="cursor:pointer;font-weight:600;">${escapeHTML(title)}</summary><div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="${btnId}">Copiar JSON</button></div><pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre></details>` }
@@ -1285,7 +1260,7 @@ function drawSuscripciones() { const rows = state.data; renderList(rows, { match
     return html;
   }
 
-  /* ====================== Cuenta  ====================== */
+  /* ====================== Cuenta (placeholder) ====================== */
   function showCuentaPanel() { try { const el = qs(".recursos-box.desktop-only"); if (el && el.style) el.style.display = "none" } catch { } try { const el = qs(".recursos-box.mobile-only"); if (el && el.style) el.style.display = "none" } catch { } try { const p = qs("#pagination-controls"); if (p && p.style) p.style.display = "none" } catch { } try { const p = qs("#pagination-mobile"); if (p && p.style) p.style.display = "none" } catch { } if (!qs("#cuenta-panel")) { const host = qs(".main-content") || document.body; const panel = document.createElement("div"); panel.id = "cuenta-panel"; panel.style.padding = "16px 18px"; panel.innerHTML = '<div class="empty-state" style="padding:1rem;font-weight:600;">Panel de cuenta</div>'; host.appendChild(panel) } }
   function hideCuentaPanel() { const p = qs("#cuenta-panel"); if (p) p.remove(); const d = qs(".recursos-box.desktop-only"); if (d) d.style.display = "block"; const m = qs(".recursos-box.mobile-only"); if (m) m.style.display = "block"; const pc = qs("#pagination-controls"); if (pc) pc.style.display = ""; const pm = qs("#pagination-mobile"); if (pm) pm.style.display = "" }
 
