@@ -34,7 +34,7 @@ export const ENDPOINTS = {
   }
 };
 
-// Límites
+// Limitadores (a lo mejor lo quito)
 export const MAXLEN = {
   usuarios: { nombre: 255 },
   cursos:   { nombre: 255, descripcion: 1000, descripcion_larga: 20000 },

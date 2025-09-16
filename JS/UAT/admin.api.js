@@ -9,7 +9,7 @@ async function request(pathOrUrl, { method='GET', body, headers } = {}) {
     opts.headers['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(body);
   } else if (body instanceof FormData) {
-    opts.body = body; // boundary se agrega solo
+    opts.body = body; 
   }
   const res = await fetch(url, opts);
   if (!res.ok) {
