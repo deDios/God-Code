@@ -1,47 +1,6 @@
 (() => {
   "use strict";
   /* ====================== utils/base ====================== */
-
-function gcIsRealImage(img) {
-  try {
-    if (!img) return false;
-    const src = img.currentSrc || img.src || "";
-    if (!src) return false;
-    if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
-    return !!(img.complete && img.naturalWidth > 1);
-  } catch { return false; }
-}
-function gcDOMHasValidImages(selector, minCount) {
-  try {
-    const root = document.querySelector(selector);
-    if (!root) return false;
-    const imgs = Array.prototype.slice.call(root.querySelectorAll("img"));
-    let ok = 0;
-    for (const im of imgs) if (gcIsRealImage(im)) ok++;
-    return ok >= (minCount || 1);
-  } catch { return false; }
-}
-async function gcRecoverFileFromImgEl(img, fallbackName) {
-  try {
-    if (!img) return null;
-    const url = (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) || img.currentSrc || img.src || "";
-    if (!url) return null;
-    if (!(url.startsWith("blob:") || url.startsWith("data:") || url.startsWith("/") || url.startsWith("./"))) return null;
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const ext = (blob.type && blob.type.split("/")[1]) || "png";
-    const safeExt = (ext || "png").replace(/[^a-z0-9]+/ig, "").slice(0,6) || "png";
-    const name = (fallbackName || "upload") + "." + safeExt;
-    return new File([blob], name, { type: blob.type || "image/png" });
-  } catch { return null; }
-}
-async function gcRecoverFileFromSelector(selector, fallbackName) {
-  try {
-    const el = document.querySelector(selector);
-    return await gcRecoverFileFromImgEl(el, fallbackName);
-  } catch { return null; }
-}
-/* === END GC PATCH === */
   const GC_DEBUG = false, gcLog = (...a) => { if (GC_DEBUG && typeof console !== "undefined") { try { console.log("[GC]", ...a) } catch { } } };
   const qs = (s, r = document) => r.querySelector(s), qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (m, t = "exito", d = 2500) => window.gcToast ? window.gcToast(m, t, d) : gcLog(`[${t}] ${m}`);
@@ -303,74 +262,10 @@ async function gcRecoverFileFromSelector(selector, fallbackName) {
   const getDefaultAvatar = () => (window.PATHS && PATHS.DEFAULT_AVATAR) || "/ASSETS/usuario/usuarioImg/img_user1.png";
   function noImageSvg() { return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>" }
   function mediaUrlsByType(type, id) { const nid = Number(id); if (type === "noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`, `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`]; if (type === "curso") return [`/ASSETS/cursos/img${nid}.png`]; if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; if (type === "usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; return [] }
-
-// --- Candidates for curso image files (png/jpg/webp + legacy names)
-function courseImageCandidates(id) {
-  const nid = Number(id);
-  return [
-    `/ASSETS/cursos/img${nid}.png`,
-    `/ASSETS/cursos/img${nid}.jpg`,
-    `/ASSETS/cursos/img${nid}.webp`,
-    `/ASSETS/cursos/cursos_img${nid}.png`,
-    `/ASSETS/cursos/cursos_img${nid}.jpg`,
-    `/ASSETS/cursos/cursos_img${nid}.webp`
-  ];
-}
-
-  const humanSize = (bytes) => {
-  if (!(bytes >= 0)) return "0 B";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1048576).toFixed(2)} MB`;
-};
-
-function validarImagen(file, opt) {
-  opt = opt || {};
-  const maxMB = Number(opt.maxMB || 2);
-  const allowed = (opt.tipos && Array.isArray(opt.tipos) && opt.tipos.length)
-    ? opt.tipos
-    : ["image/jpeg", "image/png", "image/webp"];
-  if (!file) return { ok: false, error: "No se seleccionó archivo" };
-  if (!allowed.includes(file.type)) return { ok: false, error: "Formato no permitido. Usa JPG/PNG/WEBP" };
-  const sizeMB = file.size / 1024 / 1024;
-  if (sizeMB > maxMB) return { ok: false, error: "La imagen excede " + maxMB + "MB" };
-  return { ok: true };
-}
-
-function imgExists(url) {
-  return new Promise((res) => {
-    try {
-      const i = new Image();
-      i.onload = () => res(true);
-      i.onerror = () => res(false);
-      i.src = withBust(url);
-    } catch {
-      res(false);
-    }
-  });
-}
-
-async function requireCourseImage(id) {
-  const arr = courseImageCandidates(id);
-  for (let i = 0; i < arr.length; i++) {
-    if (await imgExists(arr[i])) return true;
-  }
-  return false;
-}
-
-async function resolveCourseImageUrl(id) {
-  try {
-    const arr = courseImageCandidates(id);
-    for (let i = 0; i < arr.length; i++) {
-      if (await imgExists(arr[i])) return arr[i];
-    }
-    return null;
-  } catch (e) {
-    return null;
-  }
-}
-
-
+  const humanSize = bytes => bytes < 1024 ? bytes + " B" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " KB" : (bytes / 1048576).toFixed(2) + " MB";
+  function validarImagen(file, opt) { opt = opt || {}; const maxMB = opt.maxMB || 2; if (!file) return { ok: false, error: "No se seleccionó archivo" }; const allowed = ["image/jpeg", "image/png"]; if (!allowed.includes(file.type)) return { ok: false, error: "Formato no permitido. Solo JPG o PNG" }; const sizeMB = file.size / 1024 / 1024; if (sizeMB > maxMB) return { ok: false, error: "La imagen excede " + maxMB + "MB" }; return { ok: true } }
+  function imgExists(url) { return new Promise(res => { try { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = withBust(url) } catch { res(false) } }) }
+  async function requireCourseImage(id) { const u = mediaUrlsByType("curso", id)[0]; return await imgExists(u) }
   async function requireTutorImage(id) { const u = mediaUrlsByType("tutor", id)[0]; return await imgExists(u) }
   async function requireUserAvatar(id) { const u = mediaUrlsByType("usuario", id)[0]; return await imgExists(u) }
   async function requireNewsImages(id) { const [u1, u2] = mediaUrlsByType("noticia", id); const r1 = await imgExists(u1); const r2 = await imgExists(u2); return r1 && r2 }
@@ -401,21 +296,12 @@ async function resolveCourseImageUrl(id) {
       if (editable) {
         const btnEdit = card.querySelector(".media-edit"); if (btnEdit) {
           btnEdit.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
+            e.preventDefault(); e.stopPropagation(); const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
             input.addEventListener("change", async function () {
               const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error");
               renderPreviewUI(card, file, async () => {
                 try {
-                  if (type === "curso") {
-const v = validarImagen(file, { maxMB: 2, tipos: ["image/jpeg","image/png","image/webp"] });
-if (!v.ok) { gcToast(v.error, "error"); return; }
-await uploadCursoImagen(id, file);
-const __hit = await resolveCourseImageUrl(id);
-if (__hit) { img.src = withBust(__hit); }
-else { img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg()); }
-if (state) state.tempNewCourseImage = null;
-gcToast("Imagen de curso actualizada", "exito"); return;
-}
+                  if (type === "curso") { const fd = new FormData(); fd.append("curso_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de curso actualizada", "exito"); return }
                   if (type === "noticia") { const fd = new FormData(); fd.append("noticia_id", String(id)); fd.append("pos", String(i + 1)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de noticia actualizada", "exito"); return }
                   if (type === "tutor") { const fd = new FormData(); fd.append("tutor_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de tutor actualizada", "exito"); return }
                   if (type === "usuario") { const fd = new FormData(); fd.append("usuario_id", String(id)); fd.append("imagen", file); const res = await fetch(API.uAvatar, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Avatar actualizado", "exito"); return }
@@ -474,69 +360,24 @@ gcToast("Imagen de curso actualizada", "exito"); return;
   function getEmptyCourse() { return { nombre: "", descripcion_breve: "", descripcion_curso: "", descripcion_media: "", dirigido: "", competencias: "", certificado: 0, tutor: "", horas: 0, precio: 0, estatus: 1, fecha_inicio: "", prioridad: 1, categoria: 1, calendario: 1, tipo_evaluacion: 1, actividades: 1, creado_por: Number((currentUser && currentUser.id) || 0) || 1 } }
   function normalizeCursoPayload(p) { return { ...p, nombre: String(p.nombre || ""), descripcion_breve: String(p.descripcion_breve || ""), descripcion_curso: String(p.descripcion_curso || ""), descripcion_media: String(p.descripcion_media || ""), dirigido: String(p.dirigido || ""), competencias: String(p.competencias || ""), certificado: Number(!!p.certificado), tutor: Number(p.tutor || 0), horas: Number(p.horas || 0), precio: Number(p.precio || 0), estatus: Number(p.estatus != null ? p.estatus : 1), prioridad: Number(p.prioridad || 1), categoria: Number(p.categoria || 1), calendario: Number(p.calendario || 1), tipo_evaluacion: Number(p.tipo_evaluacion || 1), actividades: Number(p.actividades || 1), creado_por: Number(p.creado_por || 0), fecha_inicio: String(p.fecha_inicio || "") } }
   function readCursoForm(existingId) { const read = id => qs("#" + id)?.value || ""; const readN = (id, def) => Number(read(id) || def || 0); const readCh = id => qs("#" + id)?.checked ? 1 : 0; const payload = { nombre: read("f_nombre"), descripcion_breve: read("f_desc_breve"), descripcion_curso: read("f_desc_curso"), descripcion_media: read("f_desc_media"), dirigido: read("f_dirigido"), competencias: read("f_competencias"), certificado: readCh("f_certificado"), tutor: readN("f_tutor", 0), horas: readN("f_horas", 0), precio: readN("f_precio", 0), estatus: readN("f_estatus", 1), fecha_inicio: read("f_fecha"), prioridad: readN("f_prioridad", 1), categoria: readN("f_categoria", 1), calendario: readN("f_calendario", 1), tipo_evaluacion: readN("f_tipo_eval", 1), actividades: readN("f_actividades", 1), creado_por: Number((currentUser && currentUser.id) || 0) || 1 }; if (existingId != null) payload.id = Number(existingId); return payload }
-  
-async function uploadCursoImagen(cursoId, file) {
-  if (!file) throw new Error("No se seleccionó archivo");
-  const v = validarImagen(file, { maxMB: 2, tipos: ["image/jpeg","image/png","image/webp"] });
-  if (!v.ok) throw new Error(v.error || "Archivo inválido");
-  const fd = new FormData();
-  fd.append("curso_id", String(cursoId));
-  fd.append("pos", "1");
-  fd.append("imagen", file);
-  gcLog && gcLog("[UPLOAD] cursoImg", { cursoId, name: file.name, size: file.size, type: file.type });
-  const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
-  const text = await res.text().catch(() => "");
-  if (!res.ok) { gcLog && gcLog("[UPLOAD] cursoImg FAIL", res.status, text); throw new Error(`upload cursoImg: ${res.status} ${text || ""}`.trim()); }
-  let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }
-  gcLog && gcLog("[UPLOAD] cursoImg OK", json);
-  return json;
-}
+  async function uploadCursoImagen(cursoId, file) { const fd = new FormData(); fd.append("curso_id", String(cursoId)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); try { return JSON.parse(text) } catch { return { _raw: text } } }
 
   /* === Validación fuerte (crear/editar) === */
-  function validateCursoRequired(payload, { isEdit, id }) {
-  const text = v => String(v == null ? "" : v).trim();
-  const num  = v => Number(v);
-
-  const errs = [];
-  if (!text(payload.nombre))             errs.push("Nombre");
-  if (!text(payload.descripcion_breve))  errs.push("Descripción breve");
-  if (!text(payload.descripcion_media))  errs.push("Descripción media");
-  if (!text(payload.descripcion_curso))  errs.push("Descripción del curso");
-  if (!text(payload.dirigido))           errs.push("Dirigido a");
-  if (!text(payload.competencias))       errs.push("Competencias");
-
-  if (!payload.tutor)            errs.push("Tutor");
-  if (!payload.categoria)        errs.push("Categoría");
-  if (!payload.calendario)       errs.push("Calendario");
-  if (!payload.tipo_evaluacion)  errs.push("Tipo de evaluación");
-  if (!payload.actividades)      errs.push("Actividades");
-
-  if (!text(payload.fecha_inicio)) errs.push("Fecha de inicio");
-
-  const horasNum = num(payload.horas);
-  if (!(horasNum > 0)) errs.push("Horas (>0)");
-
-  return errs;
-}
+  function validateCursoRequired(payload, { isEdit, id }) { const errs = []; if (!payload.nombre.trim()) errs.push("Nombre"); if (!payload.descripcion_breve.trim()) errs.push("Descripción breve"); if (!payload.descripcion_media.trim()) errs.push("Descripción media"); if (!payload.descripcion_curso.trim()) errs.push("Descripción del curso"); if (!payload.dirigido.trim()) errs.push("Dirigido a"); if (!payload.competencias.trim()) errs.push("Competencias"); if (!payload.tutor) errs.push("Tutor"); if (!payload.categoria) errs.push("Categoría"); if (!payload.calendario) errs.push("Calendario"); if (!payload.tipo_evaluacion) errs.push("Tipo de evaluación"); if (!payload.actividades) errs.push("Actividades"); if (!payload.fecha_inicio) errs.push("Fecha de inicio"); if (Number(payload.horas) <= 0) errs.push("Horas (>0)"); return errs }
   async function ensureCursoImagen({ isEdit, id }) {
     if (state.tempNewCourseImage) return true; if (!isEdit) return !!state.tempNewCourseImage; // create exige selección
     if (!id) return false; return await requireCourseImage(id)
   }
 
   async function saveNewCurso() {
-    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) { const __rec = await gcRecoverFileFromSelector('#create-media-curso img, #create-media-thumb', 'curso-portada'); if (__rec) { state.tempNewCourseImage = __rec; } } if (!state.tempNewCourseImage) return gcToast("Selecciona la imagen del curso", "warning");
+    const payload = normalizeCursoPayload(readCursoForm(null)); const missing = validateCursoRequired(payload, { isEdit: false }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); if (!state.tempNewCourseImage) return gcToast("Selecciona la imagen del curso", "warning");
     const res = await postJSON(API.iCursos, payload); const newId = Number((res && (res.id || res.curso_id || res.insert_id || (res.data && res.data.id))) || 0); const file = state.tempNewCourseImage || null;
     if (newId && file) { try { await uploadCursoImagen(newId, file); gcToast("Imagen subida", "exito") } catch (err) { gcLog(err); gcToast("Curso creado, pero falló la imagen", "error") } finally { state.tempNewCourseImage = null } }
     gcToast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
   }
   async function saveUpdateCurso(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if ((!okImg) && !gcDOMHasValidImages("#media-curso",1) && !gcDOMHasValidImages("#media-curso-lite",1)) return gcToast("La portada del curso es obligatoria", "warning");
-    await postJSON(API.uCursos, payload); 
-    if (state && state.tempNewCourseImage) {
-      try { await uploadCursoImagen(item.id, state.tempNewCourseImage); state.tempNewCourseImage = null; }
-      catch (err) { gcLog && gcLog("[UPLOAD] curso (desde Guardar) error", err); gcToast("Curso guardado. La imagen no se pudo subir", "warning"); }
-    }
-    gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if (!okImg) return gcToast("La portada del curso es obligatoria", "warning");
+    await postJSON(API.uCursos, payload); gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
   }
   async function softDeleteCurso(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = normalizeCursoPayload({ ...item._all, estatus: 0 }); await postJSON(API.uCursos, body) }
   async function reactivateCurso(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Curso no encontrado"); const body = normalizeCursoPayload({ ...it._all, estatus: 1 }); await postJSON(API.uCursos, body) }
@@ -601,7 +442,7 @@ async function uploadCursoImagen(cursoId, file) {
           const card = qs("#create-media-curso"), btn = qs("#create-media-edit"), thumb = qs("#create-media-thumb");
           if (btn && thumb && card) {
             btn.addEventListener("click", () => {
-              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
+              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
                 const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
                 renderPreviewUI(card, file, async () => { state.tempNewCourseImage = file; try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (thumb.dataset) thumb.dataset.blobUrl = blobUrl; thumb.src = blobUrl; gcToast("Imagen seleccionada (se subirá al guardar)", "exito") }, () => { })
@@ -644,15 +485,11 @@ async function uploadCursoImagen(cursoId, file) {
   function readNoticiaForm(n) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); return { id: n.id, titulo: g("f_tit"), desc_uno: g("f_desc1"), desc_dos: g("f_desc2"), estatus: gN("f_estatus", 1), creado_por: n.creado_por } }
   function validateNoticiaRequired(p) { const errs = []; if (!String(p.titulo || "").trim()) errs.push("Título"); if (!String(p.desc_uno || "").trim()) errs.push("Descripción (1)"); if (!String(p.desc_dos || "").trim()) errs.push("Descripción (2)"); return errs }
   async function ensureNoticiaImagenes({ isEdit, id }) {
-    if (state.tempNewNewsImages[1] || state.tempNewNewsImages[2]) {
-      if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) return false;
-      return true;
+    if (state.tempNewNewsImages[1] || state.tempNewNewsImages[2]) { // si cargó nuevas, require ambas
+      if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) return false; return true
     }
     if (!isEdit) return false; // create: exige ambas nuevas
-    if (!id) return false;
-    const server = await requireNewsImages(id);
-    const domOk = gcDOMHasValidImages("#media-noticia", 2);
-    return server || domOk;
+    if (!id) return false; return await requireNewsImages(id)
   }
 
   function renderNoticiaDrawer(dataset) {
@@ -759,7 +596,7 @@ async function uploadCursoImagen(cursoId, file) {
           btn.addEventListener("click", () => {
             const input = document.createElement("input");
             input.type = "file";
-            input.accept = "image/png, image/jpeg, image/webp";
+            input.accept = "image/png, image/jpeg";
             input.style.display = "none";
             document.body.appendChild(input);
             input.addEventListener("change", () => {
@@ -812,7 +649,9 @@ async function uploadCursoImagen(cursoId, file) {
           const miss = validateNoticiaRequired(payload);
           if (miss.length) { gcToast("Campos requeridos: " + miss.join(", "), "warning"); return }
 
-          if (!state.tempNewNewsImages[1]) { const __recN1 = await gcRecoverFileFromSelector('#create-news-thumb-1', 'noticia_img1'); if (__recN1) state.tempNewNewsImages[1] = __recN1; } if (!state.tempNewNewsImages[2]) { const __recN2 = await gcRecoverFileFromSelector('#create-news-thumb-2', 'noticia_img2'); if (__recN2) state.tempNewNewsImages[2] = __recN2; } if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) { gcToast("Debes subir las 2 imágenes", "warning"); return; }
+          if (!state.tempNewNewsImages[1] || !state.tempNewNewsImages[2]) {
+            gcToast("Debes subir las 2 imágenes", "warning"); return;
+          }
 
           const res = await postJSON(API.iNoticias, payload);
           const newId = Number((res && (res.id || res.noticia_id || res.insert_id || (res.data && res.data.id))) || 0);
@@ -889,13 +728,13 @@ async function uploadCursoImagen(cursoId, file) {
   function readTutorForm(existing) { const g = id => qs("#" + id)?.value || ""; const gN = (id, def) => Number(g(id) || def || 0); const p = { nombre: g("f_nombre"), descripcion: g("f_desc"), estatus: gN("f_estatus", 1) }; if (existing?.id) p.id = existing.id; return p }
   function validateTutorRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!String(p.descripcion || "").trim()) e.push("Descripción"); return e }
   async function saveTutorCreate() {
-    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); let file = state.tempNewTutorImage || null; if (!file) { const __recTF = await gcRecoverFileFromSelector('#create-media-tutor img, #create-tutor-thumb', 'tutor-foto'); if (__recTF) { file = __recTF; state.tempNewTutorImage = __recTF; } } if (!file) return gcToast("Selecciona una imagen para el tutor", "warning");
+    const p = readTutorForm(null); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const file = state.tempNewTutorImage || null; if (!file) return gcToast("Selecciona una imagen para el tutor", "warning");
     const body = { ...p, creado_por: Number((currentUser && currentUser.id) || 0) || 1 }; const res = await postJSON(API.iTutores, body); const newId = Number((res && (res.id || res.tutor_id || res.insert_id || (res.data && res.data.id))) || 0);
     try { if (newId && file) { const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error"); const fd = new FormData(); fd.append("tutor_id", String(newId)); fd.append("imagen", file); const r = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } } } catch (e) { gcLog(e); gcToast("Tutor creado, pero falló la imagen", "error") } finally { state.tempNewTutorImage = null }
     gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if ((!okImg && !state.tempNewTutorImage) && !gcDOMHasValidImages("#media-tutor",1) && !gcDOMHasValidImages("#media-usuario",1)) return gcToast("La foto del tutor es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if (!okImg && !state.tempNewTutorImage) return gcToast("La foto del tutor es obligatoria", "warning");
     const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
@@ -929,7 +768,7 @@ async function uploadCursoImagen(cursoId, file) {
           const btn = qs("#create-tutor-pick"), img = qs("#create-tutor-thumb"), wrap = qs("#create-media-tutor");
           if (btn && img && wrap) {
             btn.addEventListener("click", () => {
-              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
+              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
                 const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
                 renderPreviewUI(wrap, file, async () => { state.tempNewTutorImage = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Imagen lista (se subirá al guardar)", "exito") }, () => { })
@@ -1061,13 +900,13 @@ async function uploadCursoImagen(cursoId, file) {
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if ((!okAvatar && !state.tempNewUserAvatar) && !gcDOMHasValidImages("#media-usuario",1) && !gcDOMHasValidImages("#media-tutor",1)) return gcToast("El avatar es obligatorio", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if (!okAvatar && !state.tempNewUserAvatar) return gcToast("El avatar es obligatorio", "warning");
     await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
     const p = readUsuarioForm(null); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); if (!state.tempNewUserAvatar) return gcToast("Selecciona un avatar", "warning");
     const res = await postJSON(API.iUsuarios, p); const newId = Number((res && (res.id || res.usuario_id || res.insert_id || (res.data && res.data.id))) || 0);
-    let file = state.tempNewUserAvatar || null; if (!file) { const __recUA = await gcRecoverFileFromSelector('#create-media-usuario img, #create-user-avatar', 'usuario-avatar'); if (__recUA) { file = __recUA; state.tempNewUserAvatar = __recUA; } } if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } gcToast("Avatar guardado", "exito") } catch (e) { gcLog(e); gcToast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
+    const file = state.tempNewUserAvatar || null; if (newId && file) { try { const fd = new FormData(); fd.append("usuario_id", String(newId)); fd.append("imagen", file); const r = await fetch(API.uAvatar, { method: "POST", body: fd }); if (!r.ok) { const tt = await r.text(); throw new Error(tt || "upload fail") } gcToast("Avatar guardado", "exito") } catch (e) { gcLog(e); gcToast("Usuario creado, pero falló el avatar", "error") } finally { state.tempNewUserAvatar = null } }
     gcToast("Usuario creado", "exito"); closeDrawer(); await loadUsuarios(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) })) }
   }
   async function softDeleteUsuario(item) { if (!item || !item._all) return; await postJSON(API.uUsuarios, { ...item._all, estatus: 0 }) }
@@ -1120,7 +959,7 @@ async function uploadCursoImagen(cursoId, file) {
       const btn = qs("#create-user-avatar-btn"), img = qs("#create-user-avatar"), wrap = qs("#create-media-usuario");
       if (btn && img && wrap) {
         btn.addEventListener("click", () => {
-          const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
+          const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
           input.addEventListener("change", () => {
             const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
             renderPreviewUI(wrap, file, async () => { state.tempNewUserAvatar = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Avatar listo (se subirá al guardar)", "exito") }, () => { })
