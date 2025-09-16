@@ -317,7 +317,7 @@
     noticias: {
       "1": "green", "activo": "green",
       "0": "red", "inactivo": "red",
-      "cancelado": "grey",
+      "cancelado": "red",
       "en pausa": "amber",
       "temporal": "blue",
       "pausado": "grey",
@@ -363,13 +363,14 @@
   function mediaUrlsByType(type, id) { const nid = Number(id); if (type === "noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`, `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`]; if (type === "curso") return [`/ASSETS/cursos/img${nid}.png`]; if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; if (type === "usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; return [] }
   // Helper: candidates for curso image file names (do not affect UI slot count)
   function courseImageCandidates(id) {
-    const nid = Number(id);
-    return [
-      `/ASSETS/cursos/img${nid}.png`,
-      `/ASSETS/cursos/img${nid}.jpg`,
-      `/ASSETS/cursos/cursos_img${nid}.png`,
-      `/ASSETS/cursos/cursos_img${nid}.jpg`,
-    ];
+  const nid = Number(id);
+  return [
+    `/ASSETS/cursos/img${nid}.png`,
+    `/ASSETS/cursos/img${nid}.jpg`,
+    `/ASSETS/cursos/cursos_img${nid}.png`,
+    `/ASSETS/cursos/cursos_img${nid}.jpg`,
+  ];
+
   }
 
   const humanSize = bytes => bytes < 1024 ? bytes + " B" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " KB" : (bytes / 1048576).toFixed(2) + " MB";
@@ -382,6 +383,18 @@
         for (let i = 0; i < arr.length; i++) {
           if (await imgExists(arr[i])) return true;
         }
+async function resolveCourseImageUrl(id) {
+  try {
+    const arr = courseImageCandidates(id);
+    for (let i = 0; i < arr.length; i++) {
+      if (await imgExists(arr[i])) return arr[i];
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
         return false;
       })();
     } catch (e) {
