@@ -361,17 +361,18 @@
   const getDefaultAvatar = () => (window.PATHS && PATHS.DEFAULT_AVATAR) || "/ASSETS/usuario/usuarioImg/img_user1.png";
   function noImageSvg() { return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>" }
   function mediaUrlsByType(type, id) { const nid = Number(id); if (type === "noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`, `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`]; if (type === "curso") return [`/ASSETS/cursos/img${nid}.png`]; if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; if (type === "usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; return [] }
-  // Helper: candidates for curso image file names (do not affect UI slot count)
-  function courseImageCandidates(id) {
+  // Helper: candidates for curso image file names 
+function courseImageCandidates(id) {
   const nid = Number(id);
   return [
     `/ASSETS/cursos/img${nid}.png`,
     `/ASSETS/cursos/img${nid}.jpg`,
+    `/ASSETS/cursos/img${nid}.webp`,
     `/ASSETS/cursos/cursos_img${nid}.png`,
     `/ASSETS/cursos/cursos_img${nid}.jpg`,
+    `/ASSETS/cursos/cursos_img${nid}.webp`,
   ];
-
-  }
+}
 
   const humanSize = bytes => bytes < 1024 ? bytes + " B" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " KB" : (bytes / 1048576).toFixed(2) + " MB";
   function validarImagen(file, opt) { opt = opt || {}; const maxMB = opt.maxMB || 2; if (!file) return { ok: false, error: "No se seleccionó archivo" }; const allowed = ["image/jpeg", "image/png"]; if (!allowed.includes(file.type)) return { ok: false, error: "Formato no permitido. Solo JPG o PNG" }; const sizeMB = file.size / 1024 / 1024; if (sizeMB > maxMB) return { ok: false, error: "La imagen excede " + maxMB + "MB" }; return { ok: true } }
@@ -577,9 +578,38 @@ async function resolveCourseImageUrl(id) {
     gcToast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
   }
   async function saveUpdateCurso(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if ((!okImg) && !gcDOMHasValidImages("#media-curso", 1) && !gcDOMHasValidImages("#media-curso-lite", 1)) return gcToast("La portada del curso es obligatoria", "warning");
-    try { if (state.tempNewCourseImage) { await uploadCursoImagen(item.id, state.tempNewCourseImage); state.tempNewCourseImage = null; } } catch (e) { gcLog(e); gcToast("Se guardó el curso, pero la imagen no se pudo subir", "warning"); } gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
+  try {
+    if (!item || !item._all) { gcToast("Sin item para actualizar", "error"); return; }
+    // Leer campos actuales del drawer y normalizar payload
+    const payload = normalizeCursoPayload(readCursoForm(item.id));
+    const missing = validateCursoRequired(payload, { isEdit: true, id: item.id });
+    if (missing && missing.length) { gcToast("Campos requeridos: " + missing.join(", "), "warning"); return; }
+
+    // Validar portada existente o nueva
+    const okImg = await ensureCursoImagen({ isEdit: true, id: item.id });
+    if (!okImg) { gcToast("La portada del curso es obligatoria", "warning"); return; }
+
+    // Enviar update
+    await postJSON(API.uCursos, payload);
+
+    // Subir imagen si el usuario eligió una nueva
+    if (state.tempNewCourseImage) {
+      await uploadCursoImagen(item.id, state.tempNewCourseImage).catch(() => {
+        gcToast("Actualizado, pero falló la imagen", "error");
+      }).finally(() => { state.tempNewCourseImage = null; });
+    }
+
+    gcToast("Cambios guardados", "exito");
+    await loadCursos();
+    const re = state.data.find(x => x.id === item.id);
+    if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }));
+
+  } catch (e) {
+    console.error("[saveUpdateCurso] error", e);
+    gcToast("No se pudo guardar: " + (e && e.message ? e.message : "Error"), "error");
   }
+}
+
   async function softDeleteCurso(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = normalizeCursoPayload({ ...item._all, estatus: 0 }); await postJSON(API.uCursos, body) }
   async function reactivateCurso(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Curso no encontrado"); const body = normalizeCursoPayload({ ...it._all, estatus: 1 }); await postJSON(API.uCursos, body) }
   async function openCreateCurso() { await Promise.all([getTutorsMap(), getPrioridadMap(), getCategoriasMap(), getCalendarioMap(), getTipoEvalMap(), getActividadesMap()]); state.currentDrawer = { type: "curso", id: null, mode: "create" }; openDrawer("Curso · Crear", renderCursoDrawer({ id: "" })) }
