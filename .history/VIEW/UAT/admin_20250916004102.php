@@ -274,7 +274,7 @@
         <div class="toolbar">
           <h1 id="titulo-suscripciones">Suscripciones</h1>
         </div>
-
+        
       <div class="row grow">
         <div class="search">
           <label for="s_search" class="sr-only">Buscar suscripciones</label>

@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>Godcode UAT</title>
-    <link rel="stylesheet" href="../../CSS/plantilla.css" />
+      <link rel="stylesheet" href="../../CSS/plantilla.css" />
     <link rel="stylesheet" href="../../CSS/admin/admin.css" />
 </head>
 <body>
@@ -274,7 +274,7 @@
         <div class="toolbar">
           <h1 id="titulo-suscripciones">Suscripciones</h1>
         </div>
-
+        
       <div class="row grow">
         <div class="search">
           <label for="s_search" class="sr-only">Buscar suscripciones</label>
