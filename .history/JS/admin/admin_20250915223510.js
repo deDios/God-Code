@@ -24,75 +24,17 @@
   async function gcRecoverFileFromImgEl(img, fallbackName) {
     try {
       if (!img) return null;
-
-      const url =
-        (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) ||
-        img.currentSrc ||
-        img.src ||
-        "";
-
+      const url = (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) || img.currentSrc || img.src || "";
       if (!url) return null;
-
-      const isData = url.startsWith("data:");
-      const isBlob = url.startsWith("blob:");
-      const isRel = url.startsWith("/") || url.startsWith("./");
-
-      if (!(isData || isBlob || isRel)) return null;
-
-      let blob;
-
-      if (isData) {
-        const m = url.match(/^data:([^;,]+)?(?:;charset=[^;,]+)?(?:;(base64))?,(.*)$/i);
-        if (!m) return null;
-        const mime = m[1] || "application/octet-stream";
-        const isBase64 = !!m[2];
-        const dataPart = decodeURIComponent(m[3] || "");
-        const byteString = isBase64 ? atob(dataPart) : dataPart;
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-        blob = new Blob([ab], { type: mime });
-      } else {
-        const res = await fetch(url);
-        if (!res || !res.ok) return null;
-        blob = await res.blob();
-      }
-
-      let mime = blob.type || "";
-      if (!mime || !mime.startsWith("image/")) {
-        const lower = url.toLowerCase();
-        if (lower.includes(".png")) mime = "image/png";
-        else if (lower.includes(".jpg") || lower.includes(".jpeg")) mime = "image/jpeg";
-        else if (lower.includes(".webp")) mime = "image/webp";
-        else if (lower.includes(".gif")) mime = "image/gif";
-        else if (lower.includes(".svg")) mime = "image/svg+xml";
-        else mime = "image/png"; // fallback
-      }
-
-      const extMap = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp",
-        "image/gif": "gif",
-        "image/svg+xml": "svg",
-      };
-      const ext = extMap[mime] || "png";
-
-      const base = (fallbackName || "upload").toString().replace(/[^a-z0-9_-]+/ig, "").slice(0, 50) || "upload";
-      const fileName = `${base}.${ext}`;
-
-      try {
-        return new File([blob], fileName, { type: mime });
-      } catch {
-        const f = blob;
-        try { f.name = fileName; } catch { }
-        return f;
-      }
-    } catch {
-      return null;
-    }
+      if (!(url.startsWith("blob:") || url.startsWith("data:") || url.startsWith("/") || url.startsWith("./"))) return null;
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const ext = (blob.type && blob.type.split("/")[1]) || "jpg";
+      const safeExt = (ext || "png").replace(/[^a-z0-9]+/ig, "").slice(0, 6) || "png";
+      const name = (fallbackName || "upload") + "." + safeExt;
+      return new File([blob], name, { type: blob.type || "image/png" });
+    } catch { return null; }
   }
-
   async function gcRecoverFileFromSelector(selector, fallbackName) {
     try {
       const el = document.querySelector(selector);

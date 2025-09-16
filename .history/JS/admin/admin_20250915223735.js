@@ -21,77 +21,83 @@
       return ok >= (minCount || 1);
     } catch { return false; }
   }
-  async function gcRecoverFileFromImgEl(img, fallbackName) {
-    try {
-      if (!img) return null;
+async function gcRecoverFileFromImgEl(img, fallbackName) {
+  try {
+    if (!img) return null;
 
-      const url =
-        (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) ||
-        img.currentSrc ||
-        img.src ||
-        "";
+    const url =
+      (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) ||
+      img.currentSrc ||
+      img.src ||
+      "";
 
-      if (!url) return null;
+    if (!url) return null;
 
-      const isData = url.startsWith("data:");
-      const isBlob = url.startsWith("blob:");
-      const isRel = url.startsWith("/") || url.startsWith("./");
+    const isData = url.startsWith("data:");
+    const isBlob = url.startsWith("blob:");
+    const isRel  = url.startsWith("/") || url.startsWith("./");
 
-      if (!(isData || isBlob || isRel)) return null;
+    // Solo aceptamos orígenes seguros (evita CORS rompedor)
+    if (!(isData || isBlob || isRel)) return null;
 
-      let blob;
+    let blob;
 
-      if (isData) {
-        const m = url.match(/^data:([^;,]+)?(?:;charset=[^;,]+)?(?:;(base64))?,(.*)$/i);
-        if (!m) return null;
-        const mime = m[1] || "application/octet-stream";
-        const isBase64 = !!m[2];
-        const dataPart = decodeURIComponent(m[3] || "");
-        const byteString = isBase64 ? atob(dataPart) : dataPart;
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-        blob = new Blob([ab], { type: mime });
-      } else {
-        const res = await fetch(url);
-        if (!res || !res.ok) return null;
-        blob = await res.blob();
-      }
-
-      let mime = blob.type || "";
-      if (!mime || !mime.startsWith("image/")) {
-        const lower = url.toLowerCase();
-        if (lower.includes(".png")) mime = "image/png";
-        else if (lower.includes(".jpg") || lower.includes(".jpeg")) mime = "image/jpeg";
-        else if (lower.includes(".webp")) mime = "image/webp";
-        else if (lower.includes(".gif")) mime = "image/gif";
-        else if (lower.includes(".svg")) mime = "image/svg+xml";
-        else mime = "image/png"; // fallback
-      }
-
-      const extMap = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp",
-        "image/gif": "gif",
-        "image/svg+xml": "svg",
-      };
-      const ext = extMap[mime] || "png";
-
-      const base = (fallbackName || "upload").toString().replace(/[^a-z0-9_-]+/ig, "").slice(0, 50) || "upload";
-      const fileName = `${base}.${ext}`;
-
-      try {
-        return new File([blob], fileName, { type: mime });
-      } catch {
-        const f = blob;
-        try { f.name = fileName; } catch { }
-        return f;
-      }
-    } catch {
-      return null;
+    if (isData) {
+      // Algunos browsers no soportan fetch('data:...'), decodificamos manualmente
+      const m = url.match(/^data:([^;,]+)?(?:;charset=[^;,]+)?(?:;(base64))?,(.*)$/i);
+      if (!m) return null;
+      const mime = m[1] || "application/octet-stream";
+      const isBase64 = !!m[2];
+      const dataPart = decodeURIComponent(m[3] || "");
+      const byteString = isBase64 ? atob(dataPart) : dataPart;
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+      blob = new Blob([ab], { type: mime });
+    } else {
+      const res = await fetch(url);
+      if (!res || !res.ok) return null;         // ← valida 200
+      blob = await res.blob();
     }
+
+    // Asegurarnos de tener un MIME de imagen razonable
+    let mime = blob.type || "";
+    if (!mime || !mime.startsWith("image/")) {
+      const lower = url.toLowerCase();
+      if (lower.includes(".png")) mime = "image/png";
+      else if (lower.includes(".jpg") || lower.includes(".jpeg")) mime = "image/jpeg";
+      else if (lower.includes(".webp")) mime = "image/webp";
+      else if (lower.includes(".gif")) mime = "image/gif";
+      else if (lower.includes(".svg")) mime = "image/svg+xml";
+      else mime = "image/png"; // fallback
+    }
+
+    // Map MIME → extensión canónica
+    const extMap = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+      "image/svg+xml": "svg",
+    };
+    const ext = extMap[mime] || "png";
+
+    // Nombre seguro y corto
+    const base = (fallbackName || "upload").toString().replace(/[^a-z0-9_-]+/ig, "").slice(0, 50) || "upload";
+    const fileName = `${base}.${ext}`;
+
+    // File() puede fallar en navegadores viejos; hacemos fallback no estándar si pasa
+    try {
+      return new File([blob], fileName, { type: mime });
+    } catch {
+      const f = blob;
+      try { f.name = fileName; } catch {}
+      return f; // Blob con .name (no estándar) como último recurso
+    }
+  } catch {
+    return null; // último fallback: conserva tu intención original
   }
+}
 
   async function gcRecoverFileFromSelector(selector, fallbackName) {
     try {
