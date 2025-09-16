@@ -1,5 +1,5 @@
 // /JS/UAT/features/usuarios.js
-import { UsuariosAPI, UploadsAPI } from '/JS/UAT/admin.api.js';
+import { UsuariosAPI } from '/JS/UAT/admin.api.js';
 import { renderTableBody } from '/JS/UAT/admin.ui.js';
 import { gcLog, gcToast } from '/JS/UAT/admin.services.js';
 import { escapeHtml } from '/JS/UAT/shared/formatters.js';
@@ -59,10 +59,10 @@ export const Usuarios = {
     fd.append('correo',   f.querySelector('#u_correo').value);
     fd.append('telefono', f.querySelector('#u_tel').value);
     fd.append('estatus',  f.querySelector('#u_status').value);
+    if (file) fd.append('imagen', file);
+
     try {
-      const saved = id ? await UsuariosAPI.update(fd) : await UsuariosAPI.insert(fd);
-      const usuarioId = (saved && (saved.id || saved.data?.id)) || id;
-      if (file && usuarioId) { await UploadsAPI.usuarioImg(usuarioId, file); }
+      if (id) await UsuariosAPI.update(fd); else await UsuariosAPI.insert(fd);
       gcToast('Usuario guardado', 'ok');
       location.reload();
     } catch(err){

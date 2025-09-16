@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
-  <title>Godcode UAT</title>
+  <title>Godcode — Panel de Administración</title>
 </head>
 <body>
 <header id="header">
@@ -589,7 +589,6 @@
   <div id="gc-drawer-host"></div>
 
   <script type="module" src="/JS/UAT/admin.boot.js"></script>
-  <script src="/JS/JSglobal.js"></script>
 
 
 </body>

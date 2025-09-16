@@ -1,5 +1,5 @@
 // /JS/UAT/features/cursos.js
-import { CursosAPI, UploadsAPI } from '/JS/UAT/admin.api.js';
+import { CursosAPI } from '/JS/UAT/admin.api.js';
 import { renderTableBody } from '/JS/UAT/admin.ui.js';
 import { gcLog, gcToast, todayYYYYMMDD } from '/JS/UAT/admin.services.js';
 import { escapeHtml, fmtDate } from '/JS/UAT/shared/formatters.js';
@@ -57,10 +57,10 @@ export const Cursos = {
     fd.append('fecha',   f.querySelector('#c_fecha_inicio')?.value || '');
     fd.append('estatus', f.querySelector('#c_status').value);
     fd.append('descripcion', f.querySelector('#c_desc').value || '');
+    if (portada) fd.append('portada', portada);
+
     try {
-      const saved = id ? await CursosAPI.update(fd) : await CursosAPI.insert(fd);
-      const cursoId = (saved && (saved.id || saved.data?.id)) || id;
-      if (portada && cursoId) { await UploadsAPI.cursoImg(cursoId, portada); }
+      if (id) await CursosAPI.update(fd); else await CursosAPI.insert(fd);
       gcToast('Curso guardado', 'ok');
       location.reload();
     } catch(err){

@@ -589,7 +589,6 @@
   <div id="gc-drawer-host"></div>
 
   <script type="module" src="/JS/UAT/admin.boot.js"></script>
-  <script src="/JS/JSglobal.js"></script>
 
 
 </body>

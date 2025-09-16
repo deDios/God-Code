@@ -5,6 +5,12 @@ export const __ADMIN_DEBUG__ = true;
 // API base 
 export const API_BASE_URL = 'https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net';
 
+
+
+/** IDs con permisos de administrador */
+export const ADMIN_IDS = [1, 12, 13, 17, 18];
+// Endpoints absolutos por entidad ( c = consultar, i = insertar, u = update, las cosas que necesitan estan en sus payloads)
+
 export const UPLOAD = {
   cursoImg:   `${API_BASE_URL}/db/web/u_cursoImg.php`,
   noticiaImg: `${API_BASE_URL}/db/web/u_noticiaImagenes.php`,
@@ -12,9 +18,6 @@ export const UPLOAD = {
   usuarioImg: `${API_BASE_URL}/db/web/u_avatar.php`,
 };
 
-/** IDs con permisos de administrador */
-export const ADMIN_IDS = [1, 12, 13, 17, 18];
-// Endpoints absolutos por entidad ( c = consultar, i = insertar, u = update, las cosas que necesitan estan en sus payloads)
 export const ENDPOINTS = {
   usuarios: {
     list:   `${API_BASE_URL}/db/web/c_usuarios.php`,

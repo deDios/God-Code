@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
-  <title>Godcode UAT</title>
+  <title>Godcode — Panel de Administración</title>
 </head>
 <body>
 <header id="header">
@@ -142,7 +142,7 @@
             <div class="search">
               <label for="u_search" class="sr-only">Buscar usuarios</label>
               <input id="u_search" type="search" placeholder="Buscar por nombre o correo" inputmode="search" enterkeyhint="search" autocomplete="off">
-              <button class="btn ghost" id="u_search_btn">Buscar</button> <button class="btn primary" id="u_new_btn">Nuevo</button>
+              <button class="btn ghost" id="u_search_btn">Buscar</button>
             </div>
             <span class="grow"></span>
             <button class="btn primary" data-open="drawer-usuarios">Nuevo usuario</button>
@@ -176,7 +176,7 @@
             <div class="search">
               <label for="c_search" class="sr-only">Buscar cursos</label>
               <input id="c_search" type="search" placeholder="Buscar por nombre" inputmode="search" enterkeyhint="search" autocomplete="off">
-              <button class="btn ghost" id="c_search_btn">Buscar</button> <button class="btn primary" id="c_new_btn">Nuevo</button>
+              <button class="btn ghost" id="c_search_btn">Buscar</button>
             </div>
             <span class="grow"></span>
             <button class="btn primary" data-open="drawer-cursos">Nuevo curso</button>
@@ -209,7 +209,7 @@
             <div class="search">
               <label for="n_search" class="sr-only">Buscar noticias</label>
               <input id="n_search" type="search" placeholder="Buscar por título" inputmode="search" enterkeyhint="search" autocomplete="off">
-              <button class="btn ghost" id="n_search_btn">Buscar</button> <button class="btn primary" id="n_new_btn">Nueva</button>
+              <button class="btn ghost" id="n_search_btn">Buscar</button>
             </div>
             <span class="grow"></span>
             <button class="btn primary" data-open="drawer-noticias">Nueva noticia</button>
@@ -242,7 +242,7 @@
             <div class="search">
               <label for="t_search" class="sr-only">Buscar tutores</label>
               <input id="t_search" type="search" placeholder="Buscar por nombre" inputmode="search" enterkeyhint="search" autocomplete="off">
-              <button class="btn ghost" id="t_search_btn">Buscar</button> <button class="btn primary" id="t_new_btn">Nuevo</button>
+              <button class="btn ghost" id="t_search_btn">Buscar</button>
             </div>
             <span class="grow"></span>
             <button class="btn primary" data-open="drawer-tutores">Nuevo tutor</button>
@@ -272,16 +272,7 @@
         <div class="toolbar">
           <h1 id="titulo-suscripciones">Suscripciones</h1>
         </div>
-        
-      <div class="row grow">
-        <div class="search">
-          <label for="s_search" class="sr-only">Buscar suscripciones</label>
-          <input id="s_search" type="search" placeholder="Buscar..." inputmode="search" enterkeyhint="search" autocomplete="off">
-          <button class="btn ghost" id="s_search_btn">Buscar</button>
-          <button class="btn primary" id="s_new_btn">Nueva</button>
-        </div>
-      </div>
-<div class="table-wrap card">
+        <div class="table-wrap card">
           <table aria-describedby="desc-sus">
             <caption class="sr-only">Lista de suscripciones</caption>
             <thead>
@@ -586,11 +577,5 @@
     </section>
 
   <!-- <script src="/JS/admin.js"></script> -->
-  <div id="gc-drawer-host"></div>
-
-  <script type="module" src="/JS/UAT/admin.boot.js"></script>
-  <script src="/JS/JSglobal.js"></script>
-
-
 </body>
 </html>

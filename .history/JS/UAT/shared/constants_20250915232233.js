@@ -5,15 +5,6 @@ export const __ADMIN_DEBUG__ = true;
 // API base 
 export const API_BASE_URL = 'https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net';
 
-export const UPLOAD = {
-  cursoImg:   `${API_BASE_URL}/db/web/u_cursoImg.php`,
-  noticiaImg: `${API_BASE_URL}/db/web/u_noticiaImagenes.php`,
-  tutorImg:   `${API_BASE_URL}/db/web/u_tutorImg.php`,
-  usuarioImg: `${API_BASE_URL}/db/web/u_avatar.php`,
-};
-
-/** IDs con permisos de administrador */
-export const ADMIN_IDS = [1, 12, 13, 17, 18];
 // Endpoints absolutos por entidad ( c = consultar, i = insertar, u = update, las cosas que necesitan estan en sus payloads)
 export const ENDPOINTS = {
   usuarios: {
@@ -46,7 +37,7 @@ export const ENDPOINTS = {
 // Limitadores (a lo mejor lo quito)
 export const MAXLEN = {
   usuarios: { nombre: 255 },
-  cursos:   { nombre: 255, descripcion: 1000, descripcion_larga: 20000 },
+  cursos:   { nombre: 255, descripcion: 1000, descripcion_larga: 2000 },
   noticias: { titulo: 255, resumen: 500, contenido: 20000, tags: 255 },
   tutores:  { nombre: 255, bio: 1000 },
   suscripciones: { notas: 500 },

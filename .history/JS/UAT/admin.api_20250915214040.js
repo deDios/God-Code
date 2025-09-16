@@ -1,7 +1,8 @@
 // /JS/UAT/admin.api.js
-import { ENDPOINTS, UPLOAD } from './shared/constants.js';
+import { ENDPOINTS } from './shared/constants.js';
 
 async function request(pathOrUrl, { method='GET', body, headers } = {}) {
+  // pathOrUrl ya viene absoluto desde ENDPOINTS
   const url = pathOrUrl;
   const opts = { method, headers: headers || {} };
   if (body && !(body instanceof FormData)) {
@@ -39,40 +40,3 @@ export const TutoresAPI = makeResourceAPI('tutores');
 export const SuscripcionesAPI = makeResourceAPI('suscripciones');
 
 export { request };
-
-export const UploadsAPI = {
-  async cursoImg(id, file) {
-    const fd = new FormData();
-    fd.append('curso_id', id);
-    fd.append('imagen', file);
-    const res = await fetch(UPLOAD.cursoImg, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('cursoImg upload failed');
-    try { return await res.json(); } catch { return {}; }
-  },
-  async noticiaImg(id, pos, file) {
-    const fd = new FormData();
-    fd.append('noticia_id', id);
-    fd.append('pos', String(pos));
-    fd.append('imagen', file);
-    const res = await fetch(UPLOAD.noticiaImg, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('noticiaImg upload failed');
-    try { return await res.json(); } catch { return {}; }
-  },
-  async tutorImg(id, file) {
-    const fd = new FormData();
-    fd.append('tutor_id', id);
-    fd.append('imagen', file);
-    const res = await fetch(UPLOAD.tutorImg, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('tutorImg upload failed');
-    try { return await res.json(); } catch { return {}; }
-  },
-  async usuarioImg(id, file) {
-    const fd = new FormData();
-    fd.append('usuario_id', id);
-    fd.append('imagen', file);
-    const res = await fetch(UPLOAD.usuarioImg, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('usuarioImg upload failed');
-    try { return await res.json(); } catch { return {}; }
-  },
-};
-

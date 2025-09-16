@@ -2,6 +2,7 @@
 import { ENDPOINTS, UPLOAD } from './shared/constants.js';
 
 async function request(pathOrUrl, { method='GET', body, headers } = {}) {
+  // pathOrUrl ya viene absoluto desde ENDPOINTS
   const url = pathOrUrl;
   const opts = { method, headers: headers || {} };
   if (body && !(body instanceof FormData)) {
@@ -40,6 +41,7 @@ export const SuscripcionesAPI = makeResourceAPI('suscripciones');
 
 export { request };
 
+// Helpers de subida para modalidad de 2 llamadas (insert/update + upload)
 export const UploadsAPI = {
   async cursoImg(id, file) {
     const fd = new FormData();

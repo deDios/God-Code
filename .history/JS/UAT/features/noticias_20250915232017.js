@@ -1,5 +1,5 @@
 // /JS/UAT/features/noticias.js
-import { NoticiasAPI, UploadsAPI } from '/JS/UAT/admin.api.js';
+import { NoticiasAPI } from '/JS/UAT/admin.api.js';
 import { renderTableBody } from '/JS/UAT/admin.ui.js';
 import { gcLog, gcToast } from '/JS/UAT/admin.services.js';
 import { escapeHtml } from '/JS/UAT/shared/formatters.js';
@@ -58,11 +58,11 @@ export const Noticias = {
     fd.append('estatus',   f.querySelector('#n_status').value);
     fd.append('contenido', f.querySelector('#n_contenido').value || '');
     fd.append('tags',      f.querySelector('#n_tags').value || '');
+    if (f1) fd.append('img1', f1);
+    if (f2) fd.append('img2', f2);
+
     try {
-      const saved = id ? await NoticiasAPI.update(fd) : await NoticiasAPI.insert(fd);
-      const noticiaId = (saved && (saved.id || saved.data?.id)) || id;
-      if (f1 && noticiaId) { await UploadsAPI.noticiaImg(noticiaId, 1, f1); }
-      if (f2 && noticiaId) { await UploadsAPI.noticiaImg(noticiaId, 2, f2); }
+      if (id) await NoticiasAPI.update(fd); else await NoticiasAPI.insert(fd);
       gcToast('Noticia guardada', 'ok');
       location.reload();
     } catch(err){

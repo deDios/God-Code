@@ -5,12 +5,7 @@ export const __ADMIN_DEBUG__ = true;
 // API base 
 export const API_BASE_URL = 'https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net';
 
-export const UPLOAD = {
-  cursoImg:   `${API_BASE_URL}/db/web/u_cursoImg.php`,
-  noticiaImg: `${API_BASE_URL}/db/web/u_noticiaImagenes.php`,
-  tutorImg:   `${API_BASE_URL}/db/web/u_tutorImg.php`,
-  usuarioImg: `${API_BASE_URL}/db/web/u_avatar.php`,
-};
+
 
 /** IDs con permisos de administrador */
 export const ADMIN_IDS = [1, 12, 13, 17, 18];
@@ -41,6 +36,13 @@ export const ENDPOINTS = {
     insert: `${API_BASE_URL}/db/web/i_suscripciones.php`,
     update: `${API_BASE_URL}/db/web/u_suscripciones.php`,
   }
+};
+
+export const UPLOAD = {
+  cursoImg:   `${API_BASE_URL}/db/web/u_cursoImg.php`,
+  noticiaImg: `${API_BASE_URL}/db/web/u_noticiaImg.php`,
+  tutorImg:   `${API_BASE_URL}/db/web/u_tutorImg.php`,
+  usuarioImg: `${API_BASE_URL}/db/web/u_usuarioImg.php`,
 };
 
 // Limitadores (a lo mejor lo quito)

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
-  <title>Godcode UAT</title>
+  <title>Godcode — Panel de Administración</title>
 </head>
 <body>
 <header id="header">
@@ -588,9 +588,30 @@
   <!-- <script src="/JS/admin.js"></script> -->
   <div id="gc-drawer-host"></div>
 
-  <script type="module" src="/JS/UAT/admin.boot.js"></script>
-  <script src="/JS/JSglobal.js"></script>
+  <script type="module">
+    import '/JS/UAT/constants.js';
+    import '/JS/UAT/admin.api.js';
+    import { Cursos }    from '/JS/UAT/features/cursos.js';
+    import { Noticias }  from '/JS/UAT/features/noticias.js';
+    import { Tutores }   from '/JS/UAT/features/tutores.js';
+    import { Usuarios }  from '/JS/UAT/features/usuarios.js';
+    import { Suscrips }  from '/JS/UAT/features/suscripciones.js';
 
+    // Montar todos; cada módulo se encarga de su vista/tabla
+    Cursos.mount?.();
+    Noticias.mount?.();
+    Tutores.mount?.();
+    Usuarios.mount?.();
+    Suscrips.mount?.();
+
+    // Drawer fallback
+    window.openDrawer = async (title, html) => {
+      const host = document.getElementById('gc-drawer-host');
+      host.innerHTML = '<div class="drawer-like"><h3>'+title+'</h3><div>'+html+'</div></div>';
+    };
+    window.closeDrawer = () => { document.getElementById('gc-drawer-host').innerHTML=''; };
+    window.Admin = window.Admin || { user: { id: 1, name: 'uat' } };
+  </script>
 
 </body>
 </html>

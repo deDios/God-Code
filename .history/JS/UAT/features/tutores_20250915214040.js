@@ -1,5 +1,5 @@
 // /JS/UAT/features/tutores.js
-import { TutoresAPI, UploadsAPI } from '/JS/UAT/admin.api.js';
+import { TutoresAPI } from '/JS/UAT/admin.api.js';
 import { renderTableBody } from '/JS/UAT/admin.ui.js';
 import { gcLog, gcToast } from '/JS/UAT/admin.services.js';
 import { escapeHtml } from '/JS/UAT/shared/formatters.js';
@@ -53,10 +53,10 @@ export const Tutores = {
     fd.append('nombre',  f.querySelector('#t_nombre').value);
     fd.append('estatus', f.querySelector('#t_status').value);
     fd.append('bio',     f.querySelector('#t_bio').value || '');
+    if (file) fd.append('avatar', file);
+
     try {
-      const saved = id ? await TutoresAPI.update(fd) : await TutoresAPI.insert(fd);
-      const tutorId = (saved && (saved.id || saved.data?.id)) || id;
-      if (file && tutorId) { await UploadsAPI.tutorImg(tutorId, file); }
+      if (id) await TutoresAPI.update(fd); else await TutoresAPI.insert(fd);
       gcToast('Tutor guardado', 'ok');
       location.reload();
     } catch(err){
