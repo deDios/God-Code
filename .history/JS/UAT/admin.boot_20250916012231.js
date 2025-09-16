@@ -1,4 +1,6 @@
 // /JS/UAT/admin.boot.guard.scoped.js
+// Boot con guard de rol, lectura de cookie 'usuario' y scope a #admin-root.
+// No monta features de admin (eso lo hace el router). Solo monta "Cuenta" para no-admin.
 
 import '/JS/UAT/shared/constants.js';
 import { ADMIN_IDS } from '/JS/UAT/shared/constants.js';
