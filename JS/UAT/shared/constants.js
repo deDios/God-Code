@@ -1,11 +1,11 @@
 // /JS/UAT/shared/constants.js
-// Debug
+// Debug, colocar true para ver todos los console logs puestos
 export const __ADMIN_DEBUG__ = true;
 
-// API base (dominio público confirmado)
+// API base 
 export const API_BASE_URL = 'https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net';
 
-// Endpoints absolutos por entidad (según patrón c_/i_/u_)
+// Endpoints absolutos por entidad ( c = consultar, i = insertar, u = update, las cosas que necesitan estan en sus payloads)
 export const ENDPOINTS = {
   usuarios: {
     list:   `${API_BASE_URL}/db/web/c_usuarios.php`,
