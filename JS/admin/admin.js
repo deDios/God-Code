@@ -2,104 +2,46 @@
   "use strict";
   /* ====================== utils/base ====================== */
 
-  function gcIsRealImage(img) {
-    try {
-      if (!img) return false;
-      const src = img.currentSrc || img.src || "";
-      if (!src) return false;
-      if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
-      return !!(img.complete && img.naturalWidth > 1);
-    } catch { return false; }
-  }
-  function gcDOMHasValidImages(selector, minCount) {
-    try {
-      const root = document.querySelector(selector);
-      if (!root) return false;
-      const imgs = Array.prototype.slice.call(root.querySelectorAll("img"));
-      let ok = 0;
-      for (const im of imgs) if (gcIsRealImage(im)) ok++;
-      return ok >= (minCount || 1);
-    } catch { return false; }
-  }
-  async function gcRecoverFileFromImgEl(img, fallbackName) {
-    try {
-      if (!img) return null;
-
-      const url =
-        (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) ||
-        img.currentSrc ||
-        img.src ||
-        "";
-
-      if (!url) return null;
-
-      const isData = url.startsWith("data:");
-      const isBlob = url.startsWith("blob:");
-      const isRel = url.startsWith("/") || url.startsWith("./");
-
-      if (!(isData || isBlob || isRel)) return null;
-
-      let blob;
-
-      if (isData) {
-        const m = url.match(/^data:([^;,]+)?(?:;charset=[^;,]+)?(?:;(base64))?,(.*)$/i);
-        if (!m) return null;
-        const mime = m[1] || "application/octet-stream";
-        const isBase64 = !!m[2];
-        const dataPart = decodeURIComponent(m[3] || "");
-        const byteString = isBase64 ? atob(dataPart) : dataPart;
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-        blob = new Blob([ab], { type: mime });
-      } else {
-        const res = await fetch(url);
-        if (!res || !res.ok) return null;
-        blob = await res.blob();
-      }
-
-      let mime = blob.type || "";
-      if (!mime || !mime.startsWith("image/")) {
-        const lower = url.toLowerCase();
-        if (lower.includes(".png")) mime = "image/png";
-        else if (lower.includes(".jpg") || lower.includes(".jpeg")) mime = "image/jpeg";
-        else if (lower.includes(".webp")) mime = "image/webp";
-        else if (lower.includes(".gif")) mime = "image/gif";
-        else if (lower.includes(".svg")) mime = "image/svg+xml";
-        else mime = "image/png"; // fallback
-      }
-
-      const extMap = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp",
-        "image/gif": "gif",
-        "image/svg+xml": "svg",
-      };
-      const ext = extMap[mime] || "png";
-
-      const base = (fallbackName || "upload").toString().replace(/[^a-z0-9_-]+/ig, "").slice(0, 50) || "upload";
-      const fileName = `${base}.${ext}`;
-
-      try {
-        return new File([blob], fileName, { type: mime });
-      } catch {
-        const f = blob;
-        try { f.name = fileName; } catch { }
-        return f;
-      }
-    } catch {
-      return null;
-    }
-  }
-
-  async function gcRecoverFileFromSelector(selector, fallbackName) {
-    try {
-      const el = document.querySelector(selector);
-      return await gcRecoverFileFromImgEl(el, fallbackName);
-    } catch { return null; }
-  }
-  /* === END GC PATCH === */
+function gcIsRealImage(img) {
+  try {
+    if (!img) return false;
+    const src = img.currentSrc || img.src || "";
+    if (!src) return false;
+    if (/placeholder|default|no[_-]?image|avatar[_-]?default/i.test(src)) return false;
+    return !!(img.complete && img.naturalWidth > 1);
+  } catch { return false; }
+}
+function gcDOMHasValidImages(selector, minCount) {
+  try {
+    const root = document.querySelector(selector);
+    if (!root) return false;
+    const imgs = Array.prototype.slice.call(root.querySelectorAll("img"));
+    let ok = 0;
+    for (const im of imgs) if (gcIsRealImage(im)) ok++;
+    return ok >= (minCount || 1);
+  } catch { return false; }
+}
+async function gcRecoverFileFromImgEl(img, fallbackName) {
+  try {
+    if (!img) return null;
+    const url = (img.dataset && (img.dataset.blobUrl || img.dataset.src || img.dataset.preview)) || img.currentSrc || img.src || "";
+    if (!url) return null;
+    if (!(url.startsWith("blob:") || url.startsWith("data:") || url.startsWith("/") || url.startsWith("./"))) return null;
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const ext = (blob.type && blob.type.split("/")[1]) || "png";
+    const safeExt = (ext || "png").replace(/[^a-z0-9]+/ig, "").slice(0,6) || "png";
+    const name = (fallbackName || "upload") + "." + safeExt;
+    return new File([blob], name, { type: blob.type || "image/png" });
+  } catch { return null; }
+}
+async function gcRecoverFileFromSelector(selector, fallbackName) {
+  try {
+    const el = document.querySelector(selector);
+    return await gcRecoverFileFromImgEl(el, fallbackName);
+  } catch { return null; }
+}
+/* === END GC PATCH === */
   const GC_DEBUG = false, gcLog = (...a) => { if (GC_DEBUG && typeof console !== "undefined") { try { console.log("[GC]", ...a) } catch { } } };
   const qs = (s, r = document) => r.querySelector(s), qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const toast = (m, t = "exito", d = 2500) => window.gcToast ? window.gcToast(m, t, d) : gcLog(`[${t}] ${m}`);
@@ -228,27 +170,27 @@
   /* ====== cursos/usuarios map (cualquier estatus) ====== */
   const _usersCache = { list: null, ts: 0 }; async function fetchAllUsuariosAnyStatus() { if (_usersCache.list && (Date.now() - _usersCache.ts) < 60 * 1000) return _usersCache.list; const [e1, e0, e2, e3] = await Promise.all([postJSON(API.usuarios, { estatus: 1 }), postJSON(API.usuarios, { estatus: 0 }), postJSON(API.usuarios, { estatus: 2 }), postJSON(API.usuarios, { estatus: 3 })]); const arr = [].concat(Array.isArray(e1) ? e1 : [], Array.isArray(e0) ? e0 : [], Array.isArray(e2) ? e2 : [], Array.isArray(e3) ? e3 : []); _usersCache.list = arr; _usersCache.ts = Date.now(); return arr }
   const _cursosCache = { list: null, ts: 0 }; async function fetchAllCursosAnyStatus() {
-    if (_cursosCache.list && (Date.now() - _cursosCache.ts) < 60 * 1000) return _cursosCache.list;
-    const [e1, e0, e2, e3, e4, e5] = await Promise.all([
-      postJSON(API.cursos, { estatus: 1 }),
-      postJSON(API.cursos, { estatus: 0 }),
-      postJSON(API.cursos, { estatus: 2 }),
-      postJSON(API.cursos, { estatus: 3 }),
-      postJSON(API.cursos, { estatus: 4 }),
-      postJSON(API.cursos, { estatus: 5 })
-    ]);
-    const arr = [].concat(
-      Array.isArray(e1) ? e1 : [],
-      Array.isArray(e0) ? e0 : [],
-      Array.isArray(e2) ? e2 : [],
-      Array.isArray(e3) ? e3 : [],
-      Array.isArray(e4) ? e4 : [],
-      Array.isArray(e5) ? e5 : []
-    );
-    _cursosCache.list = arr;
-    _cursosCache.ts = Date.now();
-    return arr;
-  }
+  if (_cursosCache.list && (Date.now() - _cursosCache.ts) < 60 * 1000) return _cursosCache.list;
+  const [e1, e0, e2, e3, e4, e5] = await Promise.all([
+    postJSON(API.cursos, { estatus: 1 }),
+    postJSON(API.cursos, { estatus: 0 }),
+    postJSON(API.cursos, { estatus: 2 }),
+    postJSON(API.cursos, { estatus: 3 }),
+    postJSON(API.cursos, { estatus: 4 }),
+    postJSON(API.cursos, { estatus: 5 })
+  ]);
+  const arr = [].concat(
+    Array.isArray(e1) ? e1 : [],
+    Array.isArray(e0) ? e0 : [],
+    Array.isArray(e2) ? e2 : [],
+    Array.isArray(e3) ? e3 : [],
+    Array.isArray(e4) ? e4 : [],
+    Array.isArray(e5) ? e5 : []
+  );
+  _cursosCache.list = arr;
+  _cursosCache.ts = Date.now();
+  return arr;
+}
   async function getCursosMapAnyStatus() { if (cacheGuard(state.cursosMap)) return state.cursosMap; const arr = await fetchAllCursosAnyStatus(); return state.cursosMap = arrToMap(arr) }
   async function getUsuariosMapAnyStatus() { if (cacheGuard(state.usuariosMap)) return state.usuariosMap; const arr = await fetchAllUsuariosAnyStatus(); return state.usuariosMap = arrToMap(arr) }
 
@@ -308,18 +250,18 @@
   const STATUS_TONE = Object.freeze({
     cursos: {
       "1": "green", "activo": "green",
-      "2": "grey", "pausado": "grey", "en pausa": "grey",
-      "4": "blue", "en curso": "blue",
-      "3": "blue", "terminado": "blue",
-      "0": "red", "inactivo": "red",
-      "5": "red", "cancelado": "red"
+      "2": "grey",  "pausado": "grey", "en pausa": "grey",
+      "4": "blue",  "en curso": "blue",
+      "3": "blue",  "terminado": "blue",
+      "0": "red",   "inactivo": "red",
+      "5": "red",   "cancelado": "red"
     },
     noticias: {
       "1": "green", "activo": "green",
       "0": "red", "inactivo": "red",
-      "cancelado": "red",
-      "en pausa": "amber",
-      "temporal": "blue",
+      "cancelado": "grey", 
+      "en pausa": "amber", 
+      "temporal": "blue", 
       "pausado": "grey",
       "2": "amber",
       "3": "blue"
@@ -361,7 +303,8 @@
   const getDefaultAvatar = () => (window.PATHS && PATHS.DEFAULT_AVATAR) || "/ASSETS/usuario/usuarioImg/img_user1.png";
   function noImageSvg() { return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>" }
   function mediaUrlsByType(type, id) { const nid = Number(id); if (type === "noticia") return [`/ASSETS/noticia/NoticiasImg/noticia_img1_${nid}.png`, `/ASSETS/noticia/NoticiasImg/noticia_img2_${nid}.png`]; if (type === "curso") return [`/ASSETS/cursos/img${nid}.png`]; if (type === "tutor") return [`/ASSETS/tutor/tutor_${nid}.png`]; if (type === "usuario") return [`/ASSETS/usuario/usuarioImg/img_user${nid}.png`]; return [] }
-  // Helper: candidates for curso image file names 
+
+// --- Candidates for curso image files (png/jpg/webp + legacy names)
 function courseImageCandidates(id) {
   const nid = Number(id);
   return [
@@ -370,20 +313,51 @@ function courseImageCandidates(id) {
     `/ASSETS/cursos/img${nid}.webp`,
     `/ASSETS/cursos/cursos_img${nid}.png`,
     `/ASSETS/cursos/cursos_img${nid}.jpg`,
-    `/ASSETS/cursos/cursos_img${nid}.webp`,
+    `/ASSETS/cursos/cursos_img${nid}.webp`
   ];
 }
 
-  const humanSize = bytes => bytes < 1024 ? bytes + " B" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " KB" : (bytes / 1048576).toFixed(2) + " MB";
-  function validarImagen(file, opt) { opt = opt || {}; const maxMB = opt.maxMB || 2; if (!file) return { ok: false, error: "No se seleccionó archivo" }; const allowed = ["image/jpeg", "image/png"]; if (!allowed.includes(file.type)) return { ok: false, error: "Formato no permitido. Solo JPG o PNG" }; const sizeMB = file.size / 1024 / 1024; if (sizeMB > maxMB) return { ok: false, error: "La imagen excede " + maxMB + "MB" }; return { ok: true } }
-  function imgExists(url) { return new Promise(res => { try { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = withBust(url) } catch { res(false) } }) }
-  function requireCourseImage(id) {
+  const humanSize = (bytes) => {
+  if (!(bytes >= 0)) return "0 B";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(2)} MB`;
+};
+
+function validarImagen(file, opt) {
+  opt = opt || {};
+  const maxMB = Number(opt.maxMB || 2);
+  const allowed = (opt.tipos && Array.isArray(opt.tipos) && opt.tipos.length)
+    ? opt.tipos
+    : ["image/jpeg", "image/png", "image/webp"];
+  if (!file) return { ok: false, error: "No se seleccionó archivo" };
+  if (!allowed.includes(file.type)) return { ok: false, error: "Formato no permitido. Usa JPG/PNG/WEBP" };
+  const sizeMB = file.size / 1024 / 1024;
+  if (sizeMB > maxMB) return { ok: false, error: "La imagen excede " + maxMB + "MB" };
+  return { ok: true };
+}
+
+function imgExists(url) {
+  return new Promise((res) => {
     try {
-      const arr = courseImageCandidates(id);
-      return (async () => {
-        for (let i = 0; i < arr.length; i++) {
-          if (await imgExists(arr[i])) return true;
-        }
+      const i = new Image();
+      i.onload = () => res(true);
+      i.onerror = () => res(false);
+      i.src = withBust(url);
+    } catch {
+      res(false);
+    }
+  });
+}
+
+async function requireCourseImage(id) {
+  const arr = courseImageCandidates(id);
+  for (let i = 0; i < arr.length; i++) {
+    if (await imgExists(arr[i])) return true;
+  }
+  return false;
+}
+
 async function resolveCourseImageUrl(id) {
   try {
     const arr = courseImageCandidates(id);
@@ -395,13 +369,6 @@ async function resolveCourseImageUrl(id) {
     return null;
   }
 }
-
-        return false;
-      })();
-    } catch (e) {
-      return Promise.resolve(false);
-    }
-  }
 
 
   async function requireTutorImage(id) { const u = mediaUrlsByType("tutor", id)[0]; return await imgExists(u) }
@@ -430,52 +397,25 @@ async function resolveCourseImageUrl(id) {
     const container = opt?.container, type = opt?.type, id = opt?.id, labels = opt?.labels || []; const editableOverride = opt?.editable; if (!container) return; const editable = typeof editableOverride === "boolean" ? editableOverride : (isAdminUser && state.currentDrawer && state.currentDrawer.mode === "edit"); const urls = mediaUrlsByType(type, id); const grid = document.createElement("div"); grid.className = "media-grid";
     urls.forEach((url, i) => {
       const label = labels[i] || ("Imagen " + (i + 1)); const card = document.createElement("div"); card.className = "media-card"; const editBtnHTML = editable ? ('<button class="icon-btn media-edit" title="Editar imagen"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.0 1.0 0 0 0 0-1.41l-2.34-2.34a1.0 1.0 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg></button>') : ""; card.innerHTML = `<figure class="media-thumb"><img alt="${escapeAttr(label)}" src="${withBust(url)}">${editBtnHTML}</figure><div class="media-meta"><div class="media-label">${escapeHTML(label)}</div></div>`;
-      const img = card.querySelector("img"); if (img) { img.onerror = function () { // Fallbacks por tipo. Para CURSO probamos variantes (.png/.jpg y prefijo alterno)
-(function() {
-  try {
-    if (type === "curso") {
-      const candidates = (typeof courseImageCandidates === "function") ? courseImageCandidates(id) : [url.replace(/\?.*$/, "")];
-      // Arrancamos desde la siguiente a la URL actual
-      const base = url.replace(/\?.*$/, "");
-      let idx = Math.max(0, candidates.indexOf(base)) + 1;
-      const tryNext = () => {
-        if (idx < candidates.length) {
-          const next = candidates[idx++];
-          img.src = withBust(next);
-        } else {
-          // último recurso: placeholder
-          img.onerror = null;
-          img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg());
-        }
-      };
-      img.onerror = tryNext;
-      tryNext();
-      return;
-    }
-    if (type === "tutor" && /\.png(\?|$)/.test(url)) {
-      img.src = withBust(url.replace(".png", ".jpg"));
-      return;
-    }
-    if (type === "usuario") {
-      img.src = withBust(getDefaultAvatar());
-      return;
-    }
-    // default
-    img.onerror = null;
-    img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg());
-  } catch (e) {
-    try { img.onerror = null; img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg()); } catch {}
-  }
-})();} }
+      const img = card.querySelector("img"); if (img) { img.onerror = function () { img.onerror = null; if (type === "tutor" && /\.png(\?|$)/.test(url)) { img.src = withBust(url.replace(".png", ".jpg")) } else if (type === "usuario") { img.src = withBust(getDefaultAvatar()) } else { img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg()) } } }
       if (editable) {
         const btnEdit = card.querySelector(".media-edit"); if (btnEdit) {
           btnEdit.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
+            e.preventDefault(); e.stopPropagation(); const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
             input.addEventListener("change", async function () {
               const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) return gcToast(v.error, "error");
               renderPreviewUI(card, file, async () => {
                 try {
-                  if (type === "curso") { const fd = new FormData(); fd.append("curso_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de curso actualizada", "exito"); return }
+                  if (type === "curso") {
+const v = validarImagen(file, { maxMB: 2, tipos: ["image/jpeg","image/png","image/webp"] });
+if (!v.ok) { gcToast(v.error, "error"); return; }
+await uploadCursoImagen(id, file);
+const __hit = await resolveCourseImageUrl(id);
+if (__hit) { img.src = withBust(__hit); }
+else { img.src = "data:image/svg+xml;utf8," + encodeURIComponent(noImageSvg()); }
+if (state) state.tempNewCourseImage = null;
+gcToast("Imagen de curso actualizada", "exito"); return;
+}
                   if (type === "noticia") { const fd = new FormData(); fd.append("noticia_id", String(id)); fd.append("pos", String(i + 1)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de noticia actualizada", "exito"); return }
                   if (type === "tutor") { const fd = new FormData(); fd.append("tutor_id", String(id)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Imagen de tutor actualizada", "exito"); return }
                   if (type === "usuario") { const fd = new FormData(); fd.append("usuario_id", String(id)); fd.append("imagen", file); const res = await fetch(API.uAvatar, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }; img.src = withBust((json && json.url) || url); gcToast("Avatar actualizado", "exito"); return }
@@ -492,35 +432,7 @@ async function resolveCourseImageUrl(id) {
   }
 
   /* ====================== drawer base + dev json ====================== */
-
-  // === GC patch: remove max-char limiters in drawer ===
-  function removeMaxCharLimiters(root) {
-    try {
-      root = root || document;
-      var scope = (root.querySelector ? root : document);
-      var dels = scope.querySelectorAll ? scope.querySelectorAll("input[maxlength], textarea[maxlength]") : [];
-      for (var i = 0; i < dels.length; i++) { try { dels[i].removeAttribute("maxlength"); } catch (e) { } }
-      var dataAttrs = ["data-maxlength", "data-maxlen", "max-char", "max-chars"];
-      for (var k = 0; k < dataAttrs.length; k++) {
-        var a = dataAttrs[k];
-        var nodes = scope.querySelectorAll ? scope.querySelectorAll("[" + a + "]") : [];
-        for (var j = 0; j < nodes.length; j++) { try { nodes[j].removeAttribute(a); } catch (e) { } }
-      }
-      var handlerAttrs = ["oninput", "onkeyup"];
-      for (var h = 0; h < handlerAttrs.length; h++) {
-        var attr = handlerAttrs[h];
-        var els = scope.querySelectorAll ? scope.querySelectorAll("[" + attr + "]") : [];
-        for (var t = 0; t < els.length; t++) {
-          try {
-            var v = (els[t].getAttribute && els[t].getAttribute(attr)) || "";
-            if (/slice\(\s*0\s*,\s*\d+/.test(v) || /length\s*[<>]=?\s*\d+/.test(v)) els[t].removeAttribute(attr);
-          } catch (e) { }
-        }
-      }
-    } catch (e) { try { console && console.warn && console.warn("removeMaxCharLimiters error", e); } catch { } }
-  }
-
-  function openDrawer(title, bodyHTML) { const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.add("open"); const dw = qs("#gc-drawer"); if (!dw) return; qs("#drawer-title") && (qs("#drawer-title").textContent = title || "Detalle"); const b = qs("#drawer-body"); if (b) { b.innerHTML = bodyHTML || ""; removeMaxCharLimiters(b); } dw.classList && dw.classList.add("open"); dw.setAttribute("aria-hidden", "false") }
+  function openDrawer(title, bodyHTML) { const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.add("open"); const dw = qs("#gc-drawer"); if (!dw) return; qs("#drawer-title") && (qs("#drawer-title").textContent = title || "Detalle"); const b = qs("#drawer-body"); if (b) b.innerHTML = bodyHTML || ""; dw.classList && dw.classList.add("open"); dw.setAttribute("aria-hidden", "false") }
   function closeDrawer() { try { document.activeElement?.blur?.() } catch { } const ov = qs("#gc-dash-overlay"); if (ov && ov.classList) ov.classList.remove("open"); const dw = qs("#gc-drawer"); if (!dw) return; dw.classList && dw.classList.remove("open"); dw.setAttribute("aria-hidden", "true"); state.currentDrawer = null }
   function disableDrawerInputs(disabled) { qsa("#drawer-body input, #drawer-body select, #drawer-body textarea").forEach(el => el.disabled = !!disabled) }
   function jsonSection(obj, title, preId, btnId) { const safe = escapeHTML(JSON.stringify(obj || {}, null, 2)); return `<details class="dev-json" open style="margin-top:16px;"><summary style="cursor:pointer;font-weight:600;">${escapeHTML(title)}</summary><div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="${btnId}">Copiar JSON</button></div><pre id="${preId}" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${safe}</pre></details>` }
@@ -562,10 +474,50 @@ async function resolveCourseImageUrl(id) {
   function getEmptyCourse() { return { nombre: "", descripcion_breve: "", descripcion_curso: "", descripcion_media: "", dirigido: "", competencias: "", certificado: 0, tutor: "", horas: 0, precio: 0, estatus: 1, fecha_inicio: "", prioridad: 1, categoria: 1, calendario: 1, tipo_evaluacion: 1, actividades: 1, creado_por: Number((currentUser && currentUser.id) || 0) || 1 } }
   function normalizeCursoPayload(p) { return { ...p, nombre: String(p.nombre || ""), descripcion_breve: String(p.descripcion_breve || ""), descripcion_curso: String(p.descripcion_curso || ""), descripcion_media: String(p.descripcion_media || ""), dirigido: String(p.dirigido || ""), competencias: String(p.competencias || ""), certificado: Number(!!p.certificado), tutor: Number(p.tutor || 0), horas: Number(p.horas || 0), precio: Number(p.precio || 0), estatus: Number(p.estatus != null ? p.estatus : 1), prioridad: Number(p.prioridad || 1), categoria: Number(p.categoria || 1), calendario: Number(p.calendario || 1), tipo_evaluacion: Number(p.tipo_evaluacion || 1), actividades: Number(p.actividades || 1), creado_por: Number(p.creado_por || 0), fecha_inicio: String(p.fecha_inicio || "") } }
   function readCursoForm(existingId) { const read = id => qs("#" + id)?.value || ""; const readN = (id, def) => Number(read(id) || def || 0); const readCh = id => qs("#" + id)?.checked ? 1 : 0; const payload = { nombre: read("f_nombre"), descripcion_breve: read("f_desc_breve"), descripcion_curso: read("f_desc_curso"), descripcion_media: read("f_desc_media"), dirigido: read("f_dirigido"), competencias: read("f_competencias"), certificado: readCh("f_certificado"), tutor: readN("f_tutor", 0), horas: readN("f_horas", 0), precio: readN("f_precio", 0), estatus: readN("f_estatus", 1), fecha_inicio: read("f_fecha"), prioridad: readN("f_prioridad", 1), categoria: readN("f_categoria", 1), calendario: readN("f_calendario", 1), tipo_evaluacion: readN("f_tipo_eval", 1), actividades: readN("f_actividades", 1), creado_por: Number((currentUser && currentUser.id) || 0) || 1 }; if (existingId != null) payload.id = Number(existingId); return payload }
-  async function uploadCursoImagen(cursoId, file) { const fd = new FormData(); fd.append("curso_id", String(cursoId)); fd.append("imagen", file); const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd }); const text = await res.text().catch(() => ""); if (!res.ok) throw new Error("HTTP " + res.status + " " + (text || "")); try { return JSON.parse(text) } catch { return { _raw: text } } }
+  
+async function uploadCursoImagen(cursoId, file) {
+  if (!file) throw new Error("No se seleccionó archivo");
+  const v = validarImagen(file, { maxMB: 2, tipos: ["image/jpeg","image/png","image/webp"] });
+  if (!v.ok) throw new Error(v.error || "Archivo inválido");
+  const fd = new FormData();
+  fd.append("curso_id", String(cursoId));
+  fd.append("pos", "1");
+  fd.append("imagen", file);
+  gcLog && gcLog("[UPLOAD] cursoImg", { cursoId, name: file.name, size: file.size, type: file.type });
+  const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+  const text = await res.text().catch(() => "");
+  if (!res.ok) { gcLog && gcLog("[UPLOAD] cursoImg FAIL", res.status, text); throw new Error(`upload cursoImg: ${res.status} ${text || ""}`.trim()); }
+  let json; try { json = JSON.parse(text) } catch { json = { _raw: text } }
+  gcLog && gcLog("[UPLOAD] cursoImg OK", json);
+  return json;
+}
 
   /* === Validación fuerte (crear/editar) === */
-  function validateCursoRequired(payload, { isEdit, id }) { const errs = []; if (!payload.nombre.trim()) errs.push("Nombre"); if (!payload.descripcion_breve.trim()) errs.push("Descripción breve"); if (!payload.descripcion_media.trim()) errs.push("Descripción media"); if (!payload.descripcion_curso.trim()) errs.push("Descripción del curso"); if (!payload.dirigido.trim()) errs.push("Dirigido a"); if (!payload.competencias.trim()) errs.push("Competencias"); if (!payload.tutor) errs.push("Tutor"); if (!payload.categoria) errs.push("Categoría"); if (!payload.calendario) errs.push("Calendario"); if (!payload.tipo_evaluacion) errs.push("Tipo de evaluación"); if (!payload.actividades) errs.push("Actividades"); if (!payload.fecha_inicio) errs.push("Fecha de inicio"); if (Number(payload.horas) <= 0) errs.push("Horas (>0)"); return errs }
+  function validateCursoRequired(payload, { isEdit, id }) {
+  const text = v => String(v == null ? "" : v).trim();
+  const num  = v => Number(v);
+
+  const errs = [];
+  if (!text(payload.nombre))             errs.push("Nombre");
+  if (!text(payload.descripcion_breve))  errs.push("Descripción breve");
+  if (!text(payload.descripcion_media))  errs.push("Descripción media");
+  if (!text(payload.descripcion_curso))  errs.push("Descripción del curso");
+  if (!text(payload.dirigido))           errs.push("Dirigido a");
+  if (!text(payload.competencias))       errs.push("Competencias");
+
+  if (!payload.tutor)            errs.push("Tutor");
+  if (!payload.categoria)        errs.push("Categoría");
+  if (!payload.calendario)       errs.push("Calendario");
+  if (!payload.tipo_evaluacion)  errs.push("Tipo de evaluación");
+  if (!payload.actividades)      errs.push("Actividades");
+
+  if (!text(payload.fecha_inicio)) errs.push("Fecha de inicio");
+
+  const horasNum = num(payload.horas);
+  if (!(horasNum > 0)) errs.push("Horas (>0)");
+
+  return errs;
+}
   async function ensureCursoImagen({ isEdit, id }) {
     if (state.tempNewCourseImage) return true; if (!isEdit) return !!state.tempNewCourseImage; // create exige selección
     if (!id) return false; return await requireCourseImage(id)
@@ -578,38 +530,14 @@ async function resolveCourseImageUrl(id) {
     gcToast("Curso creado", "exito"); closeDrawer(); await loadCursos(); if (newId) { const re = state.data.find(x => x.id === newId); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) })) }
   }
   async function saveUpdateCurso(item) {
-  try {
-    if (!item || !item._all) { gcToast("Sin item para actualizar", "error"); return; }
-    // Leer campos actuales del drawer y normalizar payload
-    const payload = normalizeCursoPayload(readCursoForm(item.id));
-    const missing = validateCursoRequired(payload, { isEdit: true, id: item.id });
-    if (missing && missing.length) { gcToast("Campos requeridos: " + missing.join(", "), "warning"); return; }
-
-    // Validar portada existente o nueva
-    const okImg = await ensureCursoImagen({ isEdit: true, id: item.id });
-    if (!okImg) { gcToast("La portada del curso es obligatoria", "warning"); return; }
-
-    // Enviar update
-    await postJSON(API.uCursos, payload);
-
-    // Subir imagen si el usuario eligió una nueva
-    if (state.tempNewCourseImage) {
-      await uploadCursoImagen(item.id, state.tempNewCourseImage).catch(() => {
-        gcToast("Actualizado, pero falló la imagen", "error");
-      }).finally(() => { state.tempNewCourseImage = null; });
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const payload = normalizeCursoPayload(readCursoForm(item.id)); const missing = validateCursoRequired(payload, { isEdit: true, id: item.id }); if (missing.length) return gcToast("Campos requeridos: " + missing.join(", "), "warning"); const okImg = await ensureCursoImagen({ isEdit: true, id: item.id }); if ((!okImg) && !gcDOMHasValidImages("#media-curso",1) && !gcDOMHasValidImages("#media-curso-lite",1)) return gcToast("La portada del curso es obligatoria", "warning");
+    await postJSON(API.uCursos, payload); 
+    if (state && state.tempNewCourseImage) {
+      try { await uploadCursoImagen(item.id, state.tempNewCourseImage); state.tempNewCourseImage = null; }
+      catch (err) { gcLog && gcLog("[UPLOAD] curso (desde Guardar) error", err); gcToast("Curso guardado. La imagen no se pudo subir", "warning"); }
     }
-
-    gcToast("Cambios guardados", "exito");
-    await loadCursos();
-    const re = state.data.find(x => x.id === item.id);
-    if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }));
-
-  } catch (e) {
-    console.error("[saveUpdateCurso] error", e);
-    gcToast("No se pudo guardar: " + (e && e.message ? e.message : "Error"), "error");
+    gcToast("Cambios guardados", "exito"); await loadCursos(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Curso · " + re.nombre, renderCursoDrawer({ id: String(re.id) }))
   }
-}
-
   async function softDeleteCurso(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = normalizeCursoPayload({ ...item._all, estatus: 0 }); await postJSON(API.uCursos, body) }
   async function reactivateCurso(id) { const it = state.data.find(x => x.id === Number(id)); if (!it || !it._all) throw new Error("Curso no encontrado"); const body = normalizeCursoPayload({ ...it._all, estatus: 1 }); await postJSON(API.uCursos, body) }
   async function openCreateCurso() { await Promise.all([getTutorsMap(), getPrioridadMap(), getCategoriasMap(), getCalendarioMap(), getTipoEvalMap(), getActividadesMap()]); state.currentDrawer = { type: "curso", id: null, mode: "create" }; openDrawer("Curso · Crear", renderCursoDrawer({ id: "" })) }
@@ -673,7 +601,7 @@ async function resolveCourseImageUrl(id) {
           const card = qs("#create-media-curso"), btn = qs("#create-media-edit"), thumb = qs("#create-media-thumb");
           if (btn && thumb && card) {
             btn.addEventListener("click", () => {
-              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
+              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
                 const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
                 renderPreviewUI(card, file, async () => { state.tempNewCourseImage = file; try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (thumb.dataset) thumb.dataset.blobUrl = blobUrl; thumb.src = blobUrl; gcToast("Imagen seleccionada (se subirá al guardar)", "exito") }, () => { })
@@ -831,7 +759,7 @@ async function resolveCourseImageUrl(id) {
           btn.addEventListener("click", () => {
             const input = document.createElement("input");
             input.type = "file";
-            input.accept = "image/png, image/jpeg";
+            input.accept = "image/png, image/jpeg, image/webp";
             input.style.display = "none";
             document.body.appendChild(input);
             input.addEventListener("change", () => {
@@ -967,7 +895,7 @@ async function resolveCourseImageUrl(id) {
     gcToast("Tutor creado", "exito"); closeDrawer(); await loadTutores()
   }
   async function saveTutorUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if ((!okImg && !state.tempNewTutorImage) && !gcDOMHasValidImages("#media-tutor", 1) && !gcDOMHasValidImages("#media-usuario", 1)) return gcToast("La foto del tutor es obligatoria", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readTutorForm(item._all); const miss = validateTutorRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okImg = await requireTutorImage(item.id); if ((!okImg && !state.tempNewTutorImage) && !gcDOMHasValidImages("#media-tutor",1) && !gcDOMHasValidImages("#media-usuario",1)) return gcToast("La foto del tutor es obligatoria", "warning");
     const body = { ...item._all, ...p }; await postJSON(API.uTutores, body); gcToast("Cambios guardados", "exito"); await loadTutores(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Tutor · " + re.nombre, renderTutorDrawer({ id: String(re.id) }))
   }
   async function softDeleteTutor(item) { if (!item || !item._all) throw new Error("Item inválido"); const body = { ...item._all, estatus: 0 }; await postJSON(API.uTutores, body) }
@@ -1001,7 +929,7 @@ async function resolveCourseImageUrl(id) {
           const btn = qs("#create-tutor-pick"), img = qs("#create-tutor-thumb"), wrap = qs("#create-media-tutor");
           if (btn && img && wrap) {
             btn.addEventListener("click", () => {
-              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
+              const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
               input.addEventListener("change", () => {
                 const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
                 renderPreviewUI(wrap, file, async () => { state.tempNewTutorImage = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Imagen lista (se subirá al guardar)", "exito") }, () => { })
@@ -1133,7 +1061,7 @@ async function resolveCourseImageUrl(id) {
   function readUsuarioForm(existing) { const v = id => qs("#" + id)?.value || ""; const n = id => Number(v(id) || 0); const p = { nombre: v("u_nombre"), correo: v("u_correo"), telefono: v("u_telefono"), fecha_nacimiento: v("u_fnac"), tipo_contacto: n("u_tcontacto"), estatus: n("u_estatus") }; if (existing?.id) p.id = existing.id; return p }
   function validateUsuarioRequired(p) { const e = []; if (!String(p.nombre || "").trim()) e.push("Nombre"); if (!isEmail(p.correo || "")) e.push("Correo válido"); if (!digits(p.telefono || "")) e.push("Teléfono"); return e }
   async function saveUsuarioUpdate(item) {
-    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if ((!okAvatar && !state.tempNewUserAvatar) && !gcDOMHasValidImages("#media-usuario", 1) && !gcDOMHasValidImages("#media-tutor", 1)) return gcToast("El avatar es obligatorio", "warning");
+    if (!item || !item._all) return gcToast("Sin item para actualizar", "error"); const p = readUsuarioForm(item._all); const miss = validateUsuarioRequired(p); if (miss.length) return gcToast("Campos requeridos: " + miss.join(", "), "warning"); const okAvatar = await requireUserAvatar(item.id); if ((!okAvatar && !state.tempNewUserAvatar) && !gcDOMHasValidImages("#media-usuario",1) && !gcDOMHasValidImages("#media-tutor",1)) return gcToast("El avatar es obligatorio", "warning");
     await postJSON(API.uUsuarios, { ...item._all, ...p }); gcToast("Cambios guardados", "exito"); await loadUsuarios(); const re = state.data.find(x => x.id === item.id); if (re) openDrawer("Usuario · " + (re.nombre || re.correo), renderUsuarioDrawer({ id: String(re.id) }))
   }
   async function saveUsuarioCreate() {
@@ -1192,7 +1120,7 @@ async function resolveCourseImageUrl(id) {
       const btn = qs("#create-user-avatar-btn"), img = qs("#create-user-avatar"), wrap = qs("#create-media-usuario");
       if (btn && img && wrap) {
         btn.addEventListener("click", () => {
-          const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg"; input.style.display = "none"; document.body.appendChild(input);
+          const input = document.createElement("input"); input.type = "file"; input.accept = "image/png, image/jpeg, image/webp"; input.style.display = "none"; document.body.appendChild(input);
           input.addEventListener("change", () => {
             const file = input.files && input.files[0]; try { document.body.removeChild(input) } catch { }; if (!file) return; const v = validarImagen(file, { maxMB: 2 }); if (!v.ok) { gcToast(v.error, "error"); return }
             renderPreviewUI(wrap, file, async () => { state.tempNewUserAvatar = file; try { if (img.dataset?.blobUrl) URL.revokeObjectURL(img.dataset.blobUrl) } catch { }; const blobUrl = URL.createObjectURL(file); if (img.dataset) img.dataset.blobUrl = blobUrl; img.src = blobUrl; gcToast("Avatar listo (se subirá al guardar)", "exito") }, () => { })
@@ -1204,7 +1132,7 @@ async function resolveCourseImageUrl(id) {
     }, 0)
   }
 
-
+  
   // Cursos disponibles para inscribir: Activo(1), Pausado(2), En curso(4)
   async function getCursosMapParaInscribir() {
     const [e1, e2, e4] = await Promise.all([
@@ -1218,7 +1146,7 @@ async function resolveCourseImageUrl(id) {
       .concat(Array.isArray(e4) ? e4 : []);
     return arr.reduce((acc, c) => { acc[String(c.id)] = c.nombre; return acc; }, {});
   }
-  /* ====================== Suscripciones ====================== */
+/* ====================== Suscripciones ====================== */
   async function loadSuscripciones() {
     qs("#mod-title") && (qs("#mod-title").textContent = "Suscripciones");
     const hdr = qs(".recursos-box.desktop-only .table-header"); if (hdr) { const c1 = hdr.querySelector(".col-nombre"), c2 = hdr.querySelector(".col-tutor") || hdr.querySelector(".col-tipo"), c3 = hdr.querySelector(".col-fecha"), c4 = hdr.querySelector(".col-status"); if (c1) c1.textContent = "Suscriptor"; if (c2) { c2.textContent = "Curso"; c2.classList.add("col-tipo") } if (c3) c3.textContent = "Fecha de suscripción"; if (c4) c4.textContent = "Status" }
@@ -1231,15 +1159,15 @@ async function resolveCourseImageUrl(id) {
       drawSuscripciones()
     } catch (err) { gcLog(err); qs("#recursos-list") && (qs("#recursos-list").innerHTML = '<div style="padding:1rem;color:#b00020;">Error al cargar suscripciones</div>'); qs("#recursos-list-mobile") && (qs("#recursos-list-mobile").innerHTML = ""); gcToast("No se pudieron cargar suscripciones", "error") }
   }
-
+  
   async function openCreateSuscripcion() {
-    // Construir select de cursos (1 Activo, 2 Pausado, 4 En curso)
-    const cursosMap = await getCursosMapParaInscribir();
-    const cursoOptions = Object.entries(cursosMap || {})
-      .map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`)
-      .join("");
+  // Construir select de cursos (1 Activo, 2 Pausado, 4 En curso)
+  const cursosMap = await getCursosMapParaInscribir();
+  const cursoOptions = Object.entries(cursosMap || {})
+    .map(([id, nombre]) => `<option value="${escapeAttr(id)}">${escapeHTML(nombre)}</option>`)
+    .join("");
 
-    const body = `
+  const body = `
     <div class="gc-actions">
       <button class="gc-btn gc-btn-ghost" id="btn-cancel">Cancelar</button>
       <button class="gc-btn gc-btn-primary" id="btn-save" disabled>Inscribir</button>
@@ -1295,127 +1223,127 @@ async function resolveCourseImageUrl(id) {
     </div>
   `;
 
-    openDrawer("Suscripción · Crear", body);
-    const root = qs("#gc-drawer");
-    const pick = (sel) => root ? root.querySelector(sel) : null;
+  openDrawer("Suscripción · Crear", body);
+  const root = qs("#gc-drawer");
+  const pick = (sel) => root ? root.querySelector(sel) : null;
 
-    const selCurso = pick("#suscr-curso");
-    const inIdent = pick("#suscr-login-identificador");
-    const btnBuscar = pick("#suscr-buscar");
-    const btnLimpiar = pick("#suscr-limpiar");
-    const btnSave = pick("#btn-save");
-    const btnCancel = pick("#btn-cancel");
+  const selCurso     = pick("#suscr-curso");
+  const inIdent      = pick("#suscr-login-identificador");
+  const btnBuscar    = pick("#suscr-buscar");
+  const btnLimpiar   = pick("#suscr-limpiar");
+  const btnSave      = pick("#btn-save");
+  const btnCancel    = pick("#btn-cancel");
 
-    const pnlUser = pick("#suscr-user-panel");
-    const uNombre = pick("#suscr-u-nombre");
-    const uCorreo = pick("#suscr-u-correo");
-    const uTel = pick("#suscr-u-tel");
-    const uFecha = pick("#suscr-u-fecha");
-    const mTel = pick("#suscr-u-mtel");
-    const mMail = pick("#suscr-u-mmail");
+  const pnlUser      = pick("#suscr-user-panel");
+  const uNombre      = pick("#suscr-u-nombre");
+  const uCorreo      = pick("#suscr-u-correo");
+  const uTel         = pick("#suscr-u-tel");
+  const uFecha       = pick("#suscr-u-fecha");
+  const mTel        = pick("#suscr-u-mtel");
+  const mMail       = pick("#suscr-u-mmail");
 
-    let usuarioEncontrado = null;
+  let usuarioEncontrado = null;
 
-    function setInscribirReady(on) {
-      if (!btnSave) return;
-      btnSave.disabled = !on;
-      btnSave.classList.toggle("gc-btn--success", !!on);
-      btnSave.classList.toggle("gc-btn-primary", !on);
-      // indicar al usuario final que ya esta listo para inscribir al cliente
-      if (on && usuarioEncontrado) {
-        btnSave.textContent = `Inscribir`;
-      } else {
-        btnSave.textContent = "Inscribir";
-      }
+  function setInscribirReady(on) {
+    if (!btnSave) return;
+    btnSave.disabled = !on;
+    btnSave.classList.toggle("gc-btn--success", !!on);
+    btnSave.classList.toggle("gc-btn-primary", !on);
+    // indicar al usuario final que ya esta listo para inscribir al cliente
+    if (on && usuarioEncontrado) {
+      btnSave.textContent = `Inscribir`;
+    } else {
+      btnSave.textContent = "Inscribir";
     }
+  }
 
-    function refreshSaveState() {
-      const ready = !!selCurso?.value && !!usuarioEncontrado?.id;
-      setInscribirReady(ready);
+  function refreshSaveState() {
+    const ready = !!selCurso?.value && !!usuarioEncontrado?.id;
+    setInscribirReady(ready);
+  }
+
+  function normalizarFecha(f) {
+    if (!f) return "";
+    if (typeof f !== "string") return "";
+    if (f.includes("T")) return f.split("T")[0];
+    if (f.includes(" ")) return f.split(" ")[0];
+    if (f.includes("/")) {
+      const p = f.split("/");
+      if (p.length === 3) return `${p[2]}-${String(p[1]).padStart(2,"0")}-${String(p[0]).padStart(2,"0")}`;
     }
+    return f;
+  }
 
-    function normalizarFecha(f) {
-      if (!f) return "";
-      if (typeof f !== "string") return "";
-      if (f.includes("T")) return f.split("T")[0];
-      if (f.includes(" ")) return f.split(" ")[0];
-      if (f.includes("/")) {
-        const p = f.split("/");
-        if (p.length === 3) return `${p[2]}-${String(p[1]).padStart(2, "0")}-${String(p[0]).padStart(2, "0")}`;
-      }
-      return f;
-    }
+  btnCancel?.addEventListener("click", (e)=>{ e.preventDefault(); closeDrawer(); });
+  selCurso?.addEventListener("change", refreshSaveState);
 
-    btnCancel?.addEventListener("click", (e) => { e.preventDefault(); closeDrawer(); });
-    selCurso?.addEventListener("change", refreshSaveState);
-
-    btnBuscar?.addEventListener("click", async () => {
-      const ident = (inIdent?.value || "").trim().toLowerCase();
-      if (!ident) { gcToast("Ingresa un correo o teléfono.", "warning"); return; }
-      try {
-        const res = await postJSON(API.usuarios, { correo: ident, telefono: ident });
-        const data = Array.isArray(res) ? res : [];
-        if (!data.length) {
-          usuarioEncontrado = null;
-          pnlUser.style.display = "none";
-          btnLimpiar.style.display = "none";
-          gcToast("No encontramos la cuenta.", "warning");
-        } else {
-          usuarioEncontrado = data[0];
-          // Pintar panel con datos (solo lectura)
-          uNombre.textContent = usuarioEncontrado?.nombre || "—";
-          uCorreo.textContent = (usuarioEncontrado?.correo || "").toLowerCase() || "—";
-          uTel.textContent = usuarioEncontrado?.telefono || "—";
-          const f = normalizarFecha(usuarioEncontrado?.fecha_nacimiento || "");
-          uFecha.textContent = f || "—";
-
-          // Medios de contacto (solo mostrar marcados)
-          const t = Number(usuarioEncontrado?.tipo_contacto || 0);
-          if (mTel) mTel.checked = (t === 1 || t === 3);
-          if (mMail) mMail.checked = (t === 2 || t === 3);
-          pnlUser.style.display = "";
-          btnLimpiar.style.display = "";
-          gcToast("Cuenta encontrada correctamente.", "exito");
-        }
-      } catch (err) {
+  btnBuscar?.addEventListener("click", async () => {
+    const ident = (inIdent?.value || "").trim().toLowerCase();
+    if (!ident) { gcToast("Ingresa un correo o teléfono.", "warning"); return; }
+    try {
+      const res = await postJSON(API.usuarios, { correo: ident, telefono: ident });
+      const data = Array.isArray(res) ? res : [];
+      if (!data.length) {
         usuarioEncontrado = null;
         pnlUser.style.display = "none";
         btnLimpiar.style.display = "none";
-        gcToast("Error al consultar la cuenta.", "error");
-      } finally {
-        refreshSaveState();
+        gcToast("No encontramos la cuenta.", "warning");
+      } else {
+        usuarioEncontrado = data[0];
+        // Pintar panel con datos (solo lectura)
+        uNombre.textContent = usuarioEncontrado?.nombre || "—";
+        uCorreo.textContent = (usuarioEncontrado?.correo || "").toLowerCase() || "—";
+        uTel.textContent    = usuarioEncontrado?.telefono || "—";
+        const f = normalizarFecha(usuarioEncontrado?.fecha_nacimiento || "");
+        uFecha.textContent  = f || "—";
+        
+        // Medios de contacto (solo mostrar marcados)
+        const t = Number(usuarioEncontrado?.tipo_contacto || 0);
+        if (mTel)  mTel.checked  = (t === 1 || t === 3);
+        if (mMail) mMail.checked = (t === 2 || t === 3);
+pnlUser.style.display = "";
+        btnLimpiar.style.display = "";
+        gcToast("Cuenta encontrada correctamente.", "exito");
       }
-    });
-
-    btnLimpiar?.addEventListener("click", (e) => {
-      e.preventDefault();
+    } catch (err) {
       usuarioEncontrado = null;
       pnlUser.style.display = "none";
       btnLimpiar.style.display = "none";
-      if (mTel) mTel.checked = false;
-      if (mMail) mMail.checked = false;
+      gcToast("Error al consultar la cuenta.", "error");
+    } finally {
       refreshSaveState();
-    });
+    }
+  });
 
-    btnSave?.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const cursoId = Number(selCurso?.value || 0);
-      if (!cursoId) { gcToast("Selecciona un curso.", "warning"); return; }
-      if (!usuarioEncontrado?.id) { gcToast("Primero busca y selecciona una cuenta válida.", "warning"); return; }
-      try {
-        const inscRes = await postJSON(API.iInscripcion, { curso: cursoId, usuario: Number(usuarioEncontrado.id), comentario: "" });
-        gcToast((inscRes && inscRes.mensaje) || "Inscripción realizada correctamente", "exito", 6000);
-        closeDrawer();
-        await loadSuscripciones();
-      } catch (err) {
-        console.error(err);
-        gcToast(err?.message || "Hubo un error al procesar la inscripción.", "error");
-      }
-    });
-
+  btnLimpiar?.addEventListener("click", (e) => {
+    e.preventDefault();
+    usuarioEncontrado = null;
+    pnlUser.style.display = "none";
+    btnLimpiar.style.display = "none";
+    if (mTel) mTel.checked = false;
+    if (mMail) mMail.checked = false;
     refreshSaveState();
-  }
-  function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
+  });
+
+  btnSave?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const cursoId = Number(selCurso?.value || 0);
+    if (!cursoId) { gcToast("Selecciona un curso.", "warning"); return; }
+    if (!usuarioEncontrado?.id) { gcToast("Primero busca y selecciona una cuenta válida.", "warning"); return; }
+    try {
+      const inscRes = await postJSON(API.iInscripcion, { curso: cursoId, usuario: Number(usuarioEncontrado.id), comentario: "" });
+      gcToast((inscRes && inscRes.mensaje) || "Inscripción realizada correctamente", "exito", 6000);
+      closeDrawer();
+      await loadSuscripciones();
+    } catch (err) {
+      console.error(err);
+      gcToast(err?.message || "Hubo un error al procesar la inscripción.", "error");
+    }
+  });
+
+  refreshSaveState();
+}
+function drawSuscripciones() { const rows = state.data; renderList(rows, { matcher: q => { const k = norm(q); return it => norm(it.suscriptor).includes(k) || norm(it.curso_nombre).includes(k) }, desktopRow: it => `<div class="table-row" data-id="${it.id}" data-type="suscripcion"><div class="col-nombre"><span class="name-text">${escapeHTML(it.suscriptor)}</span></div><div class="col-tutor">${escapeHTML(it.curso_nombre)}</div><div class="col-fecha">${fmtDateTime(it.fecha)}</div><div class="col-status">${statusBadge("suscripciones", it.estatus, statusLabel("suscripciones", it.estatus))}</div></div>`, mobileRow: it => `<div class="table-row-mobile" data-id="${it.id}" data-type="suscripcion"><button class="row-toggle"><div class="col-nombre">${escapeHTML(it.suscriptor)}</div><span class="icon-chevron">›</span></button><div class="row-details"><div><strong>Curso:</strong> ${escapeHTML(it.curso_nombre)}</div><div><strong>Fecha y hora de suscripción:</strong> ${fmtDateTime(it.fecha)}</div><div><strong>Status:</strong> ${statusBadge("suscripciones", it.estatus === 1 ? "activo" : (it.estatus === 0 ? "cancelado" : it.estatus))}</div><div style="display:flex;gap:8px;margin:.25rem 0 .5rem;"><button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>${Number(it.estatus) === 0 ? `<button class="gc-btn gc-btn--success gc-reactivate" data-type="suscripcion" data-id="${it.id}">Reactivar</button>` : ""}</div></div></div>`, drawerTitle: d => { const it = state.data.find(x => String(x.id) === d.id); return it ? ("Suscripción · " + it.curso_nombre) : "Suscripción" }, drawerBody: d => renderSuscripcionDrawer(d), afterOpen: () => { } }) }
   async function softDeleteSuscripcion(item) { if (!item || !item._all) return; await postJSON(API.uInscripcion, { id: item.id, estatus: 0 }) }
   async function reactivateSuscripcion(id) { await postJSON(API.uInscripcion, { id: Number(id), estatus: 1 }) }
   function readSuscripcionForm(existing) { const g = id => qs("#" + id)?.value || ""; const n = id => Number(g(id) || 0); const p = { comentario: g("s_comentario"), estatus: n("s_estatus") }; if (existing?.id) p.id = existing.id; return p }
@@ -1427,7 +1355,7 @@ async function resolveCourseImageUrl(id) {
     let html = controls +
       pair("Suscriptor", it.suscriptor) +
       pair("Curso", it.curso_nombre) +
-      `<div class="field"><div class="label">Estatus</div><div class="value">${isEdit ? statusSelect("s_estatus", it.estatus, "suscripciones") : escapeHTML(statusLabel("suscripciones", it.estatus))}</div></div>` +
+      `<div class="field"><div class="label">Estatus</div><div class="value">${ isEdit ? statusSelect("s_estatus", it.estatus, "suscripciones") : escapeHTML(statusLabel("suscripciones", it.estatus))}</div></div>` +
       pair("Fecha y hora de suscripción", fmtDateTime(it.fecha)) +
       field("Comentario", it.comentario || "", `<textarea id="s_comentario" rows="3" placeholder="Comentario u observación">${escapeHTML(it.comentario || "")}</textarea>`);
     if (isAdminUser) html += jsonSection({ id: it.id, ...s }, "JSON · Suscripción", "json-sus", "btn-copy-json-sus");
