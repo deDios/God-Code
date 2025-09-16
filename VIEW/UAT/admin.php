@@ -265,67 +265,173 @@
     <!-- Drawers para cada modulo (cursos,noticias,tutores,usuarios,suscripciones de momento son esos solamente) -->
 
     <!-- Drawer: Curso -->
-    <aside class="gc-drawer" id="drawer-curso" role="dialog" aria-modal="true" aria-labelledby="drawer-curso-title"
-        aria-hidden="true" hidden>
+    <!-- Drawer · CURSO -->
+    <aside id="drawer-curso" class="drawer gc-dash" aria-hidden="true" hidden>
         <div class="drawer-header">
-            <h2 class="drawer-title" id="drawer-curso-title">Curso</h2>
+            <div class="drawer-title" id="drawer-curso-title">Curso · —</div>
             <div class="drawer-actions">
-                <button class="btn" id="drawer-curso-close" aria-label="Cerrar">Cerrar</button>
+                <button class="btn" id="drawer-curso-close">Cerrar</button>
             </div>
         </div>
 
         <div class="drawer-body" id="drawer-curso-body">
-            <section class="form-grid">
-                <div id="media-curso" class="media-zone" aria-label="Imágenes"></div>
+            <!-- Acciones  -->
+            <div class="gc-actions" id="curso-actions-view">
+                <button class="gc-btn" id="btn-edit">Editar</button>
+                <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
+            </div>
 
-                <div class="fields">
+            <!--  MODO VISTA  -->
+            <section id="curso-view" class="mode-view">
+                <div class="field">
+                    <div class="label">Nombre <span class="req">*</span></div>
+                    <div class="value" id="v_nombre">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Descripción breve <span class="req">*</span></div>
+                    <div class="value" id="v_desc_breve">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Descripción media <span class="req">*</span></div>
+                    <div class="value" id="v_desc_media">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Descripción del curso <span class="req">*</span></div>
+                    <div class="value" id="v_desc_curso">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Dirigido a <span class="req">*</span></div>
+                    <div class="value" id="v_dirigido">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Competencias <span class="req">*</span></div>
+                    <div class="value" id="v_competencias">—</div>
+                </div>
+
+                <div class="grid-3">
                     <div class="field">
-                        <label for="f_nombre">Nombre</label>
+                        <div class="label">Tutor <span class="req">*</span></div>
+                        <div class="value" id="v_tutor">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Categoría <span class="req">*</span></div>
+                        <div class="value" id="v_categoria">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Prioridad <span class="req">*</span></div>
+                        <div class="value" id="v_prioridad">—</div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="field">
+                        <div class="label">Tipo de evaluación <span class="req">*</span></div>
+                        <div class="value" id="v_tipo_eval">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Actividades <span class="req">*</span></div>
+                        <div class="value" id="v_actividades">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Calendario <span class="req">*</span></div>
+                        <div class="value" id="v_calendario">—</div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="field">
+                        <div class="label">Horas <span class="req">*</span></div>
+                        <div class="value" id="v_horas">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Precio</div>
+                        <div class="value" id="v_precio">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Certificado</div>
+                        <div class="value" id="v_certificado">—</div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Fecha de inicio <span class="req">*</span></div>
+                    <div class="value" id="v_fecha">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Estatus</div>
+                    <div class="value" id="v_estatus">—</div>
+                </div>
+
+                <!-- Bloque de imágenes  -->
+                <div class="field">
+                    <div class="label">Imágenes existentes <span class="req">*</span></div>
+                    <div class="value">
+                        <div id="media-curso"><!-- mountReadOnlyMedia({ type:'curso', id, editable }) --></div>
+                        <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
+                    </div>
+                </div>
+
+                <!-- JSON Dev tools (opcional) -->
+                <details class="dev-json" id="curso-json-box" open style="margin-top:16px;">
+                    <summary style="cursor:pointer;font-weight:600;">JSON · Curso</summary>
+                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+                        <button class="gc-btn" id="btn-copy-json-curso">Copiar JSON</button>
+                    </div>
+                    <pre id="json-curso" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
+                </details>
+            </section>
+
+            <!-- MODO EDICIÓN  -->
+            <section id="curso-edit" class="mode-edit" hidden>
+                <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_nombre">Nombre <span class="req">*</span></label>
                         <input id="f_nombre" type="text" maxlength="120" data-max="120" />
                         <small class="char-counter" data-for="f_nombre"></small>
                     </div>
 
-                    <div class="field">
-                        <label for="f_desc_breve">Descripción breve</label>
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_desc_breve">Descripción breve <span class="req">*</span></label>
                         <textarea id="f_desc_breve" rows="3" maxlength="240" data-max="240"></textarea>
                         <small class="char-counter" data-for="f_desc_breve"></small>
                     </div>
 
-                    <div class="field">
-                        <label for="f_desc_curso">Descripción del larga</label>
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_desc_curso">Descripción larga <span class="req">*</span></label>
                         <textarea id="f_desc_curso" rows="6" maxlength="2000" data-max="2000"></textarea>
                         <small class="char-counter" data-for="f_desc_curso"></small>
                     </div>
 
-                    <div class="field">
-                        <label for="f_desc_media">Descripción media</label>
-                        <textarea id="f_desc_media" rows="4" maxlength="1000" data-max="1000"></textarea>
-                        <small class="char-counter" data-for="f_desc_media"></small>
-                    </div>
-
-                    <div class="field">
-                        <label for="f_dirigido">Dirigido a</label>
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_dirigido">Dirigido a <span class="req">*</span></label>
                         <textarea id="f_dirigido" rows="3" maxlength="600" data-max="600"></textarea>
                         <small class="char-counter" data-for="f_dirigido"></small>
                     </div>
 
-                    <div class="field">
-                        <label for="f_competencias">Competencias</label>
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_competencias">Competencias <span class="req">*</span></label>
                         <textarea id="f_competencias" rows="3" maxlength="800" data-max="800"></textarea>
                         <small class="char-counter" data-for="f_competencias"></small>
                     </div>
 
-                    <div class="field checkbox">
-                        <label><input id="f_certificado" type="checkbox" /> Certificado</label>
+                    <div class="field" style="grid-column:1 / -1; display:flex; align-items:center; gap:10px;">
+                        <label for="f_certificado" style="margin:0;">Certificado</label>
+                        <input id="f_certificado" type="checkbox" />
                     </div>
 
-                    <div class="grid-3">
+                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
-                            <label for="f_tutor">Tutor</label>
+                            <label for="f_tutor">Tutor <span class="req">*</span></label>
                             <select id="f_tutor"></select>
                         </div>
                         <div class="field">
-                            <label for="f_horas">Horas</label>
+                            <label for="f_horas">Horas <span class="req">*</span></label>
                             <input id="f_horas" type="number" min="1" step="1" />
                         </div>
                         <div class="field">
@@ -334,50 +440,59 @@
                         </div>
                     </div>
 
-                    <div class="grid-3">
+                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
                             <label for="f_estatus">Estatus</label>
                             <select id="f_estatus"></select>
                         </div>
                         <div class="field">
-                            <label for="f_fecha">Fecha inicio</label>
+                            <label for="f_fecha">Fecha inicio <span class="req">*</span></label>
                             <input id="f_fecha" type="date" />
                         </div>
                         <div class="field">
-                            <label for="f_prioridad">Prioridad</label>
+                            <label for="f_prioridad">Prioridad <span class="req">*</span></label>
                             <select id="f_prioridad"></select>
                         </div>
                     </div>
 
-                    <div class="grid-3">
+                    <div class="grid-3" style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
                         <div class="field">
-                            <label for="f_categoria">Categoría</label>
+                            <label for="f_categoria">Categoría <span class="req">*</span></label>
                             <select id="f_categoria"></select>
                         </div>
                         <div class="field">
-                            <label for="f_calendario">Calendario</label>
+                            <label for="f_calendario">Calendario <span class="req">*</span></label>
                             <select id="f_calendario"></select>
                         </div>
                         <div class="field">
-                            <label for="f_tipo_eval">Tipo evaluación</label>
+                            <label for="f_tipo_eval">Tipo evaluación <span class="req">*</span></label>
                             <select id="f_tipo_eval"></select>
                         </div>
                     </div>
 
-                    <div class="field">
-                        <label for="f_actividades">Actividades</label>
+                    <div class="field" style="grid-column:1 / -1;">
+                        <label for="f_actividades">Actividades <span class="req">*</span></label>
                         <select id="f_actividades"></select>
                     </div>
                 </div>
-            </section>
 
-            <footer class="drawer-footer">
-                <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                <button class="gc-btn gc-btn--primary" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
-            </footer>
+                <div class="field" style="grid-column:1 / -1;">
+                    <label for="f_desc_media">Descripción media <span class="req">*</span></label>
+                    <textarea id="f_desc_media" rows="4" maxlength="1000" data-max="1000"></textarea>
+                    <small class="char-counter" data-for="f_desc_media"></small>
+                </div>
+
+                <!-- Acciones (modo edición) -->
+                <div class="drawer-actions-row">
+                    <div class="row-right">
+                        <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
+                        <button class="gc-btn gc-btn--success" id="btn-save">Guardar</button>
+                    </div>
+                </div>
+            </section>
         </div>
     </aside>
+
 
     <!-- Drawer: Noticia (IDs según admin.js: f_tit, f_desc1, f_desc2, f_estatus) -->
     <aside class="gc-drawer" id="drawer-noticia" role="dialog" aria-modal="true" aria-labelledby="drawer-noticia-title"
@@ -545,7 +660,7 @@
                 <div class="fields">
                     <div class="field">
                         <label for="s_comentario">Comentario</label>
-                        <textarea id="s_comentario" rows="3" maxlength="500" data-max="500"></textarea> 
+                        <textarea id="s_comentario" rows="3" maxlength="500" data-max="500"></textarea>
                         <small class="char-counter" data-for="s_comentario"></small>
                     </div>
 
@@ -563,33 +678,33 @@
             </footer>
         </div>
     </aside>
-    
+
     <!-- Contadores de caracteres sencillo -->
     <script>
-    (function() {
-        function updateOne(el) {
-            var max = Number(el.getAttribute('data-max') || 0);
-            if (!max) return;
-            var id = el.id;
-            var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
-            if (!cc) return;
-            var v = (el.value || "");
-            cc.textContent = v.length + "/" + max;
-            if (v.length > max) cc.classList.add('over');
-            else cc.classList.remove('over');
-        }
+        (function() {
+            function updateOne(el) {
+                var max = Number(el.getAttribute('data-max') || 0);
+                if (!max) return;
+                var id = el.id;
+                var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
+                if (!cc) return;
+                var v = (el.value || "");
+                cc.textContent = v.length + "/" + max;
+                if (v.length > max) cc.classList.add('over');
+                else cc.classList.remove('over');
+            }
 
-        function bind(el) {
-            if (!el) return;
-            updateOne(el);
-            el.addEventListener('input', function() {
+            function bind(el) {
+                if (!el) return;
                 updateOne(el);
+                el.addEventListener('input', function() {
+                    updateOne(el);
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-max]').forEach(bind);
             });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[data-max]').forEach(bind);
-        });
-    })();
+        })();
     </script>
 
 
