@@ -154,13 +154,13 @@
                     <span class="label">Noticias</span>
                 </a>
 
-                <!-- NUEVO: Tutores -->
+                <!-- Tutores -->
                 <a class="nav-item" href="#/tutores" data-route="#/tutores">
                     <span class="icon"><img src="/ASSETS/Admin/tutores.png" alt="" aria-hidden="true"></span>
                     <span class="label">Tutores</span>
                 </a>
 
-                <!-- NUEVO: Suscripciones -->
+                <!-- Suscripciones -->
                 <a class="nav-item" href="#/suscripciones" data-route="#/suscripciones">
                     <span class="icon"><img src="/ASSETS/Admin/suscripciones.png" alt="" aria-hidden="true"></span>
                     <span class="label">Suscripciones</span>
@@ -262,9 +262,6 @@
 
     </main>
 
-
-
-
     <!-- Drawers para cada modulo (cursos,noticias,tutores,usuarios,suscripciones de momento son esos solamente) -->
 
     <!-- Drawer: Curso -->
@@ -295,7 +292,7 @@
                     </div>
 
                     <div class="field">
-                        <label for="f_desc_curso">Descripción del curso</label>
+                        <label for="f_desc_curso">Descripción del larga</label>
                         <textarea id="f_desc_curso" rows="6" maxlength="2000" data-max="2000"></textarea>
                         <small class="char-counter" data-for="f_desc_curso"></small>
                     </div>
