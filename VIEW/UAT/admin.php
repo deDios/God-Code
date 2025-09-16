@@ -1,17 +1,15 @@
-<!DOCTYPE html>
+<?php
+?><!doctype html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>GodCode</title>
-    <link rel="stylesheet" href="/CSS/plantilla.css" />
-    <link rel="stylesheet" href="/CSS/admin/admin.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>Godcode — Panel de Administración</title>
 </head>
-
 <body>
-    <!-- Tope de pagina -->
-    <header id="header">
+<header id="header">
         <!-- esta barra en el tope de pagina solo renderiza segun la resolucion de las pantallas pequeñas -->
         <div class="social-bar-mobile">
             <div class="social-icons">
@@ -134,154 +132,450 @@
 
     </header>
 
-
-    <main id="home-main" class="gc-dash">
-
-        <!-- Sidebar -->
-        <nav class="gc-side" aria-label="Configuración y administración">
-            <h3 class="side-title">Configuración y<br>Administración</h3>
-
-            <div class="nav-group">
-                <div class="group-label">Cursos y Noticias</div>
-
-                <a class="nav-item" href="#/cursos" data-route="#/cursos" aria-current="page">
-                    <span class="icon"><img src="/ASSETS/Admin/cursos.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Cursos</span>
-                </a>
-
-                <a class="nav-item" href="#/noticias" data-route="#/noticias">
-                    <span class="icon"><img src="/ASSETS/Admin/noticias.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Noticias</span>
-                </a>
-
-                <!-- NUEVO: Tutores -->
-                <a class="nav-item" href="#/tutores" data-route="#/tutores">
-                    <span class="icon"><img src="/ASSETS/Admin/tutores.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Tutores</span>
-                </a>
-
-                <!-- NUEVO: Suscripciones -->
-                <a class="nav-item" href="#/suscripciones" data-route="#/suscripciones">
-                    <span class="icon"><img src="/ASSETS/Admin/suscripciones.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Suscripciones</span>
-                </a>
+  <div id="admin-root" role="application">
+    <main id="app">
+      <!-- =================== Usuarios =================== -->
+      <section id="view-usuarios" hidden aria-labelledby="titulo-usuarios">
+        <div class="toolbar">
+          <h1 id="titulo-usuarios">Usuarios</h1>
+          <div class="row grow">
+            <div class="search">
+              <label for="u_search" class="sr-only">Buscar usuarios</label>
+              <input id="u_search" type="search" placeholder="Buscar por nombre o correo" inputmode="search" enterkeyhint="search" autocomplete="off">
+              <button class="btn ghost" id="u_search_btn">Buscar</button>
             </div>
+            <span class="grow"></span>
+            <button class="btn primary" data-open="drawer-usuarios">Nuevo usuario</button>
+          </div>
+        </div>
+        <div class="table-wrap card">
+          <table aria-describedby="desc-usuarios">
+            <caption class="sr-only">Lista de usuarios</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-usuarios">
+              <tr class="empty"><td colspan="5"><small class="helper">Sin datos por ahora…</small></td></tr>
+            </tbody>
+          </table>
+          <p id="desc-usuarios" class="sr-only">Tabla con información de usuarios; la última columna contiene acciones.</p>
+        </div>
+      </section>
 
-            <div class="nav-group">
-                <div class="group-label">Contacto y reclutamiento</div>
-
-                <a class="nav-item" href="#/contacto" data-route="#/contacto">
-                    <span class="icon"><img src="/ASSETS/Admin/contacto.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Contacto</span>
-                </a>
-
-                <a class="nav-item" href="#/reclutamiento" data-route="#/reclutamiento">
-                    <span class="icon"><img src="/ASSETS/Admin/reclutamiento.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Reclutamiento</span>
-                </a>
+      <!-- =================== Cursos =================== -->
+      <section id="view-cursos" hidden aria-labelledby="titulo-cursos">
+        <div class="toolbar">
+          <h1 id="titulo-cursos">Cursos</h1>
+          <div class="row grow">
+            <div class="search">
+              <label for="c_search" class="sr-only">Buscar cursos</label>
+              <input id="c_search" type="search" placeholder="Buscar por nombre" inputmode="search" enterkeyhint="search" autocomplete="off">
+              <button class="btn ghost" id="c_search_btn">Buscar</button>
             </div>
+            <span class="grow"></span>
+            <button class="btn primary" data-open="drawer-cursos">Nuevo curso</button>
+          </div>
+        </div>
+        <div class="table-wrap card">
+          <table aria-describedby="desc-cursos">
+            <caption class="sr-only">Lista de cursos</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-cursos">
+              <tr class="empty"><td colspan="4"><small class="helper">Sin datos por ahora…</small></td></tr>
+            </tbody>
+          </table>
+          <p id="desc-cursos" class="sr-only">Tabla con información de cursos; la última columna contiene acciones.</p>
+        </div>
+      </section>
 
-            <div class="nav-group">
-                <div class="group-label">Usuarios y cuenta</div>
-
-                <a class="nav-item" href="#/usuarios" data-route="#/usuarios">
-                    <span class="icon"><img src="/ASSETS/Admin/usuarios.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Usuarios</span>
-                </a>
-
-                <a class="nav-item" href="#/cuentas" data-route="#/cuentas">
-                    <span class="icon"><img src="/ASSETS/Admin/cuentas.png" alt="" aria-hidden="true"></span>
-                    <span class="label">Cuenta</span>
-                </a>
+      <!-- =================== Noticias =================== -->
+      <section id="view-noticias" hidden aria-labelledby="titulo-noticias">
+        <div class="toolbar">
+          <h1 id="titulo-noticias">Noticias</h1>
+          <div class="row grow">
+            <div class="search">
+              <label for="n_search" class="sr-only">Buscar noticias</label>
+              <input id="n_search" type="search" placeholder="Buscar por título" inputmode="search" enterkeyhint="search" autocomplete="off">
+              <button class="btn ghost" id="n_search_btn">Buscar</button>
             </div>
-        </nav>
+            <span class="grow"></span>
+            <button class="btn primary" data-open="drawer-noticias">Nueva noticia</button>
+          </div>
+        </div>
+        <div class="table-wrap card">
+          <table aria-describedby="desc-noticias">
+            <caption class="sr-only">Lista de noticias</caption>
+            <thead>
+              <tr>
+                <th scope="col">Título</th>
+                <th scope="col">Resumen</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-noticias">
+              <tr class="empty"><td colspan="4"><small class="helper">Sin datos por ahora…</small></td></tr>
+            </tbody>
+          </table>
+          <p id="desc-noticias" class="sr-only">Tabla con información de noticias; la última columna contiene acciones.</p>
+        </div>
+      </section>
 
-        <!-- Contenido principal -->
-        <section class="main-content">
+      <!-- =================== Tutores =================== -->
+      <section id="view-tutores" hidden aria-labelledby="titulo-tutores">
+        <div class="toolbar">
+          <h1 id="titulo-tutores">Tutores</h1>
+          <div class="row grow">
+            <div class="search">
+              <label for="t_search" class="sr-only">Buscar tutores</label>
+              <input id="t_search" type="search" placeholder="Buscar por nombre" inputmode="search" enterkeyhint="search" autocomplete="off">
+              <button class="btn ghost" id="t_search_btn">Buscar</button>
+            </div>
+            <span class="grow"></span>
+            <button class="btn primary" data-open="drawer-tutores">Nuevo tutor</button>
+          </div>
+        </div>
+        <div class="table-wrap card">
+          <table aria-describedby="desc-tutores">
+            <caption class="sr-only">Lista de tutores</caption>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Bio</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-tutores">
+              <tr class="empty"><td colspan="4"><small class="helper">Sin datos por ahora…</small></td></tr>
+            </tbody>
+          </table>
+          <p id="desc-tutores" class="sr-only">Tabla con información de tutores; la última columna contiene acciones.</p>
+        </div>
+      </section>
 
-            <!-- Toolbar -->
-            <header class="dash-toolbar">
-                <div class="left">
-                    <h2 id="mod-title" class="sr-only" aria-live="polite">—</h2>
-
-                    <div class="searchbox">
-                        <input id="search-input" type="search" placeholder="Buscar" autocomplete="off" />
-                    </div>
-
-                    <div class="tt-meta">
-                        <span class="tt-title">Cursos:</span>
-                        <span id="mod-count" aria-live="polite">—</span>
-                        <span class="tt-sep">·</span>
-                        <span class="tt-title">Estado:</span>
-                        <!-- se actualiza por JS según el filtro/endpoint -->
-                        <span id="tt-status" class="badge-activo">Activo</span>
-                    </div>
-                </div>
-
-                <div class="right">
-                    <!-- Boton crear nuevo recurso  -->
-                    <button id="btn-add" class="icon-btn blue" type="button" aria-label="Crear nuevo" title="Crear">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Tabla Desktop -->
-            <section class="recursos-box desktop-only">
-                <div class="recursos-table" role="table" aria-label="Listado">
-                    <div class="table-header" role="rowgroup">
-                        <div class="col-nombre" role="columnheader">Nombre</div>
-                        <div class="col-tutor" role="columnheader">Tutor</div>
-                        <div class="col-fecha" role="columnheader">Fecha de inicio</div>
-                        <div class="col-status" role="columnheader">Status</div>
-                    </div>
-                    <div class="table-body" id="recursos-list" role="rowgroup">
-                        <!-- filas por JS -->
-                    </div>
-                </div>
-                <div id="pagination-controls" class="pagination-controls"></div>
-            </section>
-
-            <!-- Tabla Mobile -->
-            <section class="recursos-box mobile-only">
-                <div class="recursos-table-mobile">
-                    <div class="table-header">
-                        <div class="col-nombre">Nombre</div>
-                    </div>
-                    <div class="table-body" id="recursos-list-mobile">
-                        <!-- filas por JS -->
-                    </div>
-                </div>
-                <div id="pagination-mobile" class="pagination-controls"></div>
-            </section>
-
-        </section>
-
+      <!-- =================== Suscripciones =================== -->
+      <section id="view-suscripciones" hidden aria-labelledby="titulo-suscripciones">
+        <div class="toolbar">
+          <h1 id="titulo-suscripciones">Suscripciones</h1>
+        </div>
+        <div class="table-wrap card">
+          <table aria-describedby="desc-sus">
+            <caption class="sr-only">Lista de suscripciones</caption>
+            <thead>
+              <tr>
+                <th scope="col">Curso</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-suscripciones">
+              <tr class="empty"><td colspan="4"><small class="helper">Sin datos por ahora…</small></td></tr>
+            </tbody>
+          </table>
+          <p id="desc-sus" class="sr-only">Tabla con información de suscripciones; la última columna contiene acciones.</p>
+        </div>
+      </section>
     </main>
 
-
-
-
-    <!-- Drawer -->
-    <aside id="gc-drawer" class="drawer gc-dash" aria-hidden="true">
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-title">Detalle</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-close">Cerrar</button>
+    <!-- =================== Drawers =================== -->
+    <section aria-hidden="true">
+      <!-- los drawers se activan/desactivan desde el js -->
+    </section>
+  </div>
+    <!-- =================== Drawers =================== -->
+    <section aria-hidden="true">
+    <!-- Drawer Usuarios -->
+      <dialog id="drawer-usuarios" class="drawer" aria-labelledby="du-title" aria-modal="true">
+        <form method="dialog">
+          <div class="head"><h2 id="du-title">Usuario</h2></div>
+          <div class="body">
+            <input type="hidden" id="u_id" name="id">
+            <div class="grid-2">
+              <div class="field">
+                <div class="row" style="justify-content: space-between;">
+                  <label for="u_nombre">Nombre</label>
+                  <span class="counter" id="u_nombre_count" data-for="u_nombre" data-max="80">0/80</span>
+                </div>
+                <input id="u_nombre" name="nombre" maxlength="80" required autocomplete="name" autocapitalize="words">
+              </div>
+              <div class="field">
+                <label for="u_correo">Correo</label>
+                <input id="u_correo" name="correo" type="email" required autocomplete="email" inputmode="email">
+              </div>
             </div>
-        </div>
-        <div class="drawer-body" id="drawer-body">
-            <!-- contenido dinámico -->
-        </div>
-    </aside>
-    <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="u_tel">Teléfono</label>
+                <input id="u_tel" name="telefono" inputmode="numeric" pattern="\d{10,13}" maxlength="13" autocomplete="tel">
+                <small class="helper">10–13 dígitos</small>
+              </div>
+              <div class="field">
+                <label for="u_status">Estatus</label>
+                <select id="u_status" name="estatus">
+                  <option value="1">Activo</option>
+                  <option value="0">Inactivo</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Avatar</label>
+              <div class="row">
+                <div class="thumb" id="media-usuario">
+                  <img id="u_avatar_preview" alt="Avatar del usuario">
+                  <span class="placeholder" aria-hidden="true">Sin imagen</span>
+                </div>
+                <div>
+                  <input id="u_avatar_file" type="file" accept="image/*">
+                  <small class="helper">PNG/JPG, máx 5MB</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn" data-close="drawer-usuarios">Cancelar</button>
+            <button type="submit" class="btn primary" id="u_guardar">Guardar</button>
+          </div>
+        </form>
+      </dialog>
 
-    <script src="/JS/UAT/admin.js"></script>
-    <script src="/JS/JSglobal.js"></script>
+      <!-- Drawer Cursos -->
+      <dialog id="drawer-cursos" class="drawer" aria-labelledby="dc-title" aria-modal="true">
+        <form method="dialog">
+          <div class="head"><h2 id="dc-title">Curso</h2></div>
+          <div class="body">
+            <input type="hidden" id="c_id" name="id">
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="c_nombre">Nombre</label>
+                <span class="counter" id="c_nombre_count" data-for="c_nombre" data-max="100">0/100</span>
+              </div>
+              <input id="c_nombre" name="nombre" maxlength="100" required>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="c_fecha">Fecha</label>
+                <input id="c_fecha" name="fecha" type="date" required inputmode="none" autocomplete="off">
+                <small class="helper">Se prellenará con hoy en iOS/Android</small>
+              </div>
+              <div class="field">
+                <label for="c_status">Estatus</label>
+                <select id="c_status" name="estatus">
+                  <option value="1">Activo</option>
+                  <option value="2">Pausado</option>
+                  <option value="3">En curso</option>
+                  <option value="4">Terminado</option>
+                  <option value="5">Cancelado</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label>Portada</label>
+              <div class="row">
+                <div class="thumb" id="media-curso">
+                  <img id="c_portada_preview" alt="Portada del curso">
+                  <span class="placeholder" aria-hidden="true">Sin imagen</span>
+                </div>
+                <div>
+                  <input id="c_portada_file" type="file" accept="image/*">
+                  <small class="helper">PNG/JPG, máx 5MB</small>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="c_desc">Descripción</label>
+                <span class="counter" id="c_desc_count" data-for="c_desc" data-max="2000">0/2000</span>
+              </div>
+              <textarea id="c_desc" name="descripcion" maxlength="500" placeholder="Descripción corta del curso"></textarea>
+            </div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn" data-close="drawer-cursos">Cancelar</button>
+            <button type="submit" class="btn primary" id="c_guardar">Guardar</button>
+          </div>
+        </form>
+      </dialog>
 
+      <!-- Drawer Noticias -->
+      <dialog id="drawer-noticias" class="drawer" aria-labelledby="dn-title" aria-modal="true">
+        <form method="dialog">
+          <div class="head"><h2 id="dn-title">Noticia</h2></div>
+          <div class="body">
+            <input type="hidden" id="n_id" name="id">
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="n_titulo">Título</label>
+                <span class="counter" id="n_titulo_count" data-for="n_titulo" data-max="120">0/120</span>
+              </div>
+              <input id="n_titulo" name="titulo" maxlength="120" required>
+            </div>
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="n_resumen">Resumen</label>
+                <span class="counter" id="n_resumen_count" data-for="n_resumen" data-max="160">0/160</span>
+              </div>
+              <textarea id="n_resumen" name="resumen" maxlength="160" placeholder="Resumen para listados y SEO"></textarea>
+            </div>
+            <div class="field">
+              <label>Imágenes (2 requeridas)</label>
+              <div class="row">
+                <div class="thumb" id="media-noticia">
+                  <img id="n_img1_preview" alt="Imagen 1 de la noticia">
+                  <span class="placeholder" aria-hidden="true">Imagen 1</span>
+                </div>
+                <div class="thumb">
+                  <img id="n_img2_preview" alt="Imagen 2 de la noticia">
+                  <span class="placeholder" aria-hidden="true">Imagen 2</span>
+                </div>
+                <div class="grow"></div>
+                <div class="field">
+                  <input id="n_img1_file" type="file" accept="image/*">
+                  <input id="n_img2_file" type="file" accept="image/*">
+                  <small class="helper">Ambas obligatorias al crear</small>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="n_contenido">Contenido</label>
+                <span class="counter" id="n_contenido_count" data-for="n_contenido" data-max="5000">0/5000</span>
+              </div>
+              <textarea id="n_contenido" name="contenido" maxlength="5000" placeholder="Cuerpo de la noticia…"></textarea>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <div class="row" style="justify-content: space-between;">
+                  <label for="n_tags">Tags</label>
+                  <span class="counter" id="n_tags_count" data-for="n_tags" data-max="120">0/120</span>
+                </div>
+                <input id="n_tags" name="tags" maxlength="120" placeholder="educación, programación, ...">
+              </div>
+              <div class="field">
+                <label for="n_status">Estatus</label>
+                <select id="n_status" name="estatus">
+                  <option value="1">Activo</option>
+                  <option value="2">En pausa</option>
+                  <option value="4">Temporal</option>
+                  <option value="5">Cancelado</option>
+                  <option value="0">Inactivo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn" data-close="drawer-noticias">Cancelar</button>
+            <button type="submit" class="btn primary" id="n_guardar">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- Drawer Tutores -->
+      <dialog id="drawer-tutores" class="drawer" aria-labelledby="dt-title" aria-modal="true">
+        <form method="dialog">
+          <div class="head"><h2 id="dt-title">Tutor</h2></div>
+          <div class="body">
+            <input type="hidden" id="t_id" name="id">
+            <div class="grid-2">
+              <div class="field">
+                <div class="row" style="justify-content: space-between;">
+                  <label for="t_nombre">Nombre</label>
+                  <span class="counter" id="t_nombre_count" data-for="t_nombre" data-max="80">0/80</span>
+                </div>
+                <input id="t_nombre" name="nombre" maxlength="80" required autocapitalize="words">
+              </div>
+              <div class="field">
+                <label for="t_status">Estatus</label>
+                <select id="t_status" name="estatus">
+                  <option value="1">Activo</option>
+                  <option value="2">Pausado</option>
+                  <option value="0">Inactivo</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="t_bio">Bio</label>
+                <span class="counter" id="t_bio_count" data-for="t_bio" data-max="500">0/500</span>
+              </div>
+              <textarea id="t_bio" name="bio" maxlength="500" placeholder="Resumen de experiencia…"></textarea>
+            </div>
+            <div class="field">
+              <label>Foto</label>
+              <div class="row">
+                <div class="thumb" id="media-tutor">
+                  <img id="t_avatar_preview" alt="Foto del tutor">
+                  <span class="placeholder" aria-hidden="true">Sin imagen</span>
+                </div>
+                <div>
+                  <input id="t_avatar_file" type="file" accept="image/*">
+                  <small class="helper">PNG/JPG, máx 5MB</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn" data-close="drawer-tutores">Cancelar</button>
+            <button type="submit" class="btn primary" id="t_guardar">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- Drawer Suscripciones -->
+      <dialog id="drawer-suscripciones" class="drawer" aria-labelledby="ds-title" aria-modal="true">
+        <form method="dialog">
+          <div class="head"><h2 id="ds-title">Suscripción</h2></div>
+          <div class="body">
+            <input type="hidden" id="s_id" name="id">
+            <div class="grid-2">
+              <div class="field">
+                <label for="s_usuario">Usuario</label>
+                <select id="s_usuario" name="usuario_id"><option value="">—</option></select>
+              </div>
+              <div class="field">
+                <label for="s_curso">Curso</label>
+                <select id="s_curso" name="curso_id"><option value="">—</option></select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="s_status">Estatus</label>
+              <select id="s_status" name="estatus">
+                <option value="1">Suscrito</option>
+                <option value="2">Activo</option>
+                <option value="4">Terminado</option>
+                <option value="5">Cancelado</option>
+              </select>
+            </div>
+            <div class="field">
+              <div class="row" style="justify-content: space-between;">
+                <label for="s_notas">Notas</label>
+                <span class="counter" id="s_notas_count" data-for="s_notas" data-max="200">0/200</span>
+              </div>
+              <textarea id="s_notas" name="notas" maxlength="200" placeholder="Notas internas…"></textarea>
+            </div>
+          </div>
+          <div class="foot">
+            <button type="button" class="btn" data-close="drawer-suscripciones">Cancelar</button>
+            <button type="submit" class="btn primary" id="s_guardar">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
+
+  <!-- <script src="/JS/admin.js"></script> -->
 </body>
-
 </html>

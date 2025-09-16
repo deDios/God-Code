@@ -1436,3 +1436,48 @@ body.cuenta-only .topbar {
     top: 6px; left: 6px; padding: 3px 6px; font-size: 10.5px;
   }
 }
+
+    #admin-root { --bg: #ffffff; --fg: #0f172a; --muted: #64748b; --line: #e2e8f0; --brand: #0d6efd; --ok: #16a34a; --warn: #f59e0b; --err: #dc2626; --radius: 12px; }
+    #admin-root { padding: 16px; max-width: 1200px; margin: 0 auto; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--fg); }
+    #admin-root .toolbar { display:flex; align-items:center; justify-content: space-between; gap: 8px; margin: 6px 0 12px; flex-wrap: wrap; }
+    #admin-root .row { display:flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    #admin-root .grow { flex: 1 1 auto; }
+    #admin-root .search { display:flex; gap: 8px; align-items:center; }
+    #admin-root .search input { width: 260px; max-width: 60vw; }
+    #admin-root .btn { appearance: none; border: 1px solid var(--line); background: #f8fafc; color: #111; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+    #admin-root .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    #admin-root .btn.ghost { background: transparent; }
+    #admin-root .btn.danger { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+    #admin-root .btn:disabled { opacity: .6; cursor: not-allowed; }
+    #admin-root .card { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    #admin-root .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    #admin-root table { width: 100%; border-collapse: collapse; }
+    #admin-root thead th { text-align: left; font-size: 14px; letter-spacing: .02em; background: #f8fafc; border-bottom: 1px solid var(--line); padding: 10px; position: sticky; top: 0; z-index: 1; }
+    #admin-root tbody td { border-bottom: 1px solid var(--line); padding: 10px; vertical-align: top; }
+    #admin-root tbody tr:hover { background: #f9fafb; }
+    #admin-root caption.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
+    #admin-root .badge { padding: 2px 8px; border-radius: 999px; font-size: 12px; display:inline-block; background:#eef2ff; color:#3730a3; }
+    #admin-root .badge.gray { background:#f1f5f9; color:#334155; }
+    #admin-root .badge.warn { background:#fff7ed; color:#9a3412; }
+    #admin-root .badge.ok { background:#ecfdf5; color:#065f46; }
+    #admin-root dialog.drawer { width: min(720px, 95vw); border: none; border-radius: 16px; padding: 0; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+    #admin-root dialog::backdrop { background: rgba(0,0,0,.45); }
+    #admin-root .drawer .head { padding: 16px; background: #f8fafc; border-bottom: 1px solid var(--line); border-radius: 16px 16px 0 0; }
+    #admin-root .drawer .body { padding: 16px; max-height: 70vh; overflow: auto; }
+    #admin-root .drawer .foot { padding: 16px; background: #fff; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; display:flex; gap:8px; justify-content:flex-end; }
+    #admin-root form .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    #admin-root form .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 720px){ #admin-root form .grid-2, #admin-root form .grid-3 { grid-template-columns: 1fr; } }
+    #admin-root .field { display: grid; gap: 6px; margin: 10px 0; }
+    #admin-root .field.inline { align-items: center; grid-template-columns: 160px 1fr; }
+    #admin-root label { font-weight: 600; font-size: 14px; }
+    #admin-root input[type="text"], #admin-root input[type="email"], #admin-root input[type="tel"], #admin-root input[type="date"], #admin-root input[type="url"], #admin-root input[type="search"], #admin-root textarea, #admin-root select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; background: #fff; color: inherit; outline: none; }
+    #admin-root input:focus, #admin-root select:focus, #admin-root textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
+    #admin-root textarea { min-height: 110px; resize: vertical; }
+    #admin-root small.helper { color: var(--muted); }
+    #admin-root .counter { font-size: 12px; color: var(--muted); justify-self: end; }
+    #admin-root .counter[data-over="true"] { color: var(--err); font-weight: 700; }
+    #admin-root .thumb { width: 128px; height: 128px; border: 1px dashed var(--line); border-radius: 14px; background: #f8fafc; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    #admin-root .thumb img { max-width: 100%; max-height: 100%; display:block; }
+    #admin-root .thumb .placeholder { color: var(--muted); font-size: 12px; padding: 8px; text-align: center; }
+    #admin-root .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); border:0; }
