@@ -7,6 +7,7 @@
     <title>GodCode</title>
     <link rel="stylesheet" href="/CSS/plantilla.css" />
     <link rel="stylesheet" href="/CSS/admin/admin.css" />
+    <link rel="stylesheet" href="/CSS/admin/drawers.admin.css" />
 </head>
 
 <body>
