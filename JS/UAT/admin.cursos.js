@@ -33,6 +33,7 @@
       tipoEval: null,
       actividades: null,
       pendingCoverFile: null,
+      tempNewCourseImage: null,
     },
   };
   window.__CursosState = S; // flag para el router
@@ -616,8 +617,9 @@
   }
 
   async function uploadCursoCover(cursoId, file) {
+    if (!cursoId) throw new Error("Falta cursoId para subir imagen");
     const fd = new FormData();
-    fd.append("curso_id", String(cursoId || 0));
+    fd.append("curso_id", String(cursoId));
     fd.append("imagen", file);
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     const text = await res.text().catch(() => "");
@@ -765,42 +767,36 @@
             </svg>
           </button>
         </figure>
-        <div class="media-meta">
-          <div class="media-label">Portada</div>
-          <div id="cover-hint" class="media-hint" style="font-size:.85rem;color:#666;"></div>
-        </div>
+        <div class="media-meta"><div class="media-label">Portada</div></div>
       </div>
     </div>
   `;
+
     const img = containerEl.querySelector("#curso-cover-edit");
     const pencil = containerEl.querySelector(".media-edit");
-    const hint = containerEl.querySelector("#cover-hint");
 
-    // si venimos de "crear" y ya elegiste un archivo antes de guardar, muéstralo
-    if (!cursoId && S.pendingCoverFile instanceof File) {
-      const url = URL.createObjectURL(S.pendingCoverFile);
-      img.src = url;
-      hint.textContent = "La imagen se subirá cuando guardes el curso.";
-    } else {
+    if (cursoId) {
       (async () => {
-        img.src = await resolveCursoImg(cursoId || 0);
+        img.src = await resolveCursoImg(cursoId);
       })();
-    }
-    img.onerror = () => {
-      img.onerror = null;
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = noImageSvgDataURI();
+      };
+    } else {
+      // modo CREAR: pon placeholder y no intentes cargar del servidor
       img.src = noImageSvgDataURI();
-    };
+    }
 
-    if (!pencil || pencil._b) return;
-    pencil._b = true;
-
+    // mismo botón para ambos modos, pero en crear solo guarda el archivo temporal
+    if (!pencil || pencil._gc_bound) return;
+    pencil._gc_bound = true;
     pencil.addEventListener("click", () => {
       const input = document.createElement("input");
       input.type = "file";
       input.accept = "image/png,image/jpeg";
       input.style.display = "none";
       document.body.appendChild(input);
-
       input.addEventListener("change", async () => {
         const file = input.files && input.files[0];
         input.remove();
@@ -812,35 +808,24 @@
           return;
         }
 
-        // Si NO hay ID: sólo previsualiza y guarda en buffer; se subirá tras guardar
+        // En crear: almacena temporal y solo muestra preview
         if (!cursoId) {
-          previewOverlay(file, {
-            onCancel() {},
-            async onConfirm() {
-              try {
-                S.pendingCoverFile = file;
-                const blobUrl = URL.createObjectURL(file);
-                img.src = blobUrl;
-                hint.textContent =
-                  "La imagen se subirá cuando guardes el curso.";
-                toast("Imagen lista para subir al guardar", "info");
-              } catch (e) {
-                console.error(e);
-                toast("No se pudo preparar la imagen", "error");
-              }
-            },
-          });
+          window.__CursosState.tempNewCourseImage = file;
+          // preview simple:
+          const url = URL.createObjectURL(file);
+          img.src = withBust(url);
+          // URL.revokeObjectURL(url) -> no lo revocamos de inmediato para que se vea
+          toast("Imagen seleccionada (aún no subida)", "info");
           return;
         }
 
-        // Con ID: sube de inmediato
+        // En editar: sube inmediatamente usando el id
         previewOverlay(file, {
           onCancel() {},
           async onConfirm() {
             try {
               const newUrl = await uploadCursoCover(cursoId, file);
               img.src = withBust(newUrl);
-              hint.textContent = "";
               toast("Imagen actualizada", "exito");
             } catch (err) {
               console.error(err);
@@ -849,7 +834,6 @@
           },
         });
       });
-
       input.click();
     });
   }
@@ -896,13 +880,6 @@
   }
 
   async function saveCurso() {
-    const toNumOrNull = (v) => {
-      const s = (v ?? "").toString().trim();
-      if (s === "") return null;
-      const n = Number(s);
-      return Number.isFinite(n) ? n : null;
-    };
-
     const body = {
       id: S.current?.id ?? null,
       nombre: val("f_nombre"),
@@ -911,19 +888,20 @@
       descripcion_curso: val("f_desc_curso"),
       dirigido: val("f_dirigido"),
       competencias: val("f_competencias"),
-      tutor: toNumOrNull(val("f_tutor")),
-      horas: toNumOrNull(val("f_horas")),
+      tutor: num("f_tutor"),
+      horas: num("f_horas"),
       precio: Number(val("f_precio") || 0),
-      estatus: toNumOrNull(val("f_estatus")) ?? 1,
+      estatus: num("f_estatus"),
       fecha_inicio: val("f_fecha"),
-      prioridad: toNumOrNull(val("f_prioridad")),
-      categoria: toNumOrNull(val("f_categoria")),
-      calendario: toNumOrNull(val("f_calendario")),
-      tipo_evaluacion: toNumOrNull(val("f_tipo_eval")),
-      actividades: toNumOrNull(val("f_actividades")),
+      prioridad: num("f_prioridad"),
+      categoria: num("f_categoria"),
+      calendario: num("f_calendario"),
+      tipo_evaluacion: num("f_tipo_eval"),
+      actividades: num("f_actividades"),
       certificado: qs("#f_certificado")?.checked ? 1 : 0,
     };
 
+    // validación mínima (ajústala a gusto)
     if (
       !body.nombre ||
       !body.descripcion_breve ||
@@ -936,51 +914,48 @@
     }
 
     try {
-      let newId = body.id ?? null;
+      let newId = body.id;
+
       if (body.id == null) {
-        const resp = await postJSON(API.iCursos, body);
-        const newId =
-          resp?.id ??
-          resp?.ID ??
-          resp?.insertId ??
-          resp?.insert_id ??
-          resp?.lastId ??
-          resp?.last_id ??
-          null;
+        // Crear
+        const res = await postJSON(API.iCursos, body);
+        // permítenos múltiples posibles campos devueltos
+        newId = Number(
+          (res &&
+            (res.id ||
+              res.curso_id ||
+              res.insert_id ||
+              (res.data && res.data.id))) ||
+            0
+        );
+        // si hay imagen temporal, súbela con el id nuevo
+        const file = S.tempNewCourseImage || null;
+        if (newId && file) {
+          try {
+            await uploadCursoCover(newId, file);
+            toast("Imagen subida", "exito");
+          } catch (e) {
+            console.error(e);
+            toast("Curso creado, pero falló la imagen", "error");
+          } finally {
+            S.tempNewCourseImage = null;
+          }
+        }
       } else {
+        // Editar
         await postJSON(API.uCursos, body);
-        newId = body.id;
+        // si quieres permitir cambiar imagen en editar, ya lo haces en el overlay
       }
 
       toast("Curso guardado", "exito");
 
-      // recarga y abre el curso guardado
-      await loadCursos();
-      let it = null;
-      if (newId != null) it = (S.data || []).find((x) => +x.id === +newId);
-      if (!it)
-        it =
-          (S.data || []).find((x) => x.nombre === body.nombre) || S.data?.[0];
-
+      await window.loadCursos();
+      const idToOpen = newId || body.id;
+      const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
       if (it) {
         S.current = { id: it.id, _all: it };
-        setDrawerMode("view");
-        await fillCursoView(it);
-
-        if (S.pendingCoverFile instanceof File) {
-          try {
-            const url = await uploadCursoCover(it.id, S.pendingCoverFile);
-            S.pendingCoverFile = null;
-            const imgView = document.querySelector("#curso-cover-view");
-            if (imgView) imgView.src = withBust(url);
-            toast("Imagen cargada", "exito");
-          } catch (e) {
-            console.error(e);
-            toast("Curso guardado, pero la imagen no se pudo subir.", "error");
-          }
-        }
-      } else {
-        setDrawerMode("edit");
+        window.setDrawerMode("view");
+        await window.fillCursoView(it);
       }
     } catch (err) {
       console.error(err);
