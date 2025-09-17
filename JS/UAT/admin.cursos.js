@@ -521,6 +521,7 @@
       act && (act.style.display = "none");
     }
   }
+
   window.setDrawerMode = setDrawerMode;
 
   function paintActions(it) {
@@ -611,7 +612,7 @@
               updateRowStatusCell(it.id, it.estatus);
               paintActions(it);
             } else {
-              toast("Curso reactivado", "exito");
+              //toast("Curso reactivado", "exito");
             }
           } else {
             // ====== Soft delete (optimista)
@@ -625,7 +626,7 @@
               updateRowStatusCell(it.id, it.estatus);
               paintActions(it);
             } else {
-              toast("Curso movido a Inactivo", "exito");
+              //toast("Curso movido a Inactivo", "exito");
             }
           }
         } finally {
