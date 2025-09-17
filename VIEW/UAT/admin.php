@@ -265,7 +265,6 @@
     <!-- Drawers para cada modulo (cursos,noticias,tutores,usuarios,suscripciones de momento son esos solamente) -->
 
     <!-- Drawer: Curso -->
-    <!-- Drawer · CURSO -->
     <aside id="drawer-curso" class="drawer gc-dash" aria-hidden="true" hidden>
         <div class="drawer-header">
             <div class="drawer-title" id="drawer-curso-title">Curso · —</div>
@@ -277,8 +276,7 @@
         <div class="drawer-body" id="drawer-curso-body">
             <!-- Acciones  -->
             <div class="gc-actions" id="curso-actions-view">
-                <button class="gc-btn" id="btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
+                <!-- aquí inyectamos el botón dinamicamente -->
             </div>
 
             <!----------------------------------  MODO VISTA  ---------------------------------------------->

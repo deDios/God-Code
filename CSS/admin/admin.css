@@ -1226,7 +1226,7 @@ body.cuenta-only .topbar {
 .drawer.gc-dash .mode-edit #f_desc_media{ min-height:120px; }
 .drawer.gc-dash .mode-edit #f_desc_curso{ min-height:220px; }
 
-/* Date input bonito */
+/* Date input */
 .drawer.gc-dash .mode-edit input[type="date"]{
   -webkit-appearance:none; -moz-appearance:none; appearance:none;
   height:44px; padding:10px 40px 10px 12px; border:1px solid var(--gc-border,#e6e9ee);
