@@ -60,8 +60,27 @@ async function postJSON(url, body) {
   try{ return JSON.parse(t) } catch { return { _raw:t } }
 }
 
-/* ====== Imagen de curso ====== */
-function cursoImgUrl(id){ return `/ASSETS/cursos/img${Number(id)}.png`; }
+/* ====== Imagen de curso  ====== */
+function cursoImgUrl(id, ext="png"){ return `/ASSETS/cursos/img${Number(id)}.${ext}`; }
+
+function withBust(u){ try{ const url=new URL(u, location.origin); url.searchParams.set("v", Date.now()); return url.pathname+"?"+url.searchParams.toString(); }catch{ return u+(u.includes("?")?"&":"?")+"v="+Date.now(); } }
+function noImageSvg(){ return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>"; }
+function imgExists(url){ return new Promise(res=>{ try{ const i=new Image(); i.onload=()=>res(true); i.onerror=()=>res(false); i.src=withBust(url); }catch{ res(false); } }); }
+
+async function resolveCursoImg(id){
+  const png = cursoImgUrl(id, "png");
+  if (await imgExists(png)) return withBust(png);
+  const jpg = cursoImgUrl(id, "jpg");
+  if (await imgExists(jpg)) return withBust(jpg);
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(noImageSvg());
+}
+
+async function setCursoImage(imgEl, id){
+  if(!imgEl) return;
+  const url = await resolveCursoImg(id);
+  imgEl.src = url;
+  imgEl.onerror = async () => { imgEl.onerror = null; imgEl.src = "data:image/svg+xml;utf8,"+encodeURIComponent(noImageSvg()); };
+}
 
 /* ====== Overlay + Drawer helpers (comparten vista/edición) ====== */
 function openDrawerCurso(){ const d=qs("#drawer-curso"); const ov=qs("#gc-dash-overlay"); if(!d) return;
@@ -77,7 +96,6 @@ qsa("#drawer-curso-close").forEach(b=>b.addEventListener("click", closeDrawerCur
 qsa("#gc-dash-overlay").forEach(ov=>ov.addEventListener("click", closeDrawerCurso));
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDrawerCurso(); }});
 
-/* ====== Export light para depurar ====== */
 window.__CursosState = S;
 
 /* ==================== BLOQUE 1: Carga + lista ==================== */
@@ -127,12 +145,12 @@ function renderCursos(){
     pageRows.forEach(it=>{
       const est = STATUS_LABEL[it.estatus] || it.estatus;
       d.insertAdjacentHTML("beforeend",
-        `<div class="table-row" role="row" data-id="${it.id}">
-           <div class="col-nombre" role="cell">${esc(it.nombre||"-")}</div>
-           <div class="col-tutor" role="cell">${esc(String(it.tutor||"-"))}</div>
-           <div class="col-fecha" role="cell">${esc(fmtDate(it.fecha_inicio))}</div>
-           <div class="col-status" role="cell">${esc(est)}</div>
-         </div>`);
+    `<div class="table-row" role="row" data-id="${it.id}">
+     <div class="col-nombre" role="cell">${esc(it.nombre||"-")}</div>
+     <div class="col-tutor" role="cell">${esc(mapLabel(S.maps.tutores, it.tutor))}</div>
+     <div class="col-fecha" role="cell">${esc(fmtDate(it.fecha_inicio))}</div>
+     <div class="col-status" role="cell">${esc(est)}</div>
+    </div>`);
     });
     qsa(".table-row", d).forEach(row=>{
       row.addEventListener("click",()=> openCursoView(Number(row.dataset.id)));
@@ -264,8 +282,82 @@ function fillCursoView(it){
   put("#v_fecha", fmtDate(it.fecha_inicio));
   put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
 
-  // imágenes (solo lectura)
-  mountCursoMedia("media-curso", it.id, { editable:false });
+async function mountCursoMedia(container, id, { editable=false } = {}){
+  if(!container) return;
+  container.innerHTML =
+    `<div class="media-head">
+       <div class="media-title">Imágenes</div>
+       <div class="media-help" style="color:${editable?'#666':'#888'};">${editable?'Formatos: JPG/PNG · Máx 2MB':'Solo lectura'}</div>
+     </div>
+     <div class="media-grid">
+       <div class="media-card">
+         <figure class="media-thumb">
+           <img id="curso-cover" alt="Portada">
+           ${editable ? '<button class="icon-btn media-edit" title="Editar imagen" type="button">✎</button>' : ''}
+         </figure>
+         <div class="media-meta"><div class="media-label">Portada</div></div>
+       </div>
+     </div>`;
+
+  // Cargar imagen con fallback (png→jpg→placeholder)
+  const img = container.querySelector("#curso-cover");
+  await setCursoImage(img, id);
+
+  if (editable){
+    const btn = container.querySelector(".media-edit");
+    if (btn && !btn._gc_bound){
+      btn._gc_bound = true;
+      btn.addEventListener("click", async (e)=>{
+        e.preventDefault();
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/png,image/jpeg";
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.onchange = async ()=>{
+          const file = input.files && input.files[0];
+          try{ document.body.removeChild(input); }catch{}
+          if(!file) return;
+
+          // validación ligera
+          if(!/image\/(png|jpe?g)/i.test(file.type)) { gcToast?.("Formato no permitido","error"); return; }
+          if(file.size > 2*1024*1024){ gcToast?.("La imagen excede 2MB","error"); return; }
+
+          // Vista previa simple 
+          const url = URL.createObjectURL(file);
+          img.src = url;
+
+          // Subir al backend
+          try{
+            const fd = new FormData();
+            fd.append("curso_id", String(id));
+            fd.append("imagen", file);
+            const r = await fetch(API_UPLOAD.cursoImg, { method:"POST", body:fd });
+            const t = await r.text();
+            if(!r.ok) throw new Error("HTTP "+r.status+" "+(t||""));
+            let j; try{ j = JSON.parse(t); }catch{ j = {}; }
+            // Si el backend devuelve la url, úsala; si no, refuerza fallback local
+            if (j && j.url){
+              img.src = withBust(j.url);
+            } else {
+              await setCursoImage(img, id);
+            }
+            gcToast?.("Imagen de curso actualizada","exito");
+          }catch(err){
+            console.error(err);
+            gcToast?.("No se pudo subir la imagen","error");
+            // regresar a la mejor disponible
+            await setCursoImage(img, id);
+          }finally{
+            try{ URL.revokeObjectURL(url); }catch{}
+          }
+        };
+        input.click();
+      });
+    }
+  }
+}
+
 
   // JSON dev
   const pre=qs("#json-curso"); if(pre) pre.textContent = JSON.stringify(it, null, 2);
@@ -315,8 +407,8 @@ function fillCursoEdit(c){
   putSelect("f_actividades",S.maps.actividades,c.actividades);
   putStatus("f_estatus", c.estatus);
 
-  // imágenes con lápiz (editable)
-  mountCursoMedia("media-curso-edit", S.current?.id, { editable:true });
+  // imagenes con lapiz (editable)
+  //mountCursoMedia("media-curso-edit", S.current?.id, { editable:true }); ya no es necesario aqui
 
   // botones guardar/cancelar
   const bSave=qs("#btn-save"), bCancel=qs("#btn-cancel");
