@@ -65,6 +65,36 @@
           "'": "&#39;",
         }[c])
     );
+
+  // ===== creado_por desde la cookie `usuario` =====
+  function getCreatorId() {
+    try {
+      const raw = document.cookie
+        .split("; ")
+        .find((r) => r.startsWith("usuario="));
+      if (!raw) {
+        console.warn("[Cursos] Cookie 'usuario' no encontrada.");
+        return null;
+      }
+      const json = decodeURIComponent(raw.split("=")[1] || "");
+      const u = JSON.parse(json);
+      console.log("[Cursos] usuario(cookie) →", u);
+      const n = Number(u?.id);
+      if (Number.isFinite(n)) return n;
+      console.warn(
+        "[Cursos] El objeto de cookie no trae un id numérico:",
+        u?.id
+      );
+      return null;
+    } catch (e) {
+      console.error(
+        "[Cursos] getCreatorId() error al leer cookie 'usuario':",
+        e
+      );
+      return null;
+    }
+  }
+
   const fmtMoney = (n) =>
     isFinite(+n)
       ? new Intl.NumberFormat("es-MX", {
@@ -915,9 +945,9 @@
       let newId = body.id;
 
       if (body.id == null) {
-        // INSERT: agrega creado_por
-        const creador = getCreatorId();
-        if (creador == null) {
+        // INSERT -> agrega creado_por desde cookie `usuario`
+        const creado_por = getCreatorId();
+        if (creado_por == null) {
           console.warn(
             "[Cursos] creado_por ausente. No se puede crear el curso."
           );
@@ -927,33 +957,25 @@
           );
           return;
         }
-        const insertBody = Object.assign({}, body, { creado_por: creador });
+        const insertBody = { ...body, creado_por };
         console.log("[Cursos] Insertando curso con:", insertBody);
 
         const res = await postJSON(API.iCursos, insertBody);
         console.log("[Cursos] Respuesta insert:", res);
 
-        // Manejo de error explícito del backend
         if (res && res.error) {
           console.error("[Cursos] Insert ERROR:", res.error);
           toast(res.error, "error");
           return;
         }
 
-        // Extrae id tolerante a distintos nombres
+        // Obtén el id que devuelva tu API (toma el primero que exista)
         const idCand =
-          res?.id ??
-          res?.ID ??
-          res?.curso_id ??
-          res?.insert_id ??
-          res?.insertId ??
-          res?.last_id ??
-          res?.lastId ??
-          res?.data?.id;
+          res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id;
         newId = Number(idCand || 0);
         console.log("[Cursos] Nuevo ID:", newId);
 
-        // Subida diferida de portada (si se seleccionó en crear)
+        // Subida diferida de portada si venía seleccionada en "crear"
         if (newId && S.tempNewCourseImage instanceof File) {
           try {
             const url = await uploadCursoCover(newId, S.tempNewCourseImage);
