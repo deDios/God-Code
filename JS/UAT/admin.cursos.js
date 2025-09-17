@@ -1,6 +1,8 @@
-/* ==================== CURSOS: Núcleo + Listado + Drawer ==================== */
+/* ==================== CURSOS (UAT) — Núcleo + Listado + Drawer ==================== */
 (() => {
   "use strict";
+
+  const TAG = "[Cursos]";
 
   /* ---------- Config/API ---------- */
   const API_BASE =
@@ -32,13 +34,23 @@
       calendario: null,
       tipoEval: null,
       actividades: null,
-      pendingCoverFile: null,
-      tempNewCourseImage: null,
     },
+    tempNewCourseImage: null, // buffer para portada en modo crear
   };
-  window.__CursosState = S; // flag para el router
+  window.__CursosState = S; // bandera para el router
 
-  /* ---------- Utils ---------- */
+  /* ---------- Const UI ---------- */
+  const STATUS_LABEL = {
+    1: "Activo",
+    0: "Inactivo",
+    2: "Pausado",
+    3: "Terminado",
+    4: "En curso",
+    5: "Cancelado",
+  };
+  const ORDER_CURSOS = [1, 0, 2, 3, 4, 5];
+
+  /* ---------- Utils DOM/format ---------- */
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
@@ -62,57 +74,60 @@
       : "-";
   const fmtBool = (v) => (+v === 1 || v === true || v === "1" ? "Sí" : "No");
   const fmtDate = (d) => (!d ? "-" : String(d));
-  const STATUS_LABEL = {
-    1: "Activo",
-    0: "Inactivo",
-    2: "Pausado",
-    3: "Terminado",
-    4: "En curso",
-    5: "Cancelado",
-  };
-  const ORDER_CURSOS = [1, 0, 2, 3, 4, 5];
+  const normalize = (s) =>
+    String(s || "")
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .toLowerCase()
+      .trim();
 
+  function toast(msg, type = "info", ms = 2200) {
+    if (window.gcToast) return window.gcToast(msg, type, ms);
+    console.log(`${TAG} toast[${type}]:`, msg);
+  }
+
+  /* ---------- HTTP JSON robusto ---------- */
   async function postJSON(url, body) {
+    console.log(TAG, "POST", url, { body });
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
     const text = await r.text().catch(() => "");
-    if (!r.ok) throw new Error("HTTP " + r.status + " " + text);
+    console.log(TAG, "HTTP", r.status, "raw:", text);
+    if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
 
     // 1) intento normal
     try {
-      return JSON.parse(text);
+      const j = JSON.parse(text);
+      console.log(TAG, "JSON OK:", j);
+      return j;
     } catch {}
 
-    // 2) intenta recortar la porción JSON más grande { ... } o [ ... ]
+    // 2) recorta bloque JSON { .. } o [ .. ]
     const firstBrace = text.indexOf("{");
     const lastBrace = text.lastIndexOf("}");
     const firstBrack = text.indexOf("[");
     const lastBrack = text.lastIndexOf("]");
-
     let candidate = "";
-    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace)
       candidate = text.slice(firstBrace, lastBrace + 1);
-    } else if (
-      firstBrack !== -1 &&
-      lastBrack !== -1 &&
-      lastBrack > firstBrack
-    ) {
+    else if (firstBrack !== -1 && lastBrack !== -1 && lastBrack > firstBrack)
       candidate = text.slice(firstBrack, lastBrack + 1);
-    }
-
     if (candidate) {
       try {
-        return JSON.parse(candidate);
+        const j2 = JSON.parse(candidate);
+        console.warn(TAG, "JSON trimmed:", j2);
+        return j2;
       } catch {}
     }
 
-    // 3) último recurso: regresa crudo para depurar
+    console.warn(TAG, "JSON parse failed; returning _raw");
     return { _raw: text };
   }
 
+  /* ---------- Cache-bust ---------- */
   function withBust(u) {
     if (
       !u ||
@@ -141,22 +156,23 @@
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
   async function resolveCursoImg(id) {
-    const ok = (url) =>
+    const tryUrl = (url) =>
       new Promise((res) => {
         const i = new Image();
         i.onload = () => res(true);
         i.onerror = () => res(false);
         i.src = url;
       });
-    const png = withBust(cursoImgUrl(id, "png"));
-    const jpg = withBust(cursoImgUrl(id, "jpg"));
-    if (await ok(png)) return png;
-    if (await ok(jpg)) return jpg;
+    const p = withBust(cursoImgUrl(id, "png"));
+    const j = withBust(cursoImgUrl(id, "jpg"));
+    if (await tryUrl(p)) return p;
+    if (await tryUrl(j)) return j;
     return noImageSvgDataURI();
   }
 
   /* ---------- Drawer helpers ---------- */
   function openDrawerCurso() {
+    console.log(TAG, "openDrawerCurso()");
     const d = qs("#drawer-curso"),
       ov = qs("#gc-dash-overlay");
     if (!d) return;
@@ -166,6 +182,7 @@
     ov && ov.classList.add("open");
   }
   function closeDrawerCurso() {
+    console.log(TAG, "closeDrawerCurso()");
     const d = qs("#drawer-curso"),
       ov = qs("#gc-dash-overlay");
     if (!d) return;
@@ -175,28 +192,23 @@
     ov && ov.classList.remove("open");
     S.current = null;
   }
+  // binds 1 vez
   qsa("#drawer-curso-close").forEach((b) => {
     if (!b._b) {
       b._b = true;
       b.addEventListener("click", closeDrawerCurso);
     }
   });
-  const overlay = qs("#gc-dash-overlay");
-  if (overlay && !overlay._b) {
-    overlay._b = true;
-    overlay.addEventListener("click", closeDrawerCurso);
+  const _ov = qs("#gc-dash-overlay");
+  if (_ov && !_ov._b) {
+    _ov._b = true;
+    _ov.addEventListener("click", closeDrawerCurso);
   }
   if (!window._gc_cursos_esc) {
     window._gc_cursos_esc = true;
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeDrawerCurso();
     });
-  }
-
-  /* ---------- Toast básico ---------- */
-  function toast(msg, type = "info", ms = 2200) {
-    if (window.gcToast) return window.gcToast(msg, type, ms);
-    console.log(`[${type}] ${msg}`);
   }
 
   /* ---------- Map helpers ---------- */
@@ -225,7 +237,7 @@
     return k in map ? map[k] ?? "-" : "-";
   }
 
-  /* ---------- Export utils para otros módulos si los usan ---------- */
+  /* ---------- Export utils para otros módulos (por si dependen) ---------- */
   window.gcUtils = Object.assign({}, window.gcUtils || {}, {
     qs,
     qsa,
@@ -249,6 +261,7 @@
 
   /* ==================== Catálogos + Listado ==================== */
   async function loadCatalogos() {
+    console.log(TAG, "loadCatalogos()...");
     if (!S.maps.tutores)
       S.maps.tutores = arrToMap(
         await postJSON(API.tutores, { estatus: 1 }).catch(() => [])
@@ -273,10 +286,11 @@
       S.maps.actividades = arrToMap(
         await postJSON(API.actividades, { estatus: 1 }).catch(() => [])
       );
+    console.log(TAG, "Catálogos OK:", S.maps);
   }
 
   async function loadCursos() {
-    // carga por estatus y concatena en el orden deseado
+    console.log(TAG, "loadCursos()...");
     const chunks = await Promise.all(
       ORDER_CURSOS.map((st) =>
         postJSON(API.cursos, { estatus: st }).catch(() => [])
@@ -288,18 +302,12 @@
     });
     S.data = flat;
     S.page = 1;
+    console.log(TAG, "Cursos cargados:", S.data.length);
     renderCursos();
   }
 
-  function normalize(s) {
-    return String(s || "")
-      .normalize("NFD")
-      .replace(/\p{M}/gu, "")
-      .toLowerCase()
-      .trim();
-  }
-
   function renderCursos() {
+    console.log(TAG, "renderCursos() page", S.page, "search=", S.search);
     const hostD = qs("#recursos-list");
     const hostM = qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
@@ -310,14 +318,12 @@
       ? S.data.filter((row) => normalize(JSON.stringify(row)).includes(term))
       : S.data;
 
-    // meta
     const modCount = qs("#mod-count");
     if (modCount) {
       const n = filtered.length;
       modCount.textContent = `${n} ${n === 1 ? "elemento" : "elementos"}`;
     }
 
-    // paginación
     const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
     if (S.page > totalPages) S.page = totalPages;
     const start = (S.page - 1) * S.pageSize;
@@ -338,10 +344,10 @@
             `
             <div class="table-row" role="row" data-id="${it.id}">
               <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
-              <div class="col-tutor" role="cell">${esc(
+              <div class="col-tutor"  role="cell">${esc(
                 mapLabel(S.maps.tutores, it.tutor)
               )}</div>
-              <div class="col-fecha" role="cell">${esc(
+              <div class="col-fecha"  role="cell">${esc(
                 fmtDate(it.fecha_inicio)
               )}</div>
               <div class="col-status" role="cell">${esc(est)}</div>
@@ -352,6 +358,7 @@
         qsa(".table-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
             const id = Number(row.dataset.id);
+            console.log(TAG, "click row id=", id);
             if (id) openCursoView(id);
           });
         });
@@ -385,6 +392,7 @@
             const id = Number(
               btn.closest(".table-row-mobile")?.dataset.id || 0
             );
+            console.log(TAG, "open mobile id=", id);
             if (id) openCursoView(id);
           });
         });
@@ -401,7 +409,7 @@
       cont.innerHTML = "";
       if (totalPages <= 1) return;
 
-      const mkBtn = (txt, dis, cb, cls = "page-btn") => {
+      const mk = (txt, dis, cb, cls = "page-btn") => {
         const b = document.createElement("button");
         b.textContent = txt;
         b.className = cls + (dis ? " disabled" : "");
@@ -409,9 +417,8 @@
         else b.onclick = cb;
         return b;
       };
-
       cont.appendChild(
-        mkBtn(
+        mk(
           "‹",
           S.page === 1,
           () => {
@@ -422,7 +429,7 @@
         )
       );
       for (let p = 1; p <= totalPages && p <= 7; p++) {
-        const b = mkBtn(String(p), false, () => {
+        const b = mk(String(p), false, () => {
           S.page = p;
           renderCursos();
         });
@@ -430,7 +437,7 @@
         cont.appendChild(b);
       }
       cont.appendChild(
-        mkBtn(
+        mk(
           "›",
           S.page === totalPages,
           () => {
@@ -443,7 +450,7 @@
     });
   }
 
-  // búsqueda
+  // búsqueda (bind 1 vez)
   const searchInput = qs("#search-input");
   if (searchInput && !searchInput._b) {
     searchInput._b = true;
@@ -456,9 +463,10 @@
 
   /* ==================== Drawer: Vista ==================== */
   function setDrawerMode(mode) {
-    const v = qs("#curso-view");
-    const e = qs("#curso-edit");
-    const act = qs("#curso-actions-view");
+    console.log(TAG, "setDrawerMode:", mode);
+    const v = qs("#curso-view"),
+      e = qs("#curso-edit"),
+      act = qs("#curso-actions-view");
     if (mode === "view") {
       v && (v.hidden = false);
       e && (e.hidden = true);
@@ -469,6 +477,7 @@
       act && (act.style.display = "none");
     }
   }
+  window.setDrawerMode = setDrawerMode; // expuesto para compat
 
   async function mountCursoMediaView(containerEl, cursoId) {
     if (!containerEl) return;
@@ -503,9 +512,9 @@
   }
 
   async function fillCursoView(it) {
+    console.log(TAG, "fillCursoView id=", it?.id, it);
     const title = qs("#drawer-curso-title");
     if (title) title.textContent = "Curso · " + (it.nombre || "—");
-
     put("#v_nombre", it.nombre);
     put("#v_desc_breve", it.descripcion_breve);
     put("#v_desc_media", it.descripcion_media);
@@ -548,15 +557,18 @@
       });
     }
   }
+  window.fillCursoView = fillCursoView;
 
   async function openCursoView(id) {
     const it = (S.data || []).find((x) => +x.id === +id);
+    console.log(TAG, "openCursoView id=", id, "found:", !!it);
     if (!it) return;
     S.current = { id: it.id, _all: it };
     openDrawerCurso();
     setDrawerMode("view");
     await fillCursoView(it);
   }
+  window.openCursoView = openCursoView;
 
   /* ==================== Drawer: Edición ==================== */
   function setVal(id, v) {
@@ -618,19 +630,22 @@
 
   async function uploadCursoCover(cursoId, file) {
     if (!cursoId) throw new Error("Falta cursoId para subir imagen");
+    console.log(TAG, "uploadCursoCover id=", cursoId, file);
     const fd = new FormData();
-    fd.append("curso_id", String(cursoId));
-    fd.append("imagen", file);
+    fd.append("curso_id", String(cursoId)); // verifica que tu PHP espere esta clave
+    fd.append("imagen", file); // verifica nombre del field en PHP
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     const text = await res.text().catch(() => "");
+    console.log(TAG, "upload HTTP", res.status, "raw:", text);
     if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
-    let json = null;
     try {
-      json = JSON.parse(text);
+      const j = JSON.parse(text);
+      console.log(TAG, "upload JSON:", j);
+      return j && j.url ? String(j.url) : cursoImgUrl(cursoId || 0);
     } catch {
-      json = { _raw: text };
+      console.warn(TAG, "upload parse fallback");
+      return cursoImgUrl(cursoId || 0);
     }
-    return json && json.url ? String(json.url) : cursoImgUrl(cursoId || 0);
   }
 
   function previewOverlay(file, { onConfirm, onCancel }) {
@@ -714,64 +729,27 @@
     apply();
   }
 
-  function bindEditButtonUpload(btn, img, cursoId) {
-    if (!btn || btn._b) return;
-    btn._b = true;
-    btn.addEventListener("click", () => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = "image/png,image/jpeg";
-      input.style.display = "none";
-      document.body.appendChild(input);
-      input.addEventListener("change", async () => {
-        const file = input.files && input.files[0];
-        input.remove();
-        if (!file) return;
-        const v = validarImagen(file, 2);
-        if (!v.ok) {
-          toast(v.error, "error");
-          return;
-        }
-        previewOverlay(file, {
-          onCancel() {},
-          async onConfirm() {
-            try {
-              const newUrl = await uploadCursoCover(cursoId, file);
-              img.src = withBust(newUrl);
-              toast("Imagen actualizada", "exito");
-            } catch (err) {
-              console.error(err);
-              toast("No se pudo subir la imagen", "error");
-            }
-          },
-        });
-      });
-      input.click();
-    });
-  }
-
   function mountCursoMediaEdit(containerEl, cursoId) {
     if (!containerEl) return;
     containerEl.innerHTML = `
-    <div class="media-head">
-      <div class="media-title">Imágenes</div>
-      <div class="media-help">JPG/PNG · Máx 2MB</div>
-    </div>
-    <div class="media-grid">
-      <div class="media-card">
-        <figure class="media-thumb">
-          <img alt="Portada" id="curso-cover-edit" loading="eager" src="">
-          <button class="icon-btn media-edit" type="button" title="Editar imagen" aria-label="Editar imagen">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-            </svg>
-          </button>
-        </figure>
-        <div class="media-meta"><div class="media-label">Portada</div></div>
+      <div class="media-head">
+        <div class="media-title">Imágenes</div>
+        <div class="media-help">JPG/PNG · Máx 2MB</div>
       </div>
-    </div>
-  `;
-
+      <div class="media-grid">
+        <div class="media-card">
+          <figure class="media-thumb">
+            <img alt="Portada" id="curso-cover-edit" loading="eager" src="">
+            <button class="icon-btn media-edit" type="button" title="Editar imagen" aria-label="Editar imagen">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+              </svg>
+            </button>
+          </figure>
+          <div class="media-meta"><div class="media-label">Portada</div></div>
+        </div>
+      </div>
+    `;
     const img = containerEl.querySelector("#curso-cover-edit");
     const pencil = containerEl.querySelector(".media-edit");
 
@@ -784,13 +762,16 @@
         img.src = noImageSvgDataURI();
       };
     } else {
-      // modo CREAR: pon placeholder y no intentes cargar del servidor
-      img.src = noImageSvgDataURI();
+      img.src = noImageSvgDataURI(); // crear: placeholder
+      // si ya había temp seleccionado, muéstralo
+      if (S.tempNewCourseImage instanceof File) {
+        const u = URL.createObjectURL(S.tempNewCourseImage);
+        img.src = u;
+      }
     }
 
-    // mismo botón para ambos modos, pero en crear solo guarda el archivo temporal
-    if (!pencil || pencil._gc_bound) return;
-    pencil._gc_bound = true;
+    if (!pencil || pencil._b) return;
+    pencil._b = true;
     pencil.addEventListener("click", () => {
       const input = document.createElement("input");
       input.type = "file";
@@ -801,25 +782,22 @@
         const file = input.files && input.files[0];
         input.remove();
         if (!file) return;
-
         const v = validarImagen(file, 2);
         if (!v.ok) {
           toast(v.error, "error");
           return;
         }
 
-        // En crear: almacena temporal y solo muestra preview
         if (!cursoId) {
-          window.__CursosState.tempNewCourseImage = file;
-          // preview simple:
+          // crear: solo previsualiza y guarda en buffer
           const url = URL.createObjectURL(file);
           img.src = withBust(url);
-          // URL.revokeObjectURL(url) -> no lo revocamos de inmediato para que se vea
-          toast("Imagen seleccionada (aún no subida)", "info");
+          S.tempNewCourseImage = file;
+          toast("Imagen lista; se subirá al guardar.", "info");
           return;
         }
 
-        // En editar: sube inmediatamente usando el id
+        // editar: subir inmediato
         previewOverlay(file, {
           onCancel() {},
           async onConfirm() {
@@ -828,7 +806,7 @@
               img.src = withBust(newUrl);
               toast("Imagen actualizada", "exito");
             } catch (err) {
-              console.error(err);
+              console.error(TAG, "upload error", err);
               toast("No se pudo subir la imagen", "error");
             }
           },
@@ -839,7 +817,7 @@
   }
 
   function fillCursoEdit(c) {
-    // inputs
+    console.log(TAG, "fillCursoEdit()", c);
     setVal("f_nombre", c.nombre);
     setVal("f_desc_breve", c.descripcion_breve);
     setVal("f_desc_media", c.descripcion_media);
@@ -851,7 +829,6 @@
     setVal("f_fecha", c.fecha_inicio);
     setChecked("f_certificado", c.certificado);
 
-    // selects
     putSelect("f_tutor", S.maps.tutores, c.tutor);
     putSelect("f_prioridad", S.maps.prioridad, c.prioridad);
     putSelect("f_categoria", S.maps.categorias, c.categoria);
@@ -860,10 +837,8 @@
     putSelect("f_actividades", S.maps.actividades, c.actividades);
     putStatus("f_estatus", c.estatus);
 
-    // imagen
     mountCursoMediaEdit(qs("#media-curso-edit"), c.id);
 
-    // acciones
     const bSave = qs("#btn-save");
     const bCancel = qs("#btn-cancel");
     if (bSave && !bSave._b) {
@@ -878,6 +853,7 @@
       });
     }
   }
+  window.fillCursoEdit = fillCursoEdit;
 
   async function saveCurso() {
     const body = {
@@ -900,8 +876,8 @@
       actividades: num("f_actividades"),
       certificado: qs("#f_certificado")?.checked ? 1 : 0,
     };
+    console.log(TAG, "saveCurso() body=", body);
 
-    // validación mínima (ajústala a gusto)
     if (
       !body.nombre ||
       !body.descripcion_breve ||
@@ -917,34 +893,41 @@
       let newId = body.id;
 
       if (body.id == null) {
-        // Crear
+        console.log(TAG, "Insertando curso...");
         const res = await postJSON(API.iCursos, body);
-        // permítenos múltiples posibles campos devueltos
-        newId = Number(
-          (res &&
-            (res.id ||
-              res.curso_id ||
-              res.insert_id ||
-              (res.data && res.data.id))) ||
-            0
-        );
-        // si hay imagen temporal, súbela con el id nuevo
+        console.log(TAG, "Respuesta insert:", res);
+
+        // id tolerante (varias variantes de PHP)
+        const idCand =
+          res?.id ??
+          res?.ID ??
+          res?.curso_id ??
+          res?.insert_id ??
+          res?.insertId ??
+          res?.last_id ??
+          res?.lastId ??
+          res?.data?.id;
+        newId = Number(idCand || 0);
+        console.log(TAG, "Nuevo ID:", newId);
+
+        // subir portada diferida (si existe)
         const file = S.tempNewCourseImage || null;
         if (newId && file) {
           try {
-            await uploadCursoCover(newId, file);
+            const url = await uploadCursoCover(newId, file);
+            S.tempNewCourseImage = null;
+            const imgView = document.querySelector("#curso-cover-view");
+            if (imgView) imgView.src = withBust(url);
             toast("Imagen subida", "exito");
           } catch (e) {
-            console.error(e);
-            toast("Curso creado, pero falló la imagen", "error");
-          } finally {
-            S.tempNewCourseImage = null;
+            console.error(TAG, "Upload diferido falló:", e);
+            toast("Curso creado, pero la imagen no se pudo subir.", "error");
           }
         }
       } else {
-        // Editar
-        await postJSON(API.uCursos, body);
-        // si quieres permitir cambiar imagen en editar, ya lo haces en el overlay
+        console.log(TAG, "Actualizando curso id=", body.id);
+        const resU = await postJSON(API.uCursos, body);
+        console.log(TAG, "Respuesta update:", resU);
       }
 
       toast("Curso guardado", "exito");
@@ -952,31 +935,30 @@
       await loadCursos();
       const idToOpen = newId || body.id;
       const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
+      console.log(TAG, "Reabrir id=", idToOpen, "found:", !!it);
       if (it) {
         S.current = { id: it.id, _all: it };
-        if (typeof setDrawerMode === "function") setDrawerMode("view");
-
-        await window.fillCursoView(it);
+        setDrawerMode("view");
+        await fillCursoView(it);
       }
     } catch (err) {
-      console.error(err);
+      console.error(TAG, "saveCurso ERROR:", err);
       toast("No se pudo guardar.", "error");
     }
   }
+  window.saveCurso = saveCurso;
 
-  /* ==================== API del módulo (router-lite) ==================== */
+  /* ==================== API para Router-lite ==================== */
   async function mount() {
-    // headers los pone el router; aquí solo datos + render
+    console.log(TAG, "mount() INICIO");
     try {
-      // loading state opcional
       const hostD = qs("#recursos-list");
       if (hostD)
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
-
       await loadCatalogos();
       await loadCursos();
 
-      // bind búsqueda (si no estaba)
+      // bind búsqueda por si el router no lo hizo aún
       const s = qs("#search-input");
       if (s && !s._b) {
         s._b = true;
@@ -986,8 +968,9 @@
           renderCursos();
         });
       }
+      console.log(TAG, "mount() OK");
     } catch (e) {
-      console.error("Error en mount cursos:", e);
+      console.error(TAG, "mount() ERROR:", e);
       const hostD = qs("#recursos-list");
       if (hostD)
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error cargando cursos</div></div>`;
@@ -995,6 +978,7 @@
   }
 
   function openCursoCreate() {
+    console.log(TAG, "openCursoCreate()");
     const blank = {
       id: null,
       nombre: "",
@@ -1017,18 +1001,15 @@
     };
     S.current = { id: null, _all: blank };
     openDrawerCurso();
-    if (typeof setDrawerMode === "function") setDrawerMode("edit");
-
+    setDrawerMode("edit");
     fillCursoEdit(blank);
   }
 
-  // expone API para el router
+  // expone API pública para el router
   window.cursos = { mount, openCreate: openCursoCreate };
 
-  // también expone helpers usados por otros módulos si hace falta
+  // opcional/legacy
   window.cursosLoad = { loadCatalogos, loadCursos };
-  window.openCursoView = openCursoView;
-  window.fillCursoView = fillCursoView;
-  window.fillCursoEdit = fillCursoEdit;
-  window.saveCurso = saveCurso;
+
+  console.log(TAG, "Módulo cargado.");
 })();
