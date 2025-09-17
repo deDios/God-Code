@@ -395,27 +395,27 @@
                 <!-- Nombre -->
                 <div class="field">
                     <label for="f_nombre">Nombre <span class="req">*</span></label>
-                    <input id="f_nombre" type="text" maxlength="120" data-max="120" />
+                    <input id="f_nombre" type="text" maxlength="100" data-max="100" />
                     <small class="char-counter" data-for="f_nombre"></small>
                 </div>
 
                 <!-- Descripción breve -->
                 <div class="field">
                     <label for="f_desc_breve">Descripción breve <span class="req">*</span></label>
-                    <textarea id="f_desc_breve" rows="3" maxlength="240" data-max="240"></textarea>
+                    <textarea id="f_desc_breve" rows="3" maxlength="250" data-max="250"></textarea>
                     <small class="char-counter" data-for="f_desc_breve"></small>
                 </div>
 
                 <!-- Descripción media -->
                 <div class="field">
                     <label for="f_desc_media">Descripción media <span class="req">*</span></label>
-                    <textarea id="f_desc_media" rows="4" maxlength="1000" data-max="1000"></textarea>
+                    <textarea id="f_desc_media" rows="4" maxlength="350" data-max="350"></textarea>
                     <small class="char-counter" data-for="f_desc_media"></small>
                 </div>
 
                 <!-- Descripción del curso -->
                 <div class="field">
-                    <label for="f_desc_curso">Descripción del curso <span class="req">*</span></label>
+                    <label for="f_desc_curso">Descripción del larga <span class="req">*</span></label>
                     <textarea id="f_desc_curso" rows="6" maxlength="2000" data-max="2000"></textarea>
                     <small class="char-counter" data-for="f_desc_curso"></small>
                 </div>
@@ -423,14 +423,14 @@
                 <!-- Dirigido a -->
                 <div class="field">
                     <label for="f_dirigido">Dirigido a <span class="req">*</span></label>
-                    <textarea id="f_dirigido" rows="3" maxlength="600" data-max="600"></textarea>
+                    <textarea id="f_dirigido" rows="3" maxlength="250" data-max="250"></textarea>
                     <small class="char-counter" data-for="f_dirigido"></small>
                 </div>
 
                 <!-- Competencias -->
                 <div class="field">
                     <label for="f_competencias">Competencias <span class="req">*</span></label>
-                    <textarea id="f_competencias" rows="3" maxlength="800" data-max="800"></textarea>
+                    <textarea id="f_competencias" rows="3" maxlength="250" data-max="250"></textarea>
                     <small class="char-counter" data-for="f_competencias"></small>
                 </div>
 
@@ -498,7 +498,7 @@
                     <label>Imágenes existentes <span class="req">*</span></label>
                     <div class="value">
                         <div id="media-curso-edit"><!-- mountCursoMedia(..., editable:true) --></div>
-                        <div class="hint gc-soft">Debe existir una portada válida.</div>
+                        <div class="hint gc-soft">Solo archivos PNG/JPG que pesen hasta 2MB.</div>
                     </div>
                 </div>
 

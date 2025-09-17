@@ -736,7 +736,15 @@
     await loadCursos();
   }
 
+
+
+
+
+
+
+
   /* ====================== Inicio ====================== */
+
   document.addEventListener("DOMContentLoaded", () => {
     // arrancamos en cursos
     loadCursos().catch((e) => {
@@ -745,9 +753,6 @@
     });
   });
 
-  /* =======================================================================
-     CURSO · Media (vista + edición)  ——  Montaje de imagen, lápiz y preview
-     ======================================================================= */
   (() => {
     const log = (...a) => {
       try {
