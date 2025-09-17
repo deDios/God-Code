@@ -54,21 +54,32 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
-    String(s ?? "").replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    }[c]));
+    String(s ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
+    );
   const fmtMoney = (n) =>
     isFinite(+n)
-      ? new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(+n)
+      ? new Intl.NumberFormat("es-MX", {
+          style: "currency",
+          currency: "MXN",
+        }).format(+n)
       : "-";
   const fmtBool = (v) => (+v === 1 || v === true || v === "1" ? "Sí" : "No");
   const fmtDate = (d) => (!d ? "-" : String(d));
   const normalize = (s) =>
-    String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+    String(s || "")
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .toLowerCase()
+      .trim();
 
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
@@ -78,7 +89,9 @@
   // ===== creado_por desde la cookie `usuario` =====
   function getCreatorId() {
     try {
-      const raw = document.cookie.split("; ").find((r) => r.startsWith("usuario="));
+      const raw = document.cookie
+        .split("; ")
+        .find((r) => r.startsWith("usuario="));
       if (!raw) {
         console.warn(TAG, "Cookie 'usuario' no encontrada.");
         return null;
@@ -137,7 +150,13 @@
 
   /* ---------- Cache-bust ---------- */
   function withBust(u) {
-    if (!u || typeof u !== "string" || u.startsWith("data:") || u.startsWith("blob:")) return u;
+    if (
+      !u ||
+      typeof u !== "string" ||
+      u.startsWith("data:") ||
+      u.startsWith("blob:")
+    )
+      return u;
     try {
       const url = new URL(u, location.origin);
       url.searchParams.set("v", Date.now());
@@ -153,16 +172,18 @@
     return `/ASSETS/cursos/img${Number(id)}.${ext}`;
   }
   function noImageSvgDataURI() {
-    const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
+    const svg =
+      "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
   async function resolveCursoImg(id) {
-    const tryUrl = (url) => new Promise((res) => {
-      const i = new Image();
-      i.onload = () => res(true);
-      i.onerror = () => res(false);
-      i.src = url;
-    });
+    const tryUrl = (url) =>
+      new Promise((res) => {
+        const i = new Image();
+        i.onload = () => res(true);
+        i.onerror = () => res(false);
+        i.src = url;
+      });
     const p = withBust(cursoImgUrl(id, "png"));
     const j = withBust(cursoImgUrl(id, "jpg"));
     if (await tryUrl(p)) return p;
@@ -173,7 +194,8 @@
   /* ---------- Drawer helpers ---------- */
   function openDrawerCurso() {
     console.log(TAG, "openDrawerCurso()");
-    const d = qs("#drawer-curso"), ov = qs("#gc-dash-overlay");
+    const d = qs("#drawer-curso"),
+      ov = qs("#gc-dash-overlay");
     if (!d) return;
     d.classList.add("open");
     d.removeAttribute("hidden");
@@ -182,7 +204,8 @@
   }
   function closeDrawerCurso() {
     console.log(TAG, "closeDrawerCurso()");
-    const d = qs("#drawer-curso"), ov = qs("#gc-dash-overlay");
+    const d = qs("#drawer-curso"),
+      ov = qs("#gc-dash-overlay");
     if (!d) return;
     d.classList.remove("open");
     d.setAttribute("hidden", "");
@@ -192,27 +215,42 @@
   }
   // binds 1 vez
   qsa("#drawer-curso-close").forEach((b) => {
-    if (!b._b) { b._b = true; b.addEventListener("click", closeDrawerCurso); }
+    if (!b._b) {
+      b._b = true;
+      b.addEventListener("click", closeDrawerCurso);
+    }
   });
   const _ov = qs("#gc-dash-overlay");
-  if (_ov && !_ov._b) { _ov._b = true; _ov.addEventListener("click", closeDrawerCurso); }
+  if (_ov && !_ov._b) {
+    _ov._b = true;
+    _ov.addEventListener("click", closeDrawerCurso);
+  }
   if (!window._gc_cursos_esc) {
     window._gc_cursos_esc = true;
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawerCurso(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawerCurso();
+    });
   }
 
   /* ---------- Map helpers ---------- */
   function arrToMap(arr) {
     const m = {};
-    (Array.isArray(arr) ? arr : []).forEach((x) => { m[x.id] = x.nombre || x.titulo || "#" + x.id; });
+    (Array.isArray(arr) ? arr : []).forEach((x) => {
+      m[x.id] = x.nombre || x.titulo || "#" + x.id;
+    });
     m._ts = Date.now();
     return m;
   }
   function mapToOptions(map, sel) {
     const ids = Object.keys(map || {}).filter((k) => k !== "_ts");
-    return ids.map((id) =>
-      `<option value="${id}"${+id === +sel ? " selected" : ""}>${esc(map[id])}</option>`
-    ).join("");
+    return ids
+      .map(
+        (id) =>
+          `<option value="${id}"${+id === +sel ? " selected" : ""}>${esc(
+            map[id]
+          )}</option>`
+      )
+      .join("");
   }
   function mapLabel(map, id) {
     if (!map) return "-";
@@ -222,22 +260,53 @@
 
   /* ---------- Export utils ---------- */
   window.gcUtils = Object.assign({}, window.gcUtils || {}, {
-    qs, qsa, esc, fmtMoney, fmtBool, fmtDate,
-    STATUS_LABEL, ORDER_CURSOS,
-    postJSON, withBust, toast,
-    cursoImgUrl, resolveCursoImg, noImageSvgDataURI,
-    openDrawerCurso, closeDrawerCurso, mapToOptions, mapLabel,
+    qs,
+    qsa,
+    esc,
+    fmtMoney,
+    fmtBool,
+    fmtDate,
+    STATUS_LABEL,
+    ORDER_CURSOS,
+    postJSON,
+    withBust,
+    toast,
+    cursoImgUrl,
+    resolveCursoImg,
+    noImageSvgDataURI,
+    openDrawerCurso,
+    closeDrawerCurso,
+    mapToOptions,
+    mapLabel,
   });
 
   /* ==================== Catálogos + Listado ==================== */
   async function loadCatalogos() {
     console.log(TAG, "loadCatalogos()...");
-    if (!S.maps.tutores)   S.maps.tutores   = arrToMap(await postJSON(API.tutores,   { estatus: 1 }).catch(() => []));
-    if (!S.maps.prioridad) S.maps.prioridad = arrToMap(await postJSON(API.prioridad, { estatus: 1 }).catch(() => []));
-    if (!S.maps.categorias)S.maps.categorias= arrToMap(await postJSON(API.categorias,{ estatus: 1 }).catch(() => []));
-    if (!S.maps.calendario)S.maps.calendario= arrToMap(await postJSON(API.calendario,{ estatus: 1 }).catch(() => []));
-    if (!S.maps.tipoEval)  S.maps.tipoEval  = arrToMap(await postJSON(API.tipoEval,  { estatus: 1 }).catch(() => []));
-    if (!S.maps.actividades)S.maps.actividades=arrToMap(await postJSON(API.actividades,{ estatus:1 }).catch(()=>[]));
+    if (!S.maps.tutores)
+      S.maps.tutores = arrToMap(
+        await postJSON(API.tutores, { estatus: 1 }).catch(() => [])
+      );
+    if (!S.maps.prioridad)
+      S.maps.prioridad = arrToMap(
+        await postJSON(API.prioridad, { estatus: 1 }).catch(() => [])
+      );
+    if (!S.maps.categorias)
+      S.maps.categorias = arrToMap(
+        await postJSON(API.categorias, { estatus: 1 }).catch(() => [])
+      );
+    if (!S.maps.calendario)
+      S.maps.calendario = arrToMap(
+        await postJSON(API.calendario, { estatus: 1 }).catch(() => [])
+      );
+    if (!S.maps.tipoEval)
+      S.maps.tipoEval = arrToMap(
+        await postJSON(API.tipoEval, { estatus: 1 }).catch(() => [])
+      );
+    if (!S.maps.actividades)
+      S.maps.actividades = arrToMap(
+        await postJSON(API.actividades, { estatus: 1 }).catch(() => [])
+      );
     console.log(TAG, "Catálogos OK:", S.maps);
   }
 
@@ -253,11 +322,15 @@
 
   async function loadCursos() {
     console.log(TAG, "loadCursos()...");
-    const chunks = await Promise.all(ORDER_CURSOS.map((st) =>
-      postJSON(API.cursos, { estatus: st }).catch(() => [])
-    ));
+    const chunks = await Promise.all(
+      ORDER_CURSOS.map((st) =>
+        postJSON(API.cursos, { estatus: st }).catch(() => [])
+      )
+    );
     const flat = [];
-    ORDER_CURSOS.forEach((_, i) => { flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : [])); });
+    ORDER_CURSOS.forEach((_, i) => {
+      flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []));
+    });
     S.data = flat;
     resortData();
     S.page = 1;
@@ -273,7 +346,9 @@
     if (hostM) hostM.innerHTML = "";
 
     const term = normalize(S.search);
-    const filtered = term ? S.data.filter((row) => normalize(JSON.stringify(row)).includes(term)) : S.data;
+    const filtered = term
+      ? S.data.filter((row) => normalize(JSON.stringify(row)).includes(term))
+      : S.data;
 
     const modCount = qs("#mod-count");
     if (modCount) {
@@ -289,18 +364,28 @@
     // Desktop
     if (hostD) {
       if (pageRows.length === 0) {
-        hostD.insertAdjacentHTML("beforeend", `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`);
+        hostD.insertAdjacentHTML(
+          "beforeend",
+          `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
+        );
       } else {
         pageRows.forEach((it) => {
           const est = STATUS_LABEL[it.estatus] || it.estatus;
-          hostD.insertAdjacentHTML("beforeend", `
+          hostD.insertAdjacentHTML(
+            "beforeend",
+            `
             <div class="table-row" role="row" data-id="${it.id}">
               <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
-              <div class="col-tutor"  role="cell">${esc(mapLabel(S.maps.tutores, it.tutor))}</div>
-              <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_inicio))}</div>
+              <div class="col-tutor"  role="cell">${esc(
+                mapLabel(S.maps.tutores, it.tutor)
+              )}</div>
+              <div class="col-fecha"  role="cell">${esc(
+                fmtDate(it.fecha_inicio)
+              )}</div>
               <div class="col-status" role="cell">${esc(est)}</div>
             </div>
-          `);
+          `
+          );
         });
         qsa(".table-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
@@ -314,22 +399,30 @@
     // Mobile
     if (hostM) {
       if (pageRows.length === 0) {
-        hostM.insertAdjacentHTML("beforeend", `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`);
+        hostM.insertAdjacentHTML(
+          "beforeend",
+          `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
+        );
       } else {
         pageRows.forEach((it) => {
-          hostM.insertAdjacentHTML("beforeend", `
+          hostM.insertAdjacentHTML(
+            "beforeend",
+            `
             <div class="table-row-mobile" data-id="${it.id}">
               <div class="row-head">
                 <div class="title">${esc(it.nombre || "-")}</div>
                 <button class="open-drawer gc-btn" type="button">Ver</button>
               </div>
             </div>
-          `);
+          `
+          );
         });
         qsa(".open-drawer", hostM).forEach((btn) => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            const id = Number(btn.closest(".table-row-mobile")?.dataset.id || 0);
+            const id = Number(
+              btn.closest(".table-row-mobile")?.dataset.id || 0
+            );
             if (id) openCursoView(id);
           });
         });
@@ -354,16 +447,36 @@
         else b.onclick = cb;
         return b;
       };
-      cont.appendChild(mk("‹", S.page === 1, () => { S.page = Math.max(1, S.page - 1); renderCursos(); }, "arrow-btn"));
+      cont.appendChild(
+        mk(
+          "‹",
+          S.page === 1,
+          () => {
+            S.page = Math.max(1, S.page - 1);
+            renderCursos();
+          },
+          "arrow-btn"
+        )
+      );
       for (let p = 1; p <= totalPages && p <= 7; p++) {
-        const b = mk(String(p), false, () => { S.page = p; renderCursos(); });
+        const b = mk(String(p), false, () => {
+          S.page = p;
+          renderCursos();
+        });
         if (p === S.page) b.classList.add("active");
         cont.appendChild(b);
       }
-      cont.appendChild(mk("›", S.page === totalPages, () => {
-        S.page = Math.min(totalPages, S.page + 1);
-        renderCursos();
-      }, "arrow-btn"));
+      cont.appendChild(
+        mk(
+          "›",
+          S.page === totalPages,
+          () => {
+            S.page = Math.min(totalPages, S.page + 1);
+            renderCursos();
+          },
+          "arrow-btn"
+        )
+      );
     });
   }
 
@@ -380,7 +493,9 @@
 
   /* ==================== Drawer: Vista ==================== */
   function setDrawerMode(mode) {
-    const v = qs("#curso-view"), e = qs("#curso-edit"), act = qs("#curso-actions-view");
+    const v = qs("#curso-view"),
+      e = qs("#curso-edit"),
+      act = qs("#curso-actions-view");
     if (mode === "view") {
       v && (v.hidden = false);
       e && (e.hidden = true);
@@ -404,62 +519,88 @@
       <div class="media-grid">
         <div class="media-card">
           <figure class="media-thumb">
-            <img alt="Portada" id="curso-cover-view" loading="eager" src="${esc(url)}">
+            <img alt="Portada" id="curso-cover-view" loading="eager" src="${esc(
+              url
+            )}">
           </figure>
           <div class="media-meta"><div class="media-label">Portada</div></div>
         </div>
       </div>
     `;
     const img = containerEl.querySelector("#curso-cover-view");
-    if (img) img.onerror = () => { img.onerror = null; img.src = noImageSvgDataURI(); };
+    if (img)
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = noImageSvgDataURI();
+      };
   }
 
-  function put(sel, val) { const el = qs(sel); if (el) el.innerHTML = esc(val ?? "—"); }
+  function put(sel, val) {
+    const el = qs(sel);
+    if (el) el.innerHTML = esc(val ?? "—");
+  }
 
-  // Botón dinámico (eliminar/reactivar) — SIEMPRE reemplaza el nodo para limpiar listeners
   function renderActionButtonFor(it) {
     const host = qs("#curso-actions-view");
     if (!host) return;
-    let btn = host.querySelector("#btn-delete"); // tu HTML original lo trae con este id
+
+    let btn = host.querySelector("#btn-delete"); // sigue usando tu mismo id
     if (!btn) {
       btn = document.createElement("button");
       btn.id = "btn-delete";
       host.appendChild(btn);
     }
+
+    // Reemplaza el nodo para limpiar listeners previos
     const fresh = btn.cloneNode(true);
     btn.parentNode.replaceChild(fresh, btn);
 
-    // decide acción
+    // SIEMPRE que sea botón, no submit.
+    fresh.type = "button";
+    fresh.style.display = ""; // asegúrate que sea visible
+
+    const id = it.id; // <<< clave: captura el id del curso en el cierre
+
     if (+it.estatus === 0) {
-      // Reactivar
+      // === Reactivar ===
       fresh.textContent = "Reactivar";
-      fresh.className = "gc-btn gc-badge gc-badge--green"; // como pediste
+      // tu estilo deseado:
+      fresh.className = "gc-btn gc-badge gc-badge--green";
+      // limpia estados previos de confirmación
       fresh.removeAttribute("data-step");
-      fresh.style.display = ""; // visible
+
       fresh.onclick = async () => {
-        if (!S.current?.id) return toast("No hay curso para reactivar.", "error");
         fresh.disabled = true;
         try {
-          await reactivateCurso(S.current.id, { optimistic: true });
+          // usa el id capturado, no S.current
+          await reactivateCurso(id, { optimistic: true });
+          // tras reactivar, el drawer se re-pinta en applyStatusLocally()
+          // pero igualmente podemos volver a enfocarlo
+          fresh.focus();
         } finally {
           fresh.disabled = false;
         }
       };
     } else {
-      // Eliminar (soft delete)
+      // === Eliminar (soft delete con confirm) ===
       fresh.textContent = "Eliminar";
       fresh.className = "gc-btn gc-btn--danger";
-      fresh.style.display = "";
       let confirming = false;
       let timer = null;
-      const resetConfirm = () => {
+
+      function resetConfirm() {
         confirming = false;
         fresh.textContent = "Eliminar";
         fresh.setAttribute("data-step", "1");
-        if (timer) { clearTimeout(timer); timer = null; }
-      };
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      }
+
+      resetConfirm();
+
       fresh.onclick = async () => {
-        if (!S.current?.id) return toast("No hay curso para eliminar.", "error");
         if (!confirming) {
           confirming = true;
           fresh.textContent = "Confirmar";
@@ -469,7 +610,9 @@
         }
         fresh.disabled = true;
         try {
-          await softDeleteCurso(S.current.id, { optimistic: true });
+          // usa id capturado
+          await softDeleteCurso(id, { optimistic: true });
+          // el re-render del drawer volverá a llamar a esta función
         } finally {
           fresh.disabled = false;
           resetConfirm();
@@ -534,10 +677,21 @@
   window.openCursoView = openCursoView;
 
   /* ==================== Drawer: Edición ==================== */
-  function setVal(id, v) { const el = qs("#" + id); if (el) el.value = v == null ? "" : String(v); }
-  function setChecked(id, v) { const el = qs("#" + id); if (el) el.checked = !!(+v === 1 || v === true || v === "1"); }
-  function val(id) { return (qs("#" + id)?.value || "").trim(); }
-  function num(id) { const v = val(id); return v === "" ? null : Number(v); }
+  function setVal(id, v) {
+    const el = qs("#" + id);
+    if (el) el.value = v == null ? "" : String(v);
+  }
+  function setChecked(id, v) {
+    const el = qs("#" + id);
+    if (el) el.checked = !!(+v === 1 || v === true || v === "1");
+  }
+  function val(id) {
+    return (qs("#" + id)?.value || "").trim();
+  }
+  function num(id) {
+    const v = val(id);
+    return v === "" ? null : Number(v);
+  }
 
   function putSelect(id, map, sel) {
     const el = qs("#" + id);
@@ -555,9 +709,14 @@
       { v: 4, l: "En curso" },
       { v: 5, l: "Cancelado" },
     ];
-    el.innerHTML = opts.map((o) =>
-      `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${o.l}</option>`
-    ).join("");
+    el.innerHTML = opts
+      .map(
+        (o) =>
+          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${
+            o.l
+          }</option>`
+      )
+      .join("");
   }
 
   function humanSize(bytes) {
@@ -568,8 +727,10 @@
   }
   function validarImagen(file, maxMB = 2) {
     if (!file) return { ok: false, error: "No seleccionaste archivo." };
-    if (!/image\/(png|jpeg)/.test(file.type)) return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
-    if (file.size > maxMB * 1048576) return { ok: false, error: `La imagen excede ${maxMB}MB.` };
+    if (!/image\/(png|jpeg)/.test(file.type))
+      return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
+    if (file.size > maxMB * 1048576)
+      return { ok: false, error: `La imagen excede ${maxMB}MB.` };
     return { ok: true };
   }
 
@@ -596,9 +757,11 @@
   function previewOverlay(file, { onConfirm, onCancel }) {
     const url = URL.createObjectURL(file);
     const o = document.createElement("div");
-    o.style.cssText = "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.55)";
+    o.style.cssText =
+      "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.55)";
     const m = document.createElement("div");
-    m.style.cssText = "background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
+    m.style.cssText =
+      "background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
     m.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;background:#f8fafc;">
         <div style="font-weight:700;">Vista previa de imagen</div>
@@ -626,19 +789,46 @@
     o.appendChild(m);
     document.body.appendChild(o);
     document.body.style.overflow = "hidden";
-    function cleanup() { URL.revokeObjectURL(url); o.remove(); document.body.style.overflow = ""; }
-    o.addEventListener("click", (e) => { if (e.target === o) { onCancel && onCancel(); cleanup(); } });
-    m.querySelector('[data-x="close"]').addEventListener("click", () => { onCancel && onCancel(); cleanup(); });
-    m.querySelector('[data-x="cancel"]').addEventListener("click", () => { onCancel && onCancel(); cleanup(); });
+    function cleanup() {
+      URL.revokeObjectURL(url);
+      o.remove();
+      document.body.style.overflow = "";
+    }
+    o.addEventListener("click", (e) => {
+      if (e.target === o) {
+        onCancel && onCancel();
+        cleanup();
+      }
+    });
+    m.querySelector('[data-x="close"]').addEventListener("click", () => {
+      onCancel && onCancel();
+      cleanup();
+    });
+    m.querySelector('[data-x="cancel"]').addEventListener("click", () => {
+      onCancel && onCancel();
+      cleanup();
+    });
     m.querySelector('[data-x="ok"]').addEventListener("click", async () => {
-      try { await onConfirm?.(); } finally { cleanup(); }
+      try {
+        await onConfirm?.();
+      } finally {
+        cleanup();
+      }
     });
 
-    const body = m.children[1], side = body.children[1];
+    const body = m.children[1],
+      side = body.children[1];
     const mql = window.matchMedia("(max-width: 720px)");
     function apply() {
-      if (mql.matches) { body.style.gridTemplateColumns = "1fr"; side.style.borderLeft = "none"; side.style.paddingLeft = "0"; }
-      else { body.style.gridTemplateColumns = "1fr 280px"; side.style.borderLeft = "1px dashed #e6e6e6"; side.style.paddingLeft = "16px"; }
+      if (mql.matches) {
+        body.style.gridTemplateColumns = "1fr";
+        side.style.borderLeft = "none";
+        side.style.paddingLeft = "0";
+      } else {
+        body.style.gridTemplateColumns = "1fr 280px";
+        side.style.borderLeft = "1px dashed #e6e6e6";
+        side.style.paddingLeft = "16px";
+      }
     }
     mql.addEventListener("change", apply);
     apply();
@@ -669,8 +859,13 @@
     const pencil = containerEl.querySelector(".media-edit");
 
     if (cursoId) {
-      (async () => { img.src = await resolveCursoImg(cursoId); })();
-      img.onerror = () => { img.onerror = null; img.src = noImageSvgDataURI(); };
+      (async () => {
+        img.src = await resolveCursoImg(cursoId);
+      })();
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = noImageSvgDataURI();
+      };
     } else {
       img.src = noImageSvgDataURI();
       if (S.tempNewCourseImage instanceof File) {
@@ -692,7 +887,10 @@
         input.remove();
         if (!file) return;
         const v = validarImagen(file, 2);
-        if (!v.ok) { toast(v.error, "error"); return; }
+        if (!v.ok) {
+          toast(v.error, "error");
+          return;
+        }
 
         if (!cursoId) {
           const url = URL.createObjectURL(file);
@@ -744,7 +942,10 @@
 
     const bSave = qs("#btn-save");
     const bCancel = qs("#btn-cancel");
-    if (bSave && !bSave._b) { bSave._b = true; bSave.addEventListener("click", saveCurso); }
+    if (bSave && !bSave._b) {
+      bSave._b = true;
+      bSave.addEventListener("click", saveCurso);
+    }
     if (bCancel && !bCancel._b) {
       bCancel._b = true;
       bCancel.addEventListener("click", () => {
@@ -757,16 +958,15 @@
 
   /* ---------- Cambios de estatus con UPDATE OPTIMISTA ---------- */
   function applyStatusLocally(id, estatus) {
-    const idx = S.data.findIndex(x => +x.id === +id);
+    const idx = S.data.findIndex((x) => +x.id === +id);
     if (idx === -1) return null;
     const updated = { ...S.data[idx], estatus: Number(estatus) };
     S.data.splice(idx, 1, updated);
     resortData();
     renderCursos();
-    // si el drawer muestra ese curso, refrescarlo
     if (S.current && +S.current.id === +id) {
       S.current = { id: updated.id, _all: updated };
-      fillCursoView(updated);
+      fillCursoView(updated); // <- esto vuelve a pintar el botón con los nuevos handlers
     }
     return updated;
   }
@@ -777,7 +977,7 @@
     let snapshot = null;
     if (optimistic) {
       // guardar estado previo y aplicar localmente
-      const cur = S.data.find(x => +x.id === +id);
+      const cur = S.data.find((x) => +x.id === +id);
       snapshot = cur ? { ...cur } : null;
       applyStatusLocally(id, estatus);
     }
@@ -836,7 +1036,13 @@
     };
     console.log(TAG, "saveCurso() body=", body);
 
-    if (!body.nombre || !body.descripcion_breve || !body.descripcion_curso || !body.dirigido || !body.competencias) {
+    if (
+      !body.nombre ||
+      !body.descripcion_breve ||
+      !body.descripcion_curso ||
+      !body.dirigido ||
+      !body.competencias
+    ) {
       toast("Completa los campos obligatorios.", "error");
       return;
     }
@@ -848,16 +1054,23 @@
         const creado_por = getCreatorId();
         if (creado_por == null) {
           console.warn(TAG, "creado_por ausente. No se puede crear el curso.");
-          toast("No se puede crear: falta el id de usuario (creado_por).", "error");
+          toast(
+            "No se puede crear: falta el id de usuario (creado_por).",
+            "error"
+          );
           return;
         }
         const insertBody = { ...body, creado_por };
         console.log(TAG, "Insertando curso con:", insertBody);
 
         const res = await postJSON(API.iCursos, insertBody);
-        if (res && res.error) { toast(res.error, "error"); return; }
+        if (res && res.error) {
+          toast(res.error, "error");
+          return;
+        }
 
-        const idCand = res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id;
+        const idCand =
+          res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id;
         newId = Number(idCand || 0);
 
         // si estabas creando con imagen temporal
@@ -875,7 +1088,7 @@
 
         // tras crear: recargar lista mínima (para incluirlo) y abrir su drawer
         await loadCursos();
-        const it = S.data.find(x => +x.id === +newId) || null;
+        const it = S.data.find((x) => +x.id === +newId) || null;
         if (it) {
           S.current = { id: it.id, _all: it };
           setDrawerMode("view");
@@ -884,12 +1097,15 @@
       } else {
         // UPDATE
         const resU = await postJSON(API.uCursos, body);
-        if (resU && resU.error) { toast(resU.error, "error"); return; }
+        if (resU && resU.error) {
+          toast(resU.error, "error");
+          return;
+        }
         toast("Curso guardado", "exito");
 
         // Actualiza local, resort y refresca drawer/lista sin recargar todo
         applyStatusLocally(body.id, body.estatus);
-        const idx = S.data.findIndex(x => +x.id === +body.id);
+        const idx = S.data.findIndex((x) => +x.id === +body.id);
         if (idx !== -1) {
           S.data[idx] = { ...S.data[idx], ...body };
           resortData();
@@ -912,7 +1128,8 @@
     console.log(TAG, "mount() INICIO");
     try {
       const hostD = qs("#recursos-list");
-      if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
+      if (hostD)
+        hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadCatalogos();
       await loadCursos();
 
@@ -929,7 +1146,8 @@
     } catch (e) {
       console.error(TAG, "mount() ERROR:", e);
       const hostD = qs("#recursos-list");
-      if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error cargando cursos</div></div>`;
+      if (hostD)
+        hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error cargando cursos</div></div>`;
     }
   }
 
