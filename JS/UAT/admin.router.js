@@ -1,79 +1,136 @@
-// admin.router.js (simple)
+// admin.router.js (router-lite)
 (() => {
+  const qs  = (s, r=document) => r.querySelector(s);
+
+  // Mapa de módulos (ajusta paths si cambian)
   const modules = {
-    '#/cursos':     { flag: '__CursosState',     path: '/JS/UAT/admin.cursos.js',   api: () => globalThis.cursos },
-    '#/noticias':   { flag: '__NoticiasState',   path: '/JS/UAT/admin.noticias.js', api: () => globalThis.noticias },
-    '#/tutores':    { flag: '__TutoresState',    path: '/JS/UAT/admin.tutores.js',  api: () => globalThis.tutores },
-    '#/suscripciones': { flag: '__SuscripState', path: '/JS/UAT/admin.suscrip.js',  api: () => globalThis.suscrip },
+    '#/cursos': {
+      flag: '__CursosState',
+      path: '/JS/UAT/admin.cursos.js',
+      api : () => globalThis.cursos
+    },
+    '#/noticias': {
+      flag: '__NoticiasState',
+      path: '/JS/UAT/admin.noticias.js',
+      api : () => globalThis.noticias
+    },
+    '#/tutores': {
+      flag: '__TutoresState',
+      path: '/JS/UAT/admin.tutores.js',
+      api : () => globalThis.tutores
+    },
+    // agrega más rutas cuando tengas módulos listos:
+    // '#/suscripciones': { flag:'__SuscripState', path:'/JS/UAT/admin.suscrip.js', api:()=>globalThis.suscrip },
   };
 
-  const qs = (s, r=document)=>r.querySelector(s);
-
+  // Asegura que el módulo esté cargado (si hay <script> ya insertado, espera a que exponga el flag)
   async function ensure(path, flag) {
     if (globalThis[flag]) return;
-    const has = !!document.querySelector(`script[src="${path}"]`);
-    if (has) { for (let i=0;i<10 && !globalThis[flag];i++) await new Promise(r=>setTimeout(r,30)); if (globalThis[flag]) return; }
-    try { await import(path); } catch {}
+    const hasScript = !!document.querySelector(`script[src="${path}"]`);
+    if (hasScript) {
+      for (let i = 0; i < 10 && !globalThis[flag]; i++) {
+        await new Promise(r => setTimeout(r, 30));
+      }
+      if (globalThis[flag]) return;
+    }
+    try { await import(path); } catch { /* no-op si el navegador no soporta import() relativo */ }
   }
 
-  function setTitle(t){ const h=qs('#mod-title'); if(h) h.textContent=t; }
-  function clearLists(){
-    const d=qs('#recursos-list'), m=qs('#recursos-list-mobile');
-    const p1=qs('#pagination-controls'), p2=qs('#pagination-mobile');
-    if(d) d.innerHTML=''; if(m) m.innerHTML=''; if(p1) p1.innerHTML=''; if(p2) p2.innerHTML='';
-    const c=qs('#mod-count'); if(c) c.textContent='—';
-  }
-  function setActive(route){
-    document.querySelectorAll('.gc-side .nav-item').forEach(a=>{
-      a.getAttribute('data-route')===route ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current');
+  function setActive(route) {
+    document.querySelectorAll('.gc-side .nav-item').forEach(a => {
+      const r = a.getAttribute('data-route');
+      if (r === route) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
     });
   }
-  function setHeaders(route){
-    const head = qs('.recursos-box.desktop-only .table-header');
-    if(!head) return;
-    const cols = route==="#/cursos" ? [
-      ['col-nombre','Nombre'], ['col-tutor','Tutor'], ['col-fecha','Fecha de inicio'], ['col-status','Status'],
-    ] : route==="#/noticias" ? [
-      ['col-nombre','Título'], ['col-fecha','Creación'], ['col-status','Status'], ['col-acc',''],
-    ] : route==="#/tutores" ? [
-      ['col-nombre','Nombre'], ['col-fecha','Creación'], ['col-status','Status'], ['col-acc',''],
-    ] : [];
-    head.innerHTML = cols.map(([cls,lab])=>`<div class="${cls}" role="columnheader">${lab}</div>`).join('');
+
+  function clearLists() {
+    const d = qs('#recursos-list');
+    const m = qs('#recursos-list-mobile');
+    const p1 = qs('#pagination-controls');
+    const p2 = qs('#pagination-mobile');
+    if (d) d.innerHTML = '';
+    if (m) m.innerHTML = '';
+    if (p1) p1.innerHTML = '';
+    if (p2) p2.innerHTML = '';
+    const c = qs('#mod-count'); if (c) c.textContent = '—';
   }
 
-  async function onRoute(){
+  function setTitleByRoute(route) {
+    const map = { '#/cursos':'Cursos', '#/noticias':'Noticias', '#/tutores':'Tutores' };
+    const h = qs('#mod-title'); if (h) h.textContent = map[route] || '—';
+  }
+
+  function setTableHeaders(route) {
+    const head = document.querySelector('.recursos-box.desktop-only .table-header');
+    if (!head) return;
+    let cols = [];
+    if (route === '#/cursos') {
+      cols = [
+        ['col-nombre', 'Nombre'],
+        ['col-tutor',  'Tutor'],
+        ['col-fecha',  'Fecha de inicio'],
+        ['col-status', 'Status'],
+      ];
+    } else if (route === '#/noticias') {
+      cols = [
+        ['col-nombre', 'Título'],
+        ['col-fecha',  'Creación'],
+        ['col-status', 'Status'],
+        ['col-acc',    ''],
+      ];
+    } else if (route === '#/tutores') {
+      cols = [
+        ['col-nombre', 'Nombre'],
+        ['col-fecha',  'Creación'],
+        ['col-status', 'Status'],
+        ['col-acc',    ''],
+      ];
+    } else {
+      cols = [];
+    }
+    head.innerHTML = cols.map(([cls, lab]) => `<div class="${cls}" role="columnheader">${lab}</div>`).join('');
+  }
+
+  async function onRoute() {
     const route = location.hash || '#/cursos';
     const mod = modules[route] || modules['#/cursos'];
+
     setActive(route);
     clearLists();
-    setHeaders(route);
-    setTitle(route.replace('#/','').replace(/^\w/,c=>c.toUpperCase()));
+    setTableHeaders(route);
+    setTitleByRoute(route);
 
     await ensure(mod.path, mod.flag);
     const api = mod.api && mod.api();
     if (api?.mount) await api.mount();
   }
 
-  // botón crear: un solo handler global
-  function onCreate(){
-    const route = (location.hash || '#/cursos');
+  // Botón "Crear": handler único que despacha al módulo actual
+  function onCreate() {
+    const route = location.hash || '#/cursos';
     const mod = modules[route] || modules['#/cursos'];
     const api = mod.api && mod.api();
     if (api?.openCreate) api.openCreate();
   }
 
-  // wire
-  document.addEventListener('click', (e)=>{
+  // Navegación por clicks en el sidebar (sin recarga)
+  document.addEventListener('click', (e) => {
     const a = e.target.closest('.gc-side .nav-item[href^="#/"]');
-    if(!a) return;
+    if (!a) return;
     e.preventDefault();
-    location.hash = a.getAttribute('href');
+    const to = a.getAttribute('href');
+    if (to) location.hash = to;
   });
 
+  // Wire events
   window.addEventListener('hashchange', onRoute);
-  document.addEventListener('DOMContentLoaded', ()=>{
+  document.addEventListener('DOMContentLoaded', () => {
     const btn = document.querySelector('#btn-add');
-    if (btn) { btn.onclick = onCreate; }     // << sin clonar, sin duplicar listeners
+    if (btn && !btn._wired) {
+      btn._wired = true;
+      btn.addEventListener('click', (e) => { e.preventDefault(); onCreate(); });
+    }
     onRoute();
   });
 })();
