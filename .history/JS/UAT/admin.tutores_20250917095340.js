@@ -22,7 +22,7 @@
   window.TUPLOAD = TUPLOAD;
 
   /* ======= Imagen Tutor (opcional) ======= */
-  function tutorImgUrl(id, ext = "png") { return `/ASSETS/tutor/tutor_${Number(id)}.${ext}`; }
+  function tutorImgUrl(id, ext = "png") { return `/ASSETS/tutores/img${Number(id)}.${ext}`; }
   function noImageSvgDataURI() {
     const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'><rect width='100%' height='100%' fill='#f3f3f3'/><circle cx='80' cy='60' r='30' fill='#d1d5db'/><rect x='35' y='100' width='90' height='40' rx='12' fill='#d1d5db'/></svg>";
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
