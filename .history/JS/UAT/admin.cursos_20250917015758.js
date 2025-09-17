@@ -769,7 +769,9 @@
       }
       toast("Curso guardado","exito");
 
-      await window.loadCursos(); 
+      // recargar lista y volver a vista
+      await window.loadCursos(); // expuesto por Bloque 1
+      // reubicar curso actual
       let it = body.id ? S.data.find(x=>+x.id===+body.id) : S.data.find(x=>x.nombre===body.nombre);
       if(!it) it = S.data[0];
       if(it){
@@ -786,6 +788,6 @@
   // Exponer para Bloque 2
   window.fillCursoEdit = fillCursoEdit;
   window.saveCurso     = saveCurso;
-  
+
 })();
 
