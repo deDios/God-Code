@@ -435,7 +435,7 @@
                 </div>
 
                 <!-- Tutor / Categoría / Prioridad -->
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                <div class="grid-3">
                     <div class="field">
                         <label for="f_tutor">Tutor <span class="req">*</span></label>
                         <select id="f_tutor"></select>
@@ -451,7 +451,7 @@
                 </div>
 
                 <!-- Tipo de evaluación / Actividades / Calendario -->
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                <div class="grid-3">
                     <div class="field">
                         <label for="f_tipo_eval">Tipo de evaluación <span class="req">*</span></label>
                         <select id="f_tipo_eval"></select>
@@ -467,7 +467,7 @@
                 </div>
 
                 <!-- Horas / Precio / Certificado -->
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                <div class="grid-3">
                     <div class="field">
                         <label for="f_horas">Horas <span class="req">*</span></label>
                         <input id="f_horas" type="number" min="1" step="1" />
@@ -476,9 +476,8 @@
                         <label for="f_precio">Precio</label>
                         <input id="f_precio" type="number" min="0" step="0.01" />
                     </div>
-                    <div class="field" style="display:flex;align-items:center;gap:10px;">
-                        <label for="f_certificado" style="margin:0;">Certificado</label>
-                        <input id="f_certificado" type="checkbox" />
+                    <div class="field checkbox">
+                        <label><input id="f_certificado" type="checkbox" /> Certificado</label>
                     </div>
                 </div>
 
@@ -494,12 +493,12 @@
                     <select id="f_estatus"></select>
                 </div>
 
-                <!-- Imágenes (misma posición que en vista, justo antes del JSON) -->
+                <!-- Imágenes (igual que en vista, antes del JSON) -->
                 <div class="field">
                     <label>Imágenes existentes <span class="req">*</span></label>
                     <div class="value">
                         <div id="media-curso-edit"><!-- mountCursoMedia(..., editable:true) --></div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
+                        <div class="hint gc-soft">Debe existir una portada válida.</div>
                     </div>
                 </div>
 
@@ -511,6 +510,7 @@
                     </div>
                 </div>
             </section>
+
 
         </div>
     </aside>
