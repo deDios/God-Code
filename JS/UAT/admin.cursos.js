@@ -572,99 +572,100 @@
       });
     }
 
-    // === Botón Eliminar (soft delete) ===
-    {
-      const d = qs("#btn-delete");
-      if (d) {
-        const btn = d.cloneNode(true);
-        d.parentNode.replaceChild(btn, d);
+    // === Acciones: Eliminar (soft) / Reactivar ===
+    (() => {
+      const delOrig = qs("#btn-delete");
+      const reaOrig = qs("#btn-reactivate");
+
+      // Reemplaza por clones para limpiar listeners previos
+      let delBtn = null,
+        reaBtn = null;
+      if (delOrig) {
+        delBtn = delOrig.cloneNode(true);
+        delOrig.parentNode.replaceChild(delBtn, delOrig);
+      }
+      if (reaOrig) {
+        reaBtn = reaOrig.cloneNode(true);
+        reaOrig.parentNode.replaceChild(reaBtn, reaOrig);
+      }
+
+      const isInactive = +it.estatus === 0;
+
+      // Toggle de visibilidad (reemplazo visual)
+      if (delBtn) delBtn.style.display = isInactive ? "none" : "";
+      if (reaBtn) reaBtn.style.display = isInactive ? "" : "none";
+
+      // ====== ELIMINAR (solo si está activo) ======
+      if (delBtn && !isInactive) {
         const LABELS = {
-          normal: btn.textContent || "Eliminar",
+          normal: delBtn.textContent || "Eliminar",
           confirm: "¿Confirmar?",
         };
-        let confirming = false,
-          timer = null;
+        let confirming = false;
+        let timer = null;
 
         function resetConfirmUI() {
           confirming = false;
-          btn.textContent = LABELS.normal;
-          btn.classList.remove("danger");
-          btn.removeAttribute("data-step");
+          delBtn.textContent = LABELS.normal;
+          delBtn.classList.remove("danger");
+          delBtn.removeAttribute("data-step");
           if (timer) {
             clearTimeout(timer);
             timer = null;
           }
         }
 
-        if (+it.estatus === 0) {
-          btn.disabled = true;
-          btn.title = "El curso ya está inactivo";
-          btn.classList.add("disabled");
-        } else {
-          btn.disabled = false;
-          btn.classList.remove("disabled");
-        }
+        delBtn.disabled = false;
+        delBtn.classList.remove("disabled");
+        delBtn.title = "Mover a Inactivo";
 
-        btn.addEventListener("click", async () => {
+        delBtn.addEventListener("click", async () => {
           if (!S.current?.id) {
             toast("No hay curso activo para eliminar.", "error");
             return;
           }
-          if (+it.estatus === 0) {
-            toast("El curso ya está inactivo.", "info");
-            return;
-          }
-
+          // primer click -> confirmar
           if (!confirming) {
             confirming = true;
-            btn.setAttribute("data-step", "2");
-            btn.classList.add("danger");
-            btn.textContent = LABELS.confirm;
+            delBtn.setAttribute("data-step", "2");
+            delBtn.classList.add("danger");
+            delBtn.textContent = LABELS.confirm;
             timer = setTimeout(resetConfirmUI, 3000);
             return;
           }
-
-          btn.disabled = true;
+          // segundo click -> ejecutar
+          delBtn.disabled = true;
           try {
             await softDeleteCurso(S.current.id);
           } finally {
-            btn.disabled = false;
+            delBtn.disabled = false;
             resetConfirmUI();
           }
         });
       }
-    }
 
-    // === Botón Reactivar (estatus → 1) ===
-    {
-      const r = qs("#btn-reactivate");
-      if (r) {
-        const btn = r.cloneNode(true);
-        r.parentNode.replaceChild(btn, r);
+      // ====== REACTIVAR (solo si está inactivo) ======
+      if (reaBtn && isInactive) {
+        reaBtn.disabled = false;
+        reaBtn.classList.remove("disabled");
+        reaBtn.title = "Reactivar curso";
 
-        if (+it.estatus !== 0) {
-          btn.disabled = true;
-          btn.title = "Disponible solo cuando el curso está inactivo";
-          btn.classList.add("disabled");
-        } else {
-          btn.disabled = false;
-          btn.classList.remove("disabled");
-          btn.addEventListener("click", async () => {
-            if (!S.current?.id) {
-              toast("No hay curso activo para reactivar.", "error");
-              return;
-            }
-            btn.disabled = true;
-            try {
-              await reactivateCurso(S.current.id);
-            } finally {
-              btn.disabled = false;
-            }
-          });
-        }
+        reaBtn.addEventListener("click", async () => {
+          if (!S.current?.id) {
+            toast("No hay curso activo para reactivar.", "error");
+            return;
+          }
+          reaBtn.disabled = true;
+          try {
+            await reactivateCurso(S.current.id);
+          } finally {
+            reaBtn.disabled = false;
+          }
+        });
       }
-    }
+    })();
   }
+
   window.fillCursoView = fillCursoView;
 
   async function openCursoView(id) {
