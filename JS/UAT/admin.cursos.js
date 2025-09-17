@@ -77,15 +77,41 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
-    const t = await r.text().catch(() => "");
-    if (!r.ok) throw new Error("HTTP " + r.status + " " + t);
-    if (!t.trim()) return {};
+    const text = await r.text().catch(() => "");
+    if (!r.ok) throw new Error("HTTP " + r.status + " " + text);
+
+    // 1) intento normal
     try {
-      return JSON.parse(t);
-    } catch {
-      return { _raw: t };
+      return JSON.parse(text);
+    } catch {}
+
+    // 2) intenta recortar la porción JSON más grande { ... } o [ ... ]
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    const firstBrack = text.indexOf("[");
+    const lastBrack = text.lastIndexOf("]");
+
+    let candidate = "";
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      candidate = text.slice(firstBrace, lastBrace + 1);
+    } else if (
+      firstBrack !== -1 &&
+      lastBrack !== -1 &&
+      lastBrack > firstBrack
+    ) {
+      candidate = text.slice(firstBrack, lastBrack + 1);
     }
+
+    if (candidate) {
+      try {
+        return JSON.parse(candidate);
+      } catch {}
+    }
+
+    // 3) último recurso: regresa crudo para depurar
+    return { _raw: text };
   }
+
   function withBust(u) {
     if (
       !u ||
@@ -913,8 +939,14 @@
       let newId = body.id ?? null;
       if (body.id == null) {
         const resp = await postJSON(API.iCursos, body);
-        // adapta a lo que regrese tu PHP: id / insertId / lastId...
-        newId = resp?.id ?? resp?.insertId ?? resp?.lastId ?? null;
+        const newId =
+          resp?.id ??
+          resp?.ID ??
+          resp?.insertId ??
+          resp?.insert_id ??
+          resp?.lastId ??
+          resp?.last_id ??
+          null;
       } else {
         await postJSON(API.uCursos, body);
         newId = body.id;
@@ -938,7 +970,7 @@
         if (S.pendingCoverFile instanceof File) {
           try {
             const url = await uploadCursoCover(it.id, S.pendingCoverFile);
-            S.pendingCoverFile = null; 
+            S.pendingCoverFile = null;
             const imgView = document.querySelector("#curso-cover-view");
             if (imgView) imgView.src = withBust(url);
             toast("Imagen cargada", "exito");
