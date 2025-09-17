@@ -574,29 +574,46 @@
 
     // === Acciones: Eliminar (soft) / Reactivar ===
     (() => {
-      const delOrig = qs("#btn-delete");
-      const reaOrig = qs("#btn-reactivate");
+      const actions =
+        qs("#curso-actions-view") || qs("#curso-view") || document;
+      if (!actions) return;
 
-      // Reemplaza por clones para limpiar listeners previos
-      let delBtn = null,
-        reaBtn = null;
-      if (delOrig) {
-        delBtn = delOrig.cloneNode(true);
-        delOrig.parentNode.replaceChild(delBtn, delOrig);
+      // 1) Garantiza que existan los botones
+      let del = qs("#btn-delete");
+      let rea = qs("#btn-reactivate");
+
+      if (!del) {
+        del = document.createElement("button");
+        del.id = "btn-delete";
+        del.type = "button";
+        del.className = "gc-btn danger outline"; // ajusta clases a tu estilo
+        del.textContent = "Eliminar";
+        actions.appendChild(del);
+        console.log("[Cursos] Creado #btn-delete porque no existía.");
       }
-      if (reaOrig) {
-        reaBtn = reaOrig.cloneNode(true);
-        reaOrig.parentNode.replaceChild(reaBtn, reaOrig);
+      if (!rea) {
+        rea = document.createElement("button");
+        rea.id = "btn-reactivate";
+        rea.type = "button";
+        rea.className = "gc-btn success outline"; // ajusta clases a tu estilo
+        rea.textContent = "Reactivar";
+        actions.appendChild(rea);
+        console.log("[Cursos] Creado #btn-reactivate porque no existía.");
       }
 
+      // 2) Reemplaza por clones (limpia listeners previos)
+      const delBtn = del.cloneNode(true);
+      const reaBtn = rea.cloneNode(true);
+      del.parentNode.replaceChild(delBtn, del);
+      rea.parentNode.replaceChild(reaBtn, rea);
+
+      // 3) Toggle de visibilidad según estatus
       const isInactive = +it.estatus === 0;
+      delBtn.style.display = isInactive ? "none" : ""; // Activo: se muestra Eliminar
+      reaBtn.style.display = isInactive ? "" : "none"; // Inactivo: se muestra Reactivar
 
-      // Toggle de visibilidad (reemplazo visual)
-      if (delBtn) delBtn.style.display = isInactive ? "none" : "";
-      if (reaBtn) reaBtn.style.display = isInactive ? "" : "none";
-
-      // ====== ELIMINAR (solo si está activo) ======
-      if (delBtn && !isInactive) {
+      // 4) Bind Eliminar (solo si activo)
+      if (!isInactive) {
         const LABELS = {
           normal: delBtn.textContent || "Eliminar",
           confirm: "¿Confirmar?",
@@ -616,7 +633,6 @@
         }
 
         delBtn.disabled = false;
-        delBtn.classList.remove("disabled");
         delBtn.title = "Mover a Inactivo";
 
         delBtn.addEventListener("click", async () => {
@@ -624,7 +640,6 @@
             toast("No hay curso activo para eliminar.", "error");
             return;
           }
-          // primer click -> confirmar
           if (!confirming) {
             confirming = true;
             delBtn.setAttribute("data-step", "2");
@@ -633,7 +648,6 @@
             timer = setTimeout(resetConfirmUI, 3000);
             return;
           }
-          // segundo click -> ejecutar
           delBtn.disabled = true;
           try {
             await softDeleteCurso(S.current.id);
@@ -644,12 +658,10 @@
         });
       }
 
-      // ====== REACTIVAR (solo si está inactivo) ======
-      if (reaBtn && isInactive) {
+      // 5) Bind Reactivar (solo si inactivo)
+      if (isInactive) {
         reaBtn.disabled = false;
-        reaBtn.classList.remove("disabled");
         reaBtn.title = "Reactivar curso";
-
         reaBtn.addEventListener("click", async () => {
           if (!S.current?.id) {
             toast("No hay curso activo para reactivar.", "error");
@@ -657,12 +669,14 @@
           }
           reaBtn.disabled = true;
           try {
-            await reactivateCurso(S.current.id);
+            await reactivateCurso(S.current.id); // usa tu función existente
           } finally {
             reaBtn.disabled = false;
           }
         });
       }
+
+      console.log("[Cursos] Botones listos. isInactive=", isInactive);
     })();
   }
 
