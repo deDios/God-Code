@@ -1,5 +1,5 @@
 <?php
-
+//u_noticiaImagenes.php
 header("Access-Control-Allow-Origin: https://godcode.com.mx");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");

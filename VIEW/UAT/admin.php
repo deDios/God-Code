@@ -519,137 +519,171 @@
 
 
 
-    <!-- Drawer · NOTICIA -->
-    <aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-noticia-title">Noticia · —</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-noticia-close">Cerrar</button>
-            </div>
-        </div>
+    <!-- ===== Overlay (oscurece fondo) ===== -->
+    <div id="gc-dash-overlay" class="gc-dash-overlay"></div>
 
-        <div class="drawer-body" id="drawer-noticia-body">
-            <!-- Acciones en modo vista -->
-            <div class="gc-actions" id="noticia-actions-view">
-                <button class="gc-btn" id="n-btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--danger" id="n-btn-delete" data-step="1">Eliminar</button>
-            </div>
+    <!-- ===== Drawer reutilizable (Noticias) ===== -->
+    <aside id="drawer-curso" class="drawer gc-dash" hidden aria-hidden="true">
+        <!-- Header -->
+        <header class="drawer-head">
+            <h3 id="drawer-curso-title">Noticia · —</h3>
+            <button id="drawer-curso-close" class="icon-btn" title="Cerrar" aria-label="Cerrar">
+                ✕
+            </button>
+        </header>
 
-            <!-- ===== MODO VISTA ===== -->
-            <section id="noticia-view" class="mode-view">
-                <div class="field">
-                    <div class="label">Título <span class="req">*</span></div>
-                    <div class="value" id="nv_titulo">—</div>
+        <!-- Contenido scroll -->
+        <div class="drawer-body">
+            <!-- ===== Vista (read-only) ===== -->
+            <section id="curso-view">
+                <!-- Acciones (editar / eliminar o reactivar) -->
+                <div class="gc-actions" id="curso-actions-view">
+                    <button class="gc-btn" id="btn-edit">Editar</button>
+                    <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
                 </div>
 
-                <div class="field">
-                    <div class="label">Resumen <span class="req">*</span></div>
-                    <div class="value" id="nv_resumen">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Contenido <span class="req">*</span></div>
-                    <div class="value" id="nv_contenido">—</div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="field">
-                        <div class="label">Autor <span class="req">*</span></div>
-                        <div class="value" id="nv_autor">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Categoría <span class="req">*</span></div>
-                        <div class="value" id="nv_categoria">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Estatus</div>
-                        <div class="value" id="nv_estatus">—</div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Fecha de publicación <span class="req">*</span></div>
-                    <div class="value" id="nv_fecha">—</div>
-                </div>
-
-                <!-- Bloque de imágenes (solo lectura) -->
-                <div class="field">
-                    <div class="label">Imágenes existentes <span class="req">*</span></div>
-                    <div class="value">
-                        <div id="media-noticia">
-                            <!-- mountNoticiaMediaView(...) -->
+                <!-- Grid principal -->
+                <div class="grid-two">
+                    <!-- Columna izquierda -->
+                    <div class="card">
+                        <h4 class="card-title">Contenido</h4>
+                        <div class="kv">
+                            <div class="k">Título</div>
+                            <div class="v" id="v_nombre">—</div>
                         </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
+                        <div class="kv">
+                            <div class="k">Resumen</div>
+                            <div class="v" id="v_desc_breve">—</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Cuerpo</div>
+                            <div class="v" id="v_desc_media">—</div>
+                        </div>
+
+                        <!-- Campos “compat” (no usados en noticias pero los dejamos para que el JS no truene) -->
+                        <div class="kv" style="display:none">
+                            <div class="k">Descripción curso</div>
+                            <div class="v" id="v_desc_curso">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Dirigido</div>
+                            <div class="v" id="v_dirigido">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Competencias</div>
+                            <div class="v" id="v_competencias">—</div>
+                        </div>
+
+                        <div class="sep"></div>
+
+                        <div class="kv">
+                            <div class="k">Fecha</div>
+                            <div class="v" id="v_fecha">—</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Estatus</div>
+                            <div class="v" id="v_estatus">—</div>
+                        </div>
+
+                        <!-- Más “compat” ocultos -->
+                        <div class="kv" style="display:none">
+                            <div class="k">Tutor</div>
+                            <div class="v" id="v_tutor">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Categoría</div>
+                            <div class="v" id="v_categoria">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Prioridad</div>
+                            <div class="v" id="v_prioridad">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Tipo evaluación</div>
+                            <div class="v" id="v_tipo_eval">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Actividades</div>
+                            <div class="v" id="v_actividades">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Calendario</div>
+                            <div class="v" id="v_calendario">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Horas</div>
+                            <div class="v" id="v_horas">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Precio</div>
+                            <div class="v" id="v_precio">—</div>
+                        </div>
+                        <div class="kv" style="display:none">
+                            <div class="k">Certificado</div>
+                            <div class="v" id="v_certificado">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha: Imágenes -->
+                    <div class="card">
+                        <div id="media-curso">
+                            <!-- lo rellena JS: 2 imágenes (pos 1 y 2) -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- JSON Dev -->
-                <details class="dev-json" id="noticia-json-box" open style="margin-top:16px;">
-                    <summary style="cursor:pointer;font-weight:600;">JSON · Noticia</summary>
-                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-                        <button class="gc-btn" id="n-btn-copy-json">Copiar JSON</button>
-                    </div>
-                    <pre id="json-noticia" class="value"
-                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
-                </details>
+                <!-- Debug JSON -->
+                <div class="card" style="margin-top:12px">
+                    <h4 class="card-title">Debug</h4>
+                    <pre id="json-curso" class="debug-pre">—</pre>
+                </div>
             </section>
 
-            <!-- ===== MODO EDICIÓN ===== -->
-            <section id="noticia-edit" class="mode-edit" hidden>
-                <div class="field">
-                    <label for="n_titulo">Título <span class="req">*</span></label>
-                    <input id="n_titulo" type="text" maxlength="160" data-max="160" />
-                    <small class="char-counter" data-for="n_titulo"></small>
-                </div>
+            <!-- ===== Edición (form) ===== -->
+            <section id="curso-edit" hidden>
+                <form class="form-grid" onsubmit="return false;">
+                    <div class="card">
+                        <h4 class="card-title">Editar noticia</h4>
 
-                <div class="field">
-                    <label for="n_resumen">Resumen <span class="req">*</span></label>
-                    <textarea id="n_resumen" rows="3" maxlength="300" data-max="300"></textarea>
-                    <small class="char-counter" data-for="n_resumen"></small>
-                </div>
+                        <label class="f">
+                            <span class="l">Título</span>
+                            <input type="text" id="f_nombre" placeholder="Título de la noticia" />
+                        </label>
 
-                <div class="field">
-                    <label for="n_contenido">Contenido <span class="req">*</span></label>
-                    <textarea id="n_contenido" rows="8" maxlength="6000" data-max="6000"></textarea>
-                    <small class="char-counter" data-for="n_contenido"></small>
-                </div>
+                        <label class="f">
+                            <span class="l">Resumen</span>
+                            <textarea id="f_desc_breve" rows="3" placeholder="Resumen corto"></textarea>
+                        </label>
 
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                    <div class="field">
-                        <label for="n_autor">Autor <span class="req">*</span></label>
-                        <select id="n_autor"></select>
+                        <label class="f">
+                            <span class="l">Cuerpo</span>
+                            <textarea id="f_desc_media" rows="6" placeholder="Contenido principal"></textarea>
+                        </label>
+
+                        <!-- Campos compat ocultos (el JS los setea pero no se usan) -->
+                        <input id="f_desc_curso" type="hidden" />
+
+                        <label class="f">
+                            <span class="l">Estatus</span>
+                            <select id="f_estatus">
+                                <option value="1">Activo</option>
+                                <option value="0">Inactivo</option>
+                            </select>
+                        </label>
                     </div>
-                    <div class="field">
-                        <label for="n_categoria">Categoría <span class="req">*</span></label>
-                        <select id="n_categoria"></select>
-                    </div>
-                    <div class="field">
-                        <label for="n_estatus">Estatus</label>
-                        <select id="n_estatus"></select>
-                    </div>
-                </div>
 
-                <div class="field">
-                    <label for="n_fecha">Fecha de publicación <span class="req">*</span></label>
-                    <input id="n_fecha" type="date" />
-                </div>
-
-                <!-- Imágenes (editable con lápiz) -->
-                <div class="field">
-                    <label>Imágenes existentes <span class="req">*</span></label>
-                    <div class="value">
-                        <div id="media-noticia-edit">
-                            <!-- mountNoticiaMediaEdit(..., editable:true) -->
+                    <div class="card">
+                        <h4 class="card-title">Imágenes</h4>
+                        <div id="media-curso-edit">
+                            <!-- lo rellena JS con 2 tarjetas editables -->
                         </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG · Máx 2MB</div>
                     </div>
-                </div>
+                </form>
 
-                <div class="drawer-actions-row">
-                    <div class="row-right">
-                        <button class="gc-btn gc-btn--ghost" id="n-btn-cancel">Cancelar</button>
-                        <button class="gc-btn gc-btn--success" id="n-btn-save">Guardar</button>
-                    </div>
+                <!-- Acciones edición -->
+                <div class="gc-actions">
+                    <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
+                    <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
                 </div>
             </section>
         </div>
