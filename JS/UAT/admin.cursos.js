@@ -72,7 +72,7 @@ const STATUS_SELECT_CURSOS = [
 const statusText = v => (STATUS_SELECT_CURSOS.find(x=>Number(x.v)===Number(v))?.l)||String(v);
 
 /* ====================== Imagen/Media (solo curso) ====================== */
-function validarImagen(file, opt){ opt=opt||{}; const maxMB=Number(opt.maxMB||2); if(!file) return {ok:false,error:"No se seleccionó archivo"}; const allowed=["image/jpeg","image/png"]; if(!allowed.includes(file.type)) return {ok:false,error:"Formato no permitido. Solo JPG o PNG"}; const sizeMB=file.size/1024/1024; if(sizeMB>maxMB) return {ok:false,error:"La imagen excede "+maxMB+"MB"}; return {ok:true} }
+function validarImagen(file, opt){ opt=opt||{}; const maxMB=Number(opt.maxMB||2); if(!file) return {ok:false,error:"No se seleccionó archivo"}; const allowed=["image/jpg","image/png"]; if(!allowed.includes(file.type)) return {ok:false,error:"Formato no permitido. Solo JPG o PNG"}; const sizeMB=file.size/1024/1024; if(sizeMB>maxMB) return {ok:false,error:"La imagen excede "+maxMB+"MB"}; return {ok:true} }
 function mediaUrlCurso(id){ return `/ASSETS/cursos/img${Number(id)}.png`; }
 function imgExists(url){ return new Promise(res=>{ try{ const i=new Image(); i.onload=()=>res(true); i.onerror=()=>res(false); i.src=withBust(url) }catch{ res(false) } }); }
 
@@ -110,7 +110,7 @@ function mountCursoMedia(container, id, editable){
         e.preventDefault();
         const input = document.createElement("input");
         input.type = "file";
-        input.accept = "image/png,image/jpeg";
+        input.accept = "image/png,image/jpg";
         input.style.display="none";
         document.body.appendChild(input);
         input.addEventListener("change", async ()=>{

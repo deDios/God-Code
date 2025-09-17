@@ -392,103 +392,118 @@
 
             <!-------------------------------------------- MODO EDICIÓN  ---------------------------------->
             <section id="curso-edit" class="mode-edit" hidden>
-                <div class="grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_nombre">Nombre <span class="req">*</span></label>
-                        <input id="f_nombre" type="text" maxlength="120" data-max="120" />
-                        <small class="char-counter" data-for="f_nombre"></small>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_desc_breve">Descripción breve <span class="req">*</span></label>
-                        <textarea id="f_desc_breve" rows="3" maxlength="240" data-max="240"></textarea>
-                        <small class="char-counter" data-for="f_desc_breve"></small>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_desc_curso">Descripción larga <span class="req">*</span></label>
-                        <textarea id="f_desc_curso" rows="6" maxlength="2000" data-max="2000"></textarea>
-                        <small class="char-counter" data-for="f_desc_curso"></small>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_dirigido">Dirigido a <span class="req">*</span></label>
-                        <textarea id="f_dirigido" rows="3" maxlength="600" data-max="600"></textarea>
-                        <small class="char-counter" data-for="f_dirigido"></small>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_competencias">Competencias <span class="req">*</span></label>
-                        <textarea id="f_competencias" rows="3" maxlength="800" data-max="800"></textarea>
-                        <small class="char-counter" data-for="f_competencias"></small>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1; display:flex; align-items:center; gap:10px;">
-                        <label for="f_certificado" style="margin:0;">Certificado</label>
-                        <input id="f_certificado" type="checkbox" />
-                    </div>
-
-                    <div class="grid-3"
-                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
-                        <div class="field">
-                            <label for="f_tutor">Tutor <span class="req">*</span></label>
-                            <select id="f_tutor"></select>
-                        </div>
-                        <div class="field">
-                            <label for="f_horas">Horas <span class="req">*</span></label>
-                            <input id="f_horas" type="number" min="1" step="1" />
-                        </div>
-                        <div class="field">
-                            <label for="f_precio">Precio</label>
-                            <input id="f_precio" type="number" min="0" step="0.01" />
-                        </div>
-                    </div>
-
-                    <div class="grid-3"
-                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
-                        <div class="field">
-                            <label for="f_estatus">Estatus</label>
-                            <select id="f_estatus"></select>
-                        </div>
-                        <div class="field">
-                            <label for="f_fecha">Fecha inicio <span class="req">*</span></label>
-                            <input id="f_fecha" type="date" />
-                        </div>
-                        <div class="field">
-                            <label for="f_prioridad">Prioridad <span class="req">*</span></label>
-                            <select id="f_prioridad"></select>
-                        </div>
-                    </div>
-
-                    <div class="grid-3"
-                        style="grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
-                        <div class="field">
-                            <label for="f_categoria">Categoría <span class="req">*</span></label>
-                            <select id="f_categoria"></select>
-                        </div>
-                        <div class="field">
-                            <label for="f_calendario">Calendario <span class="req">*</span></label>
-                            <select id="f_calendario"></select>
-                        </div>
-                        <div class="field">
-                            <label for="f_tipo_eval">Tipo evaluación <span class="req">*</span></label>
-                            <select id="f_tipo_eval"></select>
-                        </div>
-                    </div>
-
-                    <div class="field" style="grid-column:1 / -1;">
-                        <label for="f_actividades">Actividades <span class="req">*</span></label>
-                        <select id="f_actividades"></select>
-                    </div>
+                <!-- Nombre -->
+                <div class="field">
+                    <label for="f_nombre">Nombre <span class="req">*</span></label>
+                    <input id="f_nombre" type="text" maxlength="120" data-max="120" />
+                    <small class="char-counter" data-for="f_nombre"></small>
                 </div>
 
-                <div class="field" style="grid-column:1 / -1;">
+                <!-- Descripción breve -->
+                <div class="field">
+                    <label for="f_desc_breve">Descripción breve <span class="req">*</span></label>
+                    <textarea id="f_desc_breve" rows="3" maxlength="240" data-max="240"></textarea>
+                    <small class="char-counter" data-for="f_desc_breve"></small>
+                </div>
+
+                <!-- Descripción media -->
+                <div class="field">
                     <label for="f_desc_media">Descripción media <span class="req">*</span></label>
                     <textarea id="f_desc_media" rows="4" maxlength="1000" data-max="1000"></textarea>
                     <small class="char-counter" data-for="f_desc_media"></small>
                 </div>
 
-                <!-- Acciones (modo edición) -->
+                <!-- Descripción del curso -->
+                <div class="field">
+                    <label for="f_desc_curso">Descripción del curso <span class="req">*</span></label>
+                    <textarea id="f_desc_curso" rows="6" maxlength="2000" data-max="2000"></textarea>
+                    <small class="char-counter" data-for="f_desc_curso"></small>
+                </div>
+
+                <!-- Dirigido a -->
+                <div class="field">
+                    <label for="f_dirigido">Dirigido a <span class="req">*</span></label>
+                    <textarea id="f_dirigido" rows="3" maxlength="600" data-max="600"></textarea>
+                    <small class="char-counter" data-for="f_dirigido"></small>
+                </div>
+
+                <!-- Competencias -->
+                <div class="field">
+                    <label for="f_competencias">Competencias <span class="req">*</span></label>
+                    <textarea id="f_competencias" rows="3" maxlength="800" data-max="800"></textarea>
+                    <small class="char-counter" data-for="f_competencias"></small>
+                </div>
+
+                <!-- Tutor / Categoría / Prioridad -->
+                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                    <div class="field">
+                        <label for="f_tutor">Tutor <span class="req">*</span></label>
+                        <select id="f_tutor"></select>
+                    </div>
+                    <div class="field">
+                        <label for="f_categoria">Categoría <span class="req">*</span></label>
+                        <select id="f_categoria"></select>
+                    </div>
+                    <div class="field">
+                        <label for="f_prioridad">Prioridad <span class="req">*</span></label>
+                        <select id="f_prioridad"></select>
+                    </div>
+                </div>
+
+                <!-- Tipo de evaluación / Actividades / Calendario -->
+                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                    <div class="field">
+                        <label for="f_tipo_eval">Tipo de evaluación <span class="req">*</span></label>
+                        <select id="f_tipo_eval"></select>
+                    </div>
+                    <div class="field">
+                        <label for="f_actividades">Actividades <span class="req">*</span></label>
+                        <select id="f_actividades"></select>
+                    </div>
+                    <div class="field">
+                        <label for="f_calendario">Calendario <span class="req">*</span></label>
+                        <select id="f_calendario"></select>
+                    </div>
+                </div>
+
+                <!-- Horas / Precio / Certificado -->
+                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                    <div class="field">
+                        <label for="f_horas">Horas <span class="req">*</span></label>
+                        <input id="f_horas" type="number" min="1" step="1" />
+                    </div>
+                    <div class="field">
+                        <label for="f_precio">Precio</label>
+                        <input id="f_precio" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="field" style="display:flex;align-items:center;gap:10px;">
+                        <label for="f_certificado" style="margin:0;">Certificado</label>
+                        <input id="f_certificado" type="checkbox" />
+                    </div>
+                </div>
+
+                <!-- Fecha de inicio -->
+                <div class="field">
+                    <label for="f_fecha">Fecha de inicio <span class="req">*</span></label>
+                    <input id="f_fecha" type="date" />
+                </div>
+
+                <!-- Estatus -->
+                <div class="field">
+                    <label for="f_estatus">Estatus</label>
+                    <select id="f_estatus"></select>
+                </div>
+
+                <!-- Imágenes (misma posición que en vista, justo antes del JSON) -->
+                <div class="field">
+                    <label>Imágenes existentes <span class="req">*</span></label>
+                    <div class="value">
+                        <div id="media-curso-edit"><!-- mountCursoMedia(..., editable:true) --></div>
+                        <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
                 <div class="drawer-actions-row">
                     <div class="row-right">
                         <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
@@ -496,35 +511,36 @@
                     </div>
                 </div>
             </section>
+
         </div>
     </aside>
 
     <!-- Contadores de caracteres sencillo -->
     <script>
-    (function() {
-        function updateOne(el) {
-            var max = Number(el.getAttribute('data-max') || 0);
-            if (!max) return;
-            var id = el.id;
-            var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
-            if (!cc) return;
-            var v = (el.value || "");
-            cc.textContent = v.length + "/" + max;
-            if (v.length > max) cc.classList.add('over');
-            else cc.classList.remove('over');
-        }
+        (function() {
+            function updateOne(el) {
+                var max = Number(el.getAttribute('data-max') || 0);
+                if (!max) return;
+                var id = el.id;
+                var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
+                if (!cc) return;
+                var v = (el.value || "");
+                cc.textContent = v.length + "/" + max;
+                if (v.length > max) cc.classList.add('over');
+                else cc.classList.remove('over');
+            }
 
-        function bind(el) {
-            if (!el) return;
-            updateOne(el);
-            el.addEventListener('input', function() {
+            function bind(el) {
+                if (!el) return;
                 updateOne(el);
+                el.addEventListener('input', function() {
+                    updateOne(el);
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-max]').forEach(bind);
             });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[data-max]').forEach(bind);
-        });
-    })();
+        })();
     </script>
 
 
