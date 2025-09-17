@@ -280,83 +280,38 @@ function fillCursoView(it){
   put("#v_certificado", fmtBool(it.certificado));
   put("#v_fecha", fmtDate(it.fecha_inicio));
   put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
+  
 
-async function mountCursoMedia(container, id, { editable=false } = {}){
-  if(!container) return;
-  container.innerHTML =
-    `<div class="media-head">
-       <div class="media-title">Imágenes</div>
-       <div class="media-help" style="color:${editable?'#666':'#888'};">${editable?'Formatos: JPG/PNG · Máx 2MB':'Solo lectura'}</div>
+  // montar imagen solo lectura 
+    function mountCursoMediaView(containerEl, cursoId){
+        if(!containerEl) return;
+        const url = withBust(cursoImgUrl(cursoId||0));
+
+        containerEl.innerHTML = `
+        <div class="media-head">
+        <div class="media-title">Imágenes</div>
+        <div class="media-help" style="color:#888;">Solo lectura</div>
+        </div>
+        <div class="media-grid">
+        <div class="media-card">
+            <figure class="media-thumb">
+            <img alt="Portada" id="curso-cover-view" src="${url}">
+            </figure>
+            <div class="media-meta">
+            <div class="media-label">Portada</div>
+            </div>
+          </div>
      </div>
-     <div class="media-grid">
-       <div class="media-card">
-         <figure class="media-thumb">
-           <img id="curso-cover" alt="Portada">
-           ${editable ? '<button class="icon-btn media-edit" title="Editar imagen" type="button">✎</button>' : ''}
-         </figure>
-         <div class="media-meta"><div class="media-label">Portada</div></div>
-       </div>
-     </div>`;
+    `;
 
-  // Cargar imagen con fallback (png→jpg→placeholder)
-  const img = container.querySelector("#curso-cover");
-  await setCursoImage(img, id);
-
-  if (editable){
-    const btn = container.querySelector(".media-edit");
-    if (btn && !btn._gc_bound){
-      btn._gc_bound = true;
-      btn.addEventListener("click", async (e)=>{
-        e.preventDefault();
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/png,image/jpeg";
-        input.style.display = "none";
-        document.body.appendChild(input);
-        input.onchange = async ()=>{
-          const file = input.files && input.files[0];
-          try{ document.body.removeChild(input); }catch{}
-          if(!file) return;
-
-          // validación ligera
-          if(!/image\/(png|jpe?g)/i.test(file.type)) { gcToast?.("Formato no permitido","error"); return; }
-          if(file.size > 2*1024*1024){ gcToast?.("La imagen excede 2MB","error"); return; }
-
-          // Vista previa simple 
-          const url = URL.createObjectURL(file);
-          img.src = url;
-
-          // Subir al backend
-          try{
-            const fd = new FormData();
-            fd.append("curso_id", String(id));
-            fd.append("imagen", file);
-            const r = await fetch(API_UPLOAD.cursoImg, { method:"POST", body:fd });
-            const t = await r.text();
-            if(!r.ok) throw new Error("HTTP "+r.status+" "+(t||""));
-            let j; try{ j = JSON.parse(t); }catch{ j = {}; }
-            // Si el backend devuelve la url, úsala; si no, refuerza fallback local
-            if (j && j.url){
-              img.src = withBust(j.url);
-            } else {
-              await setCursoImage(img, id);
-            }
-            gcToast?.("Imagen de curso actualizada","exito");
-          }catch(err){
-            console.error(err);
-            gcToast?.("No se pudo subir la imagen","error");
-            // regresar a la mejor disponible
-            await setCursoImage(img, id);
-          }finally{
-            try{ URL.revokeObjectURL(url); }catch{}
-          }
+    const img = containerEl.querySelector("#curso-cover-view");
+        if(img){
+            img.onerror = () => { img.onerror=null; img.src = noImageSvg();      
         };
-        input.click();
-      });
     }
   }
-}
 
+  mountCursoMediaView(document.getElementById("media-curso"), curso.id);
 
   // JSON dev
   const pre=qs("#json-curso"); if(pre) pre.textContent = JSON.stringify(it, null, 2);
@@ -386,28 +341,194 @@ function put(sel, val){ const el=qs(sel); if(el) el.innerHTML = esc(val ?? "—"
 
 function fillCursoEdit(c){
   // inputs
-  setVal("f_nombre", c.nombre);
-  setVal("f_desc_breve", c.descripcion_breve);
-  setVal("f_desc_media", c.descripcion_media);
-  setVal("f_desc_curso", c.descripcion_curso);
-  setVal("f_dirigido", c.dirigido);
-  setVal("f_competencias", c.competencias);
-  setVal("f_horas", c.horas);
-  setVal("f_precio", c.precio);
-  setVal("f_fecha", c.fecha_inicio);
+  setVal("f_nombre",          c.nombre);
+  setVal("f_desc_breve",      c.descripcion_breve);
+  setVal("f_desc_media",      c.descripcion_media);
+  setVal("f_desc_curso",      c.descripcion_curso);
+  setVal("f_dirigido",        c.dirigido);
+  setVal("f_competencias",    c.competencias);
+  setVal("f_horas",           c.horas);
+  setVal("f_precio",          c.precio);
+  setVal("f_fecha",           c.fecha_inicio);
   setChecked("f_certificado", c.certificado);
 
   // selects
-  putSelect("f_tutor",      S.maps.tutores,    c.tutor);
-  putSelect("f_prioridad",  S.maps.prioridad,  c.prioridad);
-  putSelect("f_categoria",  S.maps.categorias, c.categoria);
-  putSelect("f_calendario", S.maps.calendario, c.calendario);
-  putSelect("f_tipo_eval",  S.maps.tipoEval,   c.tipo_evaluacion);
-  putSelect("f_actividades",S.maps.actividades,c.actividades);
-  putStatus("f_estatus", c.estatus);
+  putSelect("f_tutor",        S.maps.tutores,       c.tutor);
+  putSelect("f_prioridad",    S.maps.prioridad,     c.prioridad);
+  putSelect("f_categoria",    S.maps.categorias,    c.categoria);
+  putSelect("f_calendario",   S.maps.calendario,    c.calendario);
+  putSelect("f_tipo_eval",    S.maps.tipoEval,      c.tipo_evaluacion);
+  putSelect("f_actividades",  S.maps.actividades,   c.actividades);
+  putStatus("f_estatus",                            c.estatus);
 
-  // imagenes con lapiz (editable)
-  //mountCursoMedia("media-curso-edit", S.current?.id, { editable:true }); ya no es necesario aqui
+  // imagenes (editable)
+function gcHumanSize(bytes){
+  if(!Number.isFinite(bytes)) return "—";
+  if(bytes < 1024) return bytes + " B";
+  if(bytes < 1048576) return (bytes/1024).toFixed(1) + " KB";
+  return (bytes/1048576).toFixed(2) + " MB";
+}
+function gcValidarImagen(file, opt){
+  opt = opt || {};
+  const maxMB = opt.maxMB || 2;
+  if(!file) return { ok:false, error:"No se seleccionó archivo" };
+  const allowed = ["image/jpeg","image/png"];
+  if(!allowed.includes(file.type)) return { ok:false, error:"Formato no permitido. Solo JPG o PNG" };
+  if((file.size/1024/1024) > maxMB) return { ok:false, error:"La imagen excede " + maxMB + "MB" };
+  return { ok:true };
+}
+
+function gcRenderPreviewOverlay(file, {onConfirm, onCancel}){
+  const url = URL.createObjectURL(file);
+
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.55);backdrop-filter:saturate(120%) blur(2px);";
+
+  const modal = document.createElement("div");
+  modal.style.cssText = "background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
+  modal.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;background:#f8fafc;">
+      <div style="font-weight:700;">Vista previa de imagen</div>
+      <button type="button" class="gc-btn gc-btn--ghost" data-act="close" style="min-width:auto;padding:.35rem .6rem;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px;align-items:start;">
+      <div style="border:1px solid #eee;border-radius:12px;padding:8px;background:#fafafa;display:flex;align-items:center;justify-content:center;min-height:320px;max-height:60vh;">
+        <img src="${url}" alt="Vista previa" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;">
+      </div>
+      <div style="border-left:1px dashed #e6e6e6;padding-left:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-weight:600;">Detalles</div>
+        <div style="font-size:.92rem;color:#444;line-height:1.35;">
+          <div><strong>Archivo:</strong> ${file.name}</div>
+          <div><strong>Peso:</strong> ${gcHumanSize(file.size)}</div>
+          <div><strong>Tipo:</strong> ${file.type || "desconocido"}</div>
+          <div style="margin-top:6px;color:#666;">Formatos: JPG / PNG · Máx 2MB</div>
+        </div>
+        <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>
+          <button class="gc-btn gc-btn--ghost" data-act="cancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const body = modal.children[1];
+  const side = body.children[1];
+  const mql = window.matchMedia && window.matchMedia("(max-width: 720px)");
+  function applyResp(){
+    if(mql && mql.matches){
+      body.style.gridTemplateColumns = "1fr";
+      side.style.borderLeft = "none"; side.style.paddingLeft = "0";
+    }else{
+      body.style.gridTemplateColumns = "1fr 280px";
+      side.style.borderLeft = "1px dashed #e6e6e6"; side.style.paddingLeft = "16px";
+    }
+  }
+  mql && mql.addEventListener && mql.addEventListener("change", applyResp);
+  applyResp();
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  function cleanup(){
+    try{ URL.revokeObjectURL(url); }catch{}
+    try{ overlay.remove(); }catch{}
+    document.body.style.overflow = "";
+  }
+  overlay.addEventListener("click", (e)=>{ if(e.target===overlay){ onCancel && onCancel(); cleanup(); }});
+  modal.querySelector('[data-act="close"]').addEventListener("click", ()=>{ onCancel && onCancel(); cleanup(); });
+  modal.querySelector('[data-act="cancel"]').addEventListener("click", ()=>{ onCancel && onCancel(); cleanup(); });
+  modal.querySelector('[data-act="confirm"]').addEventListener("click", async ()=>{
+    try{ onConfirm && await onConfirm(); } finally { cleanup(); }
+  });
+}
+
+async function gcUploadCursoCover(cursoId, file){
+  const uploadUrl = (window.API_UPLOAD && window.API_UPLOAD.cursoImg) || "/db/web/u_cursoImg.php";
+  const fd = new FormData();
+  fd.append("curso_id", String(cursoId||0));
+  fd.append("imagen", file);
+  const res = await fetch(uploadUrl, { method:"POST", body: fd });
+  const text = await res.text().catch(()=> "");
+  if(!res.ok) throw new Error("HTTP "+res.status+" "+(text||""));
+  let json = null; try{ json = JSON.parse(text); }catch{ json = { _raw:text }; }
+  // el backend suele devolver {url:"..."}; si no, usamos la convención
+  return (json && json.url) ? String(json.url) : cursoImgUrl(cursoId||0);
+}
+
+// montar imagen para edicion
+function mountCursoMediaEdit(containerEl, cursoId){
+  if(!containerEl) return;
+  const url = withBust(cursoImgUrl(cursoId||0));
+
+  containerEl.innerHTML = `
+    <div class="media-head">
+      <div class="media-title">Imágenes</div>
+      <div class="media-help">JPG/PNG · Máx 2MB</div>
+    </div>
+    <div class="media-grid">
+      <div class="media-card">
+        <figure class="media-thumb">
+          <img alt="Portada" id="curso-cover-edit" src="${url}">
+          <button class="icon-btn media-edit" type="button" title="Editar imagen" aria-label="Editar imagen">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
+            </svg>
+          </button>
+        </figure>
+        <div class="media-meta">
+          <div class="media-label">Portada</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const img = containerEl.querySelector("#curso-cover-edit");
+  if(img){
+    img.onerror = () => { img.onerror=null; img.src = noImageSvg(); };
+  }
+
+  const btn = containerEl.querySelector(".media-edit");
+  if(!btn || btn._gc_bound) return;
+  btn._gc_bound = true;
+
+  btn.addEventListener("click", () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg";
+    input.style.display = "none";
+    document.body.appendChild(input);
+    input.addEventListener("change", async () => {
+      const file = input.files && input.files[0];
+      try{ input.remove(); }catch{}
+      if(!file) return;
+
+      const val = gcValidarImagen(file, {maxMB:2});
+      if(!val.ok){ alert(val.error); return; }
+
+      gcRenderPreviewOverlay(file, {
+        onCancel(){ /* nada */ },
+        async onConfirm(){
+          try{
+            const newUrl = await gcUploadCursoCover(cursoId, file);
+            // Refrescamos la imagen con anti-cache
+            img.src = withBust(newUrl || cursoImgUrl(cursoId));
+            // Si tienes toast, puedes llamarlo aquí:
+            if(window.gcToast) window.gcToast("Imagen de curso actualizada","exito");
+          }catch(err){
+            console.error(err);
+            if(window.gcToast) window.gcToast("No se pudo subir la imagen","error");
+            else alert("No se pudo subir la imagen");
+          }
+        }
+      });
+    });
+    input.click();
+  });
+}
+
+  // MODO EDICIÓN: montar imágenes con lápiz
+  mountCursoMediaEdit(document.getElementById("media-curso-edit"), curso.id);
 
   // botones guardar/cancelar
   const bSave=qs("#btn-save"), bCancel=qs("#btn-cancel");
