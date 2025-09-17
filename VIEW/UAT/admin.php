@@ -519,10 +519,9 @@
 
 
 
-    <!-- ===== Overlay (oscurece fondo) ===== -->
-    <div id="gc-dash-overlay" class="gc-dash-overlay"></div>
 
-    <!-- ===== Drawer reutilizable (Noticias) ===== -->
+
+    <!-- ------------------------------------------ Drawer  Noticias ----------------------------- -->
     <aside id="drawer-curso" class="drawer gc-dash" hidden aria-hidden="true">
         <!-- Header -->
         <header class="drawer-head">
