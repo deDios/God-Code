@@ -86,6 +86,27 @@
     console.log(`${TAG} toast[${type}]:`, msg);
   }
 
+  function getCurrentUserId() {
+    const idFromBody = document.body?.dataset?.userId;
+    if (idFromBody && !isNaN(+idFromBody)) return Number(idFromBody);
+
+    if (
+      typeof window.ADMIN_USER_ID === "number" &&
+      !isNaN(window.ADMIN_USER_ID)
+    ) {
+      return window.ADMIN_USER_ID;
+    }
+
+    if (window.gcUser && !isNaN(+window.gcUser.id))
+      return Number(window.gcUser.id);
+
+    console.warn(
+      "[Cursos] No se pudo resolver 'creado_por'. " +
+        "Define <body data-user-id='X'> o window.ADMIN_USER_ID o window.gcUser.id"
+    );
+    return null;
+  }
+
   /* ---------- HTTP JSON robusto ---------- */
   async function postJSON(url, body) {
     console.log(TAG, "POST", url, { body });
@@ -876,8 +897,9 @@
       actividades: num("f_actividades"),
       certificado: qs("#f_certificado")?.checked ? 1 : 0,
     };
-    console.log(TAG, "saveCurso() body=", body);
+    console.log("[Cursos] saveCurso() body=", body);
 
+    // Validación mínima
     if (
       !body.nombre ||
       !body.descripcion_breve ||
@@ -893,11 +915,32 @@
       let newId = body.id;
 
       if (body.id == null) {
-        console.log(TAG, "Insertando curso...");
-        const res = await postJSON(API.iCursos, body);
-        console.log(TAG, "Respuesta insert:", res);
+        // INSERT: agrega creado_por
+        const creador = getCreatorId();
+        if (creador == null) {
+          console.warn(
+            "[Cursos] creado_por ausente. No se puede crear el curso."
+          );
+          toast(
+            "No se puede crear: falta el id de usuario (creado_por).",
+            "error"
+          );
+          return;
+        }
+        const insertBody = Object.assign({}, body, { creado_por: creador });
+        console.log("[Cursos] Insertando curso con:", insertBody);
 
-        // id tolerante (varias variantes de PHP)
+        const res = await postJSON(API.iCursos, insertBody);
+        console.log("[Cursos] Respuesta insert:", res);
+
+        // Manejo de error explícito del backend
+        if (res && res.error) {
+          console.error("[Cursos] Insert ERROR:", res.error);
+          toast(res.error, "error");
+          return;
+        }
+
+        // Extrae id tolerante a distintos nombres
         const idCand =
           res?.id ??
           res?.ID ??
@@ -908,26 +951,31 @@
           res?.lastId ??
           res?.data?.id;
         newId = Number(idCand || 0);
-        console.log(TAG, "Nuevo ID:", newId);
+        console.log("[Cursos] Nuevo ID:", newId);
 
-        // subir portada diferida (si existe)
-        const file = S.tempNewCourseImage || null;
-        if (newId && file) {
+        // Subida diferida de portada (si se seleccionó en crear)
+        if (newId && S.tempNewCourseImage instanceof File) {
           try {
-            const url = await uploadCursoCover(newId, file);
+            const url = await uploadCursoCover(newId, S.tempNewCourseImage);
             S.tempNewCourseImage = null;
             const imgView = document.querySelector("#curso-cover-view");
             if (imgView) imgView.src = withBust(url);
             toast("Imagen subida", "exito");
           } catch (e) {
-            console.error(TAG, "Upload diferido falló:", e);
+            console.error("[Cursos] Upload diferido falló:", e);
             toast("Curso creado, pero la imagen no se pudo subir.", "error");
           }
         }
       } else {
-        console.log(TAG, "Actualizando curso id=", body.id);
+        // UPDATE
+        console.log("[Cursos] Actualizando curso id=", body.id);
         const resU = await postJSON(API.uCursos, body);
-        console.log(TAG, "Respuesta update:", resU);
+        console.log("[Cursos] Respuesta update:", resU);
+        if (resU && resU.error) {
+          console.error("[Cursos] Update ERROR:", resU.error);
+          toast(resU.error, "error");
+          return;
+        }
       }
 
       toast("Curso guardado", "exito");
@@ -935,17 +983,18 @@
       await loadCursos();
       const idToOpen = newId || body.id;
       const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
-      console.log(TAG, "Reabrir id=", idToOpen, "found:", !!it);
+      console.log("[Cursos] Reabrir id=", idToOpen, "found:", !!it);
       if (it) {
         S.current = { id: it.id, _all: it };
         setDrawerMode("view");
         await fillCursoView(it);
       }
     } catch (err) {
-      console.error(TAG, "saveCurso ERROR:", err);
+      console.error("[Cursos] saveCurso ERROR:", err);
       toast("No se pudo guardar.", "error");
     }
   }
+
   window.saveCurso = saveCurso;
 
   /* ==================== API para Router-lite ==================== */
@@ -1011,5 +1060,5 @@
   // opcional/legacy
   window.cursosLoad = { loadCatalogos, loadCursos };
 
-  console.log(TAG, "Módulo cargado.");
+  console.log(TAG, "Módulo cursos cargado.");
 })();
