@@ -572,112 +572,69 @@
       });
     }
 
-    // === Acciones: Eliminar (soft) / Reactivar ===
-    (() => {
-      const actions =
-        qs("#curso-actions-view") || qs("#curso-view") || document;
-      if (!actions) return;
+    // === Botón Eliminar/Reactivar dinámico ===
+    {
+      const bDel = qs("#btn-delete");
+      if (bDel) {
+        const btn = bDel.cloneNode(true);
+        bDel.parentNode.replaceChild(btn, bDel);
 
-      // 1) Garantiza que existan los botones
-      let del = qs("#btn-delete");
-      let rea = qs("#btn-reactivate");
+        if (+it.estatus === 0) {
+          // Reactivar
+          btn.textContent = "Reactivar";
+          btn.className = "gc-btn gc-btn--success"; // clases nuevas
+          btn.onclick = async () => {
+            if (!S.current?.id) {
+              toast("No hay curso para reactivar.", "error");
+              return;
+            }
+            btn.disabled = true;
+            try {
+              await reactivateCurso(S.current.id);
+            } finally {
+              btn.disabled = false;
+            }
+          };
+        } else {
+          // Eliminar (soft delete)
+          btn.textContent = "Eliminar";
+          btn.className = "gc-btn gc-btn--danger"; // estilo peligro
+          let confirming = false;
+          let timer = null;
 
-      if (!del) {
-        del = document.createElement("button");
-        del.id = "btn-delete";
-        del.type = "button";
-        del.className = "gc-btn danger outline"; // ajusta clases a tu estilo
-        del.textContent = "Eliminar";
-        actions.appendChild(del);
-        console.log("[Cursos] Creado #btn-delete porque no existía.");
-      }
-      if (!rea) {
-        rea = document.createElement("button");
-        rea.id = "btn-reactivate";
-        rea.type = "button";
-        rea.className = "gc-btn success outline"; // ajusta clases a tu estilo
-        rea.textContent = "Reactivar";
-        actions.appendChild(rea);
-        console.log("[Cursos] Creado #btn-reactivate porque no existía.");
-      }
-
-      // 2) Reemplaza por clones (limpia listeners previos)
-      const delBtn = del.cloneNode(true);
-      const reaBtn = rea.cloneNode(true);
-      del.parentNode.replaceChild(delBtn, del);
-      rea.parentNode.replaceChild(reaBtn, rea);
-
-      // 3) Toggle de visibilidad según estatus
-      const isInactive = +it.estatus === 0;
-      delBtn.style.display = isInactive ? "none" : ""; // Activo: se muestra Eliminar
-      reaBtn.style.display = isInactive ? "" : "none"; // Inactivo: se muestra Reactivar
-
-      // 4) Bind Eliminar (solo si activo)
-      if (!isInactive) {
-        const LABELS = {
-          normal: delBtn.textContent || "Eliminar",
-          confirm: "¿Confirmar?",
-        };
-        let confirming = false;
-        let timer = null;
-
-        function resetConfirmUI() {
-          confirming = false;
-          delBtn.textContent = LABELS.normal;
-          delBtn.classList.remove("danger");
-          delBtn.removeAttribute("data-step");
-          if (timer) {
-            clearTimeout(timer);
-            timer = null;
+          function resetConfirmUI() {
+            confirming = false;
+            btn.textContent = "Eliminar";
+            btn.classList.remove("danger");
+            if (timer) {
+              clearTimeout(timer);
+              timer = null;
+            }
           }
+
+          btn.addEventListener("click", async () => {
+            if (!S.current?.id) {
+              toast("No hay curso activo para eliminar.", "error");
+              return;
+            }
+            if (!confirming) {
+              confirming = true;
+              btn.textContent = "¿Confirmar?";
+              btn.classList.add("danger");
+              timer = setTimeout(resetConfirmUI, 3000);
+              return;
+            }
+            btn.disabled = true;
+            try {
+              await softDeleteCurso(S.current.id);
+            } finally {
+              btn.disabled = false;
+              resetConfirmUI();
+            }
+          });
         }
-
-        delBtn.disabled = false;
-        delBtn.title = "Mover a Inactivo";
-
-        delBtn.addEventListener("click", async () => {
-          if (!S.current?.id) {
-            toast("No hay curso activo para eliminar.", "error");
-            return;
-          }
-          if (!confirming) {
-            confirming = true;
-            delBtn.setAttribute("data-step", "2");
-            delBtn.classList.add("danger");
-            delBtn.textContent = LABELS.confirm;
-            timer = setTimeout(resetConfirmUI, 3000);
-            return;
-          }
-          delBtn.disabled = true;
-          try {
-            await softDeleteCurso(S.current.id);
-          } finally {
-            delBtn.disabled = false;
-            resetConfirmUI();
-          }
-        });
       }
-
-      // 5) Bind Reactivar (solo si inactivo)
-      if (isInactive) {
-        reaBtn.disabled = false;
-        reaBtn.title = "Reactivar curso";
-        reaBtn.addEventListener("click", async () => {
-          if (!S.current?.id) {
-            toast("No hay curso activo para reactivar.", "error");
-            return;
-          }
-          reaBtn.disabled = true;
-          try {
-            await reactivateCurso(S.current.id); // usa tu función existente
-          } finally {
-            reaBtn.disabled = false;
-          }
-        });
-      }
-
-      console.log("[Cursos] Botones listos. isInactive=", isInactive);
-    })();
+    }
   }
 
   window.fillCursoView = fillCursoView;
