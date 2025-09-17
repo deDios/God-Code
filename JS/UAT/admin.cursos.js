@@ -949,7 +949,7 @@
 
       toast("Curso guardado", "exito");
 
-      await window.loadCursos();
+      await loadCursos(); 
       const idToOpen = newId || body.id;
       const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
       if (it) {
