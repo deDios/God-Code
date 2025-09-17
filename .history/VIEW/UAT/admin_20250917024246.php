@@ -497,9 +497,7 @@
                 <div class="field">
                     <label>Imágenes existentes <span class="req">*</span></label>
                     <div class="value">
-                        <div id="media-curso-edit">
-                            <!-- mountCursoMedia(..., editable:true) -->
-                        </div>
+                        <div id="media-curso-edit"><!-- mountCursoMedia(..., editable:true) --></div>
                         <div class="hint gc-soft">Solo archivos PNG/JPG que pesen hasta 2MB.</div>
                     </div>
                 </div>
@@ -512,322 +510,169 @@
                     </div>
                 </div>
             </section>
+
+
         </div>
     </aside>
-
-
-
-
-
-
 
     <!-- Drawer · NOTICIA -->
-    <aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-noticia-title">Noticia · —</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-noticia-close">Cerrar</button>
-            </div>
+<aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-noticia-title">Noticia · —</div>
+    <div class="drawer-actions">
+      <button class="btn" id="drawer-noticia-close">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="drawer-body" id="drawer-noticia-body">
+    <!-- Acciones en modo vista -->
+    <div class="gc-actions" id="noticia-actions-view">
+      <button class="gc-btn" id="n-btn-edit">Editar</button>
+      <button class="gc-btn gc-btn--danger" id="n-btn-delete" data-step="1">Eliminar</button>
+    </div>
+
+    <!-- ===== MODO VISTA ===== -->
+    <section id="noticia-view" class="mode-view">
+      <div class="field">
+        <div class="label">Título <span class="req">*</span></div>
+        <div class="value" id="nv_titulo">—</div>
+      </div>
+
+      <div class="field">
+        <div class="label">Resumen <span class="req">*</span></div>
+        <div class="value" id="nv_resumen">—</div>
+      </div>
+
+      <div class="field">
+        <div class="label">Contenido <span class="req">*</span></div>
+        <div class="value" id="nv_contenido">—</div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <div class="label">Autor <span class="req">*</span></div>
+          <div class="value" id="nv_autor">—</div>
         </div>
-
-        <div class="drawer-body" id="drawer-noticia-body">
-            <!-- Acciones en modo vista -->
-            <div class="gc-actions" id="noticia-actions-view">
-                <button class="gc-btn" id="n-btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--danger" id="n-btn-delete" data-step="1">Eliminar</button>
-            </div>
-
-            <!-- ===== MODO VISTA ===== -->
-            <section id="noticia-view" class="mode-view">
-                <div class="field">
-                    <div class="label">Título <span class="req">*</span></div>
-                    <div class="value" id="nv_titulo">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Resumen <span class="req">*</span></div>
-                    <div class="value" id="nv_resumen">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Contenido <span class="req">*</span></div>
-                    <div class="value" id="nv_contenido">—</div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="field">
-                        <div class="label">Autor <span class="req">*</span></div>
-                        <div class="value" id="nv_autor">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Categoría <span class="req">*</span></div>
-                        <div class="value" id="nv_categoria">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Estatus</div>
-                        <div class="value" id="nv_estatus">—</div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Fecha de publicación <span class="req">*</span></div>
-                    <div class="value" id="nv_fecha">—</div>
-                </div>
-
-                <!-- Bloque de imágenes (solo lectura) -->
-                <div class="field">
-                    <div class="label">Imágenes existentes <span class="req">*</span></div>
-                    <div class="value">
-                        <div id="media-noticia">
-                            <!-- mountNoticiaMediaView(...) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
-                    </div>
-                </div>
-
-                <!-- JSON Dev -->
-                <details class="dev-json" id="noticia-json-box" open style="margin-top:16px;">
-                    <summary style="cursor:pointer;font-weight:600;">JSON · Noticia</summary>
-                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-                        <button class="gc-btn" id="n-btn-copy-json">Copiar JSON</button>
-                    </div>
-                    <pre id="json-noticia" class="value"
-                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
-                </details>
-            </section>
-
-            <!-- ===== MODO EDICIÓN ===== -->
-            <section id="noticia-edit" class="mode-edit" hidden>
-                <div class="field">
-                    <label for="n_titulo">Título <span class="req">*</span></label>
-                    <input id="n_titulo" type="text" maxlength="160" data-max="160" />
-                    <small class="char-counter" data-for="n_titulo"></small>
-                </div>
-
-                <div class="field">
-                    <label for="n_resumen">Resumen <span class="req">*</span></label>
-                    <textarea id="n_resumen" rows="3" maxlength="300" data-max="300"></textarea>
-                    <small class="char-counter" data-for="n_resumen"></small>
-                </div>
-
-                <div class="field">
-                    <label for="n_contenido">Contenido <span class="req">*</span></label>
-                    <textarea id="n_contenido" rows="8" maxlength="6000" data-max="6000"></textarea>
-                    <small class="char-counter" data-for="n_contenido"></small>
-                </div>
-
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                    <div class="field">
-                        <label for="n_autor">Autor <span class="req">*</span></label>
-                        <select id="n_autor"></select>
-                    </div>
-                    <div class="field">
-                        <label for="n_categoria">Categoría <span class="req">*</span></label>
-                        <select id="n_categoria"></select>
-                    </div>
-                    <div class="field">
-                        <label for="n_estatus">Estatus</label>
-                        <select id="n_estatus"></select>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="n_fecha">Fecha de publicación <span class="req">*</span></label>
-                    <input id="n_fecha" type="date" />
-                </div>
-
-                <!-- Imágenes (editable con lápiz) -->
-                <div class="field">
-                    <label>Imágenes existentes <span class="req">*</span></label>
-                    <div class="value">
-                        <div id="media-noticia-edit">
-                            <!-- mountNoticiaMediaEdit(..., editable:true) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG · Máx 2MB</div>
-                    </div>
-                </div>
-
-                <div class="drawer-actions-row">
-                    <div class="row-right">
-                        <button class="gc-btn gc-btn--ghost" id="n-btn-cancel">Cancelar</button>
-                        <button class="gc-btn gc-btn--success" id="n-btn-save">Guardar</button>
-                    </div>
-                </div>
-            </section>
+        <div class="field">
+          <div class="label">Categoría <span class="req">*</span></div>
+          <div class="value" id="nv_categoria">—</div>
         </div>
-    </aside>
-
-
-
-
-
-
-
-
-
-    <!-- Drawer · TUTOR -->
-    <aside id="drawer-tutor" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-tutor-title">Tutor · —</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-tutor-close">Cerrar</button>
-            </div>
+        <div class="field">
+          <div class="label">Estatus</div>
+          <div class="value" id="nv_estatus">—</div>
         </div>
+      </div>
 
-        <div class="drawer-body" id="drawer-tutor-body">
-            <!-- Acciones (modo vista) -->
-            <div class="gc-actions" id="tutor-actions-view">
-                <button class="gc-btn" id="t-btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--danger" id="t-btn-delete" data-step="1">Eliminar</button>
-            </div>
+      <div class="field">
+        <div class="label">Fecha de publicación <span class="req">*</span></div>
+        <div class="value" id="nv_fecha">—</div>
+      </div>
 
-            <!-- ===== MODO VISTA ===== -->
-            <section id="tutor-view" class="mode-view">
-                <div class="field">
-                    <div class="label">Nombre <span class="req">*</span></div>
-                    <div class="value" id="tv_nombre">—</div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="field">
-                        <div class="label">Correo <span class="req">*</span></div>
-                        <div class="value" id="tv_correo">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Teléfono</div>
-                        <div class="value" id="tv_telefono">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Estatus</div>
-                        <div class="value" id="tv_estatus">—</div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Resumen</div>
-                    <div class="value" id="tv_resumen">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Descripción</div>
-                    <div class="value" id="tv_descripcion">—</div>
-                </div>
-
-                <!-- Foto (solo lectura) -->
-                <div class="field">
-                    <div class="label">Foto</div>
-                    <div class="value">
-                        <div id="media-tutor">
-                            <!-- mountTutorMediaView(...) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG recomendado 1:1.</div>
-                    </div>
-                </div>
-
-                <!-- JSON Dev -->
-                <details class="dev-json" id="tutor-json-box" open style="margin-top:16px;">
-                    <summary style="cursor:pointer;font-weight:600;">JSON · Tutor</summary>
-                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-                        <button class="gc-btn" id="t-btn-copy-json">Copiar JSON</button>
-                    </div>
-                    <pre id="json-tutor" class="value"
-                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
-                </details>
-            </section>
-
-            <!-- ===== MODO EDICIÓN ===== -->
-            <section id="tutor-edit" class="mode-edit" hidden>
-                <div class="field">
-                    <label for="t_nombre">Nombre <span class="req">*</span></label>
-                    <input id="t_nombre" type="text" maxlength="120" data-max="120" />
-                    <small class="char-counter" data-for="t_nombre"></small>
-                </div>
-
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                    <div class="field">
-                        <label for="t_correo">Correo <span class="req">*</span></label>
-                        <input id="t_correo" type="email" maxlength="160" data-max="160" />
-                        <small class="char-counter" data-for="t_correo"></small>
-                    </div>
-                    <div class="field">
-                        <label for="t_telefono">Teléfono</label>
-                        <input id="t_telefono" type="tel" maxlength="32" data-max="32" />
-                        <small class="char-counter" data-for="t_telefono"></small>
-                    </div>
-                    <div class="field">
-                        <label for="t_estatus">Estatus</label>
-                        <select id="t_estatus"></select>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="t_resumen">Resumen</label>
-                    <textarea id="t_resumen" rows="3" maxlength="300" data-max="300"></textarea>
-                    <small class="char-counter" data-for="t_resumen"></small>
-                </div>
-
-                <div class="field">
-                    <label for="t_descripcion">Descripción</label>
-                    <textarea id="t_descripcion" rows="6" maxlength="4000" data-max="4000"></textarea>
-                    <small class="char-counter" data-for="t_descripcion"></small>
-                </div>
-
-                <!-- Foto (editable con lápiz) -->
-                <div class="field">
-                    <label>Foto</label>
-                    <div class="value">
-                        <div id="media-tutor-edit">
-                            <!-- mountTutorMediaEdit(..., editable:true) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG · Máx 2MB</div>
-                    </div>
-                </div>
-
-                <div class="drawer-actions-row">
-                    <div class="row-right">
-                        <button class="gc-btn gc-btn--ghost" id="t-btn-cancel">Cancelar</button>
-                        <button class="gc-btn gc-btn--success" id="t-btn-save">Guardar</button>
-                    </div>
-                </div>
-            </section>
+      <!-- Bloque de imágenes (solo lectura) -->
+      <div class="field">
+        <div class="label">Imágenes existentes <span class="req">*</span></div>
+        <div class="value">
+          <div id="media-noticia"><!-- mountNoticiaMediaView(...) --></div>
+          <div class="hint" style="color:#666;margin-top:.35rem;">Debe existir una portada válida.</div>
         </div>
-    </aside>
+      </div>
 
+      <!-- JSON Dev -->
+      <details class="dev-json" id="noticia-json-box" open style="margin-top:16px;">
+        <summary style="cursor:pointer;font-weight:600;">JSON · Noticia</summary>
+        <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+          <button class="gc-btn" id="n-btn-copy-json">Copiar JSON</button>
+        </div>
+        <pre id="json-noticia" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
+      </details>
+    </section>
 
+    <!-- ===== MODO EDICIÓN ===== -->
+    <section id="noticia-edit" class="mode-edit" hidden>
+      <div class="field">
+        <label for="n_titulo">Título <span class="req">*</span></label>
+        <input id="n_titulo" type="text" maxlength="160" data-max="160" />
+        <small class="char-counter" data-for="n_titulo"></small>
+      </div>
 
+      <div class="field">
+        <label for="n_resumen">Resumen <span class="req">*</span></label>
+        <textarea id="n_resumen" rows="3" maxlength="300" data-max="300"></textarea>
+        <small class="char-counter" data-for="n_resumen"></small>
+      </div>
 
+      <div class="field">
+        <label for="n_contenido">Contenido <span class="req">*</span></label>
+        <textarea id="n_contenido" rows="8" maxlength="6000" data-max="6000"></textarea>
+        <small class="char-counter" data-for="n_contenido"></small>
+      </div>
 
+      <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        <div class="field">
+          <label for="n_autor">Autor <span class="req">*</span></label>
+          <select id="n_autor"></select>
+        </div>
+        <div class="field">
+          <label for="n_categoria">Categoría <span class="req">*</span></label>
+          <select id="n_categoria"></select>
+        </div>
+        <div class="field">
+          <label for="n_estatus">Estatus</label>
+          <select id="n_estatus"></select>
+        </div>
+      </div>
 
+      <div class="field">
+        <label for="n_fecha">Fecha de publicación <span class="req">*</span></label>
+        <input id="n_fecha" type="date" />
+      </div>
 
+      <!-- Imágenes (editable con lápiz) -->
+      <div class="field">
+        <label>Imágenes existentes <span class="req">*</span></label>
+        <div class="value">
+          <div id="media-noticia-edit"><!-- mountNoticiaMediaEdit(..., editable:true) --></div>
+          <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG · Máx 2MB</div>
+        </div>
+      </div>
 
+      <div class="drawer-actions-row">
+        <div class="row-right">
+          <button class="gc-btn gc-btn--ghost" id="n-btn-cancel">Cancelar</button>
+          <button class="gc-btn gc-btn--success" id="n-btn-save">Guardar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
 
 
     <!-- Contadores de caracteres sencillo -->
     <script>
-    (function() {
-        function updateOne(el) {
-            var max = Number(el.getAttribute('data-max') || 0);
-            if (!max) return;
-            var id = el.id;
-            var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
-            if (!cc) return;
-            var v = (el.value || "");
-            cc.textContent = v.length + "/" + max;
-            if (v.length > max) cc.classList.add('over');
-            else cc.classList.remove('over');
-        }
+        (function() {
+            function updateOne(el) {
+                var max = Number(el.getAttribute('data-max') || 0);
+                if (!max) return;
+                var id = el.id;
+                var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
+                if (!cc) return;
+                var v = (el.value || "");
+                cc.textContent = v.length + "/" + max;
+                if (v.length > max) cc.classList.add('over');
+                else cc.classList.remove('over');
+            }
 
-        function bind(el) {
-            if (!el) return;
-            updateOne(el);
-            el.addEventListener('input', function() {
+            function bind(el) {
+                if (!el) return;
                 updateOne(el);
+                el.addEventListener('input', function() {
+                    updateOne(el);
+                });
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-max]').forEach(bind);
             });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[data-max]').forEach(bind);
-        });
-    })();
+        })();
     </script>
 
 
@@ -835,9 +680,9 @@
 
     <script src="/JS/JSglobal.js"></script>
     <script src="/JS/UAT/admin.cursos.js"></script>
-    <script src="/JS/UAT/admin.tutores.js"></script>
+    <script src="/JS/UAT/admin.cursos.js"></script> 
     <script src="/JS/UAT/admin.noticias.js"></script>
-    <!--
+    <!-- 
     <script src="/JS/UAT/admin.suscripciones.js"></script>
     <script src="/JS/UAT/admin.usuarios.js"></script>
       -->

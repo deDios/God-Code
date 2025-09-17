@@ -512,14 +512,10 @@
                     </div>
                 </div>
             </section>
+
+
         </div>
     </aside>
-
-
-
-
-
-
 
     <!-- Drawer · NOTICIA -->
     <aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
@@ -657,14 +653,6 @@
         </div>
     </aside>
 
-
-
-
-
-
-
-
-
     <!-- Drawer · TUTOR -->
     <aside id="drawer-tutor" class="drawer gc-dash" aria-hidden="true" hidden>
         <div class="drawer-header">
@@ -795,13 +783,6 @@
 
 
 
-
-
-
-
-
-
-
     <!-- Contadores de caracteres sencillo -->
     <script>
     (function() {
@@ -835,7 +816,7 @@
 
     <script src="/JS/JSglobal.js"></script>
     <script src="/JS/UAT/admin.cursos.js"></script>
-    <script src="/JS/UAT/admin.tutores.js"></script>
+    <script src="/JS/UAT/admin.cursos.js"></script>
     <script src="/JS/UAT/admin.noticias.js"></script>
     <!--
     <script src="/JS/UAT/admin.suscripciones.js"></script>

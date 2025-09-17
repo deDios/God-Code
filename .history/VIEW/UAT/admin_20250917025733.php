@@ -800,7 +800,7 @@
 
 
 
-
+    
 
     <!-- Contadores de caracteres sencillo -->
     <script>
@@ -835,7 +835,7 @@
 
     <script src="/JS/JSglobal.js"></script>
     <script src="/JS/UAT/admin.cursos.js"></script>
-    <script src="/JS/UAT/admin.tutores.js"></script>
+    <script src="/JS/UAT/admin.cursos.js"></script>
     <script src="/JS/UAT/admin.noticias.js"></script>
     <!--
     <script src="/JS/UAT/admin.suscripciones.js"></script>

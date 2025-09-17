@@ -795,13 +795,6 @@
 
 
 
-
-
-
-
-
-
-
     <!-- Contadores de caracteres sencillo -->
     <script>
     (function() {
@@ -835,7 +828,7 @@
 
     <script src="/JS/JSglobal.js"></script>
     <script src="/JS/UAT/admin.cursos.js"></script>
-    <script src="/JS/UAT/admin.tutores.js"></script>
+    <script src="/JS/UAT/admin.cursos.js"></script>
     <script src="/JS/UAT/admin.noticias.js"></script>
     <!--
     <script src="/JS/UAT/admin.suscripciones.js"></script>
