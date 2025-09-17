@@ -38,7 +38,6 @@ const mapToOptions = (map, sel) => {
   return ids.map(id=>`<option value="${esc(id)}"${+id===+sel?" selected":""}>${esc(map[id])}</option>`).join("");
 };
 const mapLabel = (map, id) => (map && map[id]) || "-";
-const withBust = u => u + (u.includes("?")?"&":"?") + "v=" + Date.now();
 
 /* ====== Etiquetas de estatus y orden ====== */
 const STATUS_LABEL = { 1:"Activo", 0:"Inactivo", 2:"Pausado", 3:"Terminado", 4:"En curso", 5:"Cancelado" };
