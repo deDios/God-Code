@@ -110,6 +110,7 @@
     const $btn = document.querySelector('#btn-add');
     if (!$btn) return;
 
+    // Limpia listeners previos clonando el nodo
     const newBtn = $btn.cloneNode(true);
     $btn.parentNode.replaceChild(newBtn, $btn);
 
@@ -122,14 +123,18 @@
         action();
       });
     } else {
+      // Sin acción disponible en la ruta actual
+      newBtn.disabled = true;
       newBtn.classList.add('disabled');
     }
   }
 
+  // Llamar después de cada navegación
   window.addEventListener('hashchange', bindCreateButtonForCurrentRoute);
   // Y también al cargar
   document.addEventListener('DOMContentLoaded', bindCreateButtonForCurrentRoute);
 
+  // Si tu router tiene su propio “onRouteChange”, invoca ahí también:
   if (typeof window.__afterRouteChangeHooks === 'object') {
     window.__afterRouteChangeHooks.push(bindCreateButtonForCurrentRoute);
   }
