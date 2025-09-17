@@ -70,11 +70,9 @@
   function gcNoImageSvg() {
     return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
   }
-  function noImageSvgDataURI() {
-    return "data:image/svg+xml;utf8," + encodeURIComponent(gcNoImageSvg());
-  }
+  function gcSvgDataUri(svg) { return "data:image/svg+xml;utf8," + encodeURIComponent(svg); }
 
-  // asegura PNG -> JPG -> SVG data:
+  // Fuerza cadena de fallbacks: PNG → JPG → SVG data:
   function ensureCourseCover(imgEl, cursoId) {
     if (!imgEl) return;
     const png = withBust(cursoImgUrl(cursoId, "png"));
@@ -87,25 +85,20 @@
     imgEl.onerror = () => {
       if (imgEl.dataset._state === "png") {
         imgEl.dataset._state = "jpg";
-        imgEl.src = jpg; return;
+        imgEl.src = jpg;
+        return;
+      }
+      if (imgEl.dataset._state === "jpg") {
+        imgEl.dataset._state = "svg";
+        imgEl.src = gcSvgDataUri(gcNoImageSvg());
+        imgEl.onerror = null;
+        return;
       }
       imgEl.onerror = null;
-      imgEl.src = noImageSvgDataURI();
+      imgEl.src = gcSvgDataUri(gcNoImageSvg());
     };
 
     imgEl.src = png;
-  }
-
-  // checa existencia real: PNG -> JPG -> data:
-  async function resolveCursoImg(id) {
-    const png = withBust(cursoImgUrl(id, "png"));
-    const jpg = withBust(cursoImgUrl(id, "jpg"));
-    const ok = url =>
-      new Promise(res => { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = url; });
-
-    if (await ok(png)) return png;
-    if (await ok(jpg)) return jpg;
-    return noImageSvgDataURI();
   }
 
   /* ----- Overlay + Drawer helpers (compartidos) ----- */
@@ -126,39 +119,23 @@
   qsa("#gc-dash-overlay").forEach(ov => ov.addEventListener("click", closeDrawerCurso));
   document.addEventListener("keydown", e => { if (e.key === "Escape") { closeDrawerCurso(); } });
 
-  // ---- NUEVOS helpers compartidos ----
-  function mapToOptions(map, sel) {
-    const ids = Object.keys(map || {}).filter(k => k !== "_ts");
-    return ids.map(id =>
-      `<option value="${id}"${+id === +sel ? " selected" : ""}>${esc(map[id])}</option>`
-    ).join("");
-  }
+  // export utilidades que usarán los otros bloques
+  window.gcUtils = {
+    qs, qsa, esc, fmtMoney, fmtBool, fmtDate,
+    STATUS_LABEL, ORDER_CURSOS,
+    postJSON, withBust,
+    cursoImgUrl, ensureCourseCover,
+     mapLabel,
+    openDrawerCurso, closeDrawerCurso
+  };
+
+  // === Utils (añadir junto con los demás) ===
   function mapLabel(map, id) {
     if (!map) return "-";
     const k = String(id ?? "");
     return (k in map) ? (map[k] ?? "-") : "-";
   }
-  function toast(msg, type = "info", ms = 2200) {
-    if (window.gcToast) return window.gcToast(msg, type, ms);
-    console.log(`[${type}] ${msg}`);
-  }
 
-  // export utilidades a usar en otros bloques
-  window.gcUtils = {
-    // utils
-    qs, qsa, esc, fmtMoney, fmtBool, fmtDate,
-    STATUS_LABEL, ORDER_CURSOS,
-    postJSON, withBust, toast,
-
-    // imágenes
-    cursoImgUrl, ensureCourseCover, resolveCursoImg, noImageSvgDataURI,
-
-    // drawer
-    openDrawerCurso, closeDrawerCurso,
-
-    // mapping/options
-    mapToOptions, mapLabel
-  };
 })();
 
 
@@ -169,7 +146,7 @@
   // Estado y utilidades expuestas por el BLOQUE 0
   const S = window.__CursosState;
   const {
-    qs, qsa, esc, fmtDate, mapLabel,
+    qs, qsa, esc, fmtDate,
     STATUS_LABEL, ORDER_CURSOS,
     postJSON,
   } = window.gcUtils;
@@ -186,12 +163,12 @@
   }
 
   async function loadCatalogos() {
-    if (!S.maps.tutores)    S.maps.tutores    = arrToMap(await postJSON(API.tutores,   { estatus: 1 }).catch(() => []));
-    if (!S.maps.prioridad)  S.maps.prioridad  = arrToMap(await postJSON(API.prioridad, { estatus: 1 }).catch(() => []));
-    if (!S.maps.categorias) S.maps.categorias = arrToMap(await postJSON(API.categorias,{ estatus: 1 }).catch(() => []));
-    if (!S.maps.calendario) S.maps.calendario = arrToMap(await postJSON(API.calendario,{ estatus: 1 }).catch(() => []));
-    if (!S.maps.tipoEval)   S.maps.tipoEval   = arrToMap(await postJSON(API.tipoEval,  { estatus: 1 }).catch(() => []));
-    if (!S.maps.actividades)S.maps.actividades= arrToMap(await postJSON(API.actividades,{ estatus: 1 }).catch(() => []));
+    if (!S.maps.tutores) S.maps.tutores = arrToMap(await postJSON(API.tutores, { estatus: 1 }).catch(() => []));
+    if (!S.maps.prioridad) S.maps.prioridad = arrToMap(await postJSON(API.prioridad, { estatus: 1 }).catch(() => []));
+    if (!S.maps.categorias) S.maps.categorias = arrToMap(await postJSON(API.categorias, { estatus: 1 }).catch(() => []));
+    if (!S.maps.calendario) S.maps.calendario = arrToMap(await postJSON(API.calendario, { estatus: 1 }).catch(() => []));
+    if (!S.maps.tipoEval) S.maps.tipoEval = arrToMap(await postJSON(API.tipoEval, { estatus: 1 }).catch(() => []));
+    if (!S.maps.actividades) S.maps.actividades = arrToMap(await postJSON(API.actividades, { estatus: 1 }).catch(() => []));
   }
 
   /* ----- Descarga cursos por estatus y concatena en orden ----- */
@@ -205,6 +182,8 @@
     S.page = 1;
     renderCursos();
   }
+  window.cursosLoad = { loadCatalogos, loadCursos }; // opcional para debug
+
 
   function renderCursos() {
     const hostD = qs("#recursos-list");
@@ -278,7 +257,9 @@
 
     renderPagination(filtered.length);
   }
+  window.cursosRender = { renderCursos }; // opcional para debug
 
+  /* ----- Paginación ----- */
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / S.pageSize));
     [qs("#pagination-controls"), qs("#pagination-mobile")].forEach(cont => {
@@ -296,6 +277,7 @@
 
       cont.appendChild(mkBtn("‹", S.page === 1, () => { S.page = Math.max(1, S.page - 1); renderCursos(); }, "arrow-btn"));
 
+      // primeras 7 (simple)
       for (let p = 1; p <= totalPages && p <= 7; p++) {
         const b = mkBtn(String(p), false, () => { S.page = p; renderCursos(); });
         if (p === S.page) b.classList.add("active");
@@ -306,6 +288,7 @@
     });
   }
 
+  /* ----- Búsqueda ----- */
   function normalize(s) {
     return String(s || "")
       .normalize("NFD")
@@ -313,8 +296,6 @@
       .toLowerCase()
       .trim();
   }
-
-  // búsqueda
   const searchInput = qs("#search-input");
   if (searchInput) {
     searchInput.addEventListener("input", e => {
@@ -324,10 +305,11 @@
     });
   }
 
-  // botón “crear”
+  /* ----- Crear curso (botón + flujo) ----- */
   const btnAdd = qs("#btn-add");
   if (btnAdd) {
     btnAdd.addEventListener("click", () => {
+      // Curso en blanco; los bloques 2/3 decidirán cómo abrir edición
       const blank = {
         id: null, nombre: "", descripcion_breve: "", descripcion_curso: "", descripcion_media: "",
         dirigido: "", competencias: "", tutor: "", horas: "", precio: "", estatus: 1, fecha_inicio: "",
@@ -335,13 +317,16 @@
       };
       S.current = { id: null, _all: blank };
 
-      window.gcUtils.openDrawerCurso();
+      // Si ya están cargados los helpers del drawer, inténtalo:
+      if (typeof window.openDrawerCurso === "function") window.openDrawerCurso();
       if (typeof window.setDrawerMode === "function") window.setDrawerMode("edit");
       if (typeof window.fillCursoEdit === "function") window.fillCursoEdit(blank);
+
+      // Si el bloque 3 no se ha cargado aún, no pasa nada; al cargar podrá usar S.current
     });
   }
 
-  // Bootstrap inicial
+  /* ----- Bootstrap inicial ----- */
   (async function init() {
     try {
       await loadCatalogos();
@@ -351,10 +336,6 @@
     }
   })();
 
-  // expón para Bloque 3
-  window.cursosLoad = { loadCatalogos, loadCursos };
-  window.loadCursos = loadCursos; // <- usado por saveCurso
-
 })();
 
 
@@ -362,18 +343,49 @@
 (() => {
   "use strict";
 
+  // Estado + utils definidos en el Bloque 0
   const S = window.__CursosState;
   const {
-    qs, esc, fmtMoney, fmtBool, fmtDate,
+    qs, qsa, esc, fmtMoney, fmtBool, fmtDate,
     STATUS_LABEL, mapLabel,
     withBust, cursoImgUrl, resolveCursoImg, noImageSvgDataURI,
-    openDrawerCurso, closeDrawerCurso
   } = window.gcUtils;
 
+  /* ---------- Apertura / cierre del drawer (compartido) ---------- */
+  function openDrawerCurso() {
+    const d = qs("#drawer-curso");
+    const ov = qs("#gc-dash-overlay");
+    if (!d) return;
+    d.classList.add("open");
+    d.removeAttribute("hidden");
+    d.setAttribute("aria-hidden", "false");
+    if (ov) ov.classList.add("open");
+  }
+  function closeDrawerCurso() {
+    const d = qs("#drawer-curso");
+    const ov = qs("#gc-dash-overlay");
+    if (!d) return;
+    d.classList.remove("open");
+    d.setAttribute("hidden", "");
+    d.setAttribute("aria-hidden", "true");
+    if (ov) ov.classList.remove("open");
+    S.current = null;
+  }
+  // binds (una sola vez)
+  const closeBtn = qs("#drawer-curso-close");
+  if (closeBtn && !closeBtn._bound) { closeBtn._bound = true; closeBtn.addEventListener("click", closeDrawerCurso); }
+  const overlay = qs("#gc-dash-overlay");
+  if (overlay && !overlay._bound) { overlay._bound = true; overlay.addEventListener("click", closeDrawerCurso); }
+  if (!window._gc_esc_bound) {
+    window._gc_esc_bound = true;
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeDrawerCurso(); });
+  }
+
+  /* ---------- Modo del drawer (view|edit) ---------- */
   function setDrawerMode(mode) {
     const v = qs("#curso-view");
     const e = qs("#curso-edit");
-    const act = qs("#curso-actions-view");
+    const act = qs("#curso-actions-view"); // botones Editar/Eliminar de modo vista
     if (mode === "view") {
       if (v) v.hidden = false;
       if (e) e.hidden = true;
@@ -385,6 +397,7 @@
     }
   }
 
+  /* ---------- Abrir vista de un curso ---------- */
   async function openCursoView(id) {
     const it = (S.data || []).find(x => +x.id === +id);
     if (!it) return;
@@ -394,9 +407,12 @@
     await fillCursoView(it);
   }
 
+  /* ---------- Montar bloque de imágenes (solo lectura) ---------- */
   async function mountCursoMediaView(containerEl, cursoId) {
     if (!containerEl) return;
-    const url = await resolveCursoImg(cursoId);
+    const url = (typeof resolveCursoImg === "function")
+      ? await resolveCursoImg(cursoId)
+      : withBust(cursoImgUrl(cursoId || 0));
 
     containerEl.innerHTML = `
       <div class="media-head">
@@ -415,16 +431,19 @@
       </div>
     `;
 
+    // fallback correcto a data:URI, evitando rutas relativas rotas
     const img = containerEl.querySelector("#curso-cover-view");
     if (img) {
       img.onerror = () => {
         img.onerror = null;
-        img.src = noImageSvgDataURI();
+        img.src = noImageSvgDataURI(); // data:image/svg+xml;utf8,…
       };
     }
   }
 
+  /* ---------- Rellenar campos del modo vista ---------- */
   async function fillCursoView(it) {
+    // título
     const title = qs("#drawer-curso-title");
     if (title) title.textContent = "Curso · " + (it.nombre || "—");
 
@@ -449,11 +468,14 @@
     put("#v_fecha", fmtDate(it.fecha_inicio));
     put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
 
+    // imagen (solo lectura)
     await mountCursoMediaView(qs("#media-curso"), it.id);
 
+    // JSON dev
     const pre = qs("#json-curso");
     if (pre) pre.textContent = JSON.stringify(it, null, 2);
 
+    // acciones (Editar / Eliminar) – solo bind una vez
     const bEdit = qs("#btn-edit");
     if (bEdit && !bEdit._bound) {
       bEdit._bound = true;
@@ -470,6 +492,7 @@
       bDel.addEventListener("click", () => {
         const step = bDel.getAttribute("data-step") === "2" ? "1" : "2";
         bDel.setAttribute("data-step", step);
+        // aquí podrías disparar confirm real
       });
     }
   }
@@ -479,7 +502,9 @@
     if (el) el.innerHTML = esc(val ?? "—");
   }
 
-  // Exponer
+  // Exponer helpers necesarios a otros bloques
+  window.openDrawerCurso = openDrawerCurso;
+  window.closeDrawerCurso = closeDrawerCurso;
   window.setDrawerMode = setDrawerMode;
   window.openCursoView = openCursoView;
   window.fillCursoView = fillCursoView;
@@ -491,6 +516,7 @@
 (() => {
   "use strict";
 
+  // Estado + utils + API expuestos por Bloque 0
   const S = window.__CursosState;
   const API = window.API;
   const API_UPLOAD = window.API_UPLOAD;
@@ -657,6 +683,7 @@
     const img = containerEl.querySelector("#curso-cover-edit");
     const pencil = containerEl.querySelector(".media-edit");
 
+    // carga inicial con fallback correcto
     (async () => {
       const url = await resolveCursoImg(cursoId);
       img.src = url;
@@ -704,6 +731,7 @@
     if (bCancel && !bCancel._bound) {
       bCancel._bound = true;
       bCancel.addEventListener("click", () => {
+        // volver a vista con los datos actuales en memoria
         if (window.setDrawerMode && window.fillCursoView) {
           window.setDrawerMode("view");
           window.fillCursoView(S.current ? S.current._all : c);
@@ -735,6 +763,7 @@
       certificado: qs("#f_certificado")?.checked ? 1 : 0
     };
 
+    // validación mínima
     if (!body.nombre || !body.descripcion_breve || !body.descripcion_curso || !body.dirigido || !body.competencias) {
       toast("Completa los campos obligatorios.", "error"); return;
     }
@@ -761,8 +790,9 @@
     }
   }
 
-  // Exponer
+  // Exponer para Bloque 2
   window.fillCursoEdit = fillCursoEdit;
   window.saveCurso = saveCurso;
 
 })();
+
