@@ -949,12 +949,13 @@
 
       toast("Curso guardado", "exito");
 
-      await loadCursos(); 
+      await loadCursos();
       const idToOpen = newId || body.id;
       const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
       if (it) {
         S.current = { id: it.id, _all: it };
-        window.setDrawerMode("view");
+        if (typeof setDrawerMode === "function") setDrawerMode("view");
+
         await window.fillCursoView(it);
       }
     } catch (err) {
@@ -1016,7 +1017,8 @@
     };
     S.current = { id: null, _all: blank };
     openDrawerCurso();
-    setDrawerMode("edit");
+    if (typeof setDrawerMode === "function") setDrawerMode("edit");
+
     fillCursoEdit(blank);
   }
 
