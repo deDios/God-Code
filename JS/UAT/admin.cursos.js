@@ -116,6 +116,100 @@
     console.log(`${TAG} toast[${type}]:`, msg);
   }
 
+  async function softDeleteCurso(id) {
+    if (!id) return;
+    try {
+      console.log("[Cursos] softDeleteCurso → id=", id);
+      const payload = { id: Number(id), estatus: 0 };
+      const res = await postJSON(API.uCursos, payload);
+      console.log("[Cursos] softDeleteCurso respuesta:", res);
+
+      if (res && res.error) {
+        console.error("[Cursos] Delete ERROR:", res.error);
+        toast(res.error, "error");
+        return;
+      }
+
+      toast("Curso movido a Inactivo", "exito");
+
+      await loadCursos();
+      const it = (S.data || []).find((x) => +x.id === +id);
+      if (it) {
+        S.current = { id: it.id, _all: it };
+        setDrawerMode("view");
+        await fillCursoView(it);
+      } else {
+        closeDrawerCurso?.();
+      }
+    } catch (err) {
+      console.error("[Cursos] softDeleteCurso ERROR:", err);
+      toast("No se pudo eliminar (soft delete).", "error");
+    }
+  }
+
+  // Genérico: actualiza estatus (por si luego quieres más estados)
+  async function updateCursoStatus(id, estatus, extra = {}) {
+    if (!id) return;
+    try {
+      const payload = Object.assign(
+        { id: Number(id), estatus: Number(estatus) },
+        extra
+      );
+      console.log("[Cursos] updateCursoStatus →", payload);
+      const res = await postJSON(API.uCursos, payload);
+      console.log("[Cursos] updateCursoStatus respuesta:", res);
+      if (res && res.error) {
+        console.error("[Cursos] Status ERROR:", res.error);
+        toast(res.error, "error");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("[Cursos] updateCursoStatus ERROR:", err);
+      toast("No se pudo actualizar el estatus.", "error");
+      return false;
+    }
+  }
+
+  // Soft delete (estatus = 0)
+  async function softDeleteCurso(id) {
+    const ok = await updateCursoStatus(
+      id,
+      0 /* inactivo */ /* , { modificado_por: getCreatorId() } */
+    );
+    if (!ok) return;
+    toast("Curso movido a Inactivo", "exito");
+    await loadCursos();
+    const it = (S.data || []).find((x) => +x.id === +id);
+    if (it) {
+      S.current = { id: it.id, _all: it };
+      setDrawerMode("view");
+      await fillCursoView(it);
+    } else {
+      closeDrawerCurso?.();
+    }
+  }
+
+  // Reactivar (estatus = 1)
+  async function reactivateCurso(id) {
+    const ok = await updateCursoStatus(
+      id,
+      1 /* activo */ /* , { modificado_por: getCreatorId() } */
+    );
+    if (!ok) return;
+    toast("Curso reactivado", "exito");
+    await loadCursos();
+    const it = (S.data || []).find((x) => +x.id === +id);
+    if (it) {
+      S.current = { id: it.id, _all: it };
+      setDrawerMode("view");
+      await fillCursoView(it);
+    } else {
+      closeDrawerCurso?.();
+    }
+  }
+
+  /*
   function getCurrentUserId() {
     const idFromBody = document.body?.dataset?.userId;
     if (idFromBody && !isNaN(+idFromBody)) return Number(idFromBody);
@@ -136,6 +230,7 @@
     );
     return null;
   }
+*/
 
   /* ---------- HTTP JSON robusto ---------- */
   async function postJSON(url, body) {
@@ -599,15 +694,77 @@
         fillCursoEdit(S.current ? S.current._all : it);
       });
     }
+
     const bDel = qs("#btn-delete");
-    if (bDel && !bDel._b) {
-      bDel._b = true;
-      bDel.addEventListener("click", () => {
-        const step = bDel.getAttribute("data-step") === "2" ? "1" : "2";
-        bDel.setAttribute("data-step", step);
+    if (bDel) {
+      const btn = bDel.cloneNode(true);
+      bDel.parentNode.replaceChild(btn, bDel);
+
+      // Etiquetas
+      const LABELS = {
+        normal: btn.textContent || "Eliminar",
+        confirm: "¿Confirmar?",
+      };
+
+      let confirming = false;
+      let timer = null;
+
+      function resetConfirmUI() {
+        confirming = false;
+        btn.textContent = LABELS.normal;
+        btn.classList.remove("danger");
+        btn.removeAttribute("data-step");
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+      }
+
+      // Si el curso ya está inactivo, deshabilita (o cambia el texto, como prefieras)
+      if (+it.estatus === 0) {
+        btn.disabled = true;
+        btn.title = "El curso ya está inactivo";
+        btn.classList.add("disabled");
+      } else {
+        btn.disabled = false;
+        btn.classList.remove("disabled");
+      }
+
+      btn.addEventListener("click", async () => {
+        if (!S.current?.id) {
+          toast("No hay curso activo para eliminar.", "error");
+          return;
+        }
+
+        // Si ya está inactivo, no hagas nada
+        if (+it.estatus === 0) {
+          toast("El curso ya está inactivo.", "info");
+          return;
+        }
+
+        // Primer click: pide confirmación
+        if (!confirming) {
+          confirming = true;
+          btn.setAttribute("data-step", "2");
+          btn.classList.add("danger");
+          btn.textContent = LABELS.confirm;
+
+          // Auto-cancelar en 3s
+          timer = setTimeout(resetConfirmUI, 3000);
+          return;
+        }
+
+        bDel.disabled = true;
+        try {
+          await softDeleteCurso(S.current.id);
+        } finally {
+          bDel.disabled = false;
+          resetConfirmUI();
+        }
       });
     }
   }
+
   window.fillCursoView = fillCursoView;
 
   async function openCursoView(id) {
