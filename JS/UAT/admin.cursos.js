@@ -762,6 +762,37 @@
           resetConfirmUI();
         }
       });
+
+      // === Botón Reactivar (estatus → 1) ===
+      {
+        const rBtn = qs("#btn-reactivate");
+        if (rBtn) {
+          // desbindea handlers previos
+          const btn = rBtn.cloneNode(true);
+          rBtn.parentNode.replaceChild(btn, rBtn);
+
+          if (+it.estatus !== 0) {
+            btn.disabled = true;
+            btn.title = "Disponible solo cuando el curso está inactivo";
+            btn.classList.add("disabled");
+          } else {
+            btn.disabled = false;
+            btn.classList.remove("disabled");
+            btn.addEventListener("click", async () => {
+              if (!S.current?.id) {
+                toast("No hay curso activo para reactivar.", "error");
+                return;
+              }
+              btn.disabled = true;
+              try {
+                await reactivateCurso(S.current.id);
+              } finally {
+                btn.disabled = false;
+              }
+            });
+          }
+        }
+      }
     }
   }
 
