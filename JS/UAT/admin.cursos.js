@@ -572,66 +572,73 @@
       });
     }
 
-    // === Botón Eliminar/Reactivar dinámico ===
+    // === Botón Eliminar / Reactivar (dinámico y rápido) ===
     {
       const bDel = qs("#btn-delete");
       if (bDel) {
         const btn = bDel.cloneNode(true);
         bDel.parentNode.replaceChild(btn, bDel);
 
+        // Quita el style="display:none" heredado del HTML
+        btn.removeAttribute("style");
+
+        // Limpia handlers previos
+        btn.replaceWith(btn.cloneNode(true));
+        const realBtn = qs("#btn-delete");
+
         if (+it.estatus === 0) {
-          // Reactivar
-          btn.textContent = "Reactivar";
-          btn.className = "gc-btn gc-btn--success"; // clases nuevas
-          btn.onclick = async () => {
+          // ---- Reactivar ----
+          realBtn.textContent = "Reactivar";
+          realBtn.className = "gc-btn gc-badge gc-badge--green";
+          realBtn.onclick = async () => {
             if (!S.current?.id) {
               toast("No hay curso para reactivar.", "error");
               return;
             }
-            btn.disabled = true;
+            realBtn.disabled = true;
             try {
               await reactivateCurso(S.current.id);
             } finally {
-              btn.disabled = false;
+              realBtn.disabled = false;
             }
           };
         } else {
-          // Eliminar (soft delete)
-          btn.textContent = "Eliminar";
-          btn.className = "gc-btn gc-btn--danger"; // estilo peligro
+          // ---- Eliminar (soft) ----
+          realBtn.textContent = "Eliminar";
+          realBtn.className = "gc-btn gc-btn--danger";
           let confirming = false;
           let timer = null;
 
           function resetConfirmUI() {
             confirming = false;
-            btn.textContent = "Eliminar";
-            btn.classList.remove("danger");
+            realBtn.textContent = "Eliminar";
+            realBtn.classList.remove("danger");
             if (timer) {
               clearTimeout(timer);
               timer = null;
             }
           }
 
-          btn.addEventListener("click", async () => {
+          realBtn.onclick = async () => {
             if (!S.current?.id) {
               toast("No hay curso activo para eliminar.", "error");
               return;
             }
             if (!confirming) {
               confirming = true;
-              btn.textContent = "¿Confirmar?";
-              btn.classList.add("danger");
-              timer = setTimeout(resetConfirmUI, 3000);
+              realBtn.textContent = "¿Confirmar?";
+              realBtn.classList.add("danger");
+              timer = setTimeout(resetConfirmUI, 2500);
               return;
             }
-            btn.disabled = true;
+            realBtn.disabled = true;
             try {
               await softDeleteCurso(S.current.id);
             } finally {
-              btn.disabled = false;
+              realBtn.disabled = false;
               resetConfirmUI();
             }
-          });
+          };
         }
       }
     }
@@ -944,7 +951,6 @@
       const res = await postJSON(API.uCursos, payload);
       console.log(TAG, "updateCursoStatus respuesta:", res);
       if (res && res.error) {
-        console.error(TAG, "Status ERROR:", res.error);
         toast(res.error, "error");
         return false;
       }
@@ -956,34 +962,69 @@
     }
   }
 
-  async function softDeleteCurso(id) {
-    const ok = await updateCursoStatus(id, 0 /* inactivo */);
-    if (!ok) return;
-    toast("Curso movido a Inactivo", "exito");
-    await loadCursos();
-    const it = (S.data || []).find((x) => +x.id === +id);
-    if (it) {
-      S.current = { id: it.id, _all: it };
-      setDrawerMode("view");
-      await fillCursoView(it);
-    } else {
-      closeDrawerCurso?.();
+  function patchLocalCursoStatus(id, estatus) {
+    const idx = (S.data || []).findIndex((x) => +x.id === +id);
+    if (idx >= 0) {
+      S.data[idx] = { ...S.data[idx], estatus: Number(estatus) };
+      // Si es el current, actualízalo también
+      if (S.current && +S.current.id === +id) {
+        S.current._all = { ...S.current._all, estatus: Number(estatus) };
+      }
     }
   }
 
-  async function reactivateCurso(id) {
-    const ok = await updateCursoStatus(id, 1 /* activo */);
-    if (!ok) return;
-    toast("Curso reactivado", "exito");
-    await loadCursos();
+  async function softDeleteCurso(id) {
+    // 1) Optimista: actualiza UI inmediatamente
+    patchLocalCursoStatus(id, 0);
+    renderCursos();
     const it = (S.data || []).find((x) => +x.id === +id);
     if (it) {
-      S.current = { id: it.id, _all: it };
-      setDrawerMode("view");
       await fillCursoView(it);
-    } else {
-      closeDrawerCurso?.();
     }
+
+    // 2) Llama a la API
+    const ok = await updateCursoStatus(id, 0 /* inactivo */, {
+      /* modificado_por: getCreatorId() */
+    });
+    if (!ok) {
+      // revertir si falla
+      patchLocalCursoStatus(id, 1);
+      renderCursos();
+      const it2 = (S.data || []).find((x) => +x.id === +id);
+      if (it2) {
+        await fillCursoView(it2);
+      }
+      return;
+    }
+
+    toast("Curso movido a Inactivo", "exito");
+  }
+
+  async function reactivateCurso(id) {
+    // 1) Optimista
+    patchLocalCursoStatus(id, 1);
+    renderCursos();
+    const it = (S.data || []).find((x) => +x.id === +id);
+    if (it) {
+      await fillCursoView(it);
+    }
+
+    // 2) API
+    const ok = await updateCursoStatus(id, 1 /* activo */, {
+      /* modificado_por: getCreatorId() */
+    });
+    if (!ok) {
+      // revertir si falla
+      patchLocalCursoStatus(id, 0);
+      renderCursos();
+      const it2 = (S.data || []).find((x) => +x.id === +id);
+      if (it2) {
+        await fillCursoView(it2);
+      }
+      return;
+    }
+
+    toast("Curso reactivado", "exito");
   }
 
   /* ---------- Guardado (insert/update) ---------- */
