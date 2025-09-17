@@ -833,18 +833,17 @@
 
     <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
 
+
+    <script src="/JS/UAT/admin.router.js" defer></script>
     <script src="/JS/JSglobal.js" defer></script>
     <script src="/JS/UAT/admin.cursos.js" defer></script>
 
     <!--
-
         <script src="/JS/UAT/admin.noticias.js" defer></script>
     <script src="/JS/UAT/admin.tutores.js" defer></script>
 
     <script src="/JS/UAT/admin.suscripciones.js"></script>
     <script src="/JS/UAT/admin.usuarios.js"></script>
-
-    <script src="/JS/UAT/admin.router.js" defer></script>
 
       -->
 

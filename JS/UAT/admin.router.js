@@ -1,206 +1,79 @@
-// admin.router.js (parchado)
+// admin.router.js (simple)
 (() => {
-  const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const modules = {
+    '#/cursos':     { flag: '__CursosState',     path: '/JS/UAT/admin.cursos.js',   api: () => globalThis.cursos },
+    '#/noticias':   { flag: '__NoticiasState',   path: '/JS/UAT/admin.noticias.js', api: () => globalThis.noticias },
+    '#/tutores':    { flag: '__TutoresState',    path: '/JS/UAT/admin.tutores.js',  api: () => globalThis.tutores },
+    '#/suscripciones': { flag: '__SuscripState', path: '/JS/UAT/admin.suscrip.js',  api: () => globalThis.suscrip },
+  };
 
-  function setActive(route) {
-    qsa('.gc-side .nav-item').forEach(a => {
-      const r = a.getAttribute('data-route');
-      if (r === route) a.setAttribute('aria-current', 'page');
-      else a.removeAttribute('aria-current');
+  const qs = (s, r=document)=>r.querySelector(s);
+
+  async function ensure(path, flag) {
+    if (globalThis[flag]) return;
+    const has = !!document.querySelector(`script[src="${path}"]`);
+    if (has) { for (let i=0;i<10 && !globalThis[flag];i++) await new Promise(r=>setTimeout(r,30)); if (globalThis[flag]) return; }
+    try { await import(path); } catch {}
+  }
+
+  function setTitle(t){ const h=qs('#mod-title'); if(h) h.textContent=t; }
+  function clearLists(){
+    const d=qs('#recursos-list'), m=qs('#recursos-list-mobile');
+    const p1=qs('#pagination-controls'), p2=qs('#pagination-mobile');
+    if(d) d.innerHTML=''; if(m) m.innerHTML=''; if(p1) p1.innerHTML=''; if(p2) p2.innerHTML='';
+    const c=qs('#mod-count'); if(c) c.textContent='—';
+  }
+  function setActive(route){
+    document.querySelectorAll('.gc-side .nav-item').forEach(a=>{
+      a.getAttribute('data-route')===route ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current');
     });
   }
-
-  function clearLists() {
-    const desktop = qs('#recursos-list');
-    const mobile = qs('#recursos-list-mobile');
-    const pag1 = qs('#pagination-controls');
-    const pag2 = qs('#pagination-mobile');
-    if (desktop) desktop.innerHTML = '';
-    if (mobile) mobile.innerHTML = '';
-    if (pag1) pag1.innerHTML = '';
-    if (pag2) pag2.innerHTML = '';
-    const count = qs('#mod-count'); if (count) count.textContent = '—';
+  function setHeaders(route){
+    const head = qs('.recursos-box.desktop-only .table-header');
+    if(!head) return;
+    const cols = route==="#/cursos" ? [
+      ['col-nombre','Nombre'], ['col-tutor','Tutor'], ['col-fecha','Fecha de inicio'], ['col-status','Status'],
+    ] : route==="#/noticias" ? [
+      ['col-nombre','Título'], ['col-fecha','Creación'], ['col-status','Status'], ['col-acc',''],
+    ] : route==="#/tutores" ? [
+      ['col-nombre','Nombre'], ['col-fecha','Creación'], ['col-status','Status'], ['col-acc',''],
+    ] : [];
+    head.innerHTML = cols.map(([cls,lab])=>`<div class="${cls}" role="columnheader">${lab}</div>`).join('');
   }
 
-  function setTitle(t) {
-    const h = qs('#mod-title'); if (h) h.textContent = t;
-  }
-
-  // ensureModule robusto: evita reimport innecesario y espera si ya hay <script>
-  async function ensureModule(path, globalReadyFlag, dynamicPath) {
-    if (globalThis[globalReadyFlag]) return;
-
-    const hasScript = !!document.querySelector(`script[src="${path}"]`);
-    if (hasScript) {
-      for (let i = 0; i < 10 && !globalThis[globalReadyFlag]; i++) {
-        await new Promise(r => setTimeout(r, 30));
-      }
-      if (globalThis[globalReadyFlag]) return;
-    }
-    try { await import(dynamicPath); } catch (e) { /* opcional: console.warn(e) */ }
-  }
-
-  // ===================== Botón Crear contextual =====================
-  function resolveCreateActionByHash(hash) {
-    const route = (hash || location.hash || '').toLowerCase();
-
-    if (route.startsWith('#/cursos')) {
-      if (typeof globalThis.openCursoCreate === 'function') return globalThis.openCursoCreate;
-    }
-    if (route.startsWith('#/noticias')) {
-      if (typeof globalThis.openNoticiaCreate === 'function') return globalThis.openNoticiaCreate;
-    }
-    if (route.startsWith('#/tutores')) {
-      if (typeof globalThis.openTutorCreate === 'function') return globalThis.openTutorCreate;
-    }
-    if (route.startsWith('#/suscripciones')) {
-      if (typeof globalThis.openSuscripcionCreate === 'function') return globalThis.openSuscripcionCreate;
-    }
-    return null;
-  }
-
-  function bindCreateButtonForCurrentRoute() {
-    const $btn = document.querySelector('#btn-add');
-    if (!$btn) return;
-
-    // limpia listeners clonando el nodo
-    const newBtn = $btn.cloneNode(true);
-    $btn.parentNode.replaceChild(newBtn, $btn);
-
-    const action = resolveCreateActionByHash(location.hash);
-    if (typeof action === 'function') {
-      newBtn.disabled = false;
-      newBtn.classList.remove('disabled');
-      newBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        action();
-      });
-    } else {
-      newBtn.disabled = true;
-      newBtn.classList.add('disabled');
-    }
-  }
-
-  function setTableHeadersFor(route) {
-    const head = document.querySelector('.recursos-box.desktop-only .table-header');
-    if (!head) return;
-
-    const set = (cols) => {
-      head.innerHTML = cols.map(c => `<div class="${c.className}" role="columnheader">${c.label}</div>`).join('');
-    };
-
-    if (route.startsWith('#/cursos')) {
-      set([
-        { className: 'col-nombre', label: 'Nombre' },
-        { className: 'col-tutor', label: 'Tutor' },
-        { className: 'col-fecha', label: 'Fecha de inicio' },
-        { className: 'col-status', label: 'Status' },
-      ]);
-    } else if (route.startsWith('#/noticias')) {
-      set([
-        { className: 'col-nombre', label: 'Título' },
-        { className: 'col-fecha', label: 'Creación' },
-        { className: 'col-status', label: 'Status' },
-        { className: 'col-acc', label: '' },
-      ]);
-    } else if (route.startsWith('#/tutores')) {
-      set([
-        { className: 'col-nombre', label: 'Nombre' },
-        { className: 'col-fecha', label: 'Creación' },
-        { className: 'col-status', label: 'Status' },
-        { className: 'col-acc', label: '' },
-      ]);
-    } else {
-      head.innerHTML = '';
-    }
-  }
-
-
-  // expón un arreglo de hooks para ejecutar tras cada navegación
-  window.__afterRouteChangeHooks = window.__afterRouteChangeHooks || [];
-  window.__afterRouteChangeHooks.push(bindCreateButtonForCurrentRoute);
-
-  async function onRoute() {
+  async function onRoute(){
     const route = location.hash || '#/cursos';
+    const mod = modules[route] || modules['#/cursos'];
     setActive(route);
     clearLists();
-    setTableHeadersFor(route);
+    setHeaders(route);
+    setTitle(route.replace('#/','').replace(/^\w/,c=>c.toUpperCase()));
 
-    switch (route) {
-      case '#/cursos': {
-        setTitle('Cursos');
-        // Cursos ya está en admin.cursos.js
-        if (globalThis.cursosLoad?.loadCatalogos && globalThis.cursosLoad?.loadCursos) {
-          await globalThis.cursosLoad.loadCatalogos();
-          await globalThis.cursosLoad.loadCursos();
-        } else {
-          console.warn('Módulo de cursos no disponible.');
-        }
-        break;
-      }
-
-      case '#/noticias': {
-        setTitle('Noticias');
-        // Usa flag consistente del módulo
-        await ensureModule('/JS/UAT/admin.noticias.js', '__NoticiasState', '/JS/UAT/admin.noticias.js');
-        if (typeof globalThis.noticiasInit === 'function') {
-          await globalThis.noticiasInit(); // renderiza la lista
-        } else if (typeof globalThis.openNoticiaCreate === 'function') {
-          // fallback para no dejar la pantalla vacía
-          globalThis.openNoticiaCreate();
-        } else {
-          console.warn('noticiasInit/openNoticiaCreate no disponibles.');
-        }
-        break;
-      }
-
-      case '#/tutores': {
-        setTitle('Tutores');
-        await ensureModule('/JS/UAT/admin.tutores.js', '__TutoresState', '/JS/UAT/admin.tutores.js');
-        if (typeof globalThis.tutoresInit === 'function') {
-          await globalThis.tutoresInit(); // listado si existe
-        } else if (typeof globalThis.openTutorCreate === 'function') {
-          globalThis.openTutorCreate();   // fallback
-        } else {
-          console.warn('tutoresInit/openTutorCreate no disponibles.');
-        }
-        break;
-      }
-
-      // puedes agregar más rutas aquí (suscripciones, usuarios, etc.)
-
-      default: {
-        location.hash = '#/cursos';
-        return; // evita ejecutar hooks dos veces
-      }
-    }
-
-    // Ejecuta hooks posteriores a la navegación (incluye el botón Crear contextual)
-    try {
-      for (const fn of window.__afterRouteChangeHooks) {
-        if (typeof fn === 'function') fn();
-      }
-    } catch (e) {
-      // no rompas navegación por errores de hooks
-      console.warn('afterRouteChange hook error:', e);
-    }
+    await ensure(mod.path, mod.flag);
+    const api = mod.api && mod.api();
+    if (api?.mount) await api.mount();
   }
 
-  // Navegación por clicks (sin recargar)
-  document.addEventListener('click', (e) => {
+  // botón crear: un solo handler global
+  function onCreate(){
+    const route = (location.hash || '#/cursos');
+    const mod = modules[route] || modules['#/cursos'];
+    const api = mod.api && mod.api();
+    if (api?.openCreate) api.openCreate();
+  }
+
+  // wire
+  document.addEventListener('click', (e)=>{
     const a = e.target.closest('.gc-side .nav-item[href^="#/"]');
-    if (!a) return;
+    if(!a) return;
     e.preventDefault();
-    const to = a.getAttribute('href');
-    if (to) location.hash = to;
+    location.hash = a.getAttribute('href');
   });
 
-  // Eventos de navegación
   window.addEventListener('hashchange', onRoute);
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.querySelector('#btn-add');
+    if (btn) { btn.onclick = onCreate; }     // << sin clonar, sin duplicar listeners
     onRoute();
-    // botón crear también al cargar (por si la vista inicial no dispara hooks aún)
-    bindCreateButtonForCurrentRoute();
   });
 })();
