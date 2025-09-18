@@ -3,7 +3,7 @@
 (() => {
   const qs = (s, r = document) => r.querySelector(s);
 
-  // Mapa de módulos (ajusta paths si cambian)
+  // Mapa de modulos 
   const modules = {
     "#/cursos": {
       flag: "__CursosState",
@@ -27,7 +27,6 @@
     },
   };
 
-  // Asegura que el módulo esté cargado (si hay <script> ya insertado, espera a que exponga el flag)
   async function ensure(path, flag) {
     if (globalThis[flag]) return;
     const hasScript = !!document.querySelector(`script[src="${path}"]`);
@@ -40,7 +39,6 @@
     try {
       await import(path);
     } catch {
-      /* no-op si el navegador no soporta import() relativo */
     }
   }
 

@@ -774,20 +774,19 @@
                 <div class="field">
                     <label>Imagen</label>
                     <div class="value">
-                        <!-- En crear, el JS pinta un preview/selector aquí -->
+                        <!-- En crear, el JS pinta un preview/selector aqui -->
                         <div id="media-tutor-edit">
-                            <!-- mountReadOnlyMedia({ editable:true }) en edición -->
+                            <!-- en edicion -->
                         </div>
                         <div class="hint gc-soft">Formatos: JPG/PNG · Máx 2MB.</div>
                     </div>
                 </div>
 
-                <!-- Cursos ligados (chips en edición, solo vista) -->
+                <!-- Cursos ligados -->
                 <div class="field">
                     <label>Cursos ligados</label>
                     <div class="value">
                         <div class="tutor-cursos" id="tutor-cursos-edit">
-                            <!-- renderTutorCursosChips(tutorId, "#tutor-cursos-edit") -->
                         </div>
                     </div>
                 </div>
@@ -1010,7 +1009,7 @@
 
 
 
-    <!-- Contadores de caracteres sencillo -->
+    <!-- Contadores de caracteres -->
     <script>
     (function() {
         function updateOne(el) {

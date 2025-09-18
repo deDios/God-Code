@@ -857,6 +857,9 @@
 
       const tgt = isEdit || isCreate ? "#tutor-cursos-edit" : "#tutor-cursos";
       renderTutorCursosChips(Number(t.id || item?.id || 0), tgt);
+      if (window.gcBindCharCounters) {
+        window.gcBindCharCounters(document.getElementById("drawer-tutor-body"));
+      }
     }, 0);
 
     return viewHTML + editHTML;

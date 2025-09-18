@@ -286,3 +286,37 @@
     is,
   };
 })();
+
+(function () {
+  if (window.gcBindCharCounters) return;
+
+  function _updateOne(el) {
+    var max = Number(el.getAttribute("data-max") || 0);
+    if (!max) return;
+    var id = el.id;
+    var cc = document.querySelector('.char-counter[data-for="' + id + '"]');
+    if (!cc) return;
+    var v = el.value || "";
+    cc.textContent = v.length + "/" + max;
+    if (v.length > max) cc.classList.add("over");
+    else cc.classList.remove("over");
+  }
+
+  window.gcBindCharCounters = function (root) {
+    (root || document).querySelectorAll("[data-max]").forEach(function (el) {
+      if (el._cc_wired) {
+        _updateOne(el);
+        return;
+      }
+      el._cc_wired = true;
+      _updateOne(el);
+      el.addEventListener("input", function () {
+        _updateOne(el);
+      });
+    });
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.gcBindCharCounters(document);
+  });
+})();
