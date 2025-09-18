@@ -291,17 +291,17 @@
         pageRows.forEach((it) => {
           const est = STATUS_LABEL[it.estatus] || it.estatus;
           hostD.insertAdjacentHTML(
-            "beforeend",
-            `
-            <div class="table-row news-row" role="row" data-id="${it.id}">
-             <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
-             <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_creacion))}</div>
-             <div class="col-status" role="cell" data-col="status">${esc(est)}</div>
-            </div>
-             `
-          );
+  "beforeend",
+  `
+  <div class="table-row news-row" role="row" data-id="${it.id}">
+    <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
+    <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_creacion))}</div>
+    <div class="col-status" role="cell" data-col="status">${esc(est)}</div>
+  </div>
+  `
+);
         });
-        qsa(".news-row", hostD).forEach((row) => {
+        qsa(".table-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
             const id = Number(row.dataset.id);
             console.log(TAG, "click row id=", id);

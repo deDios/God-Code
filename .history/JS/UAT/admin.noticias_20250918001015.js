@@ -258,7 +258,7 @@
   function renderNoticias() {
     console.log(TAG, "renderNoticias() page", S.page, "search=", S.search);
     const hostD = qs("#noticias-list") || qs("#recursos-list");
-    const hostM = qs("#noticias-list-mobile") || qs("#recursos-list-mobile");
+const hostM = qs("#noticias-list-mobile") || qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
     if (hostM) hostM.innerHTML = "";
 
@@ -293,15 +293,15 @@
           hostD.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row news-row" role="row" data-id="${it.id}">
-             <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
-             <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_creacion))}</div>
-             <div class="col-status" role="cell" data-col="status">${esc(est)}</div>
+            <div class="table-row" role="row" data-id="${it.id}">
+              <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
+              <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_creacion))}</div>
+              <div class="col-status" role="cell" data-col="status">${esc(est)}</div>
             </div>
-             `
+          `
           );
         });
-        qsa(".news-row", hostD).forEach((row) => {
+        qsa(".table-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
             const id = Number(row.dataset.id);
             console.log(TAG, "click row id=", id);

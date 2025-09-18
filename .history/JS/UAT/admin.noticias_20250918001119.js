@@ -301,7 +301,7 @@
              `
           );
         });
-        qsa(".news-row", hostD).forEach((row) => {
+        qsa(".table-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
             const id = Number(row.dataset.id);
             console.log(TAG, "click row id=", id);
