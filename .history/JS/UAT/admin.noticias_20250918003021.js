@@ -142,16 +142,8 @@
 
   /* ---------- Imágenes (Noticias) ---------- */
   // Ruta pública esperada por tu uploader: /ASSETS/noticia/NoticiasImg/noticia_img{pos}_{id}.png
-  function noticiaImgUrl(id, pos) {
-    return `/ASSETS/noticia/NoticiasImg/noticia_img${pos}_${Number(id)}.png`;
-  }
-  async function imgExists(url) {
-    return new Promise((res) => {
-      const i = new Image();
-      i.onload = () => res(true);
-      i.onerror = () => res(false);
-      i.src = url;
-    });
+  function noticiaImgUrl(id, pos = 1) {
+    return `/ASSETS/noticia/NoticiasImg/noticia_img${Number(pos)}_${Number(id)}.png`;
   }
   function noImageSvgDataURI() {
     const svg =
@@ -357,12 +349,12 @@
   }
 
   function putVal(sel, val) {
-    const el = document.querySelector(sel);
-    if (!el) return;
-    const v = val == null || val === "" ? "—" : String(val);
-    if ("value" in el) el.value = v;
-    else el.textContent = v;
-  }
+  const el = document.querySelector(sel);
+  if (!el) return;
+  const v = val == null || val === "" ? "—" : String(val);
+  if ("value" in el) el.value = v;
+  else el.textContent = v;
+}
 
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / S.pageSize));
@@ -431,36 +423,28 @@
 
   async function mountNoticiaMediaView(containerEl, noticiaId) {
     if (!containerEl) return;
-    const p1 = withBust(noticiaImgUrl(noticiaId, 1));
-    const p2 = withBust(noticiaImgUrl(noticiaId, 2));
-
-    const ok1 = await imgExists(p1);
-    const ok2 = await imgExists(p2);
-
-    const cards = [];
-    cards.push(`
-    <div class="media-card">
-      <figure class="media-thumb">
-        <img alt="Imagen 1" src="${ok1 ? p1 : 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns=`http://www.w3.org/2000/svg` viewBox=`0 0 160 90`><rect width=`100%` height=`100%` fill=`#f3f3f3`/></svg>')}" />
-      </figure>
-      <div class="media-meta"><div class="media-label">Imagen 1</div></div>
-    </div>`);
-
-    cards.push(`
-    <div class="media-card">
-      <figure class="media-thumb">
-        <img alt="Imagen 2" src="${ok2 ? p2 : 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns=`http://www.w3.org/2000/svg` viewBox=`0 0 160 90`><rect width=`100%` height=`100%` fill=`#f3f3f3`/></svg>')}" />
-      </figure>
-      <div class="media-meta"><div class="media-label">Imagen 2</div></div>
-    </div>`);
-
+    const url1 = await resolveNoticiaImg(noticiaId, 1);
+    const url2 = await resolveNoticiaImg(noticiaId, 2);
     containerEl.innerHTML = `
-    <div class="media-head">
-      <div class="media-title">Imágenes</div>
-      <div class="media-help" style="color:#888;">Solo lectura</div>
-    </div>
-    <div class="media-grid">${cards.join("")}</div>
-  `;
+      <div class="media-head">
+        <div class="media-title">Imágenes</div>
+        <div class="media-help" style="color:#888;">Solo lectura</div>
+      </div>
+      <div class="media-grid">
+        <div class="media-card">
+          <figure class="media-thumb">
+            <img alt="Imagen 1" id="noticia-img1-view" loading="eager" src="${esc(url1)}">
+          </figure>
+          <div class="media-meta"><div class="media-label">Imagen 1</div></div>
+        </div>
+        <div class="media-card">
+          <figure class="media-thumb">
+            <img alt="Imagen 2" id="noticia-img2-view" loading="eager" src="${esc(url2)}">
+          </figure>
+          <div class="media-meta"><div class="media-label">Imagen 2</div></div>
+        </div>
+      </div>
+    `;
   }
 
   function paintNoticiaActions(it) {
@@ -584,43 +568,46 @@
     S.data = flat;
   }
 
-  async function fillNoticiaView(n) {
-    console.log("[Noticias] fillNoticiaView id=", n?.id, n);
+  async function fillNoticiaView(it) {
+    console.log(TAG, "fillNoticiaView id=", it?.id, it);
+    const title = qs("#drawer-noticia-title");
+    if (title) title.textContent = "Noticia · " + (it.titulo || "—");
 
-    // Título del drawer
-    const title = document.querySelector("#drawer-noticia-title");
-    if (title) title.textContent = "Noticia · " + (n.titulo || "—");
+    put("#v_titulo", it.titulo);
+    put("#v_desc_uno", it.desc_uno);
+    put("#v_desc_dos", it.desc_dos);
+    put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
+    put("#v_fecha_creacion", fmtDate(it.fecha_creacion));
+    put("#v_fecha_modif", fmtDate(it.fecha_modif));
 
-    // Campos
-    putVal("#nv_titulo", n.titulo);
-    putVal("#nv_desc_uno", n.desc_uno);
-    putVal("#nv_desc_dos", n.desc_dos);
-    putVal("#nv_estatus", NEWS_STATUS_LABEL[n.estatus] || n.estatus);
-    putVal("#nv_creado_por", n.creado_por);
-    putVal("#nv_fecha_creacion", n.fecha_creacion);
+    await mountNoticiaMediaView(qs("#media-noticia"), it.id);
 
-    // Imágenes (vista)
-    await mountNoticiaMediaView(document.querySelector("#media-noticia"), n.id);
+    const pre = qs("#json-noticia");
+    if (pre) pre.textContent = JSON.stringify(it, null, 2);
 
-    // JSON dev
-    const pre = document.querySelector("#json-noticia");
-    if (pre) pre.textContent = JSON.stringify(n, null, 2);
+    // acciones
+    paintNoticiaActions(it);
 
-    // (si tienes botones de Editar/Eliminar/Reactivar en #noticia-actions-view, pínchalos aquí)
+    // editar
+    const bEdit = qs("#btn-edit-noticia");
+    if (bEdit && !bEdit._b) {
+      bEdit._b = true;
+      bEdit.addEventListener("click", () => {
+        setNoticiaDrawerMode("edit");
+        fillNoticiaEdit(S.current ? S.current._all : it);
+      });
+    }
   }
-
 
   async function openNoticiaView(id) {
-    const it = (S.data || []).find(x => +x.id === +id);
-    console.log("[Noticias] openNoticiaView id=", id, "found:", !!it);
+    const it = (S.data || []).find((x) => +x.id === +id);
+    console.log(TAG, "openNoticiaView id=", id, "found:", !!it);
     if (!it) return;
     S.current = { id: it.id, _all: it };
-
-    openDrawerNoticia();                 // muestra el drawer
-    setNoticiaDrawerMode("view");        // asegura modo vista
-    await fillNoticiaView(it);           // ← AQUÍ se nutre
+    openDrawerNoticia();
+    setNoticiaDrawerMode("view");
+    await fillNoticiaView(it);
   }
-
   window.openNoticiaView = openNoticiaView;
 
   /* ==================== Drawer: Edición ==================== */
