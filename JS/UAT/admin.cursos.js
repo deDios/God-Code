@@ -1,4 +1,4 @@
-/* ==================== CURSOS (UAT) — Núcleo + Listado + Drawer ==================== */
+/* ==================== CURSOS  ==================== */
 (() => {
   "use strict";
 
@@ -103,7 +103,7 @@
     }
   }
 
-  /* ---------- HTTP JSON robusto ---------- */
+  /* ---------- HTTP JSON ---------- */
   async function postJSON(url, body) {
     console.log(TAG, "POST", url, { body });
     const r = await fetch(url, {
@@ -163,7 +163,7 @@
     }
   }
 
-  /* ---------- Imágenes ---------- */
+  /* ---------- Imagenes ---------- */
   function cursoImgUrl(id, ext = "png") {
     return `/ASSETS/cursos/img${Number(id)}.${ext}`;
   }
@@ -187,7 +187,7 @@
     return noImageSvgDataURI();
   }
 
-  /* ---------- Preview helper (ligero, respeta tu layout) ---------- */
+  /* ---------- Preview helper ---------- */
   function humanSize(bytes) {
     if (!Number.isFinite(bytes)) return "—";
     if (bytes < 1024) return bytes + " B";
@@ -352,7 +352,7 @@
     }
   }
 
-  /* ---------- Drawer helpers (Cursos) ---------- */
+  /* ---------- Drawer helpers ---------- */
   function openDrawerCurso() {
     console.log(TAG, "openDrawerCurso()");
     const d = qs("#drawer-curso"),
@@ -454,7 +454,7 @@
     mapLabel,
   });
 
-  /* ==================== Catálogos + Listado ==================== */
+  /* ==================== Catalogos y Listado ==================== */
   async function loadCatalogos() {
     console.log(TAG, "loadCatalogos()...");
     if (!S.maps.tutores)
@@ -588,7 +588,7 @@
       }
     }
 
-    // Mobile
+    // Mobile (todavia no esta bien hecho)
     if (hostM) {
       if (pageRows.length === 0) {
         hostM.insertAdjacentHTML(
@@ -676,7 +676,7 @@
     });
   }
 
-  /* ---------- Búsqueda: usa utils.admin.js si existe ---------- */
+  /* ---------- Búsqueda ---------- */
   function wireSearch() {
     const ph = "Buscar por nombre, tutor, fecha o estatus…";
     const tip =
@@ -846,7 +846,7 @@
       btn.disabled = true;
       try {
         const prev = it.estatus;
-        it.estatus = 0; // optimista
+        it.estatus = 0; 
         updateRowStatusCell(it.id, it.estatus);
         paintActions(it);
         const ok = await updateCursoStatus(it.id, 0);
