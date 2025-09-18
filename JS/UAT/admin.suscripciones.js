@@ -20,13 +20,13 @@
     page: 1,
     pageSize: 7,
     search: "",
-    data: [], // filas normalizadas
-    raw: [], // respuesta cruda
-    maps: { cursos: null, usuarios: {} }, // id->label
-    current: null, // { id, _all }
-    create: { cursoId: null, usuario: null }, // flujo "Inscribir"
+    data: [],
+    raw: [],
+    maps: { cursos: null, usuarios: {} },
+    current: null,
+    create: { cursoId: null, usuario: null },
   };
-  window.__SuscripcionesState = S; // bandera para router-lite
+  window.__SuscripcionesState = S;
 
   /* ---------- Utils ---------- */
   const qs = (s, r = document) => r.querySelector(s);
@@ -49,7 +49,6 @@
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
-
   const fmtDateTime = (dt) => {
     if (!dt) return "-";
     try {
@@ -60,7 +59,6 @@
       return dt;
     }
   };
-
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
     console.log(`${TAG} toast[${type}]:`, msg);
@@ -76,14 +74,11 @@
     const text = await r.text().catch(() => "");
     console.log(TAG, "HTTP", r.status, "raw:", text);
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
-
     try {
       const j = JSON.parse(text);
       console.log(TAG, "JSON OK:", j);
       return j;
     } catch {}
-
-    // fallback: recortar {..} o [..]
     const fb = text.indexOf("{"),
       lb = text.lastIndexOf("}");
     const fb2 = text.indexOf("["),
@@ -99,12 +94,10 @@
         return j2;
       } catch {}
     }
-
     console.warn(TAG, "JSON parse failed; returning _raw");
     return { _raw: text };
   }
 
-  // creado_por desde cookie `usuario`
   function getCreatorId() {
     try {
       const raw = document.cookie
@@ -120,7 +113,6 @@
     }
   }
 
-  // Map helpers
   function arrToMap(arr) {
     const m = {};
     (Array.isArray(arr) ? arr : []).forEach((x) => {
@@ -139,13 +131,10 @@
     return k in m ? m[k] || `#${id}` : `#${id}`;
   }
 
-  // intenta resolver nombre de usuario por id (cacheando)
   async function resolveUserName(id) {
     if (!id) return null;
     const k = String(id);
     if (k in S.maps.usuarios) return S.maps.usuarios[k];
-
-    // intentos robustos
     const candidates = [
       { id },
       { usuario: id },
@@ -178,14 +167,13 @@
           return nombre;
         }
       } catch (e) {
-        console.warn(TAG, "resolveUserName falló con", body, e);
+        console.warn(TAG, "resolveUserName falló:", body, e);
       }
     }
     S.maps.usuarios[k] = `#${id}`;
     return S.maps.usuarios[k];
   }
 
-  /* ---------- Estatus ---------- */
   const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
   function statusBadge(tipo, s) {
     if (window.statusBadge) return window.statusBadge(tipo, s);
@@ -207,7 +195,16 @@
 
   /* ---------- Drawer helpers ---------- */
   function ensureDrawerDOM() {
-    if (qs("#drawer-suscripcion")) return;
+    // sólo crea si no existe
+    if (qs("#drawer-suscripcion")) {
+      // asegura que el botón cerrar funcione aunque el drawer exista en HTML estático
+      const btn = qs("#drawer-suscripcion-close");
+      if (btn && !btn._b) {
+        btn._b = true;
+        btn.addEventListener("click", closeDrawer);
+      }
+      return;
+    }
     const wrap = document.createElement("div");
     wrap.innerHTML = `
       <aside id="drawer-suscripcion" class="drawer gc-dash" aria-hidden="true" hidden>
@@ -254,7 +251,7 @@
       overlay.setAttribute("aria-hidden", "true");
     }
   }
-  // overlay/Escape
+  // Cerrar por overlay/Escape + delegación global para el botón Cerrar (robusto)
   (function bindOnce() {
     const ov = qs("#gc-dash-overlay");
     if (ov && !ov._sub_b) {
@@ -267,12 +264,23 @@
         if (e.key === "Escape") closeDrawer();
       });
     }
+    if (!window._gc_subs_closebtn) {
+      window._gc_subs_closebtn = true;
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if (!t) return;
+        if (
+          t.id === "drawer-suscripcion-close" ||
+          t.closest?.("#drawer-suscripcion-close")
+        )
+          closeDrawer();
+      });
+    }
   })();
 
-  /* ---------- Catálogos mínimos ---------- */
+  /* ---------- Catálogos ---------- */
   async function loadCatalogos() {
     try {
-      // cursos activos/pausados/en curso (para labels)
       const stsList = [1, 2, 4];
       const chunks = await Promise.all(
         stsList.map((st) =>
@@ -287,20 +295,18 @@
     }
   }
 
-  /* ---------- Carga listado ---------- */
+  /* ---------- Listado ---------- */
   async function load() {
     console.log(TAG, "load()…");
     try {
-      const sts = [1, 0, 2]; // Activo, Inactivo, Pausado (como nos pediste)
+      const sts = [1, 0, 2];
       const chunks = await Promise.all(
         sts.map((st) =>
           postJSON(API.suscripciones, { estatus: st }).catch(() => [])
         )
       );
       const flat = chunks.flat().filter(Boolean);
-
       S.raw = flat;
-      // normalización mínima
       S.data = flat.map((x) => {
         const id = Number(x.id ?? x.suscripcion_id ?? x.inscripcion_id ?? 0);
         const usuario_id =
@@ -321,7 +327,6 @@
           x.usuario ||
           x.user ||
           null;
-
         return {
           id,
           usuario_id,
@@ -329,13 +334,10 @@
           estatus: Number(x.estatus ?? x.status ?? 0),
           fecha_creacion: x.fecha_creacion ?? x.creado ?? x.created_at ?? null,
           comentario: x.comentario ?? x.nota ?? "",
-          alumnoNombre: nombreInline, // si viene directo, lo usamos
+          alumnoNombre: nombreInline,
           _all: x,
         };
       });
-      console.log(TAG, "Cargadas suscripciones:", S.data.length);
-
-      // hidrata nombres faltantes (cuando solo viene el id)
       const missing = [
         ...new Set(
           S.data
@@ -343,16 +345,11 @@
             .map((r) => r.usuario_id)
         ),
       ].filter((id) => !(String(id) in S.maps.usuarios));
-      for (const id of missing) {
-        await resolveUserName(id);
-      }
-
-      // aplica nombres al dataset
+      for (const id of missing) await resolveUserName(id);
       S.data.forEach((r) => {
         if (!r.alumnoNombre && r.usuario_id)
           r.alumnoNombre = mapUserLabel(r.usuario_id);
       });
-
       S.page = 1;
       render();
     } catch (e) {
@@ -364,12 +361,10 @@
   }
 
   function render() {
-    console.log(TAG, "render() page", S.page, "search=", S.search);
-    const hostD = qs("#recursos-list");
-    const hostM = qs("#recursos-list-mobile");
+    const hostD = qs("#recursos-list"),
+      hostM = qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
     if (hostM) hostM.innerHTML = "";
-
     const term = norm(S.search);
     const filtered = term
       ? S.data.filter((r) =>
@@ -380,19 +375,16 @@
           ).includes(term)
         )
       : S.data;
-
     const modCount = qs("#mod-count");
     if (modCount)
       modCount.textContent = `${filtered.length} ${
         filtered.length === 1 ? "elemento" : "elementos"
       }`;
-
     const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
     if (S.page > totalPages) S.page = totalPages;
     const start = (S.page - 1) * S.pageSize;
     const pageRows = filtered.slice(start, start + S.pageSize);
 
-    // Desktop
     if (hostD) {
       if (!pageRows.length) {
         hostD.insertAdjacentHTML(
@@ -434,7 +426,6 @@
       }
     }
 
-    // Mobile
     if (hostM) {
       if (!pageRows.length) {
         hostM.insertAdjacentHTML(
@@ -524,11 +515,9 @@
     });
   }
 
-  /* ---------- Drawer: Ver (campos como tu captura) ---------- */
+  /* ---------- Drawer: Ver ---------- */
   function openView(row) {
-    console.log(TAG, "openView id=", row?.id, row);
     S.current = { id: row.id, _all: row._all };
-
     const cursoLabel = mapCursosLabel(row.curso);
     openDrawer(
       `Suscripción · ${cursoLabel}`,
@@ -550,7 +539,6 @@
           JSON.stringify(data || {}, null, 2)
         )}</pre>
       </details>`;
-
     return `
       <section id="sus-view" class="mode-view">
         <div class="gc-actions" id="sus-actions-view">
@@ -561,45 +549,23 @@
               : `<button class="gc-btn gc-btn--danger" id="sus-eliminar" data-step="1">Eliminar</button>`
           }
         </div>
-
-        <div class="field">
-          <div class="label">Suscriptor</div>
-          <div class="value" id="sv_alumno">${esc(
-            String(data?._alumnoNombre || "—")
-          )}</div>
-        </div>
-
-        <div class="field">
-          <div class="label">Curso</div>
-          <div class="value" id="sv_curso">${esc(
-            String(data?._cursoLabel || "—")
-          )}</div>
-        </div>
-
-        <div class="field">
-          <div class="label">Estatus</div>
-          <div class="value" id="sv_estatus">${esc(
-            STATUS_LABEL[Number(data?.estatus)] || String(data?.estatus ?? "—")
-          )}</div>
-        </div>
-
-        <div class="field">
-          <div class="label">Fecha y hora de suscripción</div>
-          <div class="value" id="sv_fecha_creacion">${esc(
-            fmtDateTime(data?.fecha_creacion)
-          )}</div>
-        </div>
-
-        <div class="field">
-          <div class="label">Comentario</div>
-          <div class="value" id="sv_comentario">${esc(
-            String(data?.comentario ?? data?.nota ?? "")
-          )}</div>
-        </div>
-
+        <div class="field"><div class="label">Suscriptor</div><div class="value" id="sv_alumno">${esc(
+          String(data?._alumnoNombre || "—")
+        )}</div></div>
+        <div class="field"><div class="label">Curso</div><div class="value" id="sv_curso">${esc(
+          String(data?._cursoLabel || "—")
+        )}</div></div>
+        <div class="field"><div class="label">Estatus</div><div class="value" id="sv_estatus">${esc(
+          STATUS_LABEL[Number(data?.estatus)] || String(data?.estatus ?? "—")
+        )}</div></div>
+        <div class="field"><div class="label">Fecha y hora de suscripción</div><div class="value" id="sv_fecha_creacion">${esc(
+          fmtDateTime(data?.fecha_creacion)
+        )}</div></div>
+        <div class="field"><div class="label">Comentario</div><div class="value" id="sv_comentario">${esc(
+          String(data?.comentario ?? data?.nota ?? "")
+        )}</div></div>
         ${jsonPretty}
-      </section>
-    `;
+      </section>`;
   }
 
   function bindViewActions(row) {
@@ -614,7 +580,6 @@
       );
       bindEditActions(row._all, row.id);
     });
-
     const btnDel = qs("#sus-eliminar");
     if (btnDel) {
       btnDel.addEventListener("click", async () => {
@@ -638,7 +603,6 @@
         }
       });
     }
-
     qs("#sus-reactivar")?.addEventListener("click", async () => {
       try {
         await postJSON(API.uInscripcion, { id: row.id, estatus: 1 });
@@ -650,12 +614,11 @@
         toast("No se pudo reactivar", "error");
       }
     });
-
     if (window.bindCopyFromPre)
       window.bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
   }
 
-  /* ---------- Drawer: Editar (solo estatus + comentario) ---------- */
+  /* ---------- Drawer: Editar ---------- */
   function renderDrawerEdit(data) {
     return `
       <section id="sus-edit" class="mode-edit">
@@ -671,38 +634,28 @@
             data?.estatus ?? 1
           )}</div>
         </div>
-
-        <div class="field">
-          <label for="se_comentario">Comentario</label>
-          <textarea id="se_comentario" rows="4" maxlength="1000">${esc(
-            String(data?.comentario ?? data?.nota ?? "")
-          )}</textarea>
-        </div>
-
+        <div class="field"><label for="se_comentario">Comentario</label><textarea id="se_comentario" rows="4" maxlength="1000">${esc(
+          String(data?.comentario ?? data?.nota ?? "")
+        )}</textarea></div>
         <div class="drawer-actions-row">
           <div class="row-right">
             <button class="gc-btn gc-btn--ghost" id="se_cancel">Cancelar</button>
             <button class="gc-btn gc-btn--success" id="se_save">Guardar</button>
           </div>
         </div>
-      </section>
-    `;
+      </section>`;
   }
 
   function bindEditActions(data, id) {
     qs("#se_cancel")?.addEventListener("click", () => {
-      // Regresa a vista
       openView(S.data.find((x) => x.id === id));
     });
-
     qs("#se_save")?.addEventListener("click", async () => {
       const body = {
         id: Number(id),
         estatus: Number(qs("#se_estatus")?.value || data?.estatus || 1),
         comentario: (qs("#se_comentario")?.value || "").trim(),
       };
-      console.log(TAG, "update body=", body);
-
       try {
         await postJSON(API.uInscripcion, body);
         toast("Cambios guardados", "exito");
@@ -717,9 +670,8 @@
     });
   }
 
-  /* ---------- Drawer: Crear (Inscribir) — sin cambios de este ajuste ---------- */
+  /* ---------- Drawer: Crear (Inscribir) ---------- */
   function openCreate() {
-    console.log(TAG, "openCreate()");
     S.create = { cursoId: null, usuario: null };
     openDrawer("Suscripción · Crear", renderDrawerCreate());
     bindCreateActions();
@@ -729,14 +681,8 @@
     const cursoOptions = Object.entries(S.maps.cursos || {})
       .map(([id, name]) => `<option value="${id}">${esc(name)}</option>`)
       .join("");
-
     return `
       <section id="sus-create" class="mode-edit">
-        <div class="drawer-actions-row" style="justify-content:flex-start; gap:8px; margin-top:-8px;">
-          <button class="gc-btn gc-btn--ghost" id="sc_cancel_head">Cancelar</button>
-          <button class="gc-btn gc-btn--success" id="sc_inscribir" disabled>Inscribir</button>
-        </div>
-
         <div class="field">
           <label for="sc_curso">Curso <span class="req">*</span></label>
           <select id="sc_curso">
@@ -759,11 +705,12 @@
           <div class="field"><label>Correo</label><input id="sc_correo" type="email" disabled></div>
           <div class="field"><label>Teléfono</label><input id="sc_tel" type="text" disabled></div>
           <div class="field"><label>Fecha de nacimiento</label><input id="sc_fnac" type="date" disabled></div>
+
           <div class="field">
             <label>Medios de contacto</label>
             <div class="value" style="display:flex;gap:18px;">
-              <label><input id="sc_mc_tel" type="checkbox" disabled> Teléfono</label>
-              <label><input id="sc_mc_mail" type="checkbox" disabled> Correo</label>
+              <label><input id="sc_mc_tel" name="medios-contacto" value="telefono" type="checkbox" disabled> Teléfono</label>
+              <label><input id="sc_mc_mail" name="medios-contacto" value="correo"   type="checkbox" disabled> Correo</label>
             </div>
           </div>
         </div>
@@ -773,27 +720,21 @@
           <textarea id="sc_comentario" rows="3" placeholder="Opcional"></textarea>
         </div>
 
+        <!-- Acciones SOLO abajo -->
         <div class="drawer-actions-row">
           <div class="row-right">
             <button class="gc-btn gc-btn--ghost" id="sc_cancel">Cancelar</button>
             <button class="gc-btn gc-btn--success" id="sc_inscribir_b" disabled>Inscribir</button>
           </div>
         </div>
-      </section>
-    `;
+      </section>`;
   }
 
   function bindCreateActions() {
-    const bCancelTop = qs("#sc_cancel_head");
     const bCancelBot = qs("#sc_cancel");
-    const bInsTop = qs("#sc_inscribir");
     const bInsBot = qs("#sc_inscribir_b");
     const setInscribirEnabled = (on) => {
-      [bInsTop, bInsBot].forEach((b) => {
-        if (b) {
-          b.disabled = !on;
-        }
-      });
+      if (bInsBot) bInsBot.disabled = !on;
     };
 
     const selectCurso = qs("#sc_curso");
@@ -802,11 +743,9 @@
     const btnCambiar = qs("#sc_cambiar");
 
     function checkReady() {
-      const ok = !!S.create.cursoId && !!S.create.usuario;
-      setInscribirEnabled(ok);
+      setInscribirEnabled(!!S.create.cursoId && !!S.create.usuario);
     }
 
-    if (bCancelTop) bCancelTop.onclick = closeDrawer;
     if (bCancelBot) bCancelBot.onclick = closeDrawer;
 
     if (selectCurso) {
@@ -828,7 +767,7 @@
             return;
           }
           S.create.usuario = user;
-          pintarUsuario(user);
+          pintarUsuario(user); // setea checks correctamente (1/2/3)
           btnCambiar.disabled = false;
           checkReady();
           toast("Usuario encontrado", "exito");
@@ -842,9 +781,15 @@
     if (btnCambiar) {
       btnCambiar.addEventListener("click", () => {
         S.create.usuario = null;
-        qs("#sc_user_panel").style.display = "none";
+        const pnl = qs("#sc_user_panel");
+        if (pnl) pnl.style.display = "none";
         identInput.value = "";
         btnCambiar.disabled = true;
+        // limpia checks
+        const tel = qs("#sc_mc_tel"),
+          mail = qs("#sc_mc_mail");
+        if (tel) tel.checked = false;
+        if (mail) mail.checked = false;
         checkReady();
       });
     }
@@ -864,8 +809,9 @@
         usuario: uid,
         comentario: (qs("#sc_comentario")?.value || "").trim(),
         creado_por: getCreatorId() ?? undefined,
+        // Si deseas enviar tipo_contacto, descomenta:
+        // tipo_contacto: (typeof window.obtenerTipoContacto === "function") ? window.obtenerTipoContacto() : undefined,
       };
-      console.log(TAG, "inscribir body=", body);
       try {
         const res = await postJSON(API.iInscripcion, body);
         const newId = Number(
@@ -881,9 +827,7 @@
         toast("No se pudo inscribir", "error");
       }
     }
-    [bInsTop, bInsBot].forEach((b) => {
-      if (b) b.onclick = doInscribir;
-    });
+    if (bInsBot) bInsBot.onclick = doInscribir;
   }
 
   async function buscarUsuario(ident) {
@@ -898,7 +842,6 @@
       : res && typeof res === "object"
       ? [res]
       : [];
-    console.log(TAG, "buscarUsuario:", ident, "→", arr);
     return arr[0] || null;
   }
 
@@ -906,7 +849,6 @@
     const pnl = qs("#sc_user_panel");
     if (!pnl) return;
     pnl.style.display = "";
-
     const nombre =
       u.nombre_completo ||
       u.nombre ||
@@ -917,17 +859,26 @@
     const tel = u.telefono || u.celular || u.tel || "";
     const mail = u.correo || u.email || "";
     const fnac = (u.fecha_nacimiento || u.fnac || "").slice(0, 10);
-
     qs("#sc_nombre").value = nombre;
     qs("#sc_correo").value = mail;
     qs("#sc_tel").value = tel;
     qs("#sc_fnac").value = fnac;
 
-    const prefer = String(
-      u.medio_contacto || u.preferencias_contacto || ""
-    ).toLowerCase();
-    qs("#sc_mc_tel").checked = /tel|phone/.test(prefer);
-    qs("#sc_mc_mail").checked = /mail|correo|email/.test(prefer);
+    // === medios de contacto (1=tel, 2=correo, 3=ambos) ===
+    const tipoRaw =
+      u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
+    const tipo = Number(tipoRaw);
+    const cTel = qs("#sc_mc_tel");
+    const cMail = qs("#sc_mc_mail");
+    if (cTel) cTel.checked = tipo === 1 || tipo === 3;
+    if (cMail) cMail.checked = tipo === 2 || tipo === 3;
+
+    // fallback textual si no viene numérico
+    if (!Number.isFinite(tipo)) {
+      const pref = String(tipoRaw || "").toLowerCase();
+      if (cTel) cTel.checked = /tel|phone/.test(pref);
+      if (cMail) cMail.checked = /mail|correo|email/.test(pref);
+    }
   }
 
   /* ---------- Búsqueda global ---------- */
@@ -941,7 +892,7 @@
     });
   }
 
-  /* ---------- API pública para el router ---------- */
+  /* ---------- API pública ---------- */
   async function mount() {
     console.log(TAG, "mount() INICIO");
     window.__activeModule = "suscripciones";
@@ -959,12 +910,10 @@
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error al cargar</div></div>`;
     }
   }
-
   function openCreateExposed() {
     openCreate();
   }
 
-  // expone para router
   globalThis.suscripciones = { mount, openCreate: openCreateExposed };
   console.log(TAG, "Módulo suscripciones cargado.");
 })();
