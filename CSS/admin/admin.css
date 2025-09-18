@@ -1141,7 +1141,7 @@ body.cuenta-only .topbar {
 /* Overlay */
 .gc-dash-overlay{
   position:fixed; inset:0; background:rgba(0,0,0,.35);
-  opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:9999;
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:1001;
 }
 .gc-dash-overlay.open{ opacity:1; pointer-events:auto; }
 

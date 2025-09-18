@@ -108,7 +108,7 @@
       cols = [
         ["col-nombre", "Alumno"],
         ["col-curso", "Curso"],
-        ["col-fecha", "Creación"],
+        ["col-fecha", "Fecha de suscripción"],
         ["col-status", "Status"],
       ];
     } else {
