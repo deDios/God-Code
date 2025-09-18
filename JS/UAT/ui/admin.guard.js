@@ -4,9 +4,6 @@
   const ADMIN_IDS = [1, 12, 13, 17, 18];
 
   const HEADER_SEL = [
-    "header", 
-    ".gc-topbar",
-    ".app-header",
     ".dashboard-header",
   ];
   const ADD_BUTTON_SEL = ["#btn-add", ".gc-fab", ".add-resource"];
