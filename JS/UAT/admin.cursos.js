@@ -1,4 +1,3 @@
-/* ==================== CURSOS (UAT) — Núcleo + Listado + Drawer ==================== */
 (() => {
   "use strict";
 
