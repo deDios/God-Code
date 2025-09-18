@@ -271,7 +271,7 @@
 
 
 
-
+    
 
     <!-- Drawer: Curso -->
     <aside id="drawer-curso" class="drawer gc-dash" data-module="" aria-hidden="true" hidden>
@@ -549,123 +549,122 @@
 
 
 
-    <!-- Drawer: Noticia -->
-    <aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-noticia-title">Noticia · —</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-noticia-close">Cerrar</button>
-            </div>
+<!-- Drawer: Noticia -->
+<aside id="drawer-noticia" class="drawer gc-dash" aria-hidden="true" hidden>
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawer-noticia-title">Noticia · —</div>
+    <div class="drawer-actions">
+      <button class="btn" id="drawer-noticia-close">Cerrar</button>
+    </div>
+  </div>
+
+  <div class="drawer-body" id="drawer-noticia-body">
+
+    <!-- Acciones (Editar / Eliminar / Reactivar) -->
+    <div class="gc-actions" id="noticia-actions-view"></div>
+
+    <!-- ================ MODO VISTA ================ -->
+    <section id="noticia-view" class="mode-view">
+      <div class="field">
+        <div class="label">Título <span class="req">*</span></div>
+        <div class="value" id="nv_titulo">—</div>
+      </div>
+
+      <div class="field">
+        <div class="label">Descripción 1 <span class="req">*</span></div>
+        <div class="value" id="nv_desc_uno">—</div>
+      </div>
+
+      <div class="field">
+        <div class="label">Descripción 2</div>
+        <div class="value" id="nv_desc_dos">—</div>
+      </div>
+
+      <div class="grid-3">
+        <div class="field">
+          <div class="label">Estatus</div>
+          <div class="value" id="nv_estatus">—</div>
         </div>
-
-        <div class="drawer-body" id="drawer-noticia-body">
-
-            <!-- Acciones (Editar / Eliminar / Reactivar) -->
-            <div class="gc-actions" id="noticia-actions-view"></div>
-
-            <!-- ================ MODO VISTA ================ -->
-            <section id="noticia-view" class="mode-view">
-                <div class="field">
-                    <div class="label">Título <span class="req">*</span></div>
-                    <div class="value" id="nv_titulo">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Descripción 1 <span class="req">*</span></div>
-                    <div class="value" id="nv_desc_uno">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Descripción 2</div>
-                    <div class="value" id="nv_desc_dos">—</div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="field">
-                        <div class="label">Estatus</div>
-                        <div class="value" id="nv_estatus">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Creado por (id)</div>
-                        <div class="value" id="nv_creado_por">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Fecha creación</div>
-                        <div class="value" id="nv_fecha_creacion">—</div>
-                    </div>
-                </div>
-
-                <!-- Imágenes (solo lectura) -->
-                <div class="field">
-                    <div class="label">Imágenes</div>
-                    <div class="value">
-                        <div id="media-noticia">
-                            <!-- mountNoticiaMediaView -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">
-                            Portada (pos 1) y secundaria (pos 2), si existen.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- JSON Dev -->
-                <details class="dev-json" id="noticia-json-box" open style="margin-top:16px;">
-                    <summary style="cursor:pointer;font-weight:600;">JSON · Noticia</summary>
-                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-                        <button class="gc-btn" id="btn-copy-json-noticia">Copiar JSON</button>
-                    </div>
-                    <pre id="json-noticia" class="value"
-                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
-                </details>
-            </section>
-
-            <!-- ================ MODO EDICIÓN ================ -->
-            <section id="noticia-edit" class="mode-edit" hidden>
-                <div class="field">
-                    <label for="nf_titulo">Título <span class="req">*</span></label>
-                    <input id="nf_titulo" type="text" maxlength="150" data-max="150" />
-                    <small class="char-counter" data-for="nf_titulo"></small>
-                </div>
-
-                <div class="field">
-                    <label for="nf_desc_uno">Descripción 1 <span class="req">*</span></label>
-                    <textarea id="nf_desc_uno" rows="5" maxlength="2000" data-max="2000"></textarea>
-                    <small class="char-counter" data-for="nf_desc_uno"></small>
-                </div>
-
-                <div class="field">
-                    <label for="nf_desc_dos">Descripción 2</label>
-                    <textarea id="nf_desc_dos" rows="6" maxlength="4000" data-max="4000"></textarea>
-                    <small class="char-counter" data-for="nf_desc_dos"></small>
-                </div>
-
-                <!-- Estatus -->
-                <div class="field">
-                    <label for="nf_estatus">Estatus</label>
-                    <select id="nf_estatus"></select>
-                </div>
-
-                <!-- Imágenes (editable) -->
-                <div class="field">
-                    <label>Imágenes</label>
-                    <div class="value">
-                        <div id="media-noticia-edit">
-                            <!-- mountNoticiaMediaEdit (pos 1 y pos 2) -->
-                        </div>
-                        <div class="hint gc-soft">Formatos: JPG/PNG · Máx 2MB.</div>
-                    </div>
-                </div>
-
-                <!-- Acciones -->
-                <div class="drawer-actions-row">
-                    <div class="row-right">
-                        <button class="gc-btn gc-btn--ghost" id="btn-cancel-noticia">Cancelar</button>
-                        <button class="gc-btn gc-btn--success" id="btn-save-noticia">Guardar</button>
-                    </div>
-                </div>
-            </section>
+        <div class="field">
+          <div class="label">Creado por (id)</div>
+          <div class="value" id="nv_creado_por">—</div>
         </div>
-    </aside>
+        <div class="field">
+          <div class="label">Fecha creación</div>
+          <div class="value" id="nv_fecha_creacion">—</div>
+        </div>
+      </div>
+
+      <!-- Imágenes (solo lectura) -->
+      <div class="field">
+        <div class="label">Imágenes</div>
+        <div class="value">
+          <div id="media-noticia">
+            <!-- mountNoticiaMediaView -->
+          </div>
+          <div class="hint" style="color:#666;margin-top:.35rem;">
+            Portada (pos 1) y secundaria (pos 2), si existen.
+          </div>
+        </div>
+      </div>
+
+      <!-- JSON Dev -->
+      <details class="dev-json" id="noticia-json-box" open style="margin-top:16px;">
+        <summary style="cursor:pointer;font-weight:600;">JSON · Noticia</summary>
+        <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+          <button class="gc-btn" id="btn-copy-json-noticia">Copiar JSON</button>
+        </div>
+        <pre id="json-noticia" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
+      </details>
+    </section>
+
+    <!-- ================ MODO EDICIÓN ================ -->
+    <section id="noticia-edit" class="mode-edit" hidden>
+      <div class="field">
+        <label for="nf_titulo">Título <span class="req">*</span></label>
+        <input id="nf_titulo" type="text" maxlength="150" data-max="150" />
+        <small class="char-counter" data-for="nf_titulo"></small>
+      </div>
+
+      <div class="field">
+        <label for="nf_desc_uno">Descripción 1 <span class="req">*</span></label>
+        <textarea id="nf_desc_uno" rows="5" maxlength="2000" data-max="2000"></textarea>
+        <small class="char-counter" data-for="nf_desc_uno"></small>
+      </div>
+
+      <div class="field">
+        <label for="nf_desc_dos">Descripción 2</label>
+        <textarea id="nf_desc_dos" rows="6" maxlength="4000" data-max="4000"></textarea>
+        <small class="char-counter" data-for="nf_desc_dos"></small>
+      </div>
+
+      <!-- Estatus -->
+      <div class="field">
+        <label for="nf_estatus">Estatus</label>
+        <select id="nf_estatus"></select>
+      </div>
+
+      <!-- Imágenes (editable) -->
+      <div class="field">
+        <label>Imágenes</label>
+        <div class="value">
+          <div id="media-noticia-edit">
+            <!-- mountNoticiaMediaEdit (pos 1 y pos 2) -->
+          </div>
+          <div class="hint gc-soft">Formatos: JPG/PNG · Máx 2MB.</div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="drawer-actions-row">
+        <div class="row-right">
+          <button class="gc-btn gc-btn--ghost" id="btn-cancel-noticia">Cancelar</button>
+          <button class="gc-btn gc-btn--success" id="btn-save-noticia">Guardar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
 
 
 
