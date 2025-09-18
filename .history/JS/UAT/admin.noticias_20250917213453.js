@@ -6,9 +6,9 @@
   /* ======================= Config / API ======================= */
   const API_BASE = "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/";
   const API = {
-    noticias:  API_BASE + "c_noticia.php",
-    iNoticias: API_BASE + "i_noticia.php",
-    uNoticias: API_BASE + "u_noticia.php"
+    noticias:  API_BASE + "c_noticias.php",
+    iNoticias: API_BASE + "i_noticias.php",
+    uNoticias: API_BASE + "u_noticias.php"
   };
   const API_UPLOAD = { noticiaImg: API_BASE + "u_noticiaImagenes.php" };
 

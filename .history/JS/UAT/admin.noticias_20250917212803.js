@@ -8,7 +8,9 @@
   const API = {
     noticias:  API_BASE + "c_noticia.php",
     iNoticias: API_BASE + "i_noticia.php",
-    uNoticias: API_BASE + "u_noticia.php"
+    uNoticias: API_BASE + "u_noticia.php",
+    categorias: API_BASE + "c_categorias.php",        
+    autores:    API_BASE + "c_tutor.php",            
   };
   const API_UPLOAD = { noticiaImg: API_BASE + "u_noticiaImagenes.php" };
 
@@ -19,7 +21,8 @@
     search: "",
     data: [],          // noticias
     current: null,     // { id, _all }
-    tempImages: { 1: null, 2: null } // archivos temporales en modo “crear”
+    maps: { categorias: null, autores: null },
+    tempImages: { 1: null, 2: null }, // archivos temporales en modo “crear”
   };
   window.__NoticiasState = NS;
 
@@ -90,6 +93,28 @@
     }
   }
 
+  // maps
+  function arrToMap(arr) {
+    const m = {};
+    (Array.isArray(arr)?arr:[]).forEach(x => { m[x.id] = x.nombre || x.titulo || ("#" + x.id) });
+    m._ts = Date.now();
+    return m;
+  }
+  function mapToOptions(map, sel) {
+    const ids = Object.keys(map || {}).filter(k => k!=="_ts");
+    return ids.map(id => `<option value="${id}"${+id===+sel?" selected":""}>${esc(map[id])}</option>`).join("");
+  }
+  function mapLabel(map, id) {
+    if (!map) return "—";
+    const k = String(id ?? "");
+    return (k in map) ? (map[k] ?? "—") : "—";
+  }
+
+  // expone utils (reutiliza si ya existen)
+  window.gcUtils = Object.assign({}, window.gcUtils || {}, {
+    qs,qsa,esc,normalize,fmtDate,toast,postJSON,withBust,arrToMap,mapToOptions,mapLabel
+  });
+
   /* ======================= Imágenes ======================= */
   function noticiaImgUrl(id, pos=1) {
     // según tu uploader: /ASSETS/noticia/NoticiasImg/noticia_img{pos}_{id}.png
@@ -159,7 +184,14 @@
   }
   window.setNoticiaDrawerMode = setNoticiaDrawerMode;
 
-  /* ======================= Listado ======================= */
+  /* ======================= Catálogos + Listado ======================= */
+  async function loadCatalogos() {
+    console.log(TAG, "loadCatalogos()...");
+    if (!NS.maps.categorias) NS.maps.categorias = arrToMap(await postJSON(API.categorias, { estatus:1 }).catch(()=>[]));
+    if (!NS.maps.autores)    NS.maps.autores    = arrToMap(await postJSON(API.autores,    { estatus:1 }).catch(()=>[]));
+    console.log(TAG, "Catálogos OK:", NS.maps);
+  }
+
   async function loadNoticias() {
     console.log(TAG, "loadNoticias()...");
     const chunks = await Promise.all(ORDER_NOTICIAS.map(st => postJSON(API.noticias, { estatus: st }).catch(()=>[])));
@@ -199,7 +231,7 @@
           hostD.insertAdjacentHTML("beforeend", `
             <div class="table-row" role="row" data-id="${it.id}">
               <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
-              <div class="col-fecha" role="cell">${esc(fmtDate(it.fecha_creacion))}</div>
+              <div class="col-fecha" role="cell">${esc(fmtDate(it.fecha_publicacion))}</div>
               <div class="col-status" role="cell" id="noticia-status-${it.id}">${esc(est)}</div>
             </div>
           `);
@@ -353,9 +385,11 @@
     if (title) title.textContent = "Noticia · " + (it.titulo || "—");
 
     put("#v_titulo", it.titulo);
-    put("#v_desc_uno", it.desc_uno);
-    put("#v_desc_dos", it.desc_dos);
-    put("#v_fecha_creacion", fmtDate(it.fecha_creacion));
+    put("#v_resumen", it.resumen);
+    put("#v_contenido", it.contenido);
+    put("#v_autor", mapLabel(NS.maps.autores, it.autor));
+    put("#v_categoria", mapLabel(NS.maps.categorias, it.categoria));
+    put("#v_fecha_pub", fmtDate(it.fecha_publicacion));
     put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
 
     await mountNoticiaMediaView(qs("#media-noticia"), it.id);
@@ -378,6 +412,12 @@
   function setVal(id, v) { const el = qs("#"+id); if (el) el.value = v==null ? "" : String(v); }
   function val(id) { return (qs("#"+id)?.value || "").trim(); }
   function num(id) { const v=val(id); return v==="" ? null : Number(v); }
+
+  function putSelect(id, map, sel) {
+    const el = qs("#"+id);
+    if (!el) return;
+    el.innerHTML = mapToOptions(map || {}, sel);
+  }
 
   function mountNoticiaMediaEdit(containerEl, id) {
     if (!containerEl) return;
@@ -469,8 +509,12 @@
     console.log(TAG, "fillNoticiaEdit()", n);
 
     setVal("n_titulo", n.titulo);
-    setVal("n_desc_uno", n.desc_uno);
-    setVal("n_desc_dos", n.desc_dos);
+    setVal("n_resumen", n.resumen);
+    setVal("n_contenido", n.contenido);
+    setVal("n_fecha_pub", n.fecha_publicacion);
+
+    putSelect("n_autor", NS.maps.autores, n.autor);
+    putSelect("n_categoria", NS.maps.categorias, n.categoria);
 
     // Estatus (0/1)
     const sel = qs("#n_estatus");
@@ -549,14 +593,17 @@
     const body = {
       id: NS.current?.id ?? null,
       titulo: val("n_titulo"),
-      desc_uno: val("n_desc_uno"),
-      desc_dos: val("n_desc_dos"),
-      estatus: num("n_estatus")
+      resumen: val("n_resumen"),
+      contenido: val("n_contenido"),
+      autor: num("n_autor"),
+      categoria: num("n_categoria"),
+      fecha_publicacion: val("n_fecha_pub"),
+      estatus: num("n_estatus"),
     };
     console.log(TAG, "saveNoticia() body=", body);
 
-    if (!body.titulo || !body.desc_uno || !body.desc_dos) {
-      toast("Completa Título, Descripción uno y Descripción dos.", "error");
+    if (!body.titulo || !body.resumen || !body.contenido) {
+      toast("Completa al menos Título, Resumen y Contenido.", "error");
       return;
     }
 
@@ -604,7 +651,11 @@
 
       toast("Noticia guardada", "exito");
 
-      // Refresca
+      // Refresca en memoria: si quieres fetch completo usa loadNoticias(), aquí hacemos “merge” rápido
+      if (newId && !body.id) {
+        NS.data.unshift({ ...body, id: newId }); // push optimista
+      }
+      // Si existe, vuelve a pedir listado para asegurar orden y datos (puedes cambiar esto por un merge fino)
       await loadNoticias();
 
       const idToOpen = newId || body.id;
@@ -628,6 +679,7 @@
     try {
       const hostD = qs("#noticias-list");
       if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
+      await loadCatalogos();
       await loadNoticias();
 
       const s = qs("#search-noticias-input");
@@ -650,9 +702,10 @@
   function openNoticiaCreate() {
     console.log(TAG, "openNoticiaCreate()");
     const blank = {
-      id:null, titulo:"", desc_uno:"", desc_dos:"", estatus:1
+      id:null, titulo:"", resumen:"", contenido:"",
+      autor:null, categoria:null, fecha_publicacion:"", estatus:1
     };
-    NS.current = { id: null, _all: blank };
+    NS.current = { id:null, _all: blank };
     openDrawerNoticia();
     setNoticiaDrawerMode("edit");
     fillNoticiaEdit(blank);
