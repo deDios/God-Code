@@ -109,6 +109,7 @@
     // Borra tabla y pinta el mock
     const hostD = qs("#recursos-list"); if (hostD) hostD.innerHTML = buildCuentaPlaceholder();
     const hostM = qs("#recursos-list-mobile"); if (hostM) hostM.innerHTML = "";
+    window.__adminGuardRestricted = true;
   }
 
   // Re-aplica al cambiar de hash para bloquear navegación manual

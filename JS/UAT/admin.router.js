@@ -3,7 +3,7 @@
 (() => {
   const qs = (s, r = document) => r.querySelector(s);
 
-  // Mapa de modulos 
+  // Mapa de modulos
   const modules = {
     "#/cursos": {
       flag: "__CursosState",
@@ -38,8 +38,7 @@
     }
     try {
       await import(path);
-    } catch {
-    }
+    } catch {}
   }
 
   function setActive(route) {
@@ -119,8 +118,11 @@
   }
 
   async function onRoute() {
-    const route = location.hash || "#/cursos";
-    const mod = modules[route] || modules["#/cursos"];
+    const restricted = !!window.__adminGuardRestricted;
+    const defaultRoute = restricted ? "#/cuenta" : "#/cursos";
+    const route = location.hash || defaultRoute;
+
+    const mod = modules[route] || (!restricted ? modules["#/cursos"] : null);
 
     gcSearch.setRoute(route);
 
@@ -129,12 +131,17 @@
     setTableHeaders(route);
     setTitleByRoute(route);
 
+    if (restricted && route === "#/cuenta") {
+      return;
+    }
+
+    if (!mod) return; 
+
     await ensure(mod.path, mod.flag);
     const api = mod.api && mod.api();
     if (api?.mount) await api.mount();
   }
 
-  // Botón "Crear": handler único que despacha al módulo actual
   function onCreate() {
     const route = location.hash || "#/cursos";
     const mod = modules[route] || modules["#/cursos"];
@@ -142,7 +149,6 @@
     if (api?.openCreate) api.openCreate();
   }
 
-  // Navegación por clicks en el sidebar (sin recarga)
   document.addEventListener("click", (e) => {
     const a = e.target.closest('.gc-side .nav-item[href^="#/"]');
     if (!a) return;
