@@ -1,5 +1,4 @@
-// admin.router.js (router-lite)
-
+// admin.router.js
 (() => {
   const qs = (s, r = document) => r.querySelector(s);
 
@@ -63,14 +62,13 @@
   }
 
   function setTitleByRoute(route) {
-    //rutas de urls para los diferentes modulos
     const map = {
       "#/cursos": "Cursos",
       "#/noticias": "Noticias",
       "#/tutores": "Tutores",
       "#/suscripciones": "Suscripciones",
+      "#/cuenta": "Cuenta", // para cuando el guard manda a Cuenta
     };
-
     const h = qs("#mod-title");
     if (h) h.textContent = map[route] || "—";
   }
@@ -107,7 +105,8 @@
         ["col-fecha", "Fecha de suscripción"],
         ["col-status", "Status"],
       ];
-    } else {
+    } else if (route === "#/cuenta") {
+      // Sin cabecera de tabla; el guard pinta su placeholder
       cols = [];
     }
     head.innerHTML = cols
@@ -117,25 +116,50 @@
       .join("");
   }
 
+  // Espera a que el guard marque el flag la primera vez (evita parpadeo)
+  async function waitGuardFlagOnce(maxMs = 250) {
+    const start = Date.now();
+    while (
+      window.__adminGuardRestricted === undefined &&
+      Date.now() - start < maxMs
+    ) {
+      await new Promise((r) => setTimeout(r, 15));
+    }
+  }
+
   async function onRoute() {
+    // da chance a que el guard ponga el flag antes del primer route
+    await waitGuardFlagOnce();
+
     const restricted = !!window.__adminGuardRestricted;
     const defaultRoute = restricted ? "#/cuenta" : "#/cursos";
     const route = location.hash || defaultRoute;
 
+    // 🔒 Si está restringido y la ruta NO es #/cuenta, redirige y sal.
+    if (restricted && route !== "#/cuenta") {
+      // replace para no llenar el historial
+      location.replace("#/cuenta");
+      // deja el contenedor limpio para que el guard pinte su placeholder
+      clearLists();
+      setTableHeaders("#/cuenta");
+      setTitleByRoute("#/cuenta");
+      setActive("#/cuenta");
+      return;
+    }
+
     const mod = modules[route] || (!restricted ? modules["#/cursos"] : null);
 
-    gcSearch.setRoute(route);
+    if (window.gcSearch?.setRoute) gcSearch.setRoute(route);
 
     setActive(route);
     clearLists();
     setTableHeaders(route);
     setTitleByRoute(route);
 
-    if (restricted && route === "#/cuenta") {
-      return;
-    }
+    // En modo restringido en #/cuenta, no se monta ningún módulo
+    if (restricted && route === "#/cuenta") return;
 
-    if (!mod) return; 
+    if (!mod) return;
 
     await ensure(mod.path, mod.flag);
     const api = mod.api && mod.api();
@@ -143,23 +167,31 @@
   }
 
   function onCreate() {
+    const restricted = !!window.__adminGuardRestricted;
+    if (restricted) {
+      // si alguien llega a pulsar el + en restringido, lo llevamos a cuenta
+      location.replace("#/cuenta");
+      return;
+    }
     const route = location.hash || "#/cursos";
     const mod = modules[route] || modules["#/cursos"];
     const api = mod.api && mod.api();
     if (api?.openCreate) api.openCreate();
   }
 
+  // Navegación por clicks (en modo restringido, fuerza #/cuenta)
   document.addEventListener("click", (e) => {
     const a = e.target.closest('.gc-side .nav-item[href^="#/"]');
     if (!a) return;
     e.preventDefault();
-    const to = a.getAttribute("href");
+    const restricted = !!window.__adminGuardRestricted;
+    const to = restricted ? "#/cuenta" : a.getAttribute("href");
     if (to) location.hash = to;
   });
 
   // Wire events
   window.addEventListener("hashchange", onRoute);
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     const btn = document.querySelector("#btn-add");
     if (btn && !btn._wired) {
       btn._wired = true;
@@ -168,6 +200,6 @@
         onCreate();
       });
     }
-    onRoute();
+    await onRoute();
   });
 })();
