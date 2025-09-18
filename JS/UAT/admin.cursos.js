@@ -777,10 +777,10 @@
 
     cont.innerHTML = "";
 
-    // Editar
+    // Editar → ghost (blanco con borde)
     const btnEdit = document.createElement("button");
     btnEdit.id = "btn-edit";
-    btnEdit.className = "gc-btn";
+    btnEdit.className = "gc-btn"; // ghost por defecto en tu tema
     btnEdit.textContent = "Editar";
     btnEdit.addEventListener("click", () => {
       setDrawerMode("edit");
@@ -789,27 +789,27 @@
     cont.appendChild(btnEdit);
 
     // Acción primaria
-    const isInactive = +it.estatus === 0;
+    const isInactive = Number(it.estatus) === 0;
     const btn = document.createElement("button");
-    btn.id = isInactive ? "btn-reactivar" : "btn-delete"; // ID distinto
+    btn.id = isInactive ? "btn-reactivar" : "btn-delete";
     btn.className = isInactive
-      ? "gc-btn gc-btn--success" // verde sólido
-      : "gc-btn gc-btn--danger";
+      ? "gc-btn gc-btn--success" // ✅ verde sólido
+      : "gc-btn gc-btn--danger"; // ✅ rojo sólido
     btn.textContent = isInactive ? "Reactivar" : "Eliminar";
     cont.appendChild(btn);
 
-    // confirmación simple solo para eliminar
     let confirmTimer = null;
 
     btn.addEventListener("click", async () => {
       if (isInactive) {
-        // Reactivar directo
+        // Reactivar directo (optimista)
         btn.disabled = true;
         try {
           const prev = it.estatus;
-          it.estatus = 1; // optimista
+          it.estatus = 1;
           updateRowStatusCell(it.id, it.estatus);
           paintActions(it);
+
           const ok = await updateCursoStatus(it.id, 1);
           if (!ok) {
             it.estatus = prev;
@@ -818,7 +818,7 @@
           } else {
             toast("Curso reactivado", "exito");
             await refreshCurrentFromList(it.id);
-            resortList(); // resort tras cambio
+            resortList();
             renderCursos();
           }
         } finally {
@@ -830,14 +830,12 @@
       // Eliminar con confirmación
       if (btn.dataset.confirm !== "1") {
         btn.dataset.confirm = "1";
+        const old = btn.textContent;
         btn.textContent = "¿Confirmar?";
-        btn.classList.add("danger");
-        if (confirmTimer) clearTimeout(confirmTimer);
+        clearTimeout(confirmTimer);
         confirmTimer = setTimeout(() => {
           btn.dataset.confirm = "0";
-          btn.textContent = "Eliminar";
-          btn.classList.remove("danger");
-          confirmTimer = null;
+          btn.textContent = old;
         }, 3000);
         return;
       }
@@ -846,9 +844,10 @@
       btn.disabled = true;
       try {
         const prev = it.estatus;
-        it.estatus = 0; 
+        it.estatus = 0;
         updateRowStatusCell(it.id, it.estatus);
         paintActions(it);
+
         const ok = await updateCursoStatus(it.id, 0);
         if (!ok) {
           it.estatus = prev;
@@ -857,7 +856,7 @@
         } else {
           toast("Curso movido a Inactivo", "exito");
           await refreshCurrentFromList(it.id);
-          resortList(); // resort tras cambio
+          resortList();
           renderCursos();
         }
       } finally {
