@@ -817,6 +817,199 @@
 
 
 
+    <!-- Drawer: Suscripción -->
+    <aside id="drawer-suscripcion" class="drawer gc-dash" aria-hidden="true" hidden>
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawer-suscripcion-title">Suscripción · —</div>
+            <div class="drawer-actions">
+                <button class="btn" id="drawer-suscripcion-close">Cerrar</button>
+            </div>
+        </div>
+
+        <div class="drawer-body" id="drawer-suscripcion-body">
+
+            <!-- Acciones (Editar / Eliminar / Reactivar) – se inyectan por JS -->
+            <div class="gc-actions" id="sus-actions-view"></div>
+
+            <!-- =================== MODO VISTA =================== -->
+            <section id="sus-view" class="mode-view" hidden>
+                <div class="field">
+                    <div class="label">Alumno</div>
+                    <div class="value" id="sv_alumno">—</div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Curso</div>
+                    <div class="value" id="sv_curso">—</div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="field">
+                        <div class="label">Estatus</div>
+                        <div class="value" id="sv_estatus">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Creación</div>
+                        <div class="value" id="sv_fecha_creacion">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Inicio</div>
+                        <div class="value" id="sv_inicio">—</div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="field">
+                        <div class="label">Fin</div>
+                        <div class="value" id="sv_fin">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Monto</div>
+                        <div class="value" id="sv_monto">—</div>
+                    </div>
+                    <div class="field">
+                        <div class="label">Moneda</div>
+                        <div class="value" id="sv_moneda">—</div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="label">Comentario</div>
+                    <div class="value" id="sv_comentario">—</div>
+                </div>
+
+                <!-- JSON Dev -->
+                <details class="dev-json" id="sus-json-box" open style="margin-top:16px;">
+                    <summary style="cursor:pointer;font-weight:600;">JSON · Suscripción</summary>
+                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
+                        <button class="gc-btn" id="btn-copy-json-sus">Copiar JSON</button>
+                    </div>
+                    <pre id="json-sus" class="value"
+                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
+                </details>
+            </section>
+
+            <!-- =================== MODO EDICIÓN (editar suscripción existente) =================== -->
+            <section id="sus-edit" class="mode-edit" hidden>
+                <div class="grid-3">
+                    <div class="field">
+                        <label>Alumno</label>
+                        <div class="value" id="se_alumno">—</div>
+                    </div>
+                    <div class="field">
+                        <label>Curso</label>
+                        <div class="value" id="se_curso">—</div>
+                    </div>
+                    <div class="field">
+                        <label for="se_estatus">Estatus</label>
+                        <select id="se_estatus"></select>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="se_comentario">Comentario</label>
+                    <textarea id="se_comentario" rows="4" maxlength="1000"></textarea>
+                </div>
+
+                <!-- Acciones -->
+                <div class="drawer-actions-row">
+                    <div class="row-right">
+                        <button class="gc-btn gc-btn--ghost" id="se_cancel">Cancelar</button>
+                        <button class="gc-btn gc-btn--success" id="se_save">Guardar</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================== MODO CREAR (Inscribir) =================== -->
+            <section id="sus-create" class="mode-edit" hidden>
+                <!-- Acciones arriba -->
+                <div class="drawer-actions-row" style="justify-content:flex-start; gap:8px; margin-top:-8px;">
+                    <button class="gc-btn gc-btn--ghost" id="sc_cancel_head">Cancelar</button>
+                    <button class="gc-btn gc-btn--success" id="sc_inscribir" disabled>Inscribir</button>
+                </div>
+
+                <!-- Selección de curso -->
+                <div class="field">
+                    <label for="sc_curso">Curso <span class="req">*</span></label>
+                    <select id="sc_curso">
+                        <option value="">— Selecciona un curso —</option>
+                        <!-- opciones se inyectan por JS -->
+                    </select>
+                </div>
+
+                <!-- Búsqueda de usuario -->
+                <div class="field">
+                    <label for="sc_ident">Buscar cuenta (teléfono o correo) <span class="req">*</span></label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input id="sc_ident" type="text" placeholder="3322… o correo@dominio">
+                        <button class="gc-btn" id="sc_buscar">Buscar</button>
+                        <button class="gc-btn gc-btn--ghost" id="sc_cambiar" disabled>Cambiar usuario</button>
+                    </div>
+                </div>
+
+                <!-- Panel de datos del usuario encontrado -->
+                <div id="sc_user_panel" style="display:none;">
+                    <div class="field">
+                        <label>Nombre</label>
+                        <input id="sc_nombre" type="text" disabled>
+                    </div>
+                    <div class="field">
+                        <label>Correo</label>
+                        <input id="sc_correo" type="email" disabled>
+                    </div>
+                    <div class="field">
+                        <label>Teléfono</label>
+                        <input id="sc_tel" type="text" disabled>
+                    </div>
+                    <div class="field">
+                        <label>Fecha de nacimiento</label>
+                        <input id="sc_fnac" type="date" disabled>
+                    </div>
+
+                    <div class="field">
+                        <label>Medios de contacto</label>
+                        <div class="value" style="display:flex;gap:18px;">
+                            <label><input id="sc_mc_tel" type="checkbox" disabled> Teléfono</label>
+                            <label><input id="sc_mc_mail" type="checkbox" disabled> Correo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comentario -->
+                <div class="field">
+                    <label for="sc_comentario">Comentario</label>
+                    <textarea id="sc_comentario" rows="3" placeholder="Opcional"></textarea>
+                </div>
+
+                <!-- Acciones abajo -->
+                <div class="drawer-actions-row">
+                    <div class="row-right">
+                        <button class="gc-btn gc-btn--ghost" id="sc_cancel">Cancelar</button>
+                        <button class="gc-btn gc-btn--success" id="sc_inscribir_b" disabled>Inscribir</button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </aside>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- Contadores de caracteres sencillo -->
     <script>
     (function() {
@@ -852,7 +1045,7 @@
     <script src="/JS/JSglobal.js" defer></script>
     <script src="/JS/UAT/admin.router.js" defer></script>
     <script src="/JS/UAT/admin.cursos.js" defer></script>
-    
+
 
     <!--
     <script src="/JS/UAT/admin.noticias.js" defer></script>
