@@ -181,7 +181,7 @@
     const term = normalize(NS.search);
     const filtered = term ? NS.data.filter(row => normalize(JSON.stringify(row)).includes(term)) : NS.data;
 
-    const count = qs("#noticias-count") || qs("#mod-count");
+    const count = qs("#noticias-count");
     if (count) { const n = filtered.length; count.textContent = `${n} ${n === 1 ? "elemento" : "elementos"}`; }
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / NS.pageSize));
@@ -245,10 +245,7 @@
 
   function renderNoticiasPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / NS.pageSize));
-    [
-      qs("#noticias-pagination-controls") || qs("#pagination-controls"),
-      qs("#noticias-pagination-mobile") || qs("#pagination-mobile")
-    ].forEach(cont => {
+    [qs("#noticias-pagination-controls"), qs("#noticias-pagination-mobile")].forEach(cont => {
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
@@ -270,7 +267,7 @@
     });
   }
 
-  const searchInput = qs("#search-noticias-input") || qs("#search-input");
+  const searchInput = qs("#search-noticias-input");
   if (searchInput && !searchInput._b) {
     searchInput._b = true;
     searchInput.addEventListener("input", e => {
@@ -279,13 +276,6 @@
       renderNoticias();
     });
   }
-
-  console.log("[Noticias] containers:", {
-    hostD: !!(qs("#noticias-list") || qs("#recursos-list")),
-    hostM: !!(qs("#noticias-list-mobile") || qs("#recursos-list-mobile")),
-    search: !!(qs("#search-noticias-input") || qs("#search-input")),
-    count: !!(qs("#noticias-count") || qs("#mod-count")),
-  });
 
   /* ======================= VISTA (drawer) ======================= */
   function put(sel, val) { const el = qs(sel); if (el) el.innerHTML = esc(val ?? "—"); }
