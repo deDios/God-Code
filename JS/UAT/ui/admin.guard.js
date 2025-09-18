@@ -1,138 +1,214 @@
-// /JS/UAT/ui/admin.guard.js
 (() => {
   "use strict";
 
   const ADMIN_IDS = [1, 12, 13, 17, 18];
 
-  // --- helpers ---
-  const qs = (s, r = document) => r.querySelector(s);
-  const qsa = (s, r = document) => [...r.querySelectorAll(s)];
+  const HEADER_SEL = [
+    "header", 
+    ".gc-topbar",
+    ".app-header",
+    ".dashboard-header",
+  ];
+  const ADD_BUTTON_SEL = ["#btn-add", ".gc-fab", ".add-resource"];
+  const SEARCH_SEL = ["#search-input", ".gc-search", ".searchbar"];
 
-  function getUserId() {
+  // ======= Helpers =======
+  function getUserIdFromCookie() {
     try {
-      const id = Number(window?.usuario?.id);
-      if (Number.isFinite(id) && id > 0) return id;
-    } catch {}
-    try {
-      const raw = document.cookie.split("; ").find(x => x.startsWith("usuario="));
-      if (!raw) return null;
-      const json = decodeURIComponent(raw.split("=")[1] || "");
+      const row = document.cookie
+        .split("; ")
+        .find((x) => x.startsWith("usuario="));
+      if (!row) return null;
+      const json = decodeURIComponent(row.split("=")[1] || "");
       const u = JSON.parse(json);
-      const id = Number(u?.id);
-      return Number.isFinite(id) && id > 0 ? id : null;
-    } catch {}
-    return null;
-  }
-
-  function isAdmin(id) {
-    return ADMIN_IDS.map(Number).includes(Number(id));
-  }
-
-  // --- vista placeholder Cuenta ---
-  function buildCuentaPlaceholder() {
-    const card = (icon, title, desc) => `
-      <div class="gc-card-lite">
-        <div class="gc-card-ico">${icon}</div>
-        <div class="gc-card-body">
-          <div class="gc-card-title">${title}</div>
-          <div class="gc-card-desc">${desc}</div>
-        </div>
-      </div>`;
-
-    return `
-      <div class="cuenta-wrap">
-        <h2 class="cuenta-title">Cuenta</h2>
-        ${card("icono", "Borrar cuenta", "Esta acción eliminará tu cuenta y todos sus datos de forma permanente.")}
-        ${card("icono", "Opciones de privacidad / Visibilidad", "Permite configurar quién ve tu perfil o actividad.")}
-        ${card("icono", "Notificaciones / Preferencias", "Botones para gestionar alertas, correos, notificaciones push.")}
-        ${card("icono", "Ajustes de privacidad o configuraciones", "Botones para ajustar visibilidad de datos o preferencias de privacidad.")}
-        ${card("icono", "Cambiar de cuenta", "Cambia rápidamente entre diferentes perfiles o usuarios sin cerrar sesión.")}
-      </div>
-      <style>
-        .cuenta-wrap{max-width:860px;margin:8px auto 24px;padding:0 8px;}
-        .cuenta-title{font-size:1.35rem;font-weight:700;text-align:center;margin:8px 0 14px;}
-        .gc-card-lite{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #e7e7e7;
-          border-radius:8px;box-shadow:0 1px 0 rgba(0,0,0,.03);padding:12px 10px;margin:8px 0;}
-        .gc-card-ico{font-size:22px;line-height:1;width:28px;text-align:center;filter:saturate(0.9);}
-        .gc-card-title{font-weight:700;margin-bottom:2px}
-        .gc-card-desc{color:#555;font-size:.92rem}
-      </style>`;
-  }
-
-  // --- aplica modo restringido ---
-  function applyRestrictedUI() {
-    // Lado izquierdo: dejar solo "Cuenta"
-    const side = qs(".gc-side");
-    if (side) {
-      qsa('.gc-side .nav-item').forEach(a => {
-        const href = (a.getAttribute("href") || a.dataset?.route || "").toLowerCase();
-        const txt  = (a.textContent || "").trim().toLowerCase();
-        const isCuenta = href === "#/cuenta" || txt === "cuenta";
-        if (!isCuenta) a.style.display = "none";
-      });
-
-      // Oculta cabeceras de grupos vacíos
-      qsa(".gc-side .nav-group, .gc-side .nav-section").forEach(g => {
-        const anyVisible = !![...g.querySelectorAll(".nav-item")].find(x => x.style.display !== "none");
-        if (!anyVisible) g.style.display = "none";
-      });
-
-      // Si existe item cuenta, seleccionarlo visualmente
-      const cuentaItem = qsa(".gc-side .nav-item").find(a => (a.getAttribute("href")||"").toLowerCase()==="#/cuenta" || (a.textContent||"").trim().toLowerCase()==="cuenta");
-      if (cuentaItem) {
-        qsa(".gc-side .nav-item[aria-current]").forEach(a => a.removeAttribute("aria-current"));
-        cuentaItem.setAttribute("aria-current","page");
-      }
+      const n = Number(u?.id);
+      return Number.isFinite(n) ? n : null;
+    } catch {
+      return null;
     }
-
-    // Redirige a #/cuenta si el hash no lo es
-    if (location.hash.toLowerCase() !== "#/cuenta") {
-      // Evita loop si el router vuelve a escribir
-      setTimeout(() => { location.hash = "#/cuenta"; }, 0);
-    }
-
-    // Título de módulo
-    const title = qs("#mod-title");
-    if (title) title.textContent = "Cuenta";
-
-    // Limpia cabecera de tabla / contadores / paginación
-    const header = qs(".recursos-box.desktop-only .table-header");
-    if (header) header.innerHTML = "";
-    const count = qs("#mod-count"); if (count) count.textContent = "—";
-    const pag1 = qs("#pagination-controls"); if (pag1) pag1.innerHTML = "";
-    const pag2 = qs("#pagination-mobile");  if (pag2) pag2.innerHTML = "";
-
-    // Oculta barra de búsqueda (si quieres dejarla, comenta estas 2 líneas)
-    const sb = qs("#search-input");
-    if (sb) { sb.value = ""; sb.parentElement && (sb.parentElement.style.display = "none"); }
-
-    // Borra tabla y pinta el mock
-    const hostD = qs("#recursos-list"); if (hostD) hostD.innerHTML = buildCuentaPlaceholder();
-    const hostM = qs("#recursos-list-mobile"); if (hostM) hostM.innerHTML = "";
-    window.__adminGuardRestricted = true;
   }
 
-  // Re-aplica al cambiar de hash para bloquear navegación manual
-  function bindHashGuard() {
-    if (window.__adminGuardHashBound) return;
-    window.__adminGuardHashBound = true;
-    window.addEventListener("hashchange", () => {
-      const uid = getUserId();
-      if (!isAdmin(uid)) {
-        applyRestrictedUI();
-      }
+  function hideEls(selectors) {
+    selectors.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        el.setAttribute("data-guard-hidden", "1");
+        el.style.display = "none";
+      });
     });
   }
 
-  function init() {
-    const uid = getUserId();
-    if (isAdmin(uid)) return;   
+  function stripSidebarToCuenta() {
+    const side = document.querySelector(".gc-side");
+    if (!side) return;
 
-    const tries = [0, 30, 120, 300];
-    tries.forEach(ms => setTimeout(applyRestrictedUI, ms));
-    bindHashGuard();
+    // deja solo el item "Cuenta" si existe; si no, crea uno mínimo
+    const items = Array.from(side.querySelectorAll('.nav-item[href^="#/"]'));
+    const cuenta = items.find(
+      (a) => (a.getAttribute("href") || "").trim() === "#/cuenta"
+    );
+    items.forEach((a) => {
+      if (a !== cuenta) a.remove();
+    });
+
+    if (!cuenta) {
+      const li = document.createElement("a");
+      li.className = "nav-item";
+      li.href = "#/cuenta";
+      li.setAttribute("data-route", "#/cuenta");
+      li.textContent = "Cuenta";
+      side.innerHTML = "";
+      side.appendChild(li);
+    }
+
+    // título grande del sidebar
+    const bigTitle = side.querySelector(".side-title, .title, h3");
+    if (bigTitle) bigTitle.textContent = "Cuenta";
   }
 
-  if (document.readyState !== "loading") init();
-  else document.addEventListener("DOMContentLoaded", init);
+  function clearMainLists() {
+    const ids = [
+      "#recursos-list",
+      "#recursos-list-mobile",
+      "#pagination-controls",
+      "#pagination-mobile",
+    ];
+    ids.forEach((id) => {
+      const el = document.querySelector(id);
+      if (el) el.innerHTML = "";
+    });
+
+    const tc = document.querySelector("#mod-count");
+    if (tc) tc.textContent = "—";
+
+    const head = document.querySelector(
+      ".recursos-box.desktop-only .table-header"
+    );
+    if (head) head.innerHTML = "";
+  }
+
+  function findContentHost() {
+    // dónde colocar el placeholder
+    return (
+      document.querySelector("#gc-admin-content") ||
+      document.querySelector(".gc-content") ||
+      document.querySelector(".dashboard-content") ||
+      document.querySelector("#main") ||
+      document.querySelector("main") ||
+      document.body
+    );
+  }
+
+  function injectGuardCSS() {
+    if (document.getElementById("admin-guard-css")) return;
+    const css = `
+      .guard-placeholder{
+        max-width: 920px; margin: 48px auto; padding: 24px;
+        background:#fff; border-radius:16px; box-shadow:0 16px 40px rgba(0,0,0,.08);
+      }
+      .guard-hero{ display:flex; gap:24px; align-items:center; }
+      .guard-hero .svg{
+        flex:0 0 160px; width:160px; height:160px; display:grid; place-items:center;
+        border-radius:14px; background:linear-gradient(180deg,#f4f7ff,#eef2ff);
+      }
+      .guard-hero h1{ font-size:1.4rem; margin:0 0 6px; }
+      .guard-hero p{ color:#5b6475; margin:0; }
+      .guard-actions{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+      .guard-actions .gc-btn{ padding:.6rem 1rem; }
+    `;
+    const s = document.createElement("style");
+    s.id = "admin-guard-css";
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  function makeWipSVG() {
+    // engranes / candado suave
+    return `
+      <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+        <rect x="6" y="18" width="80" height="60" rx="12" fill="#E8EEFF"/>
+        <path d="M56 38v-6a10 10 0 10-20 0v6" stroke="#7B8BD1" stroke-width="3" stroke-linecap="round"/>
+        <rect x="30" y="38" width="32" height="28" rx="8" fill="#CFE0FF" stroke="#7B8BD1" stroke-width="2"/>
+        <circle cx="46" cy="52" r="4.5" fill="#7B8BD1"/>
+        <path d="M46 56v6" stroke="#7B8BD1" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    `;
+  }
+
+  function renderPlaceholderCuenta() {
+    injectGuardCSS();
+    clearMainLists();
+
+    const host = findContentHost();
+    // elimina cualquier placeholder previo
+    host.querySelectorAll(".guard-placeholder").forEach((n) => n.remove());
+
+    const box = document.createElement("section");
+    box.className = "guard-placeholder";
+    box.innerHTML = `
+      <div class="guard-hero">
+        <div class="svg">${makeWipSVG()}</div>
+        <div class="txt">
+          <h1>Estamos trabajando en ello</h1>
+          <p>Esta sección aún no está disponible para tu cuenta. Pronto tendrás más opciones aquí mismo.</p>
+          <div class="guard-actions">
+            <a href="#/cuenta" class="gc-btn">Ir a Cuenta</a>
+            <a href="/" class="gc-btn gc-btn--ghost">Volver al sitio</a>
+          </div>
+        </div>
+      </div>
+    `;
+    host.appendChild(box);
+
+    const title = document.querySelector("#mod-title");
+    if (title) title.textContent = "Cuenta";
+  }
+
+  function hideHeaderAndSearch() {
+    hideEls(HEADER_SEL);
+    hideEls(ADD_BUTTON_SEL);
+    hideEls(SEARCH_SEL);
+  }
+
+  function applyRestrictedUI() {
+    // 1) Oculta header + acciones
+    hideHeaderAndSearch();
+
+    // 2) Sidebar mínima
+    stripSidebarToCuenta();
+
+    // 3) Fuerza ruta y limpia tabla
+    if (location.hash !== "#/cuenta") {
+      // replace para no contaminar el historial
+      location.replace("#/cuenta");
+    }
+    renderPlaceholderCuenta();
+  }
+
+  // ======= Init =======
+  function init() {
+    // si ya decidió alguien, respétalo
+    if (window.__adminGuardRestricted === true) {
+      applyRestrictedUI();
+      return;
+    }
+    if (window.__adminGuardRestricted === false) {
+      return;
+    }
+
+    const uid = getUserIdFromCookie();
+    const isAdmin = uid != null && ADMIN_IDS.includes(Number(uid));
+    window.__adminGuardRestricted = !isAdmin;
+
+    if (!isAdmin) applyRestrictedUI();
+  }
+
+  // Ejecuta en cuanto haya DOM
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  // Expone por si quieres forzar en consola:
+  window.AdminGuard = { init, applyRestrictedUI };
 })();

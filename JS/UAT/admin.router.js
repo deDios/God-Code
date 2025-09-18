@@ -106,7 +106,6 @@
         ["col-status", "Status"],
       ];
     } else if (route === "#/cuenta") {
-      // Sin cabecera de tabla; el guard pinta su placeholder
       cols = [];
     }
     head.innerHTML = cols
@@ -116,7 +115,6 @@
       .join("");
   }
 
-  // Espera a que el guard marque el flag la primera vez (evita parpadeo)
   async function waitGuardFlagOnce(maxMs = 250) {
     const start = Date.now();
     while (
@@ -128,18 +126,14 @@
   }
 
   async function onRoute() {
-    // da chance a que el guard ponga el flag antes del primer route
     await waitGuardFlagOnce();
 
     const restricted = !!window.__adminGuardRestricted;
     const defaultRoute = restricted ? "#/cuenta" : "#/cursos";
     const route = location.hash || defaultRoute;
 
-    // 🔒 Si está restringido y la ruta NO es #/cuenta, redirige y sal.
     if (restricted && route !== "#/cuenta") {
-      // replace para no llenar el historial
       location.replace("#/cuenta");
-      // deja el contenedor limpio para que el guard pinte su placeholder
       clearLists();
       setTableHeaders("#/cuenta");
       setTitleByRoute("#/cuenta");
@@ -156,7 +150,6 @@
     setTableHeaders(route);
     setTitleByRoute(route);
 
-    // En modo restringido en #/cuenta, no se monta ningún módulo
     if (restricted && route === "#/cuenta") return;
 
     if (!mod) return;
@@ -169,7 +162,6 @@
   function onCreate() {
     const restricted = !!window.__adminGuardRestricted;
     if (restricted) {
-      // si alguien llega a pulsar el + en restringido, lo llevamos a cuenta
       location.replace("#/cuenta");
       return;
     }
@@ -179,7 +171,6 @@
     if (api?.openCreate) api.openCreate();
   }
 
-  // Navegación por clicks (en modo restringido, fuerza #/cuenta)
   document.addEventListener("click", (e) => {
     const a = e.target.closest('.gc-side .nav-item[href^="#/"]');
     if (!a) return;
@@ -189,7 +180,6 @@
     if (to) location.hash = to;
   });
 
-  // Wire events
   window.addEventListener("hashchange", onRoute);
   document.addEventListener("DOMContentLoaded", async () => {
     const btn = document.querySelector("#btn-add");
