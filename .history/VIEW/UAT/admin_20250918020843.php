@@ -760,7 +760,7 @@
 
                 <div class="field">
                     <label for="tf_descripcion">Descripción <span class="req">*</span></label>
-                    <textarea id="tf_descripcion" rows="8" maxlength="400" data-max="400"></textarea>
+                    <textarea id="tf_descripcion" rows="8" maxlength="800" data-max="800"></textarea>
                     <small class="char-counter" data-for="tf_descripcion"></small>
                 </div>
 

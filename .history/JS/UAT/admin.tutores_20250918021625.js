@@ -15,12 +15,12 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => Array.prototype.slice.call(r.querySelectorAll(s));
   const norm = s => String(s || "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
-  const escapeHTML = s => String(s == null ? "" : s).replace(/[&<>'"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;" }[c]));
+  const escapeHTML = s => String(s == null ? "" : s).replace(/[&<>'"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;" }[c]));
   const escapeAttr = s => String(s == null ? "" : s).replace(/"/g, "&quot;");
-  const fmtDateTime = dt => { if (!dt) return "-"; try { const sp = String(dt).split(" "); const d = sp[0] || ""; const p = d.split("-"); return `${(p[2] || "")}/${(p[1] || "")}/${(p[0] || "")} ${sp[1] || ""}`.trim(); } catch { return dt; } };
+  const fmtDateTime = dt => { if (!dt) return "-"; try { const sp=String(dt).split(" "); const d=sp[0]||""; const p=d.split("-"); return `${(p[2]||"")}/${(p[1]||"")}/${(p[0]||"")} ${sp[1]||""}`.trim(); } catch { return dt; } };
 
   // Fallbacks para utilidades globales (no rompen si ya existen)
-  const APIx = (function getAPI() {
+  const APIx = (function getAPI(){
     // Si tienes window.API definido, úsalo. Si no, armas rutas locales.
     const A = (typeof window !== "undefined" && window.API) ? window.API : {};
     return {
@@ -32,24 +32,24 @@
   })();
 
   const postJSON = (window.postJSON) || (async (url, body) => {
-    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type":"application/json" }, body: JSON.stringify(body || {}) });
+    if (!res.ok) throw new Error("HTTP "+res.status);
     return res.json();
   });
-  const gcToast = (window.gcToast) || ((m) => alert(m));
-  const statusBadge = (window.statusBadge) || ((/*tipo, s*/) => `<span class="gc-chip gray">—</span>`);
-  const statusSelect = (window.statusSelect) || ((id, val) => `<select id="${id}"><option value="1"${Number(val) === 1 ? ' selected' : ''}>Activo</option><option value="0"${Number(val) === 0 ? ' selected' : ''}>Inactivo</option><option value="2"${Number(val) === 2 ? ' selected' : ''}>Pausado</option></select>`);
-  const withBust = (window.withBust) || (u => u);
-  const noImageSvg = (window.noImageSvg) || (function () { return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' fill='%23eee'/><text x='50%' y='54%' text-anchor='middle' font-size='10' fill='%23888'>sin imagen</text></svg>`; });
-  const mediaUrlsByType = (window.mediaUrlsByType) || (/*type,id*/() => []);
-  const mountReadOnlyMedia = (window.mountReadOnlyMedia) || (() => { });
-  const disableDrawerInputs = (window.disableDrawerInputs) || (() => { });
-  const bindCopyFromPre = (window.bindCopyFromPre) || (() => { });
-  const renderPagination = (window.renderPagination) || (() => { });
-  const setSearchPlaceholder = (window.setSearchPlaceholder) || (() => { });
-  const showSkeletons = (window.showSkeletons) || (() => { });
-  const fetchAllCursosAnyStatus = (window.fetchAllCursosAnyStatus) || (async () => []);
-  const renderCursoDrawer = (window.renderCursoDrawer) || (() => "<p>Drawer Curso no disponible</p>");
+  const gcToast = (window.gcToast) || ((m)=>alert(m));
+  const statusBadge = (window.statusBadge) || ((/*tipo, s*/)=>`<span class="gc-chip gray">—</span>`);
+  const statusSelect = (window.statusSelect) || ((id, val)=>`<select id="${id}"><option value="1"${Number(val)===1?' selected':''}>Activo</option><option value="0"${Number(val)===0?' selected':''}>Inactivo</option><option value="2"${Number(val)===2?' selected':''}>Pausado</option></select>`);
+  const withBust = (window.withBust) || (u=>u);
+  const noImageSvg = (window.noImageSvg) || (function(){return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' fill='%23eee'/><text x='50%' y='54%' text-anchor='middle' font-size='10' fill='%23888'>sin imagen</text></svg>`;});
+  const mediaUrlsByType = (window.mediaUrlsByType) || (/*type,id*/()=>[]);
+  const mountReadOnlyMedia = (window.mountReadOnlyMedia) || (()=>{});
+  const disableDrawerInputs = (window.disableDrawerInputs) || (()=>{});
+  const bindCopyFromPre = (window.bindCopyFromPre) || (()=>{});
+  const renderPagination = (window.renderPagination) || (()=>{});
+  const setSearchPlaceholder = (window.setSearchPlaceholder) || (()=>{});
+  const showSkeletons = (window.showSkeletons) || (()=>{});
+  const fetchAllCursosAnyStatus = (window.fetchAllCursosAnyStatus) || (async ()=>[]);
+  const renderCursoDrawer = (window.renderCursoDrawer) || (()=>"<p>Drawer Curso no disponible</p>");
   const isAdminUser = (typeof window !== "undefined" ? window.isAdminUser : true);
   const state = (typeof window !== "undefined" && window.state) ? window.state : { currentDrawer: null, usuario: { id: 1 } };
 
@@ -58,7 +58,7 @@
     if (!file) return { ok: false, error: "Archivo inválido" };
     const okType = /image\/(png|jpeg)/i.test(file.type);
     if (!okType) return { ok: false, error: "Formato inválido. Usa JPG/PNG" };
-    const mb = file.size / (1024 * 1024);
+    const mb = file.size / (1024*1024);
     if (mb > maxMB) return { ok: false, error: `Imagen supera ${maxMB}MB` };
     return { ok: true };
   };
@@ -271,7 +271,7 @@
     if (!t) return "<p>No encontrado.</p>";
 
     const inText = (id, v, ph) => `<input id="${id}" type="text" value="${escapeAttr(v || "")}" placeholder="${escapeAttr(ph || "")}" maxlength="120" data-max="120" />`;
-    const inTA = (id, v, rows) => `<textarea id="${id}" rows="${rows || 8}" maxlength="800" data-max="800">${escapeHTML(v || "")}</textarea>`;
+    const inTA   = (id, v, rows) => `<textarea id="${id}" rows="${rows || 8}" maxlength="800" data-max="800">${escapeHTML(v || "")}</textarea>`;
 
     let headActions = "";
     if (isCreate) {
@@ -390,9 +390,9 @@
     setTimeout(() => {
       // título contextual
       const titleEl = qs("#drawer-tutor-title");
-      if (isCreate) { titleEl && (titleEl.textContent = "Tutor · Crear"); state.currentDrawer = { type: "tutor", id: null, mode: "create" }; }
-      else if (isEdit) { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""} (edición)`); state.currentDrawer = { type: "tutor", id: item?.id || null, mode: "edit" }; }
-      else { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""}`); state.currentDrawer = { type: "tutor", id: item?.id || null, mode: "view" }; }
+      if (isCreate) { titleEl && (titleEl.textContent = "Tutor · Crear"); state.currentDrawer = { type:"tutor", id:null, mode:"create" }; }
+      else if (isEdit) { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""} (edición)`); state.currentDrawer = { type:"tutor", id:item?.id||null, mode:"edit" }; }
+      else { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""}`); state.currentDrawer = { type:"tutor", id:item?.id||null, mode:"view" }; }
 
       // Habilitar/Deshabilitar inputs
       disableDrawerInputs(!(isEdit || isCreate));
@@ -400,13 +400,13 @@
       // Botones principales
       qs("#btn-edit-tutor")?.addEventListener("click", (e) => {
         e.stopPropagation();
-        state.currentDrawer = { type: "tutor", id: item?.id || null, mode: "edit" };
+        state.currentDrawer = { type:"tutor", id:item?.id||null, mode:"edit" };
         qs("#drawer-tutor-body").innerHTML = renderDrawer({ id: String(item?.id || "") });
       });
       qs("#btn-cancel-tutor")?.addEventListener("click", (e) => {
         e.stopPropagation();
         if (isCreate) { S.tempNewTutorImage = null; closeTutorDrawer(); }
-        else { state.currentDrawer = { type: "tutor", id: item?.id || null, mode: "view" }; qs("#drawer-tutor-body").innerHTML = renderDrawer({ id: String(item?.id || "") }); }
+        else { state.currentDrawer = { type:"tutor", id:item?.id||null, mode:"view" }; qs("#drawer-tutor-body").innerHTML = renderDrawer({ id: String(item?.id || "") }); }
       });
       qs("#btn-save-tutor")?.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -421,9 +421,9 @@
         const step = bDel.getAttribute("data-step") || "1";
         if (step === "1") {
           bDel.textContent = "Confirmar";
-          bDel.setAttribute("data-step", "2");
+          bDel.setAttribute("data-step","2");
           setTimeout(() => {
-            if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step", "1"); }
+            if (bDel.getAttribute("data-step") === "2") { bDel.textContent = "Eliminar"; bDel.setAttribute("data-step","1"); }
           }, 4000);
           return;
         }
@@ -458,18 +458,18 @@
             document.body.appendChild(input);
             input.addEventListener("change", () => {
               const file = input.files && input.files[0];
-              try { document.body.removeChild(input) } catch { }
+              try { document.body.removeChild(input) } catch {}
               if (!file) return;
               const v = validarImagen(file, { maxMB: 2 });
               if (!v.ok) return gcToast(v.error, "error");
               renderPreviewUI(card, file, async () => {
                 S.tempNewTutorImage = file;
-                try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch { }
+                try { if (thumb.dataset?.blobUrl) URL.revokeObjectURL(thumb.dataset.blobUrl) } catch {}
                 const blobUrl = URL.createObjectURL(file);
                 if (thumb.dataset) thumb.dataset.blobUrl = blobUrl;
                 thumb.src = blobUrl;
                 gcToast("Imagen seleccionada (se subirá al guardar)", "exito");
-              }, () => { });
+              }, () => {});
             });
             input.click();
           });
@@ -511,7 +511,7 @@
   }
 
   function readForm(existingId) {
-    const read = id => qs("#" + id)?.value || "";
+    const read = id => qs("#"+id)?.value || "";
     const readN = id => Number(read(id) || 0);
     const payload = {
       nombre: read("tf_nombre"),
@@ -605,7 +605,7 @@
       }
 
       // Orden: Activo (1) → En curso (4) → Pausado (2) → Terminado (3) → Inactivo/Cancelado (0/5)
-      const orderKey = v => ({ 1: 1, 4: 2, 2: 3, 3: 4, 0: 5, 5: 5 })[Number(v)] || 9;
+      const orderKey = v => ({1:1, 4:2, 2:3, 3:4, 0:5, 5:5})[Number(v)] || 9;
       list.sort((a, b) => orderKey(a.estatus) - orderKey(b.estatus) || String(a.nombre).localeCompare(String(b.nombre)));
 
       const statusClass = v => {
