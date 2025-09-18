@@ -1041,6 +1041,7 @@
     <div class="gc-dash-overlay" id="gc-dash-overlay"></div>
     <script src="/JS/UAT/ui/utils.admin.js"></script>
     <script src="/JS/JSglobal.js" defer></script>
+    <script src="/JS/UAT/ui/admin.guard.js"></script>
     <script src="/JS/UAT/admin.router.js" defer></script>
 
     <script src="/JS/UAT/admin.cursos.js" defer></script>
