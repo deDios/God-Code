@@ -1,4 +1,4 @@
-/* ==================== NOTICIAS (UAT) — Listado + Drawer (vista/edición) ==================== */
+/* ==================== NOTICIAS ==================== */
 (() => {
   "use strict";
 
@@ -25,7 +25,7 @@
   };
   window.__NoticiasState = S;
 
-  /* ---------- Status y orden deseado ---------- */
+  /* ---------- Status y orden ---------- */
   // Arriba→abajo: Activo → En pausa → Temporal → Cancelado
   const ORDER_NOTICIAS = [1, 2, 3, 0];
   const STATUS_LABEL = {
@@ -153,7 +153,7 @@
     return ok ? url : noImageSvgDataURI();
   }
 
-  /* ---------- Overlay de preview (con Confirm opcional) ---------- */
+  /* ---------- Overlay de preview ---------- */
   function humanSize(bytes) {
     if (!Number.isFinite(bytes)) return "—";
     if (bytes < 1024) return bytes + " B";
@@ -318,7 +318,7 @@
     const j = JSON.parse(text);
     console.log(TAG, "upload JSON:", j);
     if (!j.ok) throw new Error(j.error || "Upload fallo");
-    return j.url; // debe incluir cache-bust
+    return j.url;
   }
 
   /* ---------- Drawer helpers ---------- */
@@ -493,7 +493,7 @@
       }
     }
 
-    // Mobile
+    // Mobile (todavia no esta terminado)
     if (hostM) {
       if (pageRows.length === 0) {
         hostM.insertAdjacentHTML(
@@ -796,7 +796,7 @@
   }
   window.openNoticiaView = openNoticiaView;
 
-  /* ==================== Drawer: Edición/Creación ==================== */
+  /* ==================== Drawer: Edicion/Creacion ==================== */
   function setVal(id, v) {
     const el = qs("#" + id);
     if (el) el.value = v == null ? "" : String(v);
