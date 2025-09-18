@@ -57,20 +57,20 @@
     String(s ?? "").replace(
       /[&<>"']/g,
       (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[c])
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
     );
   const fmtMoney = (n) =>
     isFinite(+n)
       ? new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-      }).format(+n)
+          style: "currency",
+          currency: "MXN",
+        }).format(+n)
       : "-";
   const fmtBool = (v) => (+v === 1 || v === true || v === "1" ? "Sí" : "No");
   const fmtDate = (d) => (!d ? "-" : String(d));
@@ -98,13 +98,9 @@
       }
       const json = decodeURIComponent(raw.split("=")[1] || "");
       const u = JSON.parse(json);
-      console.log(TAG, "usuario(cookie) →", u);
       const n = Number(u?.id);
-      if (Number.isFinite(n)) return n;
-      console.warn(TAG, "El objeto de cookie no trae un id numérico:", u?.id);
-      return null;
-    } catch (e) {
-      console.error(TAG, "getCreatorId() error al leer cookie 'usuario':", e);
+      return Number.isFinite(n) ? n : null;
+    } catch {
       return null;
     }
   }
@@ -126,7 +122,7 @@
       const j = JSON.parse(text);
       console.log(TAG, "JSON OK:", j);
       return j;
-    } catch { }
+    } catch {}
 
     // 2) recorta bloque JSON { .. } o [ .. ]
     const firstBrace = text.indexOf("{");
@@ -143,7 +139,7 @@
         const j2 = JSON.parse(candidate);
         console.warn(TAG, "JSON trimmed:", j2);
         return j2;
-      } catch { }
+      } catch {}
     }
 
     console.warn(TAG, "JSON parse failed; returning _raw");
@@ -193,6 +189,172 @@
     return noImageSvgDataURI();
   }
 
+  /* ---------- Preview helper (ligero, respeta tu layout) ---------- */
+  function humanSize(bytes) {
+    if (!Number.isFinite(bytes)) return "—";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1048576).toFixed(2) + " MB";
+  }
+  function openImagePreview({
+    src,
+    file,
+    title = "Vista previa de imagen",
+    confirm = false,
+    onConfirm,
+  }) {
+    // construye overlay según tu snippet existente
+    const ov = document.createElement("div");
+    ov.className = "gc-preview-overlay";
+    ov.setAttribute("role", "dialog");
+    ov.setAttribute("aria-modal", "true");
+    ov.style.position = "fixed";
+    ov.style.inset = "0";
+    ov.style.zIndex = "99999";
+    ov.style.display = "flex";
+    ov.style.alignItems = "center";
+    ov.style.justifyContent = "center";
+    ov.style.background = "rgba(17,24,39,0.55)";
+    ov.style.backdropFilter = "saturate(120%) blur(2px)";
+
+    const modal = document.createElement("div");
+    modal.className = "gc-preview-modal";
+    modal.style.background = "#fff";
+    modal.style.borderRadius = "14px";
+    modal.style.boxShadow = "0 20px 40px rgba(0,0,0,.25)";
+    modal.style.width = "min(920px,94vw)";
+    modal.style.maxHeight = "90vh";
+    modal.style.overflow = "hidden";
+    modal.style.display = "flex";
+    modal.style.flexDirection = "column";
+
+    const head = document.createElement("div");
+    head.style.display = "flex";
+    head.style.alignItems = "center";
+    head.style.justifyContent = "space-between";
+    head.style.gap = "8px";
+    head.style.padding = "12px 16px";
+    head.style.borderBottom = "1px solid #eee";
+    head.innerHTML = `<div style="font-weight:700;font-size:1.05rem;">${esc(
+      title
+    )}</div>
+      <button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>`;
+
+    const body = document.createElement("div");
+    body.style.display = "grid";
+    body.style.gridTemplateColumns = "1fr 280px";
+    body.style.gap = "16px";
+    body.style.padding = "16px";
+    body.style.alignItems = "start";
+
+    const left = document.createElement("div");
+    left.style.border = "1px solid #eee";
+    left.style.borderRadius = "12px";
+    left.style.padding = "8px";
+    left.style.background = "#fafafa";
+    left.style.display = "flex";
+    left.style.alignItems = "center";
+    left.style.justifyContent = "center";
+    left.style.minHeight = "320px";
+    left.style.maxHeight = "60vh";
+    const img = document.createElement("img");
+    img.alt = "Vista previa";
+    img.style.maxWidth = "100%";
+    img.style.maxHeight = "100%";
+    img.style.objectFit = "contain";
+    img.style.borderRadius = "8px";
+    img.src = src || (file ? URL.createObjectURL(file) : "");
+    left.appendChild(img);
+
+    const right = document.createElement("div");
+    right.style.borderLeft = "1px dashed #e6e6e6";
+    right.style.paddingLeft = "16px";
+    right.style.display = "flex";
+    right.style.flexDirection = "column";
+    right.style.gap = "10px";
+    right.innerHTML = `
+      <div style="font-weight:600;">Detalles</div>
+      <div style="font-size:.92rem;color:#444;line-height:1.35;">
+        ${
+          file
+            ? `<div><strong>Archivo:</strong> ${esc(file.name || "-")}</div>
+               <div><strong>Peso:</strong> ${humanSize(file.size || 0)}</div>
+               <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>`
+            : `<div style="color:#666;">Solo lectura</div>`
+        }
+        <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
+      </div>
+      <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
+        ${
+          confirm
+            ? `<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>`
+            : ``
+        }
+        <button class="gc-btn gc-btn--ghost" data-act="cancel">Cerrar</button>
+      </div>
+    `;
+
+    body.append(left, right);
+    modal.append(head, body);
+    ov.appendChild(modal);
+    document.body.appendChild(ov);
+
+    const close = () => {
+      try {
+        document.activeElement && document.activeElement.blur();
+      } catch {}
+      ov.remove();
+      if (file && img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+    };
+
+    ov.addEventListener("click", (e) => {
+      if (e.target === ov) close();
+    });
+    ov.querySelector('[data-act="close"]')?.addEventListener("click", close);
+    ov.querySelector('[data-act="cancel"]')?.addEventListener("click", close);
+    ov.querySelector('[data-act="confirm"]')?.addEventListener(
+      "click",
+      async () => {
+        try {
+          if (typeof onConfirm === "function") await onConfirm();
+        } finally {
+          close();
+        }
+      }
+    );
+
+    return { close };
+  }
+
+  function validarImagen(file, maxMB = 2) {
+    if (!file) return { ok: false, error: "No seleccionaste archivo." };
+    if (!/image\/(png|jpeg)/.test(file.type))
+      return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
+    if (file.size > maxMB * 1048576)
+      return { ok: false, error: `La imagen excede ${maxMB}MB.` };
+    return { ok: true };
+  }
+
+  async function uploadCursoCover(cursoId, file) {
+    if (!cursoId) throw new Error("Falta cursoId para subir imagen");
+    console.log(TAG, "uploadCursoCover id=", cursoId, file);
+    const fd = new FormData();
+    fd.append("curso_id", String(cursoId)); // verifica que tu PHP espere esta clave
+    fd.append("imagen", file); // verifica nombre del field en PHP
+    const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
+    const text = await res.text().catch(() => "");
+    console.log(TAG, "upload HTTP", res.status, "raw:", text);
+    if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
+    try {
+      const j = JSON.parse(text);
+      console.log(TAG, "upload JSON:", j);
+      return j && j.url ? String(j.url) : cursoImgUrl(cursoId || 0);
+    } catch {
+      console.warn(TAG, "upload parse fallback");
+      return cursoImgUrl(cursoId || 0);
+    }
+  }
+
   /* ---------- Drawer helpers (Cursos) ---------- */
   function openDrawerCurso() {
     console.log(TAG, "openDrawerCurso()");
@@ -202,36 +364,51 @@
     d.classList.add("open");
     d.removeAttribute("hidden");
     d.setAttribute("aria-hidden", "false");
-    ov && ov.classList.add("open");
+    if (ov) {
+      ov.classList.add("open");
+      ov.hidden = false;
+      ov.setAttribute("aria-hidden", "false");
+      if (!ov._b_curso) {
+        ov._b_curso = true;
+        ov.addEventListener("click", closeDrawerCurso);
+      }
+    }
+    // botón cerrar
+    qsa("#drawer-curso-close").forEach((b) => {
+      if (!b._b) {
+        b._b = true;
+        b.addEventListener("click", (e) => {
+          e.preventDefault();
+          closeDrawerCurso();
+        });
+      }
+    });
+    // ESC
+    if (!window._gc_cursos_esc) {
+      window._gc_cursos_esc = true;
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeDrawerCurso();
+      });
+    }
   }
   function closeDrawerCurso() {
     console.log(TAG, "closeDrawerCurso()");
     const d = qs("#drawer-curso"),
       ov = qs("#gc-dash-overlay");
     if (!d) return;
+    try {
+      const ae = document.activeElement;
+      if (ae && d.contains(ae)) ae.blur();
+    } catch {}
     d.classList.remove("open");
     d.setAttribute("hidden", "");
     d.setAttribute("aria-hidden", "true");
-    ov && ov.classList.remove("open");
-    S.current = null;
-  }
-  // binds 1 vez básicos
-  qsa("#drawer-curso-close").forEach((b) => {
-    if (!b._b) {
-      b._b = true;
-      b.addEventListener("click", closeDrawerCurso);
+    if (ov) {
+      ov.classList.remove("open");
+      ov.hidden = true;
+      ov.setAttribute("aria-hidden", "true");
     }
-  });
-  const _ov = qs("#gc-dash-overlay");
-  if (_ov && !_ov._b) {
-    _ov._b = true;
-    _ov.addEventListener("click", closeDrawerCurso);
-  }
-  if (!window._gc_cursos_esc) {
-    window._gc_cursos_esc = true;
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeDrawerCurso();
-    });
+    S.current = null;
   }
 
   /* ---------- Map helpers ---------- */
@@ -329,6 +506,12 @@
     renderCursos();
   }
 
+  function statusText(estatus) {
+    if (window.gcTone?.statusLabel)
+      return window.gcTone.statusLabel("cursos", estatus);
+    return STATUS_LABEL[estatus] || estatus;
+  }
+
   function renderCursos() {
     console.log(TAG, "renderCursos() page", S.page, "search=", S.search);
     const hostD = qs("#recursos-list");
@@ -338,7 +521,13 @@
 
     const term = normalize(S.search);
     const filtered = term
-      ? S.data.filter((row) => normalize(JSON.stringify(row)).includes(term))
+      ? S.data.filter((row) =>
+          normalize(
+            `${row.nombre} ${mapLabel(S.maps.tutores, row.tutor)} ${
+              row.fecha_inicio
+            } ${row.estatus} ${JSON.stringify(row)}`
+          ).includes(term)
+        )
       : S.data;
 
     const modCount = qs("#mod-count");
@@ -361,19 +550,23 @@
         );
       } else {
         pageRows.forEach((it) => {
-          const est = STATUS_LABEL[it.estatus] || it.estatus;
+          const statusHTML = window.statusBadge
+            ? window.statusBadge("cursos", it.estatus)
+            : esc(statusText(it.estatus));
           hostD.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row" role="row" data-mod="curso" data-id="${it.id}">
+            <div class="table-row" role="row" data-mod="curso" data-id="${
+              it.id
+            }">
               <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
               <div class="col-tutor"  role="cell">${esc(
-              mapLabel(S.maps.tutores, it.tutor)
-            )}</div>
+                mapLabel(S.maps.tutores, it.tutor)
+              )}</div>
               <div class="col-fecha"  role="cell">${esc(
-              fmtDate(it.fecha_inicio)
-            )}</div>
-              <div class="col-status" role="cell">${esc(est)}</div>
+                fmtDate(it.fecha_inicio)
+              )}</div>
+              <div class="col-status" role="cell">${statusHTML}</div>
             </div>
           `
           );
@@ -414,8 +607,8 @@
             btn.addEventListener("click", (e) => {
               e.stopPropagation();
               const id = Number(
-                btn.closest('.table-row-mobile[data-mod="curso"]')?.dataset.id ||
-                0
+                btn.closest('.table-row-mobile[data-mod="curso"]')?.dataset
+                  .id || 0
               );
               console.log(TAG, "open mobile id=", id);
               if (id) openCursoView(id);
@@ -476,15 +669,35 @@
     });
   }
 
-  // búsqueda (bind 1 vez)
-  const searchInput = qs("#search-input");
-  if (searchInput && !searchInput._b) {
-    searchInput._b = true;
-    searchInput.addEventListener("input", (e) => {
-      S.search = e.target.value || "";
-      S.page = 1;
-      renderCursos();
-    });
+  /* ---------- Búsqueda: usa utils.admin.js si existe ---------- */
+  function wireSearch() {
+    const ph = "Buscar cursos…";
+    if (window.gcSearch?.register) {
+      if (!window._search_cursos_wired) {
+        window._search_cursos_wired = true;
+        window.gcSearch.register(
+          "#/cursos",
+          (q) => {
+            S.search = q || "";
+            S.page = 1;
+            renderCursos();
+          },
+          { placeholder: ph }
+        );
+      }
+    } else {
+      // fallback local (si no está gcSearch)
+      const s = qs("#search-input");
+      if (s && !s._b) {
+        s._b = true;
+        s.placeholder = ph;
+        s.addEventListener("input", (e) => {
+          S.search = e.target.value || "";
+          S.page = 1;
+          renderCursos();
+        });
+      }
+    }
   }
 
   /* ==================== Drawer: Vista ==================== */
@@ -505,10 +718,6 @@
   }
   window.setDrawerMode = setDrawerMode; // compat
 
-  function setNoticiaDrawerGuard() {
-    // noop; cursos usa su propio drawer
-  }
-
   function put(sel, val) {
     const el = qs(sel);
     if (el) el.innerHTML = esc(val ?? "—");
@@ -526,19 +735,29 @@
         <div class="media-card">
           <figure class="media-thumb">
             <img alt="Portada" id="curso-cover-view" loading="eager" src="${esc(
-      url
-    )}">
+              url
+            )}">
           </figure>
           <div class="media-meta"><div class="media-label">Portada</div></div>
         </div>
       </div>
     `;
     const img = containerEl.querySelector("#curso-cover-view");
-    if (img)
+    if (img) {
       img.onerror = () => {
         img.onerror = null;
         img.src = noImageSvgDataURI();
       };
+      // Preview solo lectura al hacer click
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => {
+        openImagePreview({
+          src: img.src,
+          confirm: false,
+          title: "Vista previa de portada",
+        });
+      });
+    }
   }
 
   function paintActions(it) {
@@ -641,14 +860,19 @@
     const row =
       qs(`.table-row[data-mod="curso"][data-id="${id}"]`) ||
       qs(`.table-row-mobile[data-mod="curso"][data-id="${id}"]`);
-    if (!row) return;
-    const cell =
-      row.querySelector(".col-status") ||
-      row.querySelector(".status") ||
-      row.querySelector(".col-nombre"); // fallback
-    if (cell) cell.textContent = STATUS_LABEL[estatus] || estatus;
-    // también refresca campo en vista
-    put("#v_estatus", STATUS_LABEL[estatus] || estatus);
+    if (row) {
+      const cell =
+        row.querySelector(".col-status") ||
+        row.querySelector(".status") ||
+        row.querySelector(".col-nombre"); // fallback
+      if (cell) {
+        if (window.statusBadge)
+          cell.innerHTML = window.statusBadge("cursos", estatus);
+        else cell.textContent = statusText(estatus);
+      }
+    }
+    // también refresca campo en vista (texto plano)
+    put("#v_estatus", statusText(estatus));
   }
 
   async function fillCursoView(it) {
@@ -679,7 +903,7 @@
     put("#v_precio", it.precio ? fmtMoney(it.precio) : "-");
     put("#v_certificado", fmtBool(it.certificado));
     put("#v_fecha", fmtDate(it.fecha_inicio));
-    put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
+    put("#v_estatus", statusText(it.estatus));
 
     await mountCursoMediaView(qs("#media-curso"), it.id);
 
@@ -694,7 +918,11 @@
   async function openCursoView(id) {
     // Evita colisiones con otros módulos (Noticias, etc.)
     if (window.__activeModule && window.__activeModule !== "cursos") {
-      console.log(TAG, "openCursoView ignorado; módulo activo:", window.__activeModule);
+      console.log(
+        TAG,
+        "openCursoView ignorado; módulo activo:",
+        window.__activeModule
+      );
       return;
     }
     const it = (S.data || []).find((x) => +x.id === +id);
@@ -743,45 +971,11 @@
     el.innerHTML = opts
       .map(
         (o) =>
-          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${o.l
+          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${
+            o.l
           }</option>`
       )
       .join("");
-  }
-
-  function humanSize(bytes) {
-    if (!Number.isFinite(bytes)) return "—";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / 1048576).toFixed(2) + " MB";
-  }
-  function validarImagen(file, maxMB = 2) {
-    if (!file) return { ok: false, error: "No seleccionaste archivo." };
-    if (!/image\/(png|jpeg)/.test(file.type))
-      return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
-    if (file.size > maxMB * 1048576)
-      return { ok: false, error: `La imagen excede ${maxMB}MB.` };
-    return { ok: true };
-  }
-
-  async function uploadCursoCover(cursoId, file) {
-    if (!cursoId) throw new Error("Falta cursoId para subir imagen");
-    console.log(TAG, "uploadCursoCover id=", cursoId, file);
-    const fd = new FormData();
-    fd.append("curso_id", String(cursoId)); // verifica que tu PHP espere esta clave
-    fd.append("imagen", file); // verifica nombre del field en PHP
-    const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
-    const text = await res.text().catch(() => "");
-    console.log(TAG, "upload HTTP", res.status, "raw:", text);
-    if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
-    try {
-      const j = JSON.parse(text);
-      console.log(TAG, "upload JSON:", j);
-      return j && j.url ? String(j.url) : cursoImgUrl(cursoId || 0);
-    } catch {
-      console.warn(TAG, "upload parse fallback");
-      return cursoImgUrl(cursoId || 0);
-    }
   }
 
   function mountCursoMediaEdit(containerEl, cursoId) {
@@ -808,21 +1002,14 @@
     const img = containerEl.querySelector("#curso-cover-edit");
     const pencil = containerEl.querySelector(".media-edit");
 
-    if (cursoId) {
-      (async () => {
-        img.src = await resolveCursoImg(cursoId);
-      })();
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = noImageSvgDataURI();
-      };
-    } else {
-      img.src = noImageSvgDataURI(); // crear: placeholder
-      if (S.tempNewCourseImage instanceof File) {
-        const u = URL.createObjectURL(S.tempNewCourseImage);
-        img.src = u;
-      }
-    }
+    (async () => {
+      if (cursoId) img.src = await resolveCursoImg(cursoId);
+      else img.src = noImageSvgDataURI();
+    })();
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = noImageSvgDataURI();
+    };
 
     if (!pencil || pencil._b) return;
     pencil._b = true;
@@ -842,25 +1029,33 @@
           return;
         }
 
-        if (!cursoId) {
-          const url = URL.createObjectURL(file);
-          img.src = withBust(url);
-          S.tempNewCourseImage = file;
-          toast("Imagen lista; se subirá al guardar.", "info");
-          return;
-        }
-
-        // editar: subir
-        const overlay = confirm("¿Subir nueva imagen de portada?");
-        if (!overlay) return;
-        try {
-          const newUrl = await uploadCursoCover(cursoId, file);
-          img.src = withBust(newUrl);
-          toast("Imagen actualizada", "exito");
-        } catch (err) {
-          console.error(TAG, "upload error", err);
-          toast("No se pudo subir la imagen", "error");
-        }
+        // Abre preview con confirm
+        openImagePreview({
+          file,
+          confirm: true,
+          title: "Vista previa de portada",
+          onConfirm: async () => {
+            if (!cursoId) {
+              // crear: solo guarda en buffer y muestra imagen local
+              const url = URL.createObjectURL(file);
+              img.src = withBust(url);
+              S.tempNewCourseImage = file;
+              toast("Imagen lista; se subirá al guardar.", "info");
+              return;
+            }
+            // editar: subir de inmediato
+            try {
+              const newUrl = await uploadCursoCover(cursoId, file);
+              img.src = withBust(newUrl);
+              const imgView = document.querySelector("#curso-cover-view");
+              if (imgView) imgView.src = withBust(newUrl);
+              toast("Imagen actualizada", "exito");
+            } catch (err) {
+              console.error(TAG, "upload error", err);
+              toast("No se pudo subir la imagen", "error");
+            }
+          },
+        });
       });
       input.click();
     });
@@ -934,7 +1129,7 @@
     const it = (S.data || []).find((x) => +x.id === +id);
     if (it) {
       S.current = { id: it.id, _all: it };
-      put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
+      put("#v_estatus", statusText(it.estatus));
       const pre = qs("#json-curso");
       if (pre) pre.textContent = JSON.stringify(it, null, 2);
     }
@@ -1062,17 +1257,7 @@
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadCatalogos();
       await loadCursos();
-
-      // bind búsqueda por si el router no lo hizo aún
-      const s = qs("#search-input");
-      if (s && !s._b) {
-        s._b = true;
-        s.addEventListener("input", (e) => {
-          S.search = e.target.value || "";
-          S.page = 1;
-          renderCursos();
-        });
-      }
+      wireSearch();
       console.log(TAG, "mount() OK");
     } catch (e) {
       console.error(TAG, "mount() ERROR:", e);
@@ -1112,9 +1297,6 @@
 
   // expone API pública para el router
   window.cursos = { mount, openCreate: openCursoCreate };
-
-  // opcional/legacy
-  window.cursosLoad = { loadCatalogos, loadCursos };
 
   console.log(TAG, "Módulo cursos cargado.");
 })();

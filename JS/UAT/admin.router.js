@@ -1,4 +1,12 @@
 // admin.router.js (router-lite)
+import "/JS/UAT/gc.searchbar.js";
+
+async function onRoute() {
+  const route = location.hash || "#/cursos";
+  gcSearch.setRoute(route);   
+}
+
+
 (() => {
   const qs = (s, r = document) => r.querySelector(s);
 
@@ -124,6 +132,8 @@
   async function onRoute() {
     const route = location.hash || "#/cursos";
     const mod = modules[route] || modules["#/cursos"];
+
+    gcSearch.setRoute(route);
 
     setActive(route);
     clearLists();

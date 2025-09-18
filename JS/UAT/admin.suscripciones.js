@@ -902,6 +902,18 @@
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadCatalogos();
       await load();
+      if (!window._search_cursos_wired) {
+        window._search_cursos_wired = true;
+        gcSearch.register(
+          "#/cursos",
+          (q) => {
+            S.search = q;
+            S.page = 1;
+            renderCursos(); // tu render normal
+          },
+          { placeholder: "Buscar cursos…" }
+        );
+      }
       console.log(TAG, "mount() OK");
     } catch (e) {
       console.error(TAG, "mount ERROR:", e);
