@@ -1044,8 +1044,6 @@
     <script src="/JS/UAT/ui/admin.guard.js"></script>
     <script src="/JS/UAT/admin.router.js" defer></script>
 
-    <script src="/JS/UAT/admin.cursos.js" defer></script>
-
 </body>
 
 </html>
