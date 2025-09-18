@@ -47,7 +47,7 @@
     String(s ?? "").replace(
       /[&<>"']/g,
       (c) =>
-        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+        ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])
     );
   const fmtDate = (d) => (!d ? "—" : String(d));
   const normalize = (s) =>
@@ -102,7 +102,7 @@
       const j = JSON.parse(text);
       console.log(TAG, "JSON OK:", j);
       return j;
-    } catch { }
+    } catch {}
 
     // fallback a recorte {..} ó [..]
     const firstBrace = text.indexOf("{");
@@ -119,7 +119,7 @@
         const j2 = JSON.parse(candidate);
         console.warn(TAG, "JSON trimmed:", j2);
         return j2;
-      } catch { }
+      } catch {}
     }
 
     console.warn(TAG, "JSON parse failed; returning _raw");
