@@ -7,11 +7,12 @@
   const API_BASE =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/";
   const API = {
-    suscripciones: (window.API?.suscripciones) || (API_BASE + "c_suscripciones.php"),
-    iInscripcion:  (window.API?.iInscripcion)  || (API_BASE + "i_inscripcion.php"),
-    uInscripcion:  (window.API?.uInscripcion)  || (API_BASE + "u_inscripcion.php"),
-    cursos:        (window.API?.cursos)        || (API_BASE + "c_cursos.php"),
-    usuarios:      (window.API?.usuarios)      || (API_BASE + "c_usuarios.php"),
+    suscripciones:
+      window.API?.suscripciones || API_BASE + "c_suscripciones.php",
+    iInscripcion: window.API?.iInscripcion || API_BASE + "i_inscripcion.php",
+    uInscripcion: window.API?.uInscripcion || API_BASE + "u_inscripcion.php",
+    cursos: window.API?.cursos || API_BASE + "c_cursos.php",
+    usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php",
   };
 
   /* ---------- Estado ---------- */
@@ -28,20 +29,26 @@
   window.__SuscripcionesState = S;
 
   /* ---------- Utils ---------- */
-  const qs  = (s, r = document) => r.querySelector(s);
+  const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
-    String(s ?? "").replace(/[&<>"']/g, (c) => (
-      { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
-    ));
-
+    String(s ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
+    );
   const norm = (s) =>
     String(s || "")
       .normalize("NFD")
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
-
   const fmtDateTime = (dt) => {
     if (!dt) return "-";
     try {
@@ -52,121 +59,92 @@
       return dt;
     }
   };
-
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
     console.log(`${TAG} toast[${type}]:`, msg);
   }
 
   async function postJSON(url, body) {
-    console.log(TAG, "POST", url, { body });
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
     const text = await r.text().catch(() => "");
-    console.log(TAG, "HTTP", r.status, "raw:", text);
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
+    if (!text.trim()) return {};
     try {
-      const j = JSON.parse(text);
-      console.log(TAG, "JSON OK:", j);
-      return j;
+      return JSON.parse(text);
     } catch {}
-    const fb = text.indexOf("{"),  lb = text.lastIndexOf("}");
-    const fb2 = text.indexOf("["), lb2 = text.lastIndexOf("]");
+    const fb = text.indexOf("{"),
+      lb = text.lastIndexOf("}");
+    const fb2 = text.indexOf("["),
+      lb2 = text.lastIndexOf("]");
     let c = "";
     if (fb !== -1 && lb !== -1 && lb > fb) c = text.slice(fb, lb + 1);
-    else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2) c = text.slice(fb2, lb2 + 1);
+    else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2)
+      c = text.slice(fb2, lb2 + 1);
     if (c) {
-      try { const j2 = JSON.parse(c); console.warn(TAG, "JSON trimmed:", j2); return j2; } catch {}
+      try {
+        return JSON.parse(c);
+      } catch {}
     }
-    console.warn(TAG, "JSON parse failed; returning _raw");
     return { _raw: text };
   }
 
   function getCreatorId() {
     try {
-      const raw = document.cookie.split("; ").find((r) => r.startsWith("usuario="));
+      const raw = document.cookie
+        .split("; ")
+        .find((r) => r.startsWith("usuario="));
       if (!raw) return null;
       const json = decodeURIComponent(raw.split("=")[1] || "");
       const u = JSON.parse(json);
       const n = Number(u?.id);
       return Number.isFinite(n) ? n : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   }
 
-  function arrToMap(arr) {
+  const arrToMap = (arr) => {
     const m = {};
     (Array.isArray(arr) ? arr : []).forEach((x) => {
-      if (x && x.id != null) m[x.id] = x.nombre || x.titulo || `#${x.id}`;
+      if (x && x.id != null)
+        m[String(x.id)] = x.nombre || x.titulo || `#${x.id}`;
     });
     return m;
-  }
+  };
+
   function mapCursosLabel(id) {
     const m = S.maps.cursos || {};
     const k = String(id ?? "");
-    return k in m ? (m[k] || `#${id}`) : `#${id}`;
+    return k in m ? m[k] || `#${id}` : `#${id}`;
   }
   function mapUserLabel(id) {
     const m = S.maps.usuarios || {};
     const k = String(id ?? "");
-    return k in m ? (m[k] || `#${id}`) : `#${id}`;
+    return k in m ? m[k] || `#${id}` : `#${id}`;
   }
 
-  // ---------- Resolve user name (mejorado con pistas teléfono/correo) ----------
-  async function resolveUserName(id, hints = {}) {
-    const k = String(id || "");
-    if (!k) return null;
-    if (k in S.maps.usuarios) return S.maps.usuarios[k];
-
-    // 1) Si hay pistas (tel/correo), probamos primero con ellas
-    const tel  = (hints.telefono || "").trim();
-    const mail = (hints.correo   || "").trim();
-    if (tel || mail) {
-      try {
-        const res = await postJSON(API.usuarios, {
-          telefono: tel || undefined,
-          correo:   mail || undefined,
-          // estatus: "1", // opcional
-        });
-        const arr = Array.isArray(res) ? res
-          : Array.isArray(res?.data) ? res.data
-          : Array.isArray(res?.usuarios) ? res.usuarios
-          : (res && typeof res === "object") ? [res] : [];
-        const u = arr[0];
-        if (u) {
-          const nombre = u.nombre_completo || u.nombre || `#${id}`;
-          S.maps.usuarios[k] = nombre;
-          return nombre;
-        }
-      } catch (e) {
-        console.warn(TAG, "resolveUserName (tel/correo) falló:", e);
-      }
-    }
-
-    // 2) Fallback por id
-    const shapes = [{ id }, { usuario: id }, { usuario_id: id }, { alumno: id }, { alumno_id: id }];
-    for (const body of shapes) {
-      try {
-        const res = await postJSON(API.usuarios, body);
-        const arr = Array.isArray(res) ? res
-          : Array.isArray(res?.data) ? res.data
-          : Array.isArray(res?.usuarios) ? res.usuarios
-          : (res && typeof res === "object") ? [res] : [];
-        const u = arr[0];
-        if (u) {
-          const nombre = u.nombre_completo || u.nombre || `#${id}`;
-          S.maps.usuarios[k] = nombre;
-          return nombre;
-        }
-      } catch {}
-    }
-
-    // 3) Último recurso
-    S.maps.usuarios[k] = `#${id}`;
-    return S.maps.usuarios[k];
+  // ======= NUEVO: precarga de mapa de usuarios (cualquier estatus) =======
+  async function getUsuariosMapAnyStatus() {
+    // Intentamos cubrir 1,0,2,3. Si alguno falla, lo tratamos como []
+    const [e1, e0, e2, e3] = await Promise.all([
+      postJSON(API.usuarios, { estatus: 1 }).catch(() => []),
+      postJSON(API.usuarios, { estatus: 0 }).catch(() => []),
+      postJSON(API.usuarios, { estatus: 2 }).catch(() => []),
+      postJSON(API.usuarios, { estatus: 3 }).catch(() => []),
+    ]);
+    const all = []
+      .concat(Array.isArray(e1) ? e1 : [])
+      .concat(Array.isArray(e0) ? e0 : [])
+      .concat(Array.isArray(e2) ? e2 : [])
+      .concat(Array.isArray(e3) ? e3 : []);
+    S.maps.usuarios = arrToMap(all);
+    return S.maps.usuarios;
   }
+  // =========================================================
 
   const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
   function statusBadge(tipo, s) {
@@ -177,7 +155,12 @@
   function statusSelect(id, val) {
     const v = Number(val);
     const opts = Object.entries(STATUS_LABEL)
-      .map(([k, lab]) => `<option value="${k}"${Number(k) === v ? " selected" : ""}>${lab}</option>`)
+      .map(
+        ([k, lab]) =>
+          `<option value="${k}"${
+            Number(k) === v ? " selected" : ""
+          }>${lab}</option>`
+      )
       .join("");
     return `<select id="${id}">${opts}</select>`;
   }
@@ -186,7 +169,10 @@
   function ensureDrawerDOM() {
     if (qs("#drawer-suscripcion")) {
       const btn = qs("#drawer-suscripcion-close");
-      if (btn && !btn._b) { btn._b = true; btn.addEventListener("click", closeDrawer); }
+      if (btn && !btn._b) {
+        btn._b = true;
+        btn.addEventListener("click", closeDrawer);
+      }
       return;
     }
     const wrap = document.createElement("div");
@@ -223,8 +209,7 @@
     const overlay = qs("#gc-dash-overlay");
     if (!aside) return;
     try {
-      const ae = document.activeElement;
-      if (ae && aside.contains(ae)) ae.blur();
+      document.activeElement?.blur?.();
     } catch {}
     aside.classList.remove("open");
     aside.setAttribute("hidden", "");
@@ -252,9 +237,11 @@
       document.addEventListener("click", (e) => {
         const t = e.target;
         if (!t) return;
-        if (t.id === "drawer-suscripcion-close" || t.closest?.("#drawer-suscripcion-close")) {
+        if (
+          t.id === "drawer-suscripcion-close" ||
+          t.closest?.("#drawer-suscripcion-close")
+        )
           closeDrawer();
-        }
       });
     }
   })();
@@ -262,14 +249,14 @@
   /* ---------- Catálogos ---------- */
   async function loadCatalogos() {
     try {
-      // Trae cursos activos/pausados/en curso para seleccionar en "Crear"
       const stsList = [1, 2, 4];
       const chunks = await Promise.all(
-        stsList.map((st) => postJSON(API.cursos, { estatus: st }).catch(() => []))
+        stsList.map((st) =>
+          postJSON(API.cursos, { estatus: st }).catch(() => [])
+        )
       );
       const flat = chunks.flat().filter(Boolean);
       S.maps.cursos = arrToMap(flat);
-      console.log(TAG, "Catálogo cursos:", S.maps.cursos);
     } catch (e) {
       console.warn(TAG, "No se pudieron cargar catálogos de cursos:", e);
     }
@@ -277,24 +264,46 @@
 
   /* ---------- Listado ---------- */
   async function load() {
-    console.log(TAG, "load()…");
     try {
+      // 1) Asegurar mapa de usuarios con nombres
+      if (!S.maps.usuarios || !Object.keys(S.maps.usuarios).length) {
+        await getUsuariosMapAnyStatus();
+      }
+
+      // 2) Cargar suscripciones por estatus
       const sts = [1, 0, 2];
       const chunks = await Promise.all(
-        sts.map((st) => postJSON(API.suscripciones, { estatus: st }).catch(() => []))
+        sts.map((st) =>
+          postJSON(API.suscripciones, { estatus: st }).catch(() => [])
+        )
       );
       const flat = chunks.flat().filter(Boolean);
-
       S.raw = flat;
+
+      // 3) Normalizar filas y resolver nombres
       S.data = flat.map((x) => {
         const id = Number(x.id ?? x.suscripcion_id ?? x.inscripcion_id ?? 0);
         const usuario_id =
-          Number(x.usuario_id ?? x.user_id ?? x.alumno ?? x.alumno_id ?? x.usuario ?? 0) || null;
+          Number(
+            x.usuario_id ??
+              x.user_id ??
+              x.alumno ??
+              x.alumno_id ??
+              x.usuario ??
+              0
+          ) || null;
         const curso_id =
           Number(x.curso ?? x.curso_id ?? x.id_curso ?? 0) || null;
-
         const nombreInline =
-          x.alumno_nombre || x.usuario_nombre || x.suscriptor || x.usuario || null;
+          x.alumno_nombre ||
+          x.usuario_nombre ||
+          x.suscriptor ||
+          x.usuario ||
+          x.user ||
+          null;
+
+        const alumnoNombre =
+          nombreInline || (usuario_id ? mapUserLabel(usuario_id) : null);
 
         return {
           id,
@@ -303,35 +312,9 @@
           estatus: Number(x.estatus ?? x.status ?? 0),
           fecha_creacion: x.fecha_creacion ?? x.creado ?? x.created_at ?? null,
           comentario: x.comentario ?? x.nota ?? "",
-          alumnoNombre: nombreInline,
+          alumnoNombre,
           _all: x,
         };
-      });
-
-      // Resolver nombres faltantes con pistas (tel/correo) del objeto original
-      const picks = (o, keys) => {
-        for (const k of keys) {
-          const v = o?.[k];
-          if (v != null && String(v).trim() !== "") return String(v).trim();
-        }
-        return "";
-      };
-
-      const missing = S.data.filter((r) => !r.alumnoNombre && r.usuario_id);
-      await Promise.all(
-        missing.map(async (r) => {
-          const hints = {
-            telefono: picks(r._all, ["telefono", "tel", "celular", "user_tel", "phone"]),
-            correo:   picks(r._all, ["correo", "email", "mail"]),
-          };
-          const name = await resolveUserName(r.usuario_id, hints);
-          if (name) r.alumnoNombre = name;
-        })
-      );
-
-      // Rellena con el mapa cache si aún falta
-      S.data.forEach((r) => {
-        if (!r.alumnoNombre && r.usuario_id) r.alumnoNombre = mapUserLabel(r.usuario_id);
       });
 
       S.page = 1;
@@ -346,7 +329,7 @@
 
   function render() {
     const hostD = qs("#recursos-list"),
-          hostM = qs("#recursos-list-mobile");
+      hostM = qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
     if (hostM) hostM.innerHTML = "";
 
@@ -354,13 +337,18 @@
     const filtered = term
       ? S.data.filter((r) =>
           norm(
-            `${r.alumnoNombre || ""} ${mapCursosLabel(r.curso)} ${(r._all?.correo || "")} ${(r._all?.telefono || r._all?.tel || "")}`
+            `${r.alumnoNombre || ""} ${mapCursosLabel(
+              r.curso
+            )} ${JSON.stringify(r._all || {})}`
           ).includes(term)
         )
       : S.data;
 
     const modCount = qs("#mod-count");
-    if (modCount) modCount.textContent = `${filtered.length} ${filtered.length === 1 ? "elemento" : "elementos"}`;
+    if (modCount)
+      modCount.textContent = `${filtered.length} ${
+        filtered.length === 1 ? "elemento" : "elementos"
+      }`;
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
     if (S.page > totalPages) S.page = totalPages;
@@ -379,11 +367,22 @@
           hostD.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row" role="row" data-mod="suscripcion" data-id="${it.id}">
-              <div class="col-nombre" role="cell">${esc(String(it.alumnoNombre || "—"))}</div>
-              <div class="col-curso"  role="cell">${esc(mapCursosLabel(it.curso))}</div>
-              <div class="col-fecha"  role="cell">${esc(fmtDateTime(it.fecha_creacion))}</div>
-              <div class="col-status" role="cell">${statusBadge("suscripciones", it.estatus)}</div>
+            <div class="table-row" role="row" data-mod="suscripcion" data-id="${
+              it.id
+            }">
+              <div class="col-nombre" role="cell">${esc(
+                String(it.alumnoNombre || "—")
+              )}</div>
+              <div class="col-curso"  role="cell">${esc(
+                mapCursosLabel(it.curso)
+              )}</div>
+              <div class="col-fecha"  role="cell">${esc(
+                fmtDateTime(it.fecha_creacion)
+              )}</div>
+              <div class="col-status" role="cell">${statusBadge(
+                "suscripciones",
+                it.estatus
+              )}</div>
             </div>
           `
           );
@@ -410,7 +409,9 @@
           hostM.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row-mobile" data-mod="suscripcion" data-id="${it.id}">
+            <div class="table-row-mobile" data-mod="suscripcion" data-id="${
+              it.id
+            }">
               <div class="row-head">
                 <div class="title">${esc(String(it.alumnoNombre || "—"))}</div>
                 <button class="open-drawer gc-btn" type="button">Ver</button>
@@ -419,10 +420,16 @@
           `
           );
         });
-        qsa('.table-row-mobile[data-mod="suscripcion"] .open-drawer', hostM).forEach((btn) => {
+        qsa(
+          '.table-row-mobile[data-mod="suscripcion"] .open-drawer',
+          hostM
+        ).forEach((btn) => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            const id = Number(btn.closest('.table-row-mobile[data-mod="suscripcion"]')?.dataset.id || 0);
+            const id = Number(
+              btn.closest('.table-row-mobile[data-mod="suscripcion"]')?.dataset
+                .id || 0
+            );
             const it = S.data.find((x) => +x.id === +id);
             if (it) openView(it);
           });
@@ -439,7 +446,6 @@
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
-
       const mk = (txt, dis, cb, cls = "page-btn") => {
         const b = document.createElement("button");
         b.textContent = txt;
@@ -449,15 +455,34 @@
         return b;
       };
       cont.appendChild(
-        mk("‹", S.page === 1, () => { S.page = Math.max(1, S.page - 1); render(); }, "arrow-btn")
+        mk(
+          "‹",
+          S.page === 1,
+          () => {
+            S.page = Math.max(1, S.page - 1);
+            render();
+          },
+          "arrow-btn"
+        )
       );
       for (let p = 1; p <= totalPages && p <= 7; p++) {
-        const b = mk(String(p), false, () => { S.page = p; render(); });
+        const b = mk(String(p), false, () => {
+          S.page = p;
+          render();
+        });
         if (p === S.page) b.classList.add("active");
         cont.appendChild(b);
       }
       cont.appendChild(
-        mk("›", S.page === totalPages, () => { S.page = Math.min(totalPages, S.page + 1); render(); }, "arrow-btn")
+        mk(
+          "›",
+          S.page === totalPages,
+          () => {
+            S.page = Math.min(totalPages, S.page + 1);
+            render();
+          },
+          "arrow-btn"
+        )
       );
     });
   }
@@ -482,7 +507,9 @@
       <details class="dev-json" open style="margin-top:12px;">
         <summary style="cursor:pointer;font-weight:600;">JSON · Suscripción</summary>
         <div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="btn-copy-json-sus">Copiar JSON</button></div>
-        <pre id="json-sus" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${esc(JSON.stringify(data || {}, null, 2))}</pre>
+        <pre id="json-sus" class="value" style="white-space:pre-wrap;max-height:260px;overflow:auto;">${esc(
+          JSON.stringify(data || {}, null, 2)
+        )}</pre>
       </details>`;
     return `
       <section id="sus-view" class="mode-view">
@@ -494,11 +521,21 @@
               : `<button class="gc-btn gc-btn--danger" id="sus-eliminar" data-step="1">Eliminar</button>`
           }
         </div>
-        <div class="field"><div class="label">Suscriptor</div><div class="value" id="sv_alumno">${esc(String(data?._alumnoNombre || "—"))}</div></div>
-        <div class="field"><div class="label">Curso</div><div class="value" id="sv_curso">${esc(String(data?._cursoLabel || "—"))}</div></div>
-        <div class="field"><div class="label">Estatus</div><div class="value" id="sv_estatus">${esc(STATUS_LABEL[Number(data?.estatus)] || String(data?.estatus ?? "—"))}</div></div>
-        <div class="field"><div class="label">Fecha y hora de suscripción</div><div class="value" id="sv_fecha_creacion">${esc(fmtDateTime(data?.fecha_creacion))}</div></div>
-        <div class="field"><div class="label">Comentario</div><div class="value" id="sv_comentario">${esc(String(data?.comentario ?? data?.nota ?? ""))}</div></div>
+        <div class="field"><div class="label">Suscriptor</div><div class="value" id="sv_alumno">${esc(
+          String(data?._alumnoNombre || "—")
+        )}</div></div>
+        <div class="field"><div class="label">Curso</div><div class="value" id="sv_curso">${esc(
+          String(data?._cursoLabel || "—")
+        )}</div></div>
+        <div class="field"><div class="label">Estatus</div><div class="value" id="sv_estatus">${esc(
+          STATUS_LABEL[Number(data?.estatus)] || String(data?.estatus ?? "—")
+        )}</div></div>
+        <div class="field"><div class="label">Fecha y hora de suscripción</div><div class="value" id="sv_fecha_creacion">${esc(
+          fmtDateTime(data?.fecha_creacion)
+        )}</div></div>
+        <div class="field"><div class="label">Comentario</div><div class="value" id="sv_comentario">${esc(
+          String(data?.comentario ?? data?.nota ?? "")
+        )}</div></div>
         ${jsonPretty}
       </section>`;
   }
@@ -515,7 +552,6 @@
       );
       bindEditActions(row._all, row.id);
     });
-
     const btnDel = qs("#sus-eliminar");
     if (btnDel) {
       btnDel.addEventListener("click", async () => {
@@ -539,7 +575,6 @@
         }
       });
     }
-
     qs("#sus-reactivar")?.addEventListener("click", async () => {
       try {
         await postJSON(API.uInscripcion, { id: row.id, estatus: 1 });
@@ -551,8 +586,8 @@
         toast("No se pudo reactivar", "error");
       }
     });
-
-    if (window.bindCopyFromPre) window.bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
+    if (window.bindCopyFromPre)
+      window.bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
   }
 
   /* ---------- Drawer: Editar ---------- */
@@ -560,11 +595,20 @@
     return `
       <section id="sus-edit" class="mode-edit">
         <div class="grid-3">
-          <div class="field"><label>Suscriptor</label><div class="value">${esc(String(data?._alumnoNombre || "—"))}</div></div>
-          <div class="field"><label>Curso</label><div class="value">${esc(String(data?._cursoLabel || "—"))}</div></div>
-          <div class="field"><label for="se_estatus">Estatus</label>${statusSelect("se_estatus", data?.estatus ?? 1)}</div>
+          <div class="field"><label>Suscriptor</label><div class="value">${esc(
+            String(data?._alumnoNombre || "—")
+          )}</div></div>
+          <div class="field"><label>Curso</label><div class="value">${esc(
+            String(data?._cursoLabel || "—")
+          )}</div></div>
+          <div class="field"><label for="se_estatus">Estatus</label>${statusSelect(
+            "se_estatus",
+            data?.estatus ?? 1
+          )}</div>
         </div>
-        <div class="field"><label for="se_comentario">Comentario</label><textarea id="se_comentario" rows="4" maxlength="1000">${esc(String(data?.comentario ?? data?.nota ?? ""))}</textarea></div>
+        <div class="field"><label for="se_comentario">Comentario</label><textarea id="se_comentario" rows="4" maxlength="1000">${esc(
+          String(data?.comentario ?? data?.nota ?? "")
+        )}</textarea></div>
         <div class="drawer-actions-row">
           <div class="row-right">
             <button class="gc-btn gc-btn--ghost" id="se_cancel">Cancelar</button>
@@ -578,7 +622,6 @@
     qs("#se_cancel")?.addEventListener("click", () => {
       openView(S.data.find((x) => x.id === id));
     });
-
     qs("#se_save")?.addEventListener("click", async () => {
       const body = {
         id: Number(id),
@@ -638,7 +681,7 @@
           <div class="field">
             <label>Medios de contacto</label>
             <div class="value" style="display:flex;gap:18px;">
-              <label><input id="sc_mc_tel"  name="medios-contacto" value="telefono" type="checkbox" disabled> Teléfono</label>
+              <label><input id="sc_mc_tel" name="medios-contacto" value="telefono" type="checkbox" disabled> Teléfono</label>
               <label><input id="sc_mc_mail" name="medios-contacto" value="correo"   type="checkbox" disabled> Correo</label>
             </div>
           </div>
@@ -649,10 +692,9 @@
           <textarea id="sc_comentario" rows="3" placeholder="Opcional"></textarea>
         </div>
 
-        <!-- Acciones SOLO abajo -->
         <div class="drawer-actions-row">
           <div class="row-right">
-            <button class="gc-btn gc-btn--ghost"   id="sc_cancel">Cancelar</button>
+            <button class="gc-btn gc-btn--ghost" id="sc_cancel">Cancelar</button>
             <button class="gc-btn gc-btn--success" id="sc_inscribir_b" disabled>Inscribir</button>
           </div>
         </div>
@@ -661,13 +703,15 @@
 
   function bindCreateActions() {
     const bCancelBot = qs("#sc_cancel");
-    const bInsBot   = qs("#sc_inscribir_b");
-    const setInscribirEnabled = (on) => { if (bInsBot) bInsBot.disabled = !on; };
+    const bInsBot = qs("#sc_inscribir_b");
+    const setInscribirEnabled = (on) => {
+      if (bInsBot) bInsBot.disabled = !on;
+    };
 
     const selectCurso = qs("#sc_curso");
-    const identInput  = qs("#sc_ident");
-    const btnBuscar   = qs("#sc_buscar");
-    const btnCambiar  = qs("#sc_cambiar");
+    const identInput = qs("#sc_ident");
+    const btnBuscar = qs("#sc_buscar");
+    const btnCambiar = qs("#sc_cambiar");
 
     function checkReady() {
       setInscribirEnabled(!!S.create.cursoId && !!S.create.usuario);
@@ -685,13 +729,14 @@
     if (btnBuscar) {
       btnBuscar.addEventListener("click", async () => {
         const ident = (identInput?.value || "").trim();
-        if (!ident) return toast("Ingresa teléfono o correo para buscar.", "warning");
-
+        if (!ident)
+          return toast("Ingresa teléfono o correo para buscar.", "warning");
         try {
           const user = await buscarUsuario(ident);
-          if (!user) { toast("No se encontró usuario con ese dato.", "warning"); return; }
+          if (!user)
+            return toast("No se encontró usuario con ese dato.", "warning");
           S.create.usuario = user;
-          pintarUsuario(user);         // setea Nombre/Correo/Teléfono y checks
+          pintarUsuario(user);
           btnCambiar.disabled = false;
           checkReady();
           toast("Usuario encontrado", "exito");
@@ -709,8 +754,8 @@
         if (pnl) pnl.style.display = "none";
         identInput.value = "";
         btnCambiar.disabled = true;
-        // limpia checks
-        const tel = qs("#sc_mc_tel"), mail = qs("#sc_mc_mail");
+        const tel = qs("#sc_mc_tel"),
+          mail = qs("#sc_mc_mail");
         if (tel) tel.checked = false;
         if (mail) mail.checked = false;
         checkReady();
@@ -720,21 +765,24 @@
     async function doInscribir() {
       if (!S.create.cursoId || !S.create.usuario) return;
       const uid = Number(
-        S.create.usuario.id ?? S.create.usuario.usuario_id ?? S.create.usuario.alumno_id ?? S.create.usuario.user_id ?? 0
+        S.create.usuario.id ??
+          S.create.usuario.usuario_id ??
+          S.create.usuario.alumno_id ??
+          S.create.usuario.user_id ??
+          0
       );
       if (!uid) return toast("ID de usuario inválido", "error");
-
       const body = {
         curso: S.create.cursoId,
         usuario: uid,
         comentario: (qs("#sc_comentario")?.value || "").trim(),
         creado_por: getCreatorId() ?? undefined,
-        // Si quieres enviar tipo_contacto según tus checkboxes globales:
-        // tipo_contacto: (typeof window.obtenerTipoContacto === "function") ? window.obtenerTipoContacto() : undefined,
       };
       try {
         const res = await postJSON(API.iInscripcion, body);
-        const newId = Number(res?.id || res?.inscripcion_id || res?.insert_id || res?.data?.id || 0);
+        const newId = Number(
+          res?.id || res?.inscripcion_id || res?.insert_id || res?.data?.id || 0
+        );
         toast("Inscripción creada", "exito");
         closeDrawer();
         await load();
@@ -749,12 +797,18 @@
   }
 
   async function buscarUsuario(ident) {
-    // Busca por ambos campos; el backend devolverá coincidencias por teléfono o correo
-    const res = await postJSON(API.usuarios, { telefono: ident, correo: ident });
-    const arr = Array.isArray(res) ? res
-      : Array.isArray(res?.data) ? res.data
-      : Array.isArray(res?.usuarios) ? res.usuarios
-      : (res && typeof res === "object") ? [res] : [];
+    // En tu backend, c_usuarios.php acepta teléfono o correo
+    const body = { telefono: ident, correo: ident };
+    const res = await postJSON(API.usuarios, body);
+    const arr = Array.isArray(res)
+      ? res
+      : Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res?.usuarios)
+      ? res.usuarios
+      : res && typeof res === "object"
+      ? [res]
+      : [];
     return arr[0] || null;
   }
 
@@ -762,62 +816,55 @@
     const pnl = qs("#sc_user_panel");
     if (!pnl) return;
     pnl.style.display = "";
-
-    const nombre = u.nombre_completo || u.nombre ||
-      [u.nombre1, u.nombre2, u.apellido_paterno, u.apellido_materno].filter(Boolean).join(" ") || "";
-
-    const tel   = u.telefono || u.celular || u.tel || "";
-    const mail  = u.correo   || u.email   || "";
-    const fnac  = (u.fecha_nacimiento || u.fnac || "").slice(0, 10);
-
+    const nombre =
+      u.nombre ||
+      u.nombre_completo ||
+      [u.nombre1, u.nombre2, u.apellido_paterno, u.apellido_materno]
+        .filter(Boolean)
+        .join(" ") ||
+      "";
+    const tel = u.telefono || u.celular || u.tel || "";
+    const mail = u.correo || u.email || "";
+    const fnac = (u.fecha_nacimiento || u.fnac || "").slice(0, 10);
     qs("#sc_nombre").value = nombre;
     qs("#sc_correo").value = mail;
-    qs("#sc_tel").value    = tel;
-    qs("#sc_fnac").value   = fnac;
+    qs("#sc_tel").value = tel;
+    qs("#sc_fnac").value = fnac;
 
-    // medios de contacto (1=tel, 2=correo, 3=ambos)
-    const tipoRaw = u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
+    const tipoRaw =
+      u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
     const tipo = Number(tipoRaw);
     const cTel = qs("#sc_mc_tel");
     const cMail = qs("#sc_mc_mail");
-    if (cTel)  cTel.checked  = (tipo === 1 || tipo === 3) || (!Number.isFinite(tipo) && /tel|phone/i.test(String(tipoRaw)));
-    if (cMail) cMail.checked = (tipo === 2 || tipo === 3) || (!Number.isFinite(tipo) && /mail|correo|email/i.test(String(tipoRaw)));
+    if (cTel)
+      cTel.checked =
+        tipo === 1 || tipo === 3 || /tel|phone/i.test(String(tipoRaw));
+    if (cMail)
+      cMail.checked =
+        tipo === 2 || tipo === 3 || /mail|correo|email/i.test(String(tipoRaw));
   }
 
-  /* ---------- Búsqueda global (searchbar) ---------- */
+  /* ---------- Búsqueda global ---------- */
   const searchInput = qs("#search-input");
-  if (searchInput && !searchInput._bSubs) {
-    searchInput._bSubs = true;
+  if (searchInput && !searchInput._b) {
+    searchInput._b = true;
     searchInput.addEventListener("input", (e) => {
       S.search = e.target.value || "";
       S.page = 1;
       render();
     });
   }
-  // Si existe util gcSearch, registrar ruta con placeholder/hint
-  if (window.gcSearch && !window._search_sus_wired) {
-    window._search_sus_wired = true;
-    gcSearch.register(
-      "#/suscripciones",
-      (q) => { S.search = q; S.page = 1; render(); },
-      {
-        placeholder: "Buscar suscripciones…",
-        hint: "Filtra por alumno, curso, correo o teléfono",
-      }
-    );
-  }
 
   /* ---------- API pública ---------- */
   async function mount() {
-    console.log(TAG, "mount() INICIO");
-    window.__activeModule = "suscripciones";
     try {
+      window.__activeModule = "suscripciones";
       const hostD = qs("#recursos-list");
       if (hostD)
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadCatalogos();
+      await getUsuariosMapAnyStatus(); // << clave para nombres
       await load();
-      console.log(TAG, "mount() OK");
     } catch (e) {
       console.error(TAG, "mount ERROR:", e);
       const hostD = qs("#recursos-list");
@@ -825,7 +872,9 @@
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error al cargar</div></div>`;
     }
   }
-  function openCreateExposed() { openCreate(); }
+  function openCreateExposed() {
+    openCreate();
+  }
 
   globalThis.suscripciones = { mount, openCreate: openCreateExposed };
   console.log(TAG, "Módulo suscripciones cargado.");
