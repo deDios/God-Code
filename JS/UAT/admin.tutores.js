@@ -24,11 +24,16 @@
     page: 1,
     pageSize: 7,
     search: "",
-    tempNewTutorImage: null, // crear: se sube al guardar
-    pendingEditTutorImage: null, // edición: (ya no la usamos, porque subimos tras preview)
+    tempNewTutorImage: null,
+    pendingEditTutorImage: null,
   };
+  // flag para el router
+  window.__TutoresState = S;
 
-  /* ---------- Utils básicos ---------- */
+  // Orden deseado en el listado: Activo → Pausado → Inactivo
+  const ORDER_TUTORES = [1, 2, 0];
+
+  /* ---------- Utils ---------- */
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
@@ -67,7 +72,6 @@
   }
 
   async function postJSON(url, body) {
-    console.log(TAG, "POST", url, { body });
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -75,7 +79,6 @@
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
-
     try {
       return JSON.parse(text);
     } catch {}
@@ -117,7 +120,6 @@
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
 
-  // ---------- Img helpers ----------
   function tutorImgUrl(id, ext = "png") {
     return `/ASSETS/tutor/tutor_${Number(id)}.${ext}`;
   }
@@ -137,7 +139,6 @@
     imgEl.src = withBust(primary);
   }
 
-  // ---------- Status helpers (para listado) ----------
   function statusBadge(tipo, s) {
     if (window.statusBadge) return window.statusBadge(tipo, s);
     const n = Number(s);
@@ -149,8 +150,8 @@
     const v = Number(val);
     return `<select id="${id}">
       <option value="1"${v === 1 ? " selected" : ""}>Activo</option>
-      <option value="0"${v === 0 ? " selected" : ""}>Inactivo</option>
       <option value="2"${v === 2 ? " selected" : ""}>Pausado</option>
+      <option value="0"${v === 0 ? " selected" : ""}>Inactivo</option>
     </select>`;
   }
 
@@ -163,12 +164,8 @@
       ? window.state
       : { currentDrawer: null, usuario: { id: 1 } };
 
-  /* ---------- Preview de imagen (usa tu preview nativo si existe; fallback modal ligero) ---------- */
-  async function gcAskImageUpload({
-    file,
-    title = "Vista previa de imagen",
-    detailsText = "",
-  }) {
+  /* ---------- Preview imagen (usa modal nativo si existe) ---------- */
+  async function gcAskImageUpload({ file, title = "Vista previa de imagen" }) {
     const openers = [
       window.gcImagePreview,
       window.openImagePreview,
@@ -181,7 +178,6 @@
           openers[0]({
             file,
             title,
-            detailsText,
             onConfirm: () => resolve(true),
             onCancel: () => resolve(false),
           });
@@ -190,51 +186,11 @@
         }
       });
     }
-    // Fallback simple
-    return await new Promise((resolve) => {
-      const url = URL.createObjectURL(file);
-      const m = document.createElement("div");
-      m.innerHTML = `
-        <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:1010;">
-          <div style="background:#fff;width:min(960px,92vw);max-height:92vh;border-radius:12px;overflow:hidden;box-shadow:0 12px 24px rgba(0,0,0,.2);">
-            <div style="padding:16px 18px;border-bottom:1px solid #eee;font-weight:700;">${esc(
-              title
-            )}</div>
-            <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px;max-height:calc(92vh - 120px);overflow:auto;">
-              <div style="border:1px solid #eee;border-radius:8px;overflow:hidden;">
-                <img src="${url}" alt="Preview" style="display:block;max-width:100%;height:auto;">
-              </div>
-              <div>
-                <div style="font-weight:600;margin-bottom:8px;">Detalles</div>
-                <div style="line-height:1.6;">
-                  <div><strong>Archivo:</strong> ${esc(file.name)}</div>
-                  <div><strong>Peso:</strong> ${(file.size / 1024).toFixed(
-                    1
-                  )} KB</div>
-                  <div><strong>Tipo:</strong> ${esc(file.type)}</div>
-                  <div style="margin-top:8px;color:#606770;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #eee;">
-              <button id="p-cancel" class="gc-btn gc-btn--ghost">Cancelar</button>
-              <button id="p-ok" class="gc-btn gc-btn--success">Subir</button>
-            </div>
-          </div>
-        </div>`;
-      document.body.appendChild(m);
-      m.querySelector("#p-cancel").onclick = () => {
-        m.remove();
-        resolve(false);
-      };
-      m.querySelector("#p-ok").onclick = () => {
-        m.remove();
-        resolve(true);
-      };
-    });
+    // Fallback hiper simple
+    return window.confirm("¿Subir esta imagen?");
   }
 
-  /* ---------- Drawer control (overlay bien manejado) ---------- */
+  /* ---------- Drawer control ---------- */
   function openTutorDrawer(title, html) {
     const aside = document.getElementById("drawer-tutor");
     const overlay = document.getElementById("gc-dash-overlay");
@@ -269,7 +225,6 @@
       overlay.setAttribute("aria-hidden", "true");
     }
   }
-  // binds una vez
   (function bindDrawerOnce() {
     qsa("#drawer-tutor-close").forEach((b) => {
       if (!b._b) {
@@ -332,9 +287,8 @@
     }
   }
 
-  /* ---------- Montaje Router ---------- */
+  /* ---------- Montaje ---------- */
   async function mount() {
-    console.log(TAG, "mount()");
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
       hdr.querySelector(".col-nombre") &&
@@ -362,7 +316,6 @@
   }
 
   async function openCreate() {
-    console.log(TAG, "openCreate()");
     S.tempNewTutorImage = null;
     state.currentDrawer = { type: "tutor", id: null, mode: "create" };
     openTutorDrawer("Tutor · Crear", renderDrawer({ id: "" }));
@@ -370,16 +323,19 @@
 
   /* ---------- Carga & Listado ---------- */
   async function load() {
-    console.log(TAG, "load()");
     try {
-      const [act, inact, pa] = await Promise.all([
-        postJSON(API.tutores, { estatus: 1 }),
-        postJSON(API.tutores, { estatus: 0 }),
-        postJSON(API.tutores, { estatus: 2 }),
-      ]);
-      const raw = [].concat(act || [], inact || [], pa || []);
-      S.raw = raw;
-      S.data = raw.map((t) => ({
+      const chunks = await Promise.all(
+        ORDER_TUTORES.map((st) =>
+          postJSON(API.tutores, { estatus: st }).catch(() => [])
+        )
+      );
+      const flat = [];
+      ORDER_TUTORES.forEach((st, i) => {
+        flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []));
+      });
+      S.raw = flat;
+
+      S.data = flat.map((t) => ({
         id: Number(t.id),
         nombre: t.nombre,
         descripcion: t.descripcion || "",
@@ -387,11 +343,65 @@
         fecha_creacion: t.fecha_creacion,
         _all: t,
       }));
+      // reinicia página si cambia el dataset
+      if (S.page < 1) S.page = 1;
       draw();
     } catch (e) {
       console.error(TAG, "load error", e);
       toast("No se pudieron cargar tutores", "error");
     }
+  }
+
+  function renderPagination(total) {
+    const totalPages = Math.max(1, Math.ceil(total / S.pageSize));
+    // corrige page si quedó fuera de rango
+    if (S.page > totalPages) S.page = totalPages;
+
+    [qs("#pagination-controls"), qs("#pagination-mobile")].forEach((cont) => {
+      if (!cont) return;
+      cont.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      const mk = (txt, dis, cb, cls = "page-btn") => {
+        const b = document.createElement("button");
+        b.textContent = txt;
+        b.className = cls + (dis ? " disabled" : "");
+        if (dis) b.disabled = true;
+        else b.onclick = cb;
+        return b;
+      };
+      cont.appendChild(
+        mk(
+          "‹",
+          S.page === 1,
+          () => {
+            S.page = Math.max(1, S.page - 1);
+            draw();
+          },
+          "arrow-btn"
+        )
+      );
+      // máximo 7 botones de página visibles
+      for (let p = 1; p <= totalPages && p <= 7; p++) {
+        const b = mk(String(p), false, () => {
+          S.page = p;
+          draw();
+        });
+        if (p === S.page) b.classList.add("active");
+        cont.appendChild(b);
+      }
+      cont.appendChild(
+        mk(
+          "›",
+          S.page === totalPages,
+          () => {
+            S.page = Math.min(totalPages, S.page + 1);
+            draw();
+          },
+          "arrow-btn"
+        )
+      );
+    });
   }
 
   function draw() {
@@ -416,6 +426,8 @@
         filtered.length === 1 ? "elemento" : "elementos"
       }`;
 
+    const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
+    if (S.page > totalPages) S.page = totalPages;
     const start = (S.page - 1) * S.pageSize;
     const pageRows = filtered.slice(start, start + S.pageSize);
 
@@ -424,6 +436,7 @@
         '<div class="empty-state" style="padding:1rem;">Sin resultados</div>';
       if (hostD) hostD.innerHTML = empty;
       if (hostM) hostM.innerHTML = empty;
+      renderPagination(filtered.length);
       return;
     }
 
@@ -504,6 +517,9 @@
         }
       });
     });
+
+    // pinta paginación
+    renderPagination(filtered.length);
   }
 
   /* ---------- Drawer (view/edit/create) ---------- */
@@ -959,7 +975,7 @@
     }
   }
 
-  /* ---------- Cursos ligados (fetch all + filtrar por tutor) ---------- */
+  /* ---------- Cursos ligados ---------- */
   async function renderTutorCursosChips(
     tutorId,
     containerSel = "#tutor-cursos"
@@ -1045,7 +1061,7 @@
     }
   }
 
-  /* ---------- Mini Drawer de curso (solo lectura) ---------- */
+  /* ---------- Mini Drawer de curso ---------- */
   function ensureCursoMiniDOM() {
     if (qs("#drawer-curso-mini")) return;
     const tpl = document.createElement("div");
@@ -1161,7 +1177,7 @@
     }
   }
 
-  /* ---------- API pública Router ---------- */
+  /* ---------- API pública ---------- */
   window.tutores = { mount, openCreate };
 
   console.log(TAG, "Módulo tutores cargado.");
