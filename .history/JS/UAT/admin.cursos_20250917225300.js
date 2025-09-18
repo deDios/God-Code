@@ -25,7 +25,7 @@
     page: 1,
     pageSize: 7,
     search: "",
-    data: [],
+    data: [], // cursos
     current: null, // { id, _all }
     maps: {
       tutores: null,
@@ -35,9 +35,9 @@
       tipoEval: null,
       actividades: null,
     },
-    tempNewCourseImage: null, // buffer para portada en modo crear
+    tempNewCourseImage: null, // buffer para portada en modo CREAR
   };
-  window.__CursosState = S; // bandera para debug/inspección
+  window.__CursosState = S;
 
   /* ---------- Const UI ---------- */
   const STATUS_LABEL = {
@@ -57,20 +57,20 @@
     String(s ?? "").replace(
       /[&<>"']/g,
       (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[c])
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
     );
   const fmtMoney = (n) =>
     isFinite(+n)
       ? new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-      }).format(+n)
+          style: "currency",
+          currency: "MXN",
+        }).format(+n)
       : "-";
   const fmtBool = (v) => (+v === 1 || v === true || v === "1" ? "Sí" : "No");
   const fmtDate = (d) => (!d ? "-" : String(d));
@@ -81,12 +81,34 @@
       .toLowerCase()
       .trim();
 
+  const ORDER_INDEX = ORDER_CURSOS.reduce((m, st, i) => {
+    m[st] = i;
+    return m;
+  }, {});
+
+  // Orden estable por estatus (ORDER_CURSOS), luego nombre ASC, luego id DESC
+  function sortCursosInPlace() {
+    S.data.sort((a, b) => {
+      const oa = ORDER_INDEX[a.estatus] ?? 999;
+      const ob = ORDER_INDEX[b.estatus] ?? 999;
+      if (oa !== ob) return oa - ob;
+      const nc = (a.nombre || "").localeCompare(b.nombre || "", "es", {
+        sensitivity: "base",
+      });
+      if (nc !== 0) return nc;
+      return +b.id - +a.id;
+    });
+  }
+
+  function refreshListView() {
+    renderCursos();
+  }
+
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
     console.log(`${TAG} toast[${type}]:`, msg);
   }
 
-  // ===== creado_por desde la cookie `usuario` =====
   function getCreatorId() {
     try {
       const raw = document.cookie
@@ -96,15 +118,13 @@
         console.warn(TAG, "Cookie 'usuario' no encontrada.");
         return null;
       }
-      const json = decodeURIComponent(raw.split("=")[1] || "");
-      const u = JSON.parse(json);
-      console.log(TAG, "usuario(cookie) →", u);
+      const u = JSON.parse(decodeURIComponent(raw.split("=")[1] || ""));
       const n = Number(u?.id);
       if (Number.isFinite(n)) return n;
-      console.warn(TAG, "El objeto de cookie no trae un id numérico:", u?.id);
+      console.warn(TAG, "Cookie usuario sin id numérico:", u?.id);
       return null;
     } catch (e) {
-      console.error(TAG, "getCreatorId() error al leer cookie 'usuario':", e);
+      console.error(TAG, "getCreatorId() error:", e);
       return null;
     }
   }
@@ -121,32 +141,27 @@
     console.log(TAG, "HTTP", r.status, "raw:", text);
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
 
-    // 1) intento normal
     try {
       const j = JSON.parse(text);
       console.log(TAG, "JSON OK:", j);
       return j;
-    } catch { }
+    } catch {}
 
-    // 2) recorta bloque JSON { .. } o [ .. ]
-    const firstBrace = text.indexOf("{");
-    const lastBrace = text.lastIndexOf("}");
-    const firstBrack = text.indexOf("[");
-    const lastBrack = text.lastIndexOf("]");
+    const fb = text.indexOf("{"),
+      lb = text.lastIndexOf("}");
+    const fB = text.indexOf("["),
+      lB = text.lastIndexOf("]");
     let candidate = "";
-    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace)
-      candidate = text.slice(firstBrace, lastBrace + 1);
-    else if (firstBrack !== -1 && lastBrack !== -1 && lastBrack > firstBrack)
-      candidate = text.slice(firstBrack, lastBrack + 1);
+    if (fb !== -1 && lb !== -1 && lb > fb) candidate = text.slice(fb, lb + 1);
+    else if (fB !== -1 && lB !== -1 && lB > fB)
+      candidate = text.slice(fB, lB + 1);
     if (candidate) {
       try {
         const j2 = JSON.parse(candidate);
         console.warn(TAG, "JSON trimmed:", j2);
         return j2;
-      } catch { }
+      } catch {}
     }
-
-    console.warn(TAG, "JSON parse failed; returning _raw");
     return { _raw: text };
   }
 
@@ -179,21 +194,21 @@
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
   async function resolveCursoImg(id) {
-    const tryUrl = (url) =>
+    const ok = (url) =>
       new Promise((res) => {
         const i = new Image();
         i.onload = () => res(true);
         i.onerror = () => res(false);
         i.src = url;
       });
-    const p = withBust(cursoImgUrl(id, "png"));
-    const j = withBust(cursoImgUrl(id, "jpg"));
-    if (await tryUrl(p)) return p;
-    if (await tryUrl(j)) return j;
+    const p = withBust(cursoImgUrl(id, "png")),
+      j = withBust(cursoImgUrl(id, "jpg"));
+    if (await ok(p)) return p;
+    if (await ok(j)) return j;
     return noImageSvgDataURI();
   }
 
-  /* ---------- Drawer helpers (Cursos) ---------- */
+  /* ---------- Drawer helpers ---------- */
   function openDrawerCurso() {
     console.log(TAG, "openDrawerCurso()");
     const d = qs("#drawer-curso"),
@@ -215,7 +230,7 @@
     ov && ov.classList.remove("open");
     S.current = null;
   }
-  // binds 1 vez básicos
+  // bind cierre (una vez)
   qsa("#drawer-curso-close").forEach((b) => {
     if (!b._b) {
       b._b = true;
@@ -244,8 +259,8 @@
     return m;
   }
   function mapToOptions(map, sel) {
-    const ids = Object.keys(map || {}).filter((k) => k !== "_ts");
-    return ids
+    return Object.keys(map || {})
+      .filter((k) => k !== "_ts")
       .map(
         (id) =>
           `<option value="${id}"${+id === +sel ? " selected" : ""}>${esc(
@@ -260,7 +275,7 @@
     return k in map ? map[k] ?? "-" : "-";
   }
 
-  /* ---------- Export utils (por si otros módulos dependen) ---------- */
+  // export utilidades (por si otros módulos las usan)
   window.gcUtils = Object.assign({}, window.gcUtils || {}, {
     qs,
     qsa,
@@ -284,7 +299,7 @@
 
   /* ==================== Catálogos + Listado ==================== */
   async function loadCatalogos() {
-    console.log(TAG, "loadCatalogos()...");
+    console.log(TAG, "loadCatalogos()…");
     if (!S.maps.tutores)
       S.maps.tutores = arrToMap(
         await postJSON(API.tutores, { estatus: 1 }).catch(() => [])
@@ -313,7 +328,7 @@
   }
 
   async function loadCursos() {
-    console.log(TAG, "loadCursos()...");
+    console.log(TAG, "loadCursos()…");
     const chunks = await Promise.all(
       ORDER_CURSOS.map((st) =>
         postJSON(API.cursos, { estatus: st }).catch(() => [])
@@ -327,6 +342,21 @@
     S.page = 1;
     console.log(TAG, "Cursos cargados:", S.data.length);
     renderCursos();
+  }
+
+  function rebuildRowHTML(it) {
+    const est = STATUS_LABEL[it.estatus] || it.estatus;
+    return `
+      <div class="table-row" role="row" data-id="${it.id}">
+        <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
+        <div class="col-tutor"  role="cell">${esc(
+          mapLabel(S.maps.tutores, it.tutor)
+        )}</div>
+        <div class="col-fecha"  role="cell">${esc(
+          fmtDate(it.fecha_inicio)
+        )}</div>
+        <div class="col-status" role="cell">${esc(est)}</div>
+      </div>`;
   }
 
   function renderCursos() {
@@ -357,38 +387,24 @@
       if (pageRows.length === 0) {
         hostD.insertAdjacentHTML(
           "beforeend",
-          `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
+  `
+  <div class="table-row" role="row" data-mod="curso" data-id="${it.id}">
+    <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
+    <div class="col-tutor"  role="cell">${esc(mapLabel(S.maps.tutores, it.tutor))}</div>
+    <div class="col-fecha"  role="cell">${esc(fmtDate(it.fecha_inicio))}</div>
+    <div class="col-status" role="cell">${esc(est)}</div>
+  </div>
+`
         );
       } else {
-        pageRows.forEach((it) => {
-          const est = STATUS_LABEL[it.estatus] || it.estatus;
-          hostD.insertAdjacentHTML(
-            "beforeend",
-            `
-            <div class="table-row" role="row" data-mod="curso" data-id="${it.id}">
-              <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
-              <div class="col-tutor"  role="cell">${esc(
-              mapLabel(S.maps.tutores, it.tutor)
-            )}</div>
-              <div class="col-fecha"  role="cell">${esc(
-              fmtDate(it.fecha_inicio)
-            )}</div>
-              <div class="col-status" role="cell">${esc(est)}</div>
-            </div>
-          `
-          );
-        });
-        qsa('.table-row[data-mod="curso"]', hostD).forEach((row) => {
-          row.addEventListener("click", () => {
-            const id = Number(row.dataset.id);
-            console.log(TAG, "click row id=", id);
-            if (id) openCursoView(id);
-          });
-        });
+        hostD.insertAdjacentHTML(
+          "beforeend",
+          pageRows.map(rebuildRowHTML).join("")
+        );
       }
     }
 
-    // Mobile
+    // Mobile (solo título + botón ver)
     if (hostM) {
       if (pageRows.length === 0) {
         hostM.insertAdjacentHTML(
@@ -396,31 +412,19 @@
           `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
         );
       } else {
-        pageRows.forEach((it) => {
-          hostM.insertAdjacentHTML(
-            "beforeend",
-            `
-            <div class="table-row-mobile" data-mod="curso" data-id="${it.id}">
-              <div class="row-head">
-                <div class="title">${esc(it.nombre || "-")}</div>
-                <button class="open-drawer gc-btn" type="button">Ver</button>
-              </div>
+        hostM.insertAdjacentHTML(
+          "beforeend",
+          pageRows
+            .map(
+              (it) => `
+          <div class="table-row-mobile" data-id="${it.id}">
+            <div class="row-head">
+              <div class="title">${esc(it.nombre || "-")}</div>
+              <button class="open-drawer gc-btn" type="button">Ver</button>
             </div>
-          `
-          );
-        });
-        qsa('.table-row-mobile[data-mod="curso"] .open-drawer', hostM).forEach(
-          (btn) => {
-            btn.addEventListener("click", (e) => {
-              e.stopPropagation();
-              const id = Number(
-                btn.closest('.table-row-mobile[data-mod="curso"]')?.dataset.id ||
-                0
-              );
-              console.log(TAG, "open mobile id=", id);
-              if (id) openCursoView(id);
-            });
-          }
+          </div>`
+            )
+            .join("")
         );
       }
     }
@@ -434,7 +438,6 @@
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
-
       const mk = (txt, dis, cb, cls = "page-btn") => {
         const b = document.createElement("button");
         b.textContent = txt;
@@ -476,7 +479,29 @@
     });
   }
 
-  // búsqueda (bind 1 vez)
+  // Delegación para filas (bind una vez)
+  const desktopBody = qs("#recursos-list");
+  if (desktopBody && !desktopBody._b) {
+    desktopBody._b = true;
+    desktopBody.addEventListener("click", (e) => {
+      const row = e.target.closest(".table-row[data-id]");
+      if (!row) return;
+      const id = Number(row.dataset.id || 0);
+      if (id) openCursoView(id);
+    });
+  }
+  const mobileBody = qs("#recursos-list-mobile");
+  if (mobileBody && !mobileBody._b) {
+    mobileBody._b = true;
+    mobileBody.addEventListener("click", (e) => {
+      const btn = e.target.closest(".open-drawer");
+      if (!btn) return;
+      const id = Number(btn.closest(".table-row-mobile")?.dataset.id || 0);
+      if (id) openCursoView(id);
+    });
+  }
+
+  // Búsqueda (bind una vez)
   const searchInput = qs("#search-input");
   if (searchInput && !searchInput._b) {
     searchInput._b = true;
@@ -503,36 +528,152 @@
       act && (act.style.display = "none");
     }
   }
-  window.setDrawerMode = setDrawerMode; // compat
 
-  function setNoticiaDrawerGuard() {
-    // noop; cursos usa su propio drawer
+  window.setDrawerMode = setDrawerMode;
+
+  function paintActions(it) {
+    const actions = qs("#curso-actions-view");
+    if (!actions) return;
+    // Construimos SIEMPRE los dos botones (edit + toggle) y delegamos eventos en el contenedor
+    const isInactive = +it.estatus === 0;
+    const toggleLabel = isInactive ? "Reactivar" : "Eliminar";
+    const toggleClass = isInactive
+      ? "gc-btn gc-btn--success"
+      : "gc-btn gc-btn--danger";
+    // Nota: para confirmación usaremos data-confirm internamente
+    actions.innerHTML = `
+      <button class="gc-btn" id="btn-edit" data-action="edit">Editar</button>
+      <button class="${toggleClass}" id="btn-toggle" data-action="toggle-status">${toggleLabel}</button>
+    `;
+    actions.dataset.estatus = String(it.estatus);
   }
 
-  function put(sel, val) {
-    const el = qs(sel);
-    if (el) el.innerHTML = esc(val ?? "—");
+  // Delegación de eventos del área de acciones (bind una vez)
+  const actionsHost = qs("#curso-actions-view");
+  if (actionsHost && !actionsHost._b) {
+    actionsHost._b = true;
+    let confirmTimer = null;
+
+    actionsHost.addEventListener("click", async (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      // Seguridad
+      if (!S.current?.id) {
+        toast("No hay curso seleccionado.", "error");
+        return;
+      }
+      const it = S.current._all;
+
+      if (action === "edit") {
+        setDrawerMode("edit");
+        fillCursoEdit(it);
+        return;
+      }
+
+      if (action === "toggle-status") {
+        const isInactive = +it.estatus === 0;
+
+        // Si vamos a eliminar (soft delete) pide confirmación
+        if (isInactive) {
+          const prev = it.estatus;
+          it.estatus = 1;
+          updateRowStatusCell(it.id, it.estatus); // <-- esto ahora resort + re-render
+          paintActions(it); // <-- repinta los botones del drawer
+          const ok = await updateCursoStatus(it.id, 1);
+          if (!ok) {
+            it.estatus = prev;
+            updateRowStatusCell(it.id, it.estatus);
+            paintActions(it);
+          } else {
+            toast("Curso reactivado", "exito");
+          }
+        } else {
+          const prev = it.estatus;
+          it.estatus = 0;
+          updateRowStatusCell(it.id, it.estatus);
+          paintActions(it);
+          const ok = await updateCursoStatus(it.id, 0);
+          if (!ok) {
+            it.estatus = prev;
+            updateRowStatusCell(it.id, it.estatus);
+            paintActions(it);
+          } else {
+            toast("Curso movido a Inactivo", "exito");
+          }
+        }
+
+        // Bloquea mientras corre
+        btn.disabled = true;
+        try {
+          if (isInactive) {
+            // ====== Reactivar (optimista)
+            const prev = it.estatus;
+            it.estatus = 1;
+            updateRowStatusCell(it.id, it.estatus);
+            paintActions(it);
+            const ok = await updateCursoStatus(it.id, 1);
+            if (!ok) {
+              it.estatus = prev;
+              updateRowStatusCell(it.id, it.estatus);
+              paintActions(it);
+            } else {
+              //toast("Curso reactivado", "exito");
+            }
+          } else {
+            // ====== Soft delete (optimista)
+            const prev = it.estatus;
+            it.estatus = 0;
+            updateRowStatusCell(it.id, it.estatus);
+            paintActions(it);
+            const ok = await updateCursoStatus(it.id, 0);
+            if (!ok) {
+              it.estatus = prev;
+              updateRowStatusCell(it.id, it.estatus);
+              paintActions(it);
+            } else {
+              //toast("Curso movido a Inactivo", "exito");
+            }
+          }
+        } finally {
+          btn.disabled = false;
+          // Limpia confirmación si existía
+          btn.dataset.confirm = "0";
+          if (confirmTimer) {
+            clearTimeout(confirmTimer);
+            confirmTimer = null;
+          }
+        }
+      }
+    });
+  }
+
+  function updateRowStatusCell(id, estatus) {
+    // actualiza la fuente de verdad
+    const idx = S.data.findIndex((x) => +x.id === +id);
+    if (idx >= 0) S.data[idx].estatus = estatus;
+
+    // resort orden lógico y re-render
+    sortCursosInPlace();
+    refreshListView();
   }
 
   async function mountCursoMediaView(containerEl, cursoId) {
     if (!containerEl) return;
     const url = await resolveCursoImg(cursoId);
     containerEl.innerHTML = `
-      <div class="media-head">
-        <div class="media-title">Imágenes</div>
-        <div class="media-help" style="color:#888;">Solo lectura</div>
-      </div>
+      <div class="media-head"><div class="media-title">Imágenes</div><div class="media-help" style="color:#888;">Solo lectura</div></div>
       <div class="media-grid">
         <div class="media-card">
           <figure class="media-thumb">
             <img alt="Portada" id="curso-cover-view" loading="eager" src="${esc(
-      url
-    )}">
+              url
+            )}">
           </figure>
           <div class="media-meta"><div class="media-label">Portada</div></div>
         </div>
-      </div>
-    `;
+      </div>`;
     const img = containerEl.querySelector("#curso-cover-view");
     if (img)
       img.onerror = () => {
@@ -541,126 +682,16 @@
       };
   }
 
-  function paintActions(it) {
-    const cont = qs("#curso-actions-view");
-    if (!cont) return;
-
-    // Limpia y crea botones consistentes en cada render para evitar "listeners zombies"
-    cont.innerHTML = "";
-
-    // Editar
-    const btnEdit = document.createElement("button");
-    btnEdit.id = "btn-edit";
-    btnEdit.className = "gc-btn";
-    btnEdit.textContent = "Editar";
-    btnEdit.addEventListener("click", () => {
-      setDrawerMode("edit");
-      fillCursoEdit(S.current ? S.current._all : it);
-    });
-    cont.appendChild(btnEdit);
-
-    // Acción primaria (Eliminar / Reactivar)
-    const btn = document.createElement("button");
-    btn.id = "btn-delete"; // mantenemos id por tu CSS existente
-    btn.className =
-      +it.estatus === 0 ? "gc-btn gc-btn--success" : "gc-btn gc-btn--danger";
-    btn.textContent = +it.estatus === 0 ? "Reactivar" : "Eliminar";
-    cont.appendChild(btn);
-
-    // confirmación simple solo para eliminar
-    let confirmTimer = null;
-
-    btn.addEventListener("click", async () => {
-      const isInactive = +it.estatus === 0;
-      // Reactivar directo
-      if (isInactive) {
-        btn.disabled = true;
-        try {
-          const prev = it.estatus;
-          it.estatus = 1; // optimista
-          updateRowStatusCell(it.id, it.estatus);
-          paintActions(it);
-          const ok = await updateCursoStatus(it.id, 1);
-          if (!ok) {
-            it.estatus = prev;
-            updateRowStatusCell(it.id, it.estatus);
-            paintActions(it);
-          } else {
-            toast("Curso reactivado", "exito");
-            await refreshCurrentFromList(it.id);
-          }
-        } finally {
-          btn.disabled = false;
-        }
-        return;
-      }
-
-      // Eliminar con confirmación
-      if (btn.dataset.confirm !== "1") {
-        btn.dataset.confirm = "1";
-        btn.textContent = "¿Confirmar?";
-        btn.classList.add("danger");
-        if (confirmTimer) clearTimeout(confirmTimer);
-        confirmTimer = setTimeout(() => {
-          btn.dataset.confirm = "0";
-          btn.textContent = "Eliminar";
-          btn.classList.remove("danger");
-          confirmTimer = null;
-        }, 3000);
-        return;
-      }
-
-      // Confirmado: inactivar
-      btn.disabled = true;
-      try {
-        const prev = it.estatus;
-        it.estatus = 0; // optimista
-        updateRowStatusCell(it.id, it.estatus);
-        paintActions(it);
-        const ok = await updateCursoStatus(it.id, 0);
-        if (!ok) {
-          it.estatus = prev;
-          updateRowStatusCell(it.id, it.estatus);
-          paintActions(it);
-        } else {
-          toast("Curso movido a Inactivo", "exito");
-          await refreshCurrentFromList(it.id);
-        }
-      } finally {
-        btn.disabled = false;
-        btn.dataset.confirm = "0";
-        if (confirmTimer) {
-          clearTimeout(confirmTimer);
-          confirmTimer = null;
-        }
-      }
-    });
-  }
-
-  function updateRowStatusCell(id, estatus) {
-    const row =
-      qs(`.table-row[data-mod="curso"][data-id="${id}"]`) ||
-      qs(`.table-row-mobile[data-mod="curso"][data-id="${id}"]`);
-    if (!row) return;
-    const cell =
-      row.querySelector(".col-status") ||
-      row.querySelector(".status") ||
-      row.querySelector(".col-nombre"); // fallback
-    if (cell) cell.textContent = STATUS_LABEL[estatus] || estatus;
-    // también refresca campo en vista
-    put("#v_estatus", STATUS_LABEL[estatus] || estatus);
+  function put(sel, val) {
+    const el = qs(sel);
+    if (el) el.innerHTML = esc(val ?? "—");
   }
 
   async function fillCursoView(it) {
     console.log(TAG, "fillCursoView id=", it?.id, it);
-
-    // Asegura que current apunte al mismo objeto que está en S.data (para optimismo)
-    const live = (S.data || []).find((x) => +x.id === +it.id) || it;
-    S.current = { id: live.id, _all: live };
-    it = live;
-
     const title = qs("#drawer-curso-title");
     if (title) title.textContent = "Curso · " + (it.nombre || "—");
+
     put("#v_nombre", it.nombre);
     put("#v_desc_breve", it.descripcion_breve);
     put("#v_desc_media", it.descripcion_media);
@@ -682,21 +713,16 @@
     put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
 
     await mountCursoMediaView(qs("#media-curso"), it.id);
-
     const pre = qs("#json-curso");
     if (pre) pre.textContent = JSON.stringify(it, null, 2);
 
-    // Acciones unificadas
+    // Pinta acciones con estilos reutilizados
     paintActions(it);
   }
   window.fillCursoView = fillCursoView;
 
   async function openCursoView(id) {
-    // Evita colisiones con otros módulos (Noticias, etc.)
-    if (window.__activeModule && window.__activeModule !== "cursos") {
-      console.log(TAG, "openCursoView ignorado; módulo activo:", window.__activeModule);
-      return;
-    }
+    if (window.__activeModule !== "cursos") return;
     const it = (S.data || []).find((x) => +x.id === +id);
     console.log(TAG, "openCursoView id=", id, "found:", !!it);
     if (!it) return;
@@ -743,7 +769,8 @@
     el.innerHTML = opts
       .map(
         (o) =>
-          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${o.l
+          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${
+            o.l
           }</option>`
       )
       .join("");
@@ -768,8 +795,8 @@
     if (!cursoId) throw new Error("Falta cursoId para subir imagen");
     console.log(TAG, "uploadCursoCover id=", cursoId, file);
     const fd = new FormData();
-    fd.append("curso_id", String(cursoId)); // verifica que tu PHP espere esta clave
-    fd.append("imagen", file); // verifica nombre del field en PHP
+    fd.append("curso_id", String(cursoId));
+    fd.append("imagen", file);
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     const text = await res.text().catch(() => "");
     console.log(TAG, "upload HTTP", res.status, "raw:", text);
@@ -784,27 +811,100 @@
     }
   }
 
+  function previewOverlay(file, { onConfirm, onCancel }) {
+    const url = URL.createObjectURL(file);
+    const o = document.createElement("div");
+    o.style.cssText =
+      "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(17,24,39,.55)";
+    const m = document.createElement("div");
+    m.style.cssText =
+      "background:#fff;border-radius:14px;box-shadow:0 20px 40px rgba(0,0,0,.25);width:min(920px,94vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;";
+    m.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid #eee;background:#f8fafc;">
+        <div style="font-weight:700;">Vista previa de imagen</div>
+        <button type="button" data-x="close" class="gc-btn gc-btn--ghost" style="min-width:auto;padding:.35rem .6rem;">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px;align-items:start;">
+        <div style="border:1px solid #eee;border-radius:12px;padding:8px;background:#fafafa;display:flex;align-items:center;justify-content:center;min-height:320px;max-height:60vh;">
+          <img src="${url}" alt="Vista previa" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;">
+        </div>
+        <div style="border-left:1px dashed #e6e6e6;padding-left:16px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-weight:600;">Detalles</div>
+          <div style="font-size:.92rem;color:#444;line-height:1.35;">
+            <div><strong>Archivo:</strong> ${esc(file.name)}</div>
+            <div><strong>Peso:</strong> ${humanSize(file.size)}</div>
+            <div><strong>Tipo:</strong> ${esc(file.type || "—")}</div>
+            <div style="margin-top:6px;color:#666;">Formatos: JPG / PNG · Máx 2MB</div>
+          </div>
+          <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="gc-btn gc-btn--primary" data-x="ok">Subir</button>
+            <button class="gc-btn gc-btn--ghost" data-x="cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>`;
+    o.appendChild(m);
+    document.body.appendChild(o);
+    document.body.style.overflow = "hidden";
+    function cleanup() {
+      URL.revokeObjectURL(url);
+      o.remove();
+      document.body.style.overflow = "";
+    }
+    o.addEventListener("click", (e) => {
+      if (e.target === o) {
+        onCancel && onCancel();
+        cleanup();
+      }
+    });
+    m.querySelector('[data-x="close"]').addEventListener("click", () => {
+      onCancel && onCancel();
+      cleanup();
+    });
+    m.querySelector('[data-x="cancel"]').addEventListener("click", () => {
+      onCancel && onCancel();
+      cleanup();
+    });
+    m.querySelector('[data-x="ok"]').addEventListener("click", async () => {
+      try {
+        await onConfirm?.();
+      } finally {
+        cleanup();
+      }
+    });
+
+    const body = m.children[1],
+      side = body.children[1];
+    const mql = window.matchMedia("(max-width: 720px)");
+    function apply() {
+      if (mql.matches) {
+        body.style.gridTemplateColumns = "1fr";
+        side.style.borderLeft = "none";
+        side.style.paddingLeft = "0";
+      } else {
+        body.style.gridTemplateColumns = "1fr 280px";
+        side.style.borderLeft = "1px dashed #e6e6e6";
+        side.style.paddingLeft = "16px";
+      }
+    }
+    mql.addEventListener("change", apply);
+    apply();
+  }
+
   function mountCursoMediaEdit(containerEl, cursoId) {
     if (!containerEl) return;
     containerEl.innerHTML = `
-      <div class="media-head">
-        <div class="media-title">Imágenes</div>
-        <div class="media-help">JPG/PNG · Máx 2MB</div>
-      </div>
+      <div class="media-head"><div class="media-title">Imágenes</div><div class="media-help">JPG/PNG · Máx 2MB</div></div>
       <div class="media-grid">
         <div class="media-card">
           <figure class="media-thumb">
             <img alt="Portada" id="curso-cover-edit" loading="eager" src="">
             <button class="icon-btn media-edit" type="button" title="Editar imagen" aria-label="Editar imagen">
-              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path>
-              </svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"></path></svg>
             </button>
           </figure>
           <div class="media-meta"><div class="media-label">Portada</div></div>
         </div>
-      </div>
-    `;
+      </div>`;
     const img = containerEl.querySelector("#curso-cover-edit");
     const pencil = containerEl.querySelector(".media-edit");
 
@@ -817,7 +917,7 @@
         img.src = noImageSvgDataURI();
       };
     } else {
-      img.src = noImageSvgDataURI(); // crear: placeholder
+      img.src = noImageSvgDataURI();
       if (S.tempNewCourseImage instanceof File) {
         const u = URL.createObjectURL(S.tempNewCourseImage);
         img.src = u;
@@ -850,17 +950,19 @@
           return;
         }
 
-        // editar: subir
-        const overlay = confirm("¿Subir nueva imagen de portada?");
-        if (!overlay) return;
-        try {
-          const newUrl = await uploadCursoCover(cursoId, file);
-          img.src = withBust(newUrl);
-          toast("Imagen actualizada", "exito");
-        } catch (err) {
-          console.error(TAG, "upload error", err);
-          toast("No se pudo subir la imagen", "error");
-        }
+        previewOverlay(file, {
+          onCancel() {},
+          async onConfirm() {
+            try {
+              const newUrl = await uploadCursoCover(cursoId, file);
+              img.src = withBust(newUrl);
+              toast("Imagen actualizada", "exito");
+            } catch (err) {
+              console.error(TAG, "upload error", err);
+              toast("No se pudo subir la imagen", "error");
+            }
+          },
+        });
       });
       input.click();
     });
@@ -905,7 +1007,7 @@
   }
   window.fillCursoEdit = fillCursoEdit;
 
-  /* ---------- Cambios de estatus (soft delete / reactivar) ---------- */
+  /* ---------- Cambios de estatus (optimistas) ---------- */
   async function updateCursoStatus(id, estatus, extra = {}) {
     if (!id) return false;
     try {
@@ -926,17 +1028,6 @@
       console.error(TAG, "updateCursoStatus ERROR:", err);
       toast("No se pudo actualizar el estatus.", "error");
       return false;
-    }
-  }
-
-  async function refreshCurrentFromList(id) {
-    // actualiza S.current._all desde S.data y vuelve a pintar JSON/estatus
-    const it = (S.data || []).find((x) => +x.id === +id);
-    if (it) {
-      S.current = { id: it.id, _all: it };
-      put("#v_estatus", STATUS_LABEL[it.estatus] || it.estatus);
-      const pre = qs("#json-curso");
-      if (pre) pre.textContent = JSON.stringify(it, null, 2);
     }
   }
 
@@ -980,10 +1071,8 @@
       let newId = body.id;
 
       if (body.id == null) {
-        // INSERT -> agrega creado_por desde cookie `usuario`
         const creado_por = getCreatorId();
         if (creado_por == null) {
-          console.warn(TAG, "creado_por ausente. No se puede crear el curso.");
           toast(
             "No se puede crear: falta el id de usuario (creado_por).",
             "error"
@@ -992,22 +1081,17 @@
         }
         const insertBody = { ...body, creado_por };
         console.log(TAG, "Insertando curso con:", insertBody);
-
         const res = await postJSON(API.iCursos, insertBody);
-        console.log(TAG, "Respuesta insert:", res);
         if (res && res.error) {
           console.error(TAG, "Insert ERROR:", res.error);
           toast(res.error, "error");
           return;
         }
-
-        // id devuelto por la API
         const idCand =
           res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id;
         newId = Number(idCand || 0);
         console.log(TAG, "Nuevo ID:", newId);
 
-        // Subida diferida de portada si venía seleccionada en "crear"
         if (newId && S.tempNewCourseImage instanceof File) {
           try {
             const url = await uploadCursoCover(newId, S.tempNewCourseImage);
@@ -1021,28 +1105,54 @@
           }
         }
       } else {
-        // UPDATE
         console.log(TAG, "Actualizando curso id=", body.id);
+
+        if (idx >= 0) {
+          S.data[idx] = { ...S.data[idx], ...body };
+          sortCursosInPlace();
+          refreshListView();
+        }
+        if (S.current) {
+          S.current._all = { ...S.current._all, ...body };
+        }
+
         const resU = await postJSON(API.uCursos, body);
-        console.log(TAG, "Respuesta update:", resU);
         if (resU && resU.error) {
           console.error(TAG, "Update ERROR:", resU.error);
           toast(resU.error, "error");
           return;
         }
+
+        // Actualiza el S.data local y la fila
+        const idx = S.data.findIndex((x) => +x.id === +body.id);
+        if (idx >= 0) {
+          S.data[idx] = { ...S.data[idx], ...body };
+          updateRowStatusCell(body.id, S.data[idx].estatus);
+        }
+        if (S.current) {
+          S.current._all = { ...S.current._all, ...body };
+        }
       }
 
       toast("Curso guardado", "exito");
 
-      // Refresca lista y reabre el curso (manteniendo paginación y búsqueda actuales)
-      await loadCursos();
-      const idToOpen = newId || body.id;
-      const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
-      console.log(TAG, "Reabrir id=", idToOpen, "found:", !!it);
-      if (it) {
-        S.current = { id: it.id, _all: it };
-        setDrawerMode("view");
-        await fillCursoView(it);
+      if (newId) {
+        // refresca lista mínima: trae el curso recién insertado (opcional) o recarga suave
+        await loadCursos();
+        const it = (S.data || []).find((x) => +x.id === +newId) || S.data[0];
+        if (it) {
+          S.current = { id: it.id, _all: it };
+          setDrawerMode("view");
+          await fillCursoView(it);
+        }
+      } else if (S.current?.id) {
+        // Para update, solo reabrimos el mismo
+        const it = (S.data || []).find((x) => +x.id === +S.current.id);
+        if (it) {
+          S.current._all = it;
+          setDrawerMode("view");
+          await fillCursoView(it);
+        }
       }
     } catch (err) {
       console.error(TAG, "saveCurso ERROR:", err);
@@ -1054,7 +1164,6 @@
   /* ==================== API para Router-lite ==================== */
   async function mount() {
     console.log(TAG, "mount() INICIO");
-    // marca módulo activo para evitar colisiones con noticias, etc.
     window.__activeModule = "cursos";
     try {
       const hostD = qs("#recursos-list");
@@ -1063,7 +1172,6 @@
       await loadCatalogos();
       await loadCursos();
 
-      // bind búsqueda por si el router no lo hizo aún
       const s = qs("#search-input");
       if (s && !s._b) {
         s._b = true;
@@ -1112,9 +1220,7 @@
 
   // expone API pública para el router
   window.cursos = { mount, openCreate: openCursoCreate };
-
-  // opcional/legacy
-  window.cursosLoad = { loadCatalogos, loadCursos };
+  window.cursosLoad = { loadCatalogos, loadCursos }; // opcional/legacy
 
   console.log(TAG, "Módulo cursos cargado.");
 })();

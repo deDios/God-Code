@@ -57,20 +57,20 @@
     String(s ?? "").replace(
       /[&<>"']/g,
       (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[c])
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
     );
   const fmtMoney = (n) =>
     isFinite(+n)
       ? new Intl.NumberFormat("es-MX", {
-        style: "currency",
-        currency: "MXN",
-      }).format(+n)
+          style: "currency",
+          currency: "MXN",
+        }).format(+n)
       : "-";
   const fmtBool = (v) => (+v === 1 || v === true || v === "1" ? "Sí" : "No");
   const fmtDate = (d) => (!d ? "-" : String(d));
@@ -126,7 +126,7 @@
       const j = JSON.parse(text);
       console.log(TAG, "JSON OK:", j);
       return j;
-    } catch { }
+    } catch {}
 
     // 2) recorta bloque JSON { .. } o [ .. ]
     const firstBrace = text.indexOf("{");
@@ -143,7 +143,7 @@
         const j2 = JSON.parse(candidate);
         console.warn(TAG, "JSON trimmed:", j2);
         return j2;
-      } catch { }
+      } catch {}
     }
 
     console.warn(TAG, "JSON parse failed; returning _raw");
@@ -368,11 +368,11 @@
             <div class="table-row" role="row" data-mod="curso" data-id="${it.id}">
               <div class="col-nombre" role="cell">${esc(it.nombre || "-")}</div>
               <div class="col-tutor"  role="cell">${esc(
-              mapLabel(S.maps.tutores, it.tutor)
-            )}</div>
+                mapLabel(S.maps.tutores, it.tutor)
+              )}</div>
               <div class="col-fecha"  role="cell">${esc(
-              fmtDate(it.fecha_inicio)
-            )}</div>
+                fmtDate(it.fecha_inicio)
+              )}</div>
               <div class="col-status" role="cell">${esc(est)}</div>
             </div>
           `
@@ -415,7 +415,7 @@
               e.stopPropagation();
               const id = Number(
                 btn.closest('.table-row-mobile[data-mod="curso"]')?.dataset.id ||
-                0
+                  0
               );
               console.log(TAG, "open mobile id=", id);
               if (id) openCursoView(id);
@@ -526,8 +526,8 @@
         <div class="media-card">
           <figure class="media-thumb">
             <img alt="Portada" id="curso-cover-view" loading="eager" src="${esc(
-      url
-    )}">
+              url
+            )}">
           </figure>
           <div class="media-meta"><div class="media-label">Portada</div></div>
         </div>
@@ -743,7 +743,8 @@
     el.innerHTML = opts
       .map(
         (o) =>
-          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${o.l
+          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${
+            o.l
           }</option>`
       )
       .join("");
