@@ -1,3 +1,4 @@
+/* ==================== CURSOS (UAT) — Núcleo + Listado + Drawer ==================== */
 (() => {
   "use strict";
 
@@ -47,7 +48,8 @@
     4: "En curso",
     5: "Cancelado",
   };
-  const ORDER_CURSOS = [1, 0, 2, 3, 4, 5];
+  // NUEVO ORDEN: Activo, En curso, Terminado, Pausado, Cancelado, Inactivo
+  const ORDER_CURSOS = [1, 4, 3, 2, 5, 0];
 
   /* ---------- Utils DOM/format ---------- */
   const qs = (s, r = document) => r.querySelector(s);
@@ -91,10 +93,7 @@
       const raw = document.cookie
         .split("; ")
         .find((r) => r.startsWith("usuario="));
-      if (!raw) {
-        console.warn(TAG, "Cookie 'usuario' no encontrada.");
-        return null;
-      }
+      if (!raw) return null;
       const json = decodeURIComponent(raw.split("=")[1] || "");
       const u = JSON.parse(json);
       const n = Number(u?.id);
@@ -202,7 +201,6 @@
     confirm = false,
     onConfirm,
   }) {
-    // construye overlay según tu snippet existente
     const ov = document.createElement("div");
     ov.className = "gc-preview-overlay";
     ov.setAttribute("role", "dialog");
@@ -338,8 +336,8 @@
     if (!cursoId) throw new Error("Falta cursoId para subir imagen");
     console.log(TAG, "uploadCursoCover id=", cursoId, file);
     const fd = new FormData();
-    fd.append("curso_id", String(cursoId)); // verifica que tu PHP espere esta clave
-    fd.append("imagen", file); // verifica nombre del field en PHP
+    fd.append("curso_id", String(cursoId));
+    fd.append("imagen", file);
     const res = await fetch(API_UPLOAD.cursoImg, { method: "POST", body: fd });
     const text = await res.text().catch(() => "");
     console.log(TAG, "upload HTTP", res.status, "raw:", text);
@@ -372,7 +370,6 @@
         ov.addEventListener("click", closeDrawerCurso);
       }
     }
-    // botón cerrar
     qsa("#drawer-curso-close").forEach((b) => {
       if (!b._b) {
         b._b = true;
@@ -382,7 +379,6 @@
         });
       }
     });
-    // ESC
     if (!window._gc_cursos_esc) {
       window._gc_cursos_esc = true;
       document.addEventListener("keydown", (e) => {
@@ -436,7 +432,7 @@
     return k in map ? map[k] ?? "-" : "-";
   }
 
-  /* ---------- Export utils (por si otros módulos dependen) ---------- */
+  /* ---------- Export utils ---------- */
   window.gcUtils = Object.assign({}, window.gcUtils || {}, {
     qs,
     qsa,
@@ -501,8 +497,20 @@
     });
     S.data = flat;
     S.page = 1;
+    resortList(); // asegura orden secundario por nombre
     console.log(TAG, "Cursos cargados:", S.data.length);
     renderCursos();
+  }
+
+  // Resort de la lista en vivo (usa ORDER_CURSOS)
+  function resortList() {
+    const rank = new Map(ORDER_CURSOS.map((st, i) => [String(st), i]));
+    S.data.sort((a, b) => {
+      const ra = rank.get(String(a.estatus)) ?? 999;
+      const rb = rank.get(String(b.estatus)) ?? 999;
+      if (ra !== rb) return ra - rb;
+      return String(a.nombre || "").localeCompare(String(b.nombre || ""));
+    });
   }
 
   function statusText(estatus) {
@@ -670,7 +678,10 @@
 
   /* ---------- Búsqueda: usa utils.admin.js si existe ---------- */
   function wireSearch() {
-    const ph = "Buscar cursos…";
+    const ph = "Buscar por nombre, tutor, fecha o estatus…";
+    const tip =
+      "Filtra por: nombre de curso, nombre del tutor, fecha (YYYY-MM-DD) o estatus (Activo, En curso, Terminado, Pausado, Cancelado, Inactivo).";
+
     if (window.gcSearch?.register) {
       if (!window._search_cursos_wired) {
         window._search_cursos_wired = true;
@@ -683,13 +694,15 @@
           },
           { placeholder: ph }
         );
+        const inp = document.querySelector("#search-input");
+        if (inp) inp.title = tip;
       }
     } else {
-      // fallback local (si no está gcSearch)
       const s = qs("#search-input");
       if (s && !s._b) {
         s._b = true;
         s.placeholder = ph;
+        s.title = tip;
         s.addEventListener("input", (e) => {
           S.search = e.target.value || "";
           S.page = 1;
@@ -715,7 +728,7 @@
       act && (act.style.display = "none");
     }
   }
-  window.setDrawerMode = setDrawerMode; // compat
+  window.setDrawerMode = setDrawerMode;
 
   function put(sel, val) {
     const el = qs(sel);
@@ -747,7 +760,6 @@
         img.onerror = null;
         img.src = noImageSvgDataURI();
       };
-      // Preview solo lectura al hacer click
       img.style.cursor = "zoom-in";
       img.addEventListener("click", () => {
         openImagePreview({
@@ -763,7 +775,6 @@
     const cont = qs("#curso-actions-view");
     if (!cont) return;
 
-    // Limpia y crea botones consistentes en cada render para evitar "listeners zombies"
     cont.innerHTML = "";
 
     // Editar
@@ -777,21 +788,22 @@
     });
     cont.appendChild(btnEdit);
 
-    // Acción primaria (Eliminar / Reactivar)
+    // Acción primaria
+    const isInactive = +it.estatus === 0;
     const btn = document.createElement("button");
-    btn.id = "btn-delete"; // mantenemos id por tu CSS existente
-    btn.className =
-      +it.estatus === 0 ? "gc-btn gc-btn--success" : "gc-btn gc-btn--danger";
-    btn.textContent = +it.estatus === 0 ? "Reactivar" : "Eliminar";
+    btn.id = isInactive ? "btn-reactivar" : "btn-delete"; // ID distinto
+    btn.className = isInactive
+      ? "gc-btn gc-btn--success" // verde sólido
+      : "gc-btn gc-btn--danger";
+    btn.textContent = isInactive ? "Reactivar" : "Eliminar";
     cont.appendChild(btn);
 
     // confirmación simple solo para eliminar
     let confirmTimer = null;
 
     btn.addEventListener("click", async () => {
-      const isInactive = +it.estatus === 0;
-      // Reactivar directo
       if (isInactive) {
+        // Reactivar directo
         btn.disabled = true;
         try {
           const prev = it.estatus;
@@ -806,6 +818,8 @@
           } else {
             toast("Curso reactivado", "exito");
             await refreshCurrentFromList(it.id);
+            resortList(); // resort tras cambio
+            renderCursos();
           }
         } finally {
           btn.disabled = false;
@@ -843,6 +857,8 @@
         } else {
           toast("Curso movido a Inactivo", "exito");
           await refreshCurrentFromList(it.id);
+          resortList(); // resort tras cambio
+          renderCursos();
         }
       } finally {
         btn.disabled = false;
@@ -870,14 +886,11 @@
         else cell.textContent = statusText(estatus);
       }
     }
-    // también refresca campo en vista (texto plano)
     put("#v_estatus", statusText(estatus));
   }
 
   async function fillCursoView(it) {
     console.log(TAG, "fillCursoView id=", it?.id, it);
-
-    // Asegura que current apunte al mismo objeto que está en S.data (para optimismo)
     const live = (S.data || []).find((x) => +x.id === +it.id) || it;
     S.current = { id: live.id, _all: live };
     it = live;
@@ -909,13 +922,11 @@
     const pre = qs("#json-curso");
     if (pre) pre.textContent = JSON.stringify(it, null, 2);
 
-    // Acciones unificadas
     paintActions(it);
   }
   window.fillCursoView = fillCursoView;
 
   async function openCursoView(id) {
-    // Evita colisiones con otros módulos (Noticias, etc.)
     if (window.__activeModule && window.__activeModule !== "cursos") {
       console.log(
         TAG,
@@ -1028,21 +1039,18 @@
           return;
         }
 
-        // Abre preview con confirm
         openImagePreview({
           file,
           confirm: true,
           title: "Vista previa de portada",
           onConfirm: async () => {
             if (!cursoId) {
-              // crear: solo guarda en buffer y muestra imagen local
               const url = URL.createObjectURL(file);
               img.src = withBust(url);
               S.tempNewCourseImage = file;
               toast("Imagen lista; se subirá al guardar.", "info");
               return;
             }
-            // editar: subir de inmediato
             try {
               const newUrl = await uploadCursoCover(cursoId, file);
               img.src = withBust(newUrl);
@@ -1099,7 +1107,7 @@
   }
   window.fillCursoEdit = fillCursoEdit;
 
-  /* ---------- Cambios de estatus (soft delete / reactivar) ---------- */
+  /* ---------- Cambios de estatus ---------- */
   async function updateCursoStatus(id, estatus, extra = {}) {
     if (!id) return false;
     try {
@@ -1124,7 +1132,6 @@
   }
 
   async function refreshCurrentFromList(id) {
-    // actualiza S.current._all desde S.data y vuelve a pintar JSON/estatus
     const it = (S.data || []).find((x) => +x.id === +id);
     if (it) {
       S.current = { id: it.id, _all: it };
@@ -1158,7 +1165,6 @@
     };
     console.log(TAG, "saveCurso() body=", body);
 
-    // Validación mínima
     if (
       !body.nombre ||
       !body.descripcion_breve ||
@@ -1174,10 +1180,8 @@
       let newId = body.id;
 
       if (body.id == null) {
-        // INSERT -> agrega creado_por desde cookie `usuario`
         const creado_por = getCreatorId();
         if (creado_por == null) {
-          console.warn(TAG, "creado_por ausente. No se puede crear el curso.");
           toast(
             "No se puede crear: falta el id de usuario (creado_por).",
             "error"
@@ -1185,23 +1189,16 @@
           return;
         }
         const insertBody = { ...body, creado_por };
-        console.log(TAG, "Insertando curso con:", insertBody);
-
         const res = await postJSON(API.iCursos, insertBody);
-        console.log(TAG, "Respuesta insert:", res);
         if (res && res.error) {
-          console.error(TAG, "Insert ERROR:", res.error);
           toast(res.error, "error");
           return;
         }
 
-        // id devuelto por la API
         const idCand =
           res?.id ?? res?.curso_id ?? res?.insert_id ?? res?.data?.id;
         newId = Number(idCand || 0);
-        console.log(TAG, "Nuevo ID:", newId);
 
-        // Subida diferida de portada si venía seleccionada en "crear"
         if (newId && S.tempNewCourseImage instanceof File) {
           try {
             const url = await uploadCursoCover(newId, S.tempNewCourseImage);
@@ -1215,24 +1212,17 @@
           }
         }
       } else {
-        // UPDATE
-        console.log(TAG, "Actualizando curso id=", body.id);
         const resU = await postJSON(API.uCursos, body);
-        console.log(TAG, "Respuesta update:", resU);
         if (resU && resU.error) {
-          console.error(TAG, "Update ERROR:", resU.error);
           toast(resU.error, "error");
           return;
         }
       }
 
       toast("Curso guardado", "exito");
-
-      // Refresca lista y reabre el curso (manteniendo paginación y búsqueda actuales)
       await loadCursos();
       const idToOpen = newId || body.id;
       const it = (S.data || []).find((x) => +x.id === +idToOpen) || S.data[0];
-      console.log(TAG, "Reabrir id=", idToOpen, "found:", !!it);
       if (it) {
         S.current = { id: it.id, _all: it };
         setDrawerMode("view");
@@ -1248,7 +1238,6 @@
   /* ==================== API para Router-lite ==================== */
   async function mount() {
     console.log(TAG, "mount() INICIO");
-    // marca módulo activo para evitar colisiones con noticias, etc.
     window.__activeModule = "cursos";
     try {
       const hostD = qs("#recursos-list");
@@ -1294,7 +1283,6 @@
     fillCursoEdit(blank);
   }
 
-  // expone API pública para el router
   window.cursos = { mount, openCreate: openCursoCreate };
 
   console.log(TAG, "Módulo cursos cargado.");
