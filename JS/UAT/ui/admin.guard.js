@@ -3,11 +3,26 @@
 
   const ADMIN_IDS = [1, 12, 13, 17, 18];
 
-  const HEADER_SEL = [
-    ".dashboard-header",
+  const MODULE_BAR_SEL = [
+    ".gc-toolbar",
+    ".gc-admin-header",
+    ".admin-subheader",
+    ".resources-header",
+    ".recursos-head",
+    ".mod-toolbar",
+    ".top-controls",
+    ".filters-row",
+    ".breadcrumbs-row",
   ];
-  const ADD_BUTTON_SEL = ["#btn-add", ".gc-fab", ".add-resource"];
-  const SEARCH_SEL = ["#search-input", ".gc-search", ".searchbar"];
+  
+  const MODULE_AUX_SEL = [
+    "#btn-add",
+    ".gc-fab",
+    ".add-resource",
+    "#search-input",
+    ".gc-search",
+    ".searchbar",
+  ];
 
   // ======= Helpers =======
   function getUserIdFromCookie() {
@@ -38,7 +53,7 @@
     const side = document.querySelector(".gc-side");
     if (!side) return;
 
-    // deja solo el item "Cuenta" si existe; si no, crea uno mínimo
+    // deja solo el item "Cuenta"
     const items = Array.from(side.querySelectorAll('.nav-item[href^="#/"]'));
     const cuenta = items.find(
       (a) => (a.getAttribute("href") || "").trim() === "#/cuenta"
@@ -57,26 +72,22 @@
       side.appendChild(li);
     }
 
-    // título grande del sidebar
     const bigTitle = side.querySelector(".side-title, .title, h3");
     if (bigTitle) bigTitle.textContent = "Cuenta";
   }
 
   function clearMainLists() {
-    const ids = [
+    [
       "#recursos-list",
       "#recursos-list-mobile",
       "#pagination-controls",
       "#pagination-mobile",
-    ];
-    ids.forEach((id) => {
+    ].forEach((id) => {
       const el = document.querySelector(id);
       if (el) el.innerHTML = "";
     });
-
     const tc = document.querySelector("#mod-count");
     if (tc) tc.textContent = "—";
-
     const head = document.querySelector(
       ".recursos-box.desktop-only .table-header"
     );
@@ -84,7 +95,6 @@
   }
 
   function findContentHost() {
-    // dónde colocar el placeholder
     return (
       document.querySelector("#gc-admin-content") ||
       document.querySelector(".gc-content") ||
@@ -119,7 +129,6 @@
   }
 
   function makeWipSVG() {
-    // engranes / candado suave
     return `
       <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
         <rect x="6" y="18" width="80" height="60" rx="12" fill="#E8EEFF"/>
@@ -136,7 +145,6 @@
     clearMainLists();
 
     const host = findContentHost();
-    // elimina cualquier placeholder previo
     host.querySelectorAll(".guard-placeholder").forEach((n) => n.remove());
 
     const box = document.createElement("section");
@@ -160,30 +168,21 @@
     if (title) title.textContent = "Cuenta";
   }
 
-  function hideHeaderAndSearch() {
-    hideEls(HEADER_SEL);
-    hideEls(ADD_BUTTON_SEL);
-    hideEls(SEARCH_SEL);
+  // Solo oculta la barra del MÓDULO (buscador/título/estatus/“+”), no el header global
+  function hideModuleHeaderBar() {
+    hideEls(MODULE_BAR_SEL);
+    hideEls(MODULE_AUX_SEL);
   }
 
   function applyRestrictedUI() {
-    // 1) Oculta header + acciones
-    hideHeaderAndSearch();
-
-    // 2) Sidebar mínima
+    hideModuleHeaderBar();
     stripSidebarToCuenta();
-
-    // 3) Fuerza ruta y limpia tabla
-    if (location.hash !== "#/cuenta") {
-      // replace para no contaminar el historial
-      location.replace("#/cuenta");
-    }
+    if (location.hash !== "#/cuenta") location.replace("#/cuenta");
     renderPlaceholderCuenta();
   }
 
   // ======= Init =======
   function init() {
-    // si ya decidió alguien, respétalo
     if (window.__adminGuardRestricted === true) {
       applyRestrictedUI();
       return;
@@ -199,13 +198,11 @@
     if (!isAdmin) applyRestrictedUI();
   }
 
-  // Ejecuta en cuanto haya DOM
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
 
-  // Expone por si quieres forzar en consola:
   window.AdminGuard = { init, applyRestrictedUI };
 })();
