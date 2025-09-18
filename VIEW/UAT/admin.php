@@ -262,10 +262,19 @@
 
     </main>
 
-    <!-- Drawers para cada modulo (cursos,noticias,tutores,usuarios,suscripciones de momento son esos solamente) -->
+
+
+
+
+
+
+
+
+
+    
 
     <!-- Drawer: Curso -->
-    <aside id="drawer-curso" class="drawer gc-dash" aria-hidden="true" hidden>
+    <aside id="drawer-curso" class="drawer gc-dash" data-module="" aria-hidden="true" hidden>
         <div class="drawer-header">
             <div class="drawer-title" id="drawer-curso-title">Curso · —</div>
             <div class="drawer-actions">
@@ -278,6 +287,16 @@
             <div class="gc-actions" id="curso-actions-view">
                 <!-- aquí inyectamos el botón dinamicamente -->
             </div>
+
+
+
+
+
+
+
+
+
+
 
             <!----------------------------------  MODO VISTA  ---------------------------------------------->
             <section id="curso-view" class="mode-view">
@@ -387,6 +406,15 @@
                         style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
                 </details>
             </section>
+
+
+
+
+
+
+
+
+
 
             <!-------------------------------------------- MODO EDICIÓN  ---------------------------------->
             <section id="curso-edit" class="mode-edit" hidden>
@@ -517,312 +545,6 @@
 
 
 
-
-
-
-
-    <!-- ------------------------------------------ Drawer  Noticias ----------------------------- -->
-    <aside id="drawer-curso" class="drawer gc-dash" hidden aria-hidden="true">
-        <!-- Header -->
-        <header class="drawer-head">
-            <h3 id="drawer-curso-title">Noticia · —</h3>
-            <button id="drawer-curso-close" class="icon-btn" title="Cerrar" aria-label="Cerrar">
-                ✕
-            </button>
-        </header>
-
-        <!-- Contenido scroll -->
-        <div class="drawer-body">
-            <!-- ===== Vista (read-only) ===== -->
-            <section id="curso-view">
-                <!-- Acciones (editar / eliminar o reactivar) -->
-                <div class="gc-actions" id="curso-actions-view">
-                    <button class="gc-btn" id="btn-edit">Editar</button>
-                    <button class="gc-btn gc-btn--danger" id="btn-delete" data-step="1">Eliminar</button>
-                </div>
-
-                <!-- Grid principal -->
-                <div class="grid-two">
-                    <!-- Columna izquierda -->
-                    <div class="card">
-                        <h4 class="card-title">Contenido</h4>
-                        <div class="kv">
-                            <div class="k">Título</div>
-                            <div class="v" id="v_nombre">—</div>
-                        </div>
-                        <div class="kv">
-                            <div class="k">Resumen</div>
-                            <div class="v" id="v_desc_breve">—</div>
-                        </div>
-                        <div class="kv">
-                            <div class="k">Cuerpo</div>
-                            <div class="v" id="v_desc_media">—</div>
-                        </div>
-
-                        <!-- Campos “compat” (no usados en noticias pero los dejamos para que el JS no truene) -->
-                        <div class="kv" style="display:none">
-                            <div class="k">Descripción curso</div>
-                            <div class="v" id="v_desc_curso">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Dirigido</div>
-                            <div class="v" id="v_dirigido">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Competencias</div>
-                            <div class="v" id="v_competencias">—</div>
-                        </div>
-
-                        <div class="sep"></div>
-
-                        <div class="kv">
-                            <div class="k">Fecha</div>
-                            <div class="v" id="v_fecha">—</div>
-                        </div>
-                        <div class="kv">
-                            <div class="k">Estatus</div>
-                            <div class="v" id="v_estatus">—</div>
-                        </div>
-
-                        <!-- Más “compat” ocultos -->
-                        <div class="kv" style="display:none">
-                            <div class="k">Tutor</div>
-                            <div class="v" id="v_tutor">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Categoría</div>
-                            <div class="v" id="v_categoria">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Prioridad</div>
-                            <div class="v" id="v_prioridad">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Tipo evaluación</div>
-                            <div class="v" id="v_tipo_eval">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Actividades</div>
-                            <div class="v" id="v_actividades">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Calendario</div>
-                            <div class="v" id="v_calendario">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Horas</div>
-                            <div class="v" id="v_horas">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Precio</div>
-                            <div class="v" id="v_precio">—</div>
-                        </div>
-                        <div class="kv" style="display:none">
-                            <div class="k">Certificado</div>
-                            <div class="v" id="v_certificado">—</div>
-                        </div>
-                    </div>
-
-                    <!-- Columna derecha: Imágenes -->
-                    <div class="card">
-                        <div id="media-curso">
-                            <!-- lo rellena JS: 2 imágenes (pos 1 y 2) -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Debug JSON -->
-                <div class="card" style="margin-top:12px">
-                    <h4 class="card-title">Debug</h4>
-                    <pre id="json-curso" class="debug-pre">—</pre>
-                </div>
-            </section>
-
-            <!-- ===== Edición (form) ===== -->
-            <section id="curso-edit" hidden>
-                <form class="form-grid" onsubmit="return false;">
-                    <div class="card">
-                        <h4 class="card-title">Editar noticia</h4>
-
-                        <label class="f">
-                            <span class="l">Título</span>
-                            <input type="text" id="f_nombre" placeholder="Título de la noticia" />
-                        </label>
-
-                        <label class="f">
-                            <span class="l">Resumen</span>
-                            <textarea id="f_desc_breve" rows="3" placeholder="Resumen corto"></textarea>
-                        </label>
-
-                        <label class="f">
-                            <span class="l">Cuerpo</span>
-                            <textarea id="f_desc_media" rows="6" placeholder="Contenido principal"></textarea>
-                        </label>
-
-                        <!-- Campos compat ocultos (el JS los setea pero no se usan) -->
-                        <input id="f_desc_curso" type="hidden" />
-
-                        <label class="f">
-                            <span class="l">Estatus</span>
-                            <select id="f_estatus">
-                                <option value="1">Activo</option>
-                                <option value="0">Inactivo</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="card">
-                        <h4 class="card-title">Imágenes</h4>
-                        <div id="media-curso-edit">
-                            <!-- lo rellena JS con 2 tarjetas editables -->
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Acciones edición -->
-                <div class="gc-actions">
-                    <button class="gc-btn gc-btn--primary" id="btn-save">Guardar</button>
-                    <button class="gc-btn gc-btn--ghost" id="btn-cancel">Cancelar</button>
-                </div>
-            </section>
-        </div>
-    </aside>
-
-
-
-
-
-
-
-
-
-    <!-- Drawer · TUTOR -->
-    <aside id="drawer-tutor" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-            <div class="drawer-title" id="drawer-tutor-title">Tutor · —</div>
-            <div class="drawer-actions">
-                <button class="btn" id="drawer-tutor-close">Cerrar</button>
-            </div>
-        </div>
-
-        <div class="drawer-body" id="drawer-tutor-body">
-            <!-- Acciones (modo vista) -->
-            <div class="gc-actions" id="tutor-actions-view">
-                <button class="gc-btn" id="t-btn-edit">Editar</button>
-                <button class="gc-btn gc-btn--danger" id="t-btn-delete" data-step="1">Eliminar</button>
-            </div>
-
-            <!-- ===== MODO VISTA ===== -->
-            <section id="tutor-view" class="mode-view">
-                <div class="field">
-                    <div class="label">Nombre <span class="req">*</span></div>
-                    <div class="value" id="tv_nombre">—</div>
-                </div>
-
-                <div class="grid-3">
-                    <div class="field">
-                        <div class="label">Correo <span class="req">*</span></div>
-                        <div class="value" id="tv_correo">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Teléfono</div>
-                        <div class="value" id="tv_telefono">—</div>
-                    </div>
-                    <div class="field">
-                        <div class="label">Estatus</div>
-                        <div class="value" id="tv_estatus">—</div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Resumen</div>
-                    <div class="value" id="tv_resumen">—</div>
-                </div>
-
-                <div class="field">
-                    <div class="label">Descripción</div>
-                    <div class="value" id="tv_descripcion">—</div>
-                </div>
-
-                <!-- Foto (solo lectura) -->
-                <div class="field">
-                    <div class="label">Foto</div>
-                    <div class="value">
-                        <div id="media-tutor">
-                            <!-- mountTutorMediaView(...) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG recomendado 1:1.</div>
-                    </div>
-                </div>
-
-                <!-- JSON Dev -->
-                <details class="dev-json" id="tutor-json-box" open style="margin-top:16px;">
-                    <summary style="cursor:pointer;font-weight:600;">JSON · Tutor</summary>
-                    <div style="display:flex;gap:.5rem;margin:.5rem 0;">
-                        <button class="gc-btn" id="t-btn-copy-json">Copiar JSON</button>
-                    </div>
-                    <pre id="json-tutor" class="value"
-                        style="white-space:pre-wrap;max-height:260px;overflow:auto;">{}</pre>
-                </details>
-            </section>
-
-            <!-- ===== MODO EDICIÓN ===== -->
-            <section id="tutor-edit" class="mode-edit" hidden>
-                <div class="field">
-                    <label for="t_nombre">Nombre <span class="req">*</span></label>
-                    <input id="t_nombre" type="text" maxlength="120" data-max="120" />
-                    <small class="char-counter" data-for="t_nombre"></small>
-                </div>
-
-                <div class="grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-                    <div class="field">
-                        <label for="t_correo">Correo <span class="req">*</span></label>
-                        <input id="t_correo" type="email" maxlength="160" data-max="160" />
-                        <small class="char-counter" data-for="t_correo"></small>
-                    </div>
-                    <div class="field">
-                        <label for="t_telefono">Teléfono</label>
-                        <input id="t_telefono" type="tel" maxlength="32" data-max="32" />
-                        <small class="char-counter" data-for="t_telefono"></small>
-                    </div>
-                    <div class="field">
-                        <label for="t_estatus">Estatus</label>
-                        <select id="t_estatus"></select>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label for="t_resumen">Resumen</label>
-                    <textarea id="t_resumen" rows="3" maxlength="300" data-max="300"></textarea>
-                    <small class="char-counter" data-for="t_resumen"></small>
-                </div>
-
-                <div class="field">
-                    <label for="t_descripcion">Descripción</label>
-                    <textarea id="t_descripcion" rows="6" maxlength="4000" data-max="4000"></textarea>
-                    <small class="char-counter" data-for="t_descripcion"></small>
-                </div>
-
-                <!-- Foto (editable con lápiz) -->
-                <div class="field">
-                    <label>Foto</label>
-                    <div class="value">
-                        <div id="media-tutor-edit">
-                            <!-- mountTutorMediaEdit(..., editable:true) -->
-                        </div>
-                        <div class="hint" style="color:#666;margin-top:.35rem;">JPG/PNG · Máx 2MB</div>
-                    </div>
-                </div>
-
-                <div class="drawer-actions-row">
-                    <div class="row-right">
-                        <button class="gc-btn gc-btn--ghost" id="t-btn-cancel">Cancelar</button>
-                        <button class="gc-btn gc-btn--success" id="t-btn-save">Guardar</button>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </aside>
 
 
 
