@@ -15,6 +15,10 @@
     usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php",
   };
 
+  /* ---------- Orden de estatus (Activas→Pausadas→Inactivas) ---------- */
+  const ORDER_SUSCRIP = [1, 2, 0];
+  const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
+
   /* ---------- Estado ---------- */
   const S = {
     page: 1,
@@ -79,6 +83,7 @@
       console.log(TAG, "JSON OK:", j);
       return j;
     } catch {}
+    // recorte defensivo
     const fb = text.indexOf("{"),
       lb = text.lastIndexOf("}");
     const fb2 = text.indexOf("["),
@@ -174,7 +179,6 @@
     return S.maps.usuarios[k];
   }
 
-  const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
   function statusBadge(tipo, s) {
     if (window.statusBadge) return window.statusBadge(tipo, s);
     const label = STATUS_LABEL[Number(s)] || String(s);
@@ -195,9 +199,7 @@
 
   /* ---------- Drawer helpers ---------- */
   function ensureDrawerDOM() {
-    // sólo crea si no existe
     if (qs("#drawer-suscripcion")) {
-      // asegura que el botón cerrar funcione aunque el drawer exista en HTML estático
       const btn = qs("#drawer-suscripcion-close");
       if (btn && !btn._b) {
         btn._b = true;
@@ -251,7 +253,7 @@
       overlay.setAttribute("aria-hidden", "true");
     }
   }
-  // Cerrar por overlay/Escape + delegación global para el botón Cerrar (robusto)
+  // Overlay + Escape + delegación de botón cerrar
   (function bindOnce() {
     const ov = qs("#gc-dash-overlay");
     if (ov && !ov._sub_b) {
@@ -272,8 +274,9 @@
         if (
           t.id === "drawer-suscripcion-close" ||
           t.closest?.("#drawer-suscripcion-close")
-        )
+        ) {
           closeDrawer();
+        }
       });
     }
   })();
@@ -281,7 +284,7 @@
   /* ---------- Catálogos ---------- */
   async function loadCatalogos() {
     try {
-      const stsList = [1, 2, 4];
+      const stsList = [1, 2, 4]; // activos/pausados/en curso
       const chunks = await Promise.all(
         stsList.map((st) =>
           postJSON(API.cursos, { estatus: st }).catch(() => [])
@@ -299,13 +302,13 @@
   async function load() {
     console.log(TAG, "load()…");
     try {
-      const sts = [1, 0, 2];
       const chunks = await Promise.all(
-        sts.map((st) =>
+        ORDER_SUSCRIP.map((st) =>
           postJSON(API.suscripciones, { estatus: st }).catch(() => [])
         )
       );
       const flat = chunks.flat().filter(Boolean);
+
       S.raw = flat;
       S.data = flat.map((x) => {
         const id = Number(x.id ?? x.suscripcion_id ?? x.inscripcion_id ?? 0);
@@ -338,6 +341,8 @@
           _all: x,
         };
       });
+
+      // Rellena nombres de alumnos faltantes
       const missing = [
         ...new Set(
           S.data
@@ -350,6 +355,7 @@
         if (!r.alumnoNombre && r.usuario_id)
           r.alumnoNombre = mapUserLabel(r.usuario_id);
       });
+
       S.page = 1;
       render();
     } catch (e) {
@@ -361,10 +367,12 @@
   }
 
   function render() {
+    console.log(TAG, "render() page", S.page, "search=", S.search);
     const hostD = qs("#recursos-list"),
       hostM = qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
     if (hostM) hostM.innerHTML = "";
+
     const term = norm(S.search);
     const filtered = term
       ? S.data.filter((r) =>
@@ -375,16 +383,19 @@
           ).includes(term)
         )
       : S.data;
+
     const modCount = qs("#mod-count");
     if (modCount)
       modCount.textContent = `${filtered.length} ${
         filtered.length === 1 ? "elemento" : "elementos"
       }`;
+
     const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
     if (S.page > totalPages) S.page = totalPages;
     const start = (S.page - 1) * S.pageSize;
     const pageRows = filtered.slice(start, start + S.pageSize);
 
+    // Desktop
     if (hostD) {
       if (!pageRows.length) {
         hostD.insertAdjacentHTML(
@@ -426,6 +437,7 @@
       }
     }
 
+    // Mobile
     if (hostM) {
       if (!pageRows.length) {
         hostM.insertAdjacentHTML(
@@ -809,7 +821,6 @@
         usuario: uid,
         comentario: (qs("#sc_comentario")?.value || "").trim(),
         creado_por: getCreatorId() ?? undefined,
-        // Si deseas enviar tipo_contacto, descomenta:
         // tipo_contacto: (typeof window.obtenerTipoContacto === "function") ? window.obtenerTipoContacto() : undefined,
       };
       try {
@@ -864,7 +875,7 @@
     qs("#sc_tel").value = tel;
     qs("#sc_fnac").value = fnac;
 
-    // === medios de contacto (1=tel, 2=correo, 3=ambos) ===
+    // medios de contacto (1=tel, 2=correo, 3=ambos)
     const tipoRaw =
       u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
     const tipo = Number(tipoRaw);
@@ -872,8 +883,7 @@
     const cMail = qs("#sc_mc_mail");
     if (cTel) cTel.checked = tipo === 1 || tipo === 3;
     if (cMail) cMail.checked = tipo === 2 || tipo === 3;
-
-    // fallback textual si no viene numérico
+    // fallback textual
     if (!Number.isFinite(tipo)) {
       const pref = String(tipoRaw || "").toLowerCase();
       if (cTel) cTel.checked = /tel|phone/.test(pref);
@@ -883,8 +893,8 @@
 
   /* ---------- Búsqueda global ---------- */
   const searchInput = qs("#search-input");
-  if (searchInput && !searchInput._b) {
-    searchInput._b = true;
+  if (searchInput && !searchInput._bSubs) {
+    searchInput._bSubs = true;
     searchInput.addEventListener("input", (e) => {
       S.search = e.target.value || "";
       S.page = 1;
@@ -897,23 +907,33 @@
     console.log(TAG, "mount() INICIO");
     window.__activeModule = "suscripciones";
     try {
+      // Pista de uso en la barra de búsqueda (tooltip) + placeholder
+      const s = qs("#search-input");
+      if (s) {
+        s.setAttribute("placeholder", "Buscar suscripciones…");
+        s.setAttribute("title", "Filtra por: alumno, curso, fecha, id.");
+      }
+      // Integración con gcSearch si existe
+      if (window.gcSearch && !window._search_suscrip_wired) {
+        window._search_suscrip_wired = true;
+        gcSearch.register(
+          "#/suscripciones",
+          (q) => {
+            S.search = q || "";
+            S.page = 1;
+            render();
+          },
+          { placeholder: "Buscar suscripciones…" }
+        );
+      }
+
       const hostD = qs("#recursos-list");
       if (hostD)
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
+
       await loadCatalogos();
       await load();
-      if (!window._search_cursos_wired) {
-        window._search_cursos_wired = true;
-        gcSearch.register(
-          "#/cursos",
-          (q) => {
-            S.search = q;
-            S.page = 1;
-            renderCursos(); // tu render normal
-          },
-          { placeholder: "Buscar cursos…" }
-        );
-      }
+
       console.log(TAG, "mount() OK");
     } catch (e) {
       console.error(TAG, "mount ERROR:", e);
