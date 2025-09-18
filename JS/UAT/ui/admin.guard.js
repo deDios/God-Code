@@ -11,10 +11,17 @@
     ".recursos-head",
     ".mod-toolbar",
     ".top-controls",
-    ".filters-row",
     ".breadcrumbs-row",
+
+    ".dash-toolbar",
+    ".tt-meta",
+
+    ".recursos-box.desktop-only",
+    ".recursos-box.mobile-only",
+    "#pagination-controls",
+    "#pagination-mobile",
   ];
-  
+
   const MODULE_AUX_SEL = [
     "#btn-add",
     ".gc-fab",
