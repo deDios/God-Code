@@ -96,18 +96,16 @@
         ["col-nombre", "Título"],
         ["col-fecha", "Creación"],
         ["col-status", "Status"],
-        ["col-acc", ""],
       ];
     } else if (route === "#/tutores") {
       cols = [
         ["col-nombre", "Nombre"],
         ["col-fecha", "Creación"],
         ["col-status", "Status"],
-        ["col-acc", ""],
       ];
     } else if (route === "#/suscripciones") {
       cols = [
-        ["col-nombre", "Alumno"],
+        ["col-nombre", "Suscriptor"],
         ["col-curso", "Curso"],
         ["col-fecha", "Fecha de suscripción"],
         ["col-status", "Status"],
