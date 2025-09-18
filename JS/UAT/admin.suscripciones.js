@@ -12,7 +12,7 @@
     iInscripcion: window.API?.iInscripcion || API_BASE + "i_inscripcion.php",
     uInscripcion: window.API?.uInscripcion || API_BASE + "u_inscripcion.php",
     cursos: window.API?.cursos || API_BASE + "c_cursos.php",
-    usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php",
+    usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php", // <- usa este
   };
 
   /* ---------- Estado ---------- */
@@ -32,17 +32,9 @@
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
-    String(s ?? "").replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[c])
-    );
+    String(s ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
   const norm = (s) =>
     String(s || "")
       .normalize("NFD")
@@ -51,14 +43,11 @@
       .trim();
   const fmtDateTime = (dt) => {
     if (!dt) return "-";
-    try {
-      const [d, t = ""] = String(dt).split(" ");
-      const [y, m, da] = d.split("-");
-      return `${da}/${m}/${y} ${t}`.trim();
-    } catch {
-      return dt;
-    }
+    try { const [d, t = ""] = String(dt).split(" "); const [y, m, da] = d.split("-"); return `${da}/${m}/${y} ${t}`.trim(); }
+    catch { return dt; }
   };
+  const isNumericLike = (v) => /^\s*\d+\s*$/.test(String(v ?? ""));
+
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
     console.log(`${TAG} toast[${type}]:`, msg);
@@ -66,52 +55,38 @@
 
   async function postJSON(url, body) {
     const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
     if (!text.trim()) return {};
-    try {
-      return JSON.parse(text);
-    } catch {}
-    const fb = text.indexOf("{"),
-      lb = text.lastIndexOf("}");
-    const fb2 = text.indexOf("["),
-      lb2 = text.lastIndexOf("]");
+    try { return JSON.parse(text); } catch {}
+    const fb = text.indexOf("{"), lb = text.lastIndexOf("}");
+    const fb2 = text.indexOf("["), lb2 = text.lastIndexOf("]");
     let c = "";
     if (fb !== -1 && lb !== -1 && lb > fb) c = text.slice(fb, lb + 1);
-    else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2)
-      c = text.slice(fb2, lb2 + 1);
-    if (c) {
-      try {
-        return JSON.parse(c);
-      } catch {}
-    }
+    else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2) c = text.slice(fb2, lb2 + 1);
+    if (c) { try { return JSON.parse(c); } catch {} }
     return { _raw: text };
   }
 
   function getCreatorId() {
     try {
-      const raw = document.cookie
-        .split("; ")
-        .find((r) => r.startsWith("usuario="));
+      const raw = document.cookie.split("; ").find((r) => r.startsWith("usuario="));
       if (!raw) return null;
       const json = decodeURIComponent(raw.split("=")[1] || "");
       const u = JSON.parse(json);
       const n = Number(u?.id);
       return Number.isFinite(n) ? n : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   }
 
   const arrToMap = (arr) => {
     const m = {};
     (Array.isArray(arr) ? arr : []).forEach((x) => {
-      if (x && x.id != null)
-        m[String(x.id)] = x.nombre || x.titulo || `#${x.id}`;
+      const id = x?.id ?? x?.usuario_id;
+      if (id != null) m[String(id)] = x.nombre || x.nombre_completo || `Usuario #${id}`;
     });
     return m;
   };
@@ -119,32 +94,40 @@
   function mapCursosLabel(id) {
     const m = S.maps.cursos || {};
     const k = String(id ?? "");
-    return k in m ? m[k] || `#${id}` : `#${id}`;
+    return (k in m) ? (m[k] || `#${id}`) : `#${id}`;
   }
   function mapUserLabel(id) {
     const m = S.maps.usuarios || {};
     const k = String(id ?? "");
-    return k in m ? m[k] || `#${id}` : `#${id}`;
+    return (k in m) ? (m[k] || `Usuario #${id}`) : `Usuario #${id}`;
   }
 
-  // ======= NUEVO: precarga de mapa de usuarios (cualquier estatus) =======
-  async function getUsuariosMapAnyStatus() {
-    // Intentamos cubrir 1,0,2,3. Si alguno falla, lo tratamos como []
-    const [e1, e0, e2, e3] = await Promise.all([
-      postJSON(API.usuarios, { estatus: 1 }).catch(() => []),
-      postJSON(API.usuarios, { estatus: 0 }).catch(() => []),
-      postJSON(API.usuarios, { estatus: 2 }).catch(() => []),
-      postJSON(API.usuarios, { estatus: 3 }).catch(() => []),
-    ]);
-    const all = []
-      .concat(Array.isArray(e1) ? e1 : [])
-      .concat(Array.isArray(e0) ? e0 : [])
-      .concat(Array.isArray(e2) ? e2 : [])
-      .concat(Array.isArray(e3) ? e3 : []);
-    S.maps.usuarios = arrToMap(all);
-    return S.maps.usuarios;
+  /* ========= NUEVO: precargar mapa de usuarios robusto ========= */
+  async function hydrateUsuariosMap() {
+    // Intentos que suelen existir en tu backend
+    const attempts = [
+      {}, // lista completa (si el backend la permite)
+      { estatus: 1 }, { estatus: 0 }, { estatus: 2 }, { estatus: 3 },
+    ];
+    const seen = new Map();
+    for (const body of attempts) {
+      try {
+        const res = await postJSON(API.usuarios, body);
+        const arr = Array.isArray(res) ? res
+          : Array.isArray(res?.data) ? res.data
+          : Array.isArray(res?.usuarios) ? res.usuarios
+          : [];
+        for (const u of arr) {
+          const id = String(u?.id ?? "");
+          if (id && !seen.has(id)) seen.set(id, u);
+        }
+      } catch {
+        /* ignora cada intento fallido */
+      }
+    }
+    S.maps.usuarios = arrToMap([...seen.values()]);
   }
-  // =========================================================
+  /* ============================================================= */
 
   const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
   function statusBadge(tipo, s) {
@@ -155,12 +138,7 @@
   function statusSelect(id, val) {
     const v = Number(val);
     const opts = Object.entries(STATUS_LABEL)
-      .map(
-        ([k, lab]) =>
-          `<option value="${k}"${
-            Number(k) === v ? " selected" : ""
-          }>${lab}</option>`
-      )
+      .map(([k, lab]) => `<option value="${k}"${Number(k) === v ? " selected" : ""}>${lab}</option>`)
       .join("");
     return `<select id="${id}">${opts}</select>`;
   }
@@ -169,10 +147,7 @@
   function ensureDrawerDOM() {
     if (qs("#drawer-suscripcion")) {
       const btn = qs("#drawer-suscripcion-close");
-      if (btn && !btn._b) {
-        btn._b = true;
-        btn.addEventListener("click", closeDrawer);
-      }
+      if (btn && !btn._b) { btn._b = true; btn.addEventListener("click", closeDrawer); }
       return;
     }
     const wrap = document.createElement("div");
@@ -208,9 +183,7 @@
     const aside = qs("#drawer-suscripcion");
     const overlay = qs("#gc-dash-overlay");
     if (!aside) return;
-    try {
-      document.activeElement?.blur?.();
-    } catch {}
+    try { document.activeElement?.blur?.(); } catch {}
     aside.classList.remove("open");
     aside.setAttribute("hidden", "");
     aside.setAttribute("aria-hidden", "true");
@@ -228,20 +201,14 @@
     }
     if (!window._gc_subs_esc) {
       window._gc_subs_esc = true;
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDrawer();
-      });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
     }
     if (!window._gc_subs_closebtn) {
       window._gc_subs_closebtn = true;
       document.addEventListener("click", (e) => {
         const t = e.target;
         if (!t) return;
-        if (
-          t.id === "drawer-suscripcion-close" ||
-          t.closest?.("#drawer-suscripcion-close")
-        )
-          closeDrawer();
+        if (t.id === "drawer-suscripcion-close" || t.closest?.("#drawer-suscripcion-close")) closeDrawer();
       });
     }
   })();
@@ -250,11 +217,7 @@
   async function loadCatalogos() {
     try {
       const stsList = [1, 2, 4];
-      const chunks = await Promise.all(
-        stsList.map((st) =>
-          postJSON(API.cursos, { estatus: st }).catch(() => [])
-        )
-      );
+      const chunks = await Promise.all(stsList.map((st) => postJSON(API.cursos, { estatus: st }).catch(() => [])));
       const flat = chunks.flat().filter(Boolean);
       S.maps.cursos = arrToMap(flat);
     } catch (e) {
@@ -265,45 +228,32 @@
   /* ---------- Listado ---------- */
   async function load() {
     try {
-      // 1) Asegurar mapa de usuarios con nombres
+      // Asegura nombres en el mapa
       if (!S.maps.usuarios || !Object.keys(S.maps.usuarios).length) {
-        await getUsuariosMapAnyStatus();
+        await hydrateUsuariosMap();
       }
 
-      // 2) Cargar suscripciones por estatus
+      // Cargar suscripciones
       const sts = [1, 0, 2];
       const chunks = await Promise.all(
-        sts.map((st) =>
-          postJSON(API.suscripciones, { estatus: st }).catch(() => [])
-        )
+        sts.map((st) => postJSON(API.suscripciones, { estatus: st }).catch(() => []))
       );
       const flat = chunks.flat().filter(Boolean);
       S.raw = flat;
 
-      // 3) Normalizar filas y resolver nombres
+      // Normalizar
       S.data = flat.map((x) => {
         const id = Number(x.id ?? x.suscripcion_id ?? x.inscripcion_id ?? 0);
         const usuario_id =
-          Number(
-            x.usuario_id ??
-              x.user_id ??
-              x.alumno ??
-              x.alumno_id ??
-              x.usuario ??
-              0
-          ) || null;
-        const curso_id =
-          Number(x.curso ?? x.curso_id ?? x.id_curso ?? 0) || null;
-        const nombreInline =
-          x.alumno_nombre ||
-          x.usuario_nombre ||
-          x.suscriptor ||
-          x.usuario ||
-          x.user ||
-          null;
+          Number(x.usuario_id ?? x.user_id ?? x.alumno ?? x.alumno_id ?? x.usuario ?? 0) || null;
+        const curso_id = Number(x.curso ?? x.curso_id ?? x.id_curso ?? 0) || null;
 
-        const alumnoNombre =
-          nombreInline || (usuario_id ? mapUserLabel(usuario_id) : null);
+        // “Nombre inline” que algunas APIs ponen (a veces viene un número…)
+        let inlineName =
+          x.alumno_nombre || x.usuario_nombre || x.suscriptor || x.usuario || x.user || null;
+        if (isNumericLike(inlineName)) inlineName = null; // <- clave
+
+        const alumnoNombre = inlineName || (usuario_id ? mapUserLabel(usuario_id) : null) || (usuario_id ? `Usuario #${usuario_id}` : "—");
 
         return {
           id,
@@ -322,8 +272,7 @@
     } catch (e) {
       console.error(TAG, "load ERROR:", e);
       const hostD = qs("#recursos-list");
-      if (hostD)
-        hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error cargando suscripciones</div></div>`;
+      if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error cargando suscripciones</div></div>`;
     }
   }
 
@@ -336,19 +285,12 @@
     const term = norm(S.search);
     const filtered = term
       ? S.data.filter((r) =>
-          norm(
-            `${r.alumnoNombre || ""} ${mapCursosLabel(
-              r.curso
-            )} ${JSON.stringify(r._all || {})}`
-          ).includes(term)
+          norm(`${r.alumnoNombre || ""} ${mapCursosLabel(r.curso)} ${JSON.stringify(r._all || {})}`).includes(term)
         )
       : S.data;
 
     const modCount = qs("#mod-count");
-    if (modCount)
-      modCount.textContent = `${filtered.length} ${
-        filtered.length === 1 ? "elemento" : "elementos"
-      }`;
+    if (modCount) modCount.textContent = `${filtered.length} ${filtered.length === 1 ? "elemento" : "elementos"}`;
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / S.pageSize));
     if (S.page > totalPages) S.page = totalPages;
@@ -358,31 +300,17 @@
     // Desktop
     if (hostD) {
       if (!pageRows.length) {
-        hostD.insertAdjacentHTML(
-          "beforeend",
-          `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
-        );
+        hostD.insertAdjacentHTML("beforeend", `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`);
       } else {
         pageRows.forEach((it) => {
           hostD.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row" role="row" data-mod="suscripcion" data-id="${
-              it.id
-            }">
-              <div class="col-nombre" role="cell">${esc(
-                String(it.alumnoNombre || "—")
-              )}</div>
-              <div class="col-curso"  role="cell">${esc(
-                mapCursosLabel(it.curso)
-              )}</div>
-              <div class="col-fecha"  role="cell">${esc(
-                fmtDateTime(it.fecha_creacion)
-              )}</div>
-              <div class="col-status" role="cell">${statusBadge(
-                "suscripciones",
-                it.estatus
-              )}</div>
+            <div class="table-row" role="row" data-mod="suscripcion" data-id="${it.id}">
+              <div class="col-nombre" role="cell">${esc(String(it.alumnoNombre || "—"))}</div>
+              <div class="col-curso"  role="cell">${esc(mapCursosLabel(it.curso))}</div>
+              <div class="col-fecha"  role="cell">${esc(fmtDateTime(it.fecha_creacion))}</div>
+              <div class="col-status" role="cell">${statusBadge("suscripciones", it.estatus)}</div>
             </div>
           `
           );
@@ -400,18 +328,13 @@
     // Mobile
     if (hostM) {
       if (!pageRows.length) {
-        hostM.insertAdjacentHTML(
-          "beforeend",
-          `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`
-        );
+        hostM.insertAdjacentHTML("beforeend", `<div class="table-row"><div class="col-nombre">Sin resultados</div></div>`);
       } else {
         pageRows.forEach((it) => {
           hostM.insertAdjacentHTML(
             "beforeend",
             `
-            <div class="table-row-mobile" data-mod="suscripcion" data-id="${
-              it.id
-            }">
+            <div class="table-row-mobile" data-mod="suscripcion" data-id="${it.id}">
               <div class="row-head">
                 <div class="title">${esc(String(it.alumnoNombre || "—"))}</div>
                 <button class="open-drawer gc-btn" type="button">Ver</button>
@@ -420,16 +343,10 @@
           `
           );
         });
-        qsa(
-          '.table-row-mobile[data-mod="suscripcion"] .open-drawer',
-          hostM
-        ).forEach((btn) => {
+        qsa('.table-row-mobile[data-mod="suscripcion"] .open-drawer', hostM).forEach((btn) => {
           btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            const id = Number(
-              btn.closest('.table-row-mobile[data-mod="suscripcion"]')?.dataset
-                .id || 0
-            );
+            const id = Number(btn.closest('.table-row-mobile[data-mod="suscripcion"]')?.dataset.id || 0);
             const it = S.data.find((x) => +x.id === +id);
             if (it) openView(it);
           });
@@ -454,36 +371,13 @@
         else b.onclick = cb;
         return b;
       };
-      cont.appendChild(
-        mk(
-          "‹",
-          S.page === 1,
-          () => {
-            S.page = Math.max(1, S.page - 1);
-            render();
-          },
-          "arrow-btn"
-        )
-      );
+      cont.appendChild(mk("‹", S.page === 1, () => { S.page = Math.max(1, S.page - 1); render(); }, "arrow-btn"));
       for (let p = 1; p <= totalPages && p <= 7; p++) {
-        const b = mk(String(p), false, () => {
-          S.page = p;
-          render();
-        });
+        const b = mk(String(p), false, () => { S.page = p; render(); });
         if (p === S.page) b.classList.add("active");
         cont.appendChild(b);
       }
-      cont.appendChild(
-        mk(
-          "›",
-          S.page === totalPages,
-          () => {
-            S.page = Math.min(totalPages, S.page + 1);
-            render();
-          },
-          "arrow-btn"
-        )
-      );
+      cont.appendChild(mk("›", S.page === totalPages, () => { S.page = Math.min(totalPages, S.page + 1); render(); }, "arrow-btn"));
     });
   }
 
@@ -556,38 +450,19 @@
     if (btnDel) {
       btnDel.addEventListener("click", async () => {
         if (btnDel.dataset.step !== "2") {
-          btnDel.dataset.step = "2";
-          btnDel.textContent = "¿Confirmar?";
-          setTimeout(() => {
-            btnDel.dataset.step = "1";
-            btnDel.textContent = "Eliminar";
-          }, 3000);
+          btnDel.dataset.step = "2"; btnDel.textContent = "¿Confirmar?";
+          setTimeout(() => { btnDel.dataset.step = "1"; btnDel.textContent = "Eliminar"; }, 3000);
           return;
         }
-        try {
-          await postJSON(API.uInscripcion, { id: row.id, estatus: 0 });
-          toast("Suscripción movida a Inactivo", "exito");
-          closeDrawer();
-          await load();
-        } catch (e) {
-          console.error(TAG, "delete", e);
-          toast("No se pudo eliminar", "error");
-        }
+        try { await postJSON(API.uInscripcion, { id: row.id, estatus: 0 }); toast("Suscripción movida a Inactivo", "exito"); closeDrawer(); await load(); }
+        catch (e) { console.error(TAG, "delete", e); toast("No se pudo eliminar", "error"); }
       });
     }
     qs("#sus-reactivar")?.addEventListener("click", async () => {
-      try {
-        await postJSON(API.uInscripcion, { id: row.id, estatus: 1 });
-        toast("Reactivada", "exito");
-        closeDrawer();
-        await load();
-      } catch (e) {
-        console.error(TAG, "reactivar", e);
-        toast("No se pudo reactivar", "error");
-      }
+      try { await postJSON(API.uInscripcion, { id: row.id, estatus: 1 }); toast("Reactivada", "exito"); closeDrawer(); await load(); }
+      catch (e) { console.error(TAG, "reactivar", e); toast("No se pudo reactivar", "error"); }
     });
-    if (window.bindCopyFromPre)
-      window.bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
+    if (window.bindCopyFromPre) window.bindCopyFromPre("#json-sus", "#btn-copy-json-sus");
   }
 
   /* ---------- Drawer: Editar ---------- */
@@ -704,18 +579,14 @@
   function bindCreateActions() {
     const bCancelBot = qs("#sc_cancel");
     const bInsBot = qs("#sc_inscribir_b");
-    const setInscribirEnabled = (on) => {
-      if (bInsBot) bInsBot.disabled = !on;
-    };
+    const setInscribirEnabled = (on) => { if (bInsBot) bInsBot.disabled = !on; };
 
     const selectCurso = qs("#sc_curso");
     const identInput = qs("#sc_ident");
     const btnBuscar = qs("#sc_buscar");
     const btnCambiar = qs("#sc_cambiar");
 
-    function checkReady() {
-      setInscribirEnabled(!!S.create.cursoId && !!S.create.usuario);
-    }
+    function checkReady() { setInscribirEnabled(!!S.create.cursoId && !!S.create.usuario); }
 
     if (bCancelBot) bCancelBot.onclick = closeDrawer;
 
@@ -729,12 +600,10 @@
     if (btnBuscar) {
       btnBuscar.addEventListener("click", async () => {
         const ident = (identInput?.value || "").trim();
-        if (!ident)
-          return toast("Ingresa teléfono o correo para buscar.", "warning");
+        if (!ident) return toast("Ingresa teléfono o correo para buscar.", "warning");
         try {
           const user = await buscarUsuario(ident);
-          if (!user)
-            return toast("No se encontró usuario con ese dato.", "warning");
+          if (!user) return toast("No se encontró usuario con ese dato.", "warning");
           S.create.usuario = user;
           pintarUsuario(user);
           btnCambiar.disabled = false;
@@ -754,8 +623,7 @@
         if (pnl) pnl.style.display = "none";
         identInput.value = "";
         btnCambiar.disabled = true;
-        const tel = qs("#sc_mc_tel"),
-          mail = qs("#sc_mc_mail");
+        const tel = qs("#sc_mc_tel"), mail = qs("#sc_mc_mail");
         if (tel) tel.checked = false;
         if (mail) mail.checked = false;
         checkReady();
@@ -766,10 +634,9 @@
       if (!S.create.cursoId || !S.create.usuario) return;
       const uid = Number(
         S.create.usuario.id ??
-          S.create.usuario.usuario_id ??
-          S.create.usuario.alumno_id ??
-          S.create.usuario.user_id ??
-          0
+        S.create.usuario.usuario_id ??
+        S.create.usuario.alumno_id ??
+        S.create.usuario.user_id ?? 0
       );
       if (!uid) return toast("ID de usuario inválido", "error");
       const body = {
@@ -780,9 +647,7 @@
       };
       try {
         const res = await postJSON(API.iInscripcion, body);
-        const newId = Number(
-          res?.id || res?.inscripcion_id || res?.insert_id || res?.data?.id || 0
-        );
+        const newId = Number(res?.id || res?.inscripcion_id || res?.insert_id || res?.data?.id || 0);
         toast("Inscripción creada", "exito");
         closeDrawer();
         await load();
@@ -797,18 +662,12 @@
   }
 
   async function buscarUsuario(ident) {
-    // En tu backend, c_usuarios.php acepta teléfono o correo
     const body = { telefono: ident, correo: ident };
     const res = await postJSON(API.usuarios, body);
-    const arr = Array.isArray(res)
-      ? res
-      : Array.isArray(res?.data)
-      ? res.data
-      : Array.isArray(res?.usuarios)
-      ? res.usuarios
-      : res && typeof res === "object"
-      ? [res]
-      : [];
+    const arr = Array.isArray(res) ? res
+      : Array.isArray(res?.data) ? res.data
+      : Array.isArray(res?.usuarios) ? res.usuarios
+      : (res && typeof res === "object" ? [res] : []);
     return arr[0] || null;
   }
 
@@ -819,10 +678,7 @@
     const nombre =
       u.nombre ||
       u.nombre_completo ||
-      [u.nombre1, u.nombre2, u.apellido_paterno, u.apellido_materno]
-        .filter(Boolean)
-        .join(" ") ||
-      "";
+      [u.nombre1, u.nombre2, u.apellido_paterno, u.apellido_materno].filter(Boolean).join(" ") || "";
     const tel = u.telefono || u.celular || u.tel || "";
     const mail = u.correo || u.email || "";
     const fnac = (u.fecha_nacimiento || u.fnac || "").slice(0, 10);
@@ -831,17 +687,12 @@
     qs("#sc_tel").value = tel;
     qs("#sc_fnac").value = fnac;
 
-    const tipoRaw =
-      u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
+    const tipoRaw = u.tipo_contacto ?? u.medio_contacto ?? u.preferencias_contacto ?? 0;
     const tipo = Number(tipoRaw);
     const cTel = qs("#sc_mc_tel");
     const cMail = qs("#sc_mc_mail");
-    if (cTel)
-      cTel.checked =
-        tipo === 1 || tipo === 3 || /tel|phone/i.test(String(tipoRaw));
-    if (cMail)
-      cMail.checked =
-        tipo === 2 || tipo === 3 || /mail|correo|email/i.test(String(tipoRaw));
+    if (cTel) cTel.checked = tipo === 1 || tipo === 3 || /tel|phone/i.test(String(tipoRaw));
+    if (cMail) cMail.checked = tipo === 2 || tipo === 3 || /mail|correo|email/i.test(String(tipoRaw));
   }
 
   /* ---------- Búsqueda global ---------- */
@@ -860,21 +711,17 @@
     try {
       window.__activeModule = "suscripciones";
       const hostD = qs("#recursos-list");
-      if (hostD)
-        hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
+      if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadCatalogos();
-      await getUsuariosMapAnyStatus(); // << clave para nombres
+      await hydrateUsuariosMap(); // <- clave para nombres
       await load();
     } catch (e) {
       console.error(TAG, "mount ERROR:", e);
       const hostD = qs("#recursos-list");
-      if (hostD)
-        hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error al cargar</div></div>`;
+      if (hostD) hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Error al cargar</div></div>`;
     }
   }
-  function openCreateExposed() {
-    openCreate();
-  }
+  function openCreateExposed() { openCreate(); }
 
   globalThis.suscripciones = { mount, openCreate: openCreateExposed };
   console.log(TAG, "Módulo suscripciones cargado.");

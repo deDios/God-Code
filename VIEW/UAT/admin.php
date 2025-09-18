@@ -908,7 +908,7 @@
 
                 <div class="field">
                     <label for="se_comentario">Comentario</label>
-                    <textarea id="se_comentario" rows="4" maxlength="1000"></textarea>
+                    <textarea id="se_comentario" rows="4" maxlength="200" data-max="200"></textarea>
                 </div>
 
                 <!-- Acciones -->
