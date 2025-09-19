@@ -1,4 +1,4 @@
-/* ==================== SUSCRIPCIONES (UAT) — Listado + Drawer ==================== */
+/* ==================== SUSCRIPCIONES ==================== */
 (() => {
   "use strict";
   const TAG = "[Suscripciones]";
@@ -12,7 +12,7 @@
     iInscripcion: window.API?.iInscripcion || API_BASE + "i_inscripcion.php",
     uInscripcion: window.API?.uInscripcion || API_BASE + "u_inscripcion.php",
     cursos: window.API?.cursos || API_BASE + "c_cursos.php",
-    usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php", // <- usa este
+    usuarios: window.API?.usuarios || API_BASE + "c_usuarios.php", 
   };
 
   /* ---------- Estado ---------- */
@@ -213,7 +213,7 @@
   /* ---------- Catálogos ---------- */
   async function loadCatalogos() {
     try {
-      const stsList = [1, 2, 4];
+      const stsList = [1, 4, 2, 3];
       const chunks = await Promise.all(stsList.map((st) => postJSON(API.cursos, { estatus: st }).catch(() => [])));
       const flat = chunks.flat().filter(Boolean);
       S.maps.cursos = arrToMap(flat);
@@ -231,7 +231,7 @@
       }
 
       // Cargar suscripciones
-      const sts = [1, 0, 2];
+      const sts = [1, 0, 2, 3];
       const chunks = await Promise.all(
         sts.map((st) => postJSON(API.suscripciones, { estatus: st }).catch(() => []))
       );

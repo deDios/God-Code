@@ -57,12 +57,14 @@
           "'": "&#39;",
         }[c])
     );
+
   const norm = (s) =>
     String(s || "")
       .normalize("NFD")
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
+
   const fmtDateTime = (dt) => {
     if (!dt) return "-";
     try {
@@ -73,7 +75,39 @@
       return dt;
     }
   };
-  const STATUS_LABEL_TUTOR = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
+
+  const img = qs("#cm_img");
+  if (img && data?.id)
+    setImgWithFallback(
+      img,
+      cursoImgUrl(data.id, "png"),
+      cursoImgUrl(data.id, "jpg"),
+      noImageSvgDataURI()
+    );
+
+  const STATUS_LABEL_TUTOR = {
+    1: "Activo",
+    0: "Inactivo",
+    2: "Pausado",
+  };
+
+  // enlazar preview a la imagen del tutor
+  function bindImagePreview(el, title = "Vista previa") {
+    if (!el || el._previewBound) return;
+    el._previewBound = true;
+    el.style.cursor = "zoom-in";
+    el.addEventListener("click", () => {
+      const src = el.getAttribute("src") || "";
+      if (!src) return;
+      if (window.gcPreview?.openImagePreview) {
+        window.gcPreview.openImagePreview({ src, title });
+      } else if (window.openImagePreview) {
+        window.openImagePreview({ src, title, confirm: false });
+      } else {
+        window.open(src, "_blank", "noopener,noreferrer");
+      }
+    });
+  }
 
   function toast(m, t = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(m, t, ms);
@@ -781,13 +815,15 @@
       if (isView) {
         const tid = Number(t.id || item?.id || 0);
         const imgView = qs("#tutor-img-view");
-        if (imgView && tid)
+        if (imgView && tid) {
           setImgWithFallback(
             imgView,
             tutorImgUrl(tid, "png"),
             tutorImgUrl(tid, "jpg"),
             noImageSvgDataURI()
           );
+          bindImagePreview(imgView, "Vista previa · Foto del tutor");
+        }
       }
 
       if (isEdit || isCreate) {

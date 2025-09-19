@@ -68,10 +68,11 @@
       inactivo: "red",
       2: "amber",
       "en pausa": "amber",
-      pausado: "grey",
+      pausado: "amber",
       3: "blue",
       temporal: "blue",
-      cancelado: "grey",
+      4: "red",
+      cancelado: "red",
     },
     tutores: {
       1: "green",
