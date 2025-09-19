@@ -1,44 +1,30 @@
+// /JS/UAT/ui/admin.guard.js
 (() => {
   "use strict";
+  const TAG = "[AdminGuard]";
 
-  const ADMIN_IDS = [1, 12, 13, 17, 18];
+  // === CONFIG ===
+  // Puedes sobreescribir desde fuera con window.__ADMIN_IDS = [...];
+  const ADMIN_IDS =
+    globalThis.__ADMIN_IDS && Array.isArray(globalThis.__ADMIN_IDS)
+      ? globalThis.__ADMIN_IDS.map((n) => Number(n)).filter(Number.isFinite)
+      : [1, 12, 13, 17, 18]; // <-- tu array por defecto
 
-  const MODULE_BAR_SEL = [
-    ".gc-toolbar",
-    ".gc-admin-header",
-    ".admin-subheader",
-    ".resources-header",
-    ".recursos-head",
-    ".mod-toolbar",
-    ".top-controls",
-    ".breadcrumbs-row",
+  // Links del placeholder — puedes sobreescribir con:
+  // window.__GUARD_LINKS = { cuenta: "#/cuenta", sitio: "/" }
+  const LINKS = Object.assign(
+    { cuenta: "#/cuenta", sitio: "/" },
+    globalThis.__GUARD_LINKS || {}
+  );
 
-    ".dash-toolbar",
-    ".tt-meta",
-
-    ".recursos-box.desktop-only",
-    ".recursos-box.mobile-only",
-    "#pagination-controls",
-    "#pagination-mobile",
-  ];
-
-  const MODULE_AUX_SEL = [
-    "#btn-add",
-    ".gc-fab",
-    ".add-resource",
-    "#search-input",
-    ".gc-search",
-    ".searchbar",
-  ];
-
-  // ======= Helpers =======
-  function getUserIdFromCookie() {
+  // === UTILS ===
+  function parseUserIdFromCookie() {
     try {
-      const row = document.cookie
+      const raw = document.cookie
         .split("; ")
-        .find((x) => x.startsWith("usuario="));
-      if (!row) return null;
-      const json = decodeURIComponent(row.split("=")[1] || "");
+        .find((r) => r.startsWith("usuario="));
+      if (!raw) return null;
+      const json = decodeURIComponent(raw.split("=")[1] || "");
       const u = JSON.parse(json);
       const n = Number(u?.id);
       return Number.isFinite(n) ? n : null;
@@ -46,170 +32,191 @@
       return null;
     }
   }
-
-  function hideEls(selectors) {
-    selectors.forEach((sel) => {
-      document.querySelectorAll(sel).forEach((el) => {
-        el.setAttribute("data-guard-hidden", "1");
-        el.style.display = "none";
-      });
-    });
+  function getUserId() {
+    // Orden de resolución
+    const fromCookie = parseUserIdFromCookie();
+    if (Number.isFinite(fromCookie)) return fromCookie;
+    const winUser = Number(globalThis.usuario?.id);
+    if (Number.isFinite(winUser)) return winUser;
+    const stateUser = Number(globalThis.state?.usuario?.id);
+    if (Number.isFinite(stateUser)) return stateUser;
+    return null;
   }
+  const isAdmin = (id) => Number.isFinite(id) && ADMIN_IDS.includes(Number(id));
 
-  function stripSidebarToCuenta() {
-    const side = document.querySelector(".gc-side");
-    if (!side) return;
-
-    // deja solo el item "Cuenta"
-    const items = Array.from(side.querySelectorAll('.nav-item[href^="#/"]'));
-    const cuenta = items.find(
-      (a) => (a.getAttribute("href") || "").trim() === "#/cuenta"
-    );
-    items.forEach((a) => {
-      if (a !== cuenta) a.remove();
-    });
-
-    if (!cuenta) {
-      const li = document.createElement("a");
-      li.className = "nav-item";
-      li.href = "#/cuenta";
-      li.setAttribute("data-route", "#/cuenta");
-      li.textContent = "Cuenta";
-      side.innerHTML = "";
-      side.appendChild(li);
-    }
-
-    const bigTitle = side.querySelector(".side-title, .title, h3");
-    if (bigTitle) bigTitle.textContent = "Cuenta";
-  }
-
-  function clearMainLists() {
-    [
-      "#recursos-list",
-      "#recursos-list-mobile",
-      "#pagination-controls",
-      "#pagination-mobile",
-    ].forEach((id) => {
-      const el = document.querySelector(id);
-      if (el) el.innerHTML = "";
-    });
-    const tc = document.querySelector("#mod-count");
-    if (tc) tc.textContent = "—";
-    const head = document.querySelector(
-      ".recursos-box.desktop-only .table-header"
-    );
-    if (head) head.innerHTML = "";
-  }
-
-  function findContentHost() {
-    return (
-      document.querySelector("#gc-admin-content") ||
-      document.querySelector(".gc-content") ||
-      document.querySelector(".dashboard-content") ||
-      document.querySelector("#main") ||
-      document.querySelector("main") ||
-      document.body
-    );
-  }
-
+  // === CSS ===
   function injectGuardCSS() {
     if (document.getElementById("admin-guard-css")) return;
     const css = `
-      .guard-placeholder{
-        max-width: 920px; margin: 48px auto; padding: 24px;
-        background:#fff; border-radius:16px; box-shadow:0 16px 40px rgba(0,0,0,.08);
+      /* Placeholder oculto por defecto */
+      #home-main .guard-placeholder { display:none; }
+
+      /* Cuando el guard está activo oculta TODO el contenido del panel derecho */
+      #home-main.guard-on .main-content { display:none !important; }
+      #home-main.guard-on .guard-placeholder {
+        display:flex !important;
+        align-items:flex-start;
+        justify-content:center;
+        padding: 18px 24px;
       }
-      .guard-hero{ display:flex; gap:24px; align-items:center; }
-      .guard-hero .svg{
-        flex:0 0 160px; width:160px; height:160px; display:grid; place-items:center;
-        border-radius:14px; background:linear-gradient(180deg,#f4f7ff,#eef2ff);
+
+      /* Estilo simple del hero */
+      .guard-hero {
+        width: 100%;
+        max-width: 920px;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.06);
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 22px;
+        padding: 28px 32px;
       }
-      .guard-hero h1{ font-size:1.4rem; margin:0 0 6px; }
-      .guard-hero p{ color:#5b6475; margin:0; }
-      .guard-actions{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
-      .guard-actions .gc-btn{ padding:.6rem 1rem; }
+      .guard-hero .svg {
+        display:grid; place-items:center;
+        background: #F2F5FF;
+        border-radius: 16px;
+        width: 120px; height: 120px;
+      }
+      .guard-hero h1 {
+        margin: 4px 0 6px;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      .guard-hero p {
+        margin: 0 0 12px;
+        color: #5a6075;
+      }
+      .guard-actions { display:flex; gap:10px; margin-top: 8px; }
+      .guard-actions .gc-btn { line-height: 1; }
+      
+      /* Por si algo quedó suelto (sobrecobertura defensiva) */
+      #home-main.guard-on .dash-toolbar,
+      #home-main.guard-on .recursos-box.desktop-only,
+      #home-main.guard-on .recursos-box.mobile-only,
+      #home-main.guard-on #pagination-controls,
+      #home-main.guard-on #pagination-mobile { display:none !important; }
     `;
-    const s = document.createElement("style");
-    s.id = "admin-guard-css";
-    s.textContent = css;
-    document.head.appendChild(s);
+    const tag = document.createElement("style");
+    tag.id = "admin-guard-css";
+    tag.textContent = css;
+    document.head.appendChild(tag);
   }
 
-  function makeWipSVG() {
-    return `
-      <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
-        <rect x="6" y="18" width="80" height="60" rx="12" fill="#E8EEFF"/>
-        <path d="M56 38v-6a10 10 0 10-20 0v6" stroke="#7B8BD1" stroke-width="3" stroke-linecap="round"/>
-        <rect x="30" y="38" width="32" height="28" rx="8" fill="#CFE0FF" stroke="#7B8BD1" stroke-width="2"/>
-        <circle cx="46" cy="52" r="4.5" fill="#7B8BD1"/>
-        <path d="M46 56v6" stroke="#7B8BD1" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `;
-  }
-
-  function renderPlaceholderCuenta() {
-    injectGuardCSS();
-    clearMainLists();
-
-    const host = findContentHost();
-    host.querySelectorAll(".guard-placeholder").forEach((n) => n.remove());
-
-    const box = document.createElement("section");
-    box.className = "guard-placeholder";
-    box.innerHTML = `
-      <div class="guard-hero">
-        <div class="svg">${makeWipSVG()}</div>
-        <div class="txt">
-          <h1>Estamos trabajando en ello</h1>
-          <p>Esta sección aún no está disponible para tu cuenta. Pronto tendrás más opciones aquí mismo.</p>
-          <div class="guard-actions">
-            <a href="#/cuenta" class="gc-btn">Ir a Cuenta</a>
-            <a href="/" class="gc-btn gc-btn--ghost">Volver al sitio</a>
+  // === DOM helpers ===
+  function ensureGuardPlaceholder() {
+    let ph = document.querySelector("#home-main .guard-placeholder");
+    if (!ph) {
+      const tpl = document.createElement("section");
+      tpl.className = "guard-placeholder";
+      tpl.innerHTML = `
+        <div class="guard-hero">
+          <div class="svg" aria-hidden="true">
+            <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="18" width="80" height="60" rx="12" fill="#E8EEFF"></rect>
+              <path d="M56 38v-6a10 10 0 10-20 0v6" stroke="#7B8BD1" stroke-width="3" stroke-linecap="round"></path>
+              <rect x="30" y="38" width="32" height="28" rx="8" fill="#CFE0FF" stroke="#7B8BD1" stroke-width="2"></rect>
+              <circle cx="46" cy="52" r="4.5" fill="#7B8BD1"></circle>
+              <path d="M46 56v6" stroke="#7B8BD1" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
           </div>
-        </div>
-      </div>
-    `;
-    host.appendChild(box);
-
-    const title = document.querySelector("#mod-title");
-    if (title) title.textContent = "Cuenta";
+          <div class="txt">
+            <h1>Estamos trabajando en ello</h1>
+            <p>Esta sección aún no está disponible para tu cuenta. Pronto tendrás más opciones aquí mismo.</p>
+            <div class="guard-actions">
+              <a id="guard-link-cuenta" class="gc-btn" href="#">Ir a Cuenta</a>
+              <a id="guard-link-sitio"  class="gc-btn gc-btn--ghost" href="#">Volver al sitio</a>
+            </div>
+          </div>
+        </div>`;
+      const host = document.getElementById("home-main") || document.body;
+      host.appendChild(tpl);
+      ph = tpl;
+    }
+    // set links
+    const aCuenta = ph.querySelector("#guard-link-cuenta");
+    const aSitio = ph.querySelector("#guard-link-sitio");
+    if (aCuenta) aCuenta.setAttribute("href", LINKS.cuenta || "#/cuenta");
+    if (aSitio) aSitio.setAttribute("href", LINKS.sitio || "/");
+    return ph;
   }
 
-  // Solo oculta la barra del MÓDULO (buscador/título/estatus/“+”), no el header global
-  function hideModuleHeaderBar() {
-    hideEls(MODULE_BAR_SEL);
-    hideEls(MODULE_AUX_SEL);
+  function cleanSidebarForRestricted() {
+    const side = document.querySelector(".gc-side");
+    if (!side) return;
+    const items = Array.from(side.querySelectorAll(".nav-item"));
+    // deja solo #/cuenta
+    items.forEach((a) => {
+      const href = a.getAttribute("href") || a.getAttribute("data-route") || "";
+      if (href !== "#/cuenta") a.remove();
+    });
+    // si no existe, lo creamos
+    if (!side.querySelector('.nav-item[href="#/cuenta"]')) {
+      const a = document.createElement("a");
+      a.className = "nav-item";
+      a.href = "#/cuenta";
+      a.setAttribute("data-route", "#/cuenta");
+      a.textContent = "Cuenta";
+      side.appendChild(a);
+    }
+    // marca activo
+    side.querySelectorAll(".nav-item").forEach((a) => {
+      if ((a.getAttribute("href") || "") === "#/cuenta") {
+        a.setAttribute("aria-current", "page");
+      } else {
+        a.removeAttribute("aria-current");
+      }
+    });
   }
 
-  function applyRestrictedUI() {
-    hideModuleHeaderBar();
-    stripSidebarToCuenta();
-    if (location.hash !== "#/cuenta") location.replace("#/cuenta");
-    renderPlaceholderCuenta();
+  function toggleHeaderWidgets(hidden) {
+    const search = document.getElementById("search-input");
+    const addBtn = document.getElementById("btn-add");
+    if (search) {
+      search.style.display = hidden ? "none" : "";
+      if (hidden) search.setAttribute("data-guard-hidden", "1");
+      else search.removeAttribute("data-guard-hidden");
+    }
+    if (addBtn) {
+      addBtn.style.display = hidden ? "none" : "";
+      if (hidden) addBtn.setAttribute("data-guard-hidden", "1");
+      else addBtn.removeAttribute("data-guard-hidden");
+    }
   }
 
-  // ======= Init =======
+  // === CORE ===
+  function applyGuard(restricted) {
+    globalThis.__adminGuardRestricted = !!restricted;
+
+    injectGuardCSS();
+    ensureGuardPlaceholder();
+
+    const root = document.getElementById("home-main");
+    if (root) root.classList.toggle("guard-on", !!restricted);
+
+    toggleHeaderWidgets(!!restricted);
+
+    if (restricted) {
+      cleanSidebarForRestricted();
+      // Entra a #/cuenta si viene de otra ruta
+      if (location.hash !== "#/cuenta") {
+        // Evita salto extra si el router ya lo manejará, pero garantizamos el estado
+        location.hash = "#/cuenta";
+      }
+    }
+  }
+
+  // === INIT ===
   function init() {
-    if (window.__adminGuardRestricted === true) {
-      applyRestrictedUI();
-      return;
-    }
-    if (window.__adminGuardRestricted === false) {
-      return;
-    }
-
-    const uid = getUserIdFromCookie();
-    const isAdmin = uid != null && ADMIN_IDS.includes(Number(uid));
-    window.__adminGuardRestricted = !isAdmin;
-
-    if (!isAdmin) applyRestrictedUI();
+    const uid = getUserId();
+    const restricted = !isAdmin(uid);
+    console.log(TAG, "userId:", uid, "restricted:", restricted);
+    applyGuard(restricted);
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
     init();
   }
-
-  window.AdminGuard = { init, applyRestrictedUI };
 })();
