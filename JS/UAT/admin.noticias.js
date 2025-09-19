@@ -27,12 +27,13 @@
 
   /* ---------- Status y orden ---------- */
   // Arriba→abajo: Activo → En pausa → Temporal → Cancelado
-  const ORDER_NOTICIAS = [1, 2, 3, 0];
+  const ORDER_NOTICIAS = [1, 2, 3, 0, 4];
   const STATUS_LABEL = {
     1: "Activo",
     2: "En pausa",
     3: "Temporal",
-    0: "Cancelado",
+    0: "inactivo",
+    4: "Cancelado",
   };
 
   /* ---------- Utils ---------- */

@@ -102,11 +102,9 @@
     return (k in m) ? (m[k] || `Usuario #${id}`) : `Usuario #${id}`;
   }
 
-  /* ========= NUEVO: precargar mapa de usuarios robusto ========= */
   async function hydrateUsuariosMap() {
-    // Intentos que suelen existir en tu backend
     const attempts = [
-      {}, // lista completa (si el backend la permite)
+      {}, 
       { estatus: 1 }, { estatus: 0 }, { estatus: 2 }, { estatus: 3 },
     ];
     const seen = new Map();
@@ -122,14 +120,13 @@
           if (id && !seen.has(id)) seen.set(id, u);
         }
       } catch {
-        /* ignora cada intento fallido */
       }
     }
     S.maps.usuarios = arrToMap([...seen.values()]);
   }
   /* ============================================================= */
 
-  const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
+  const STATUS_LABEL = { 1: "Activo", 0: "Cancelado", 2: "Suscrito", 3: "Terminado" };
   function statusBadge(tipo, s) {
     if (window.statusBadge) return window.statusBadge(tipo, s);
     const label = STATUS_LABEL[Number(s)] || String(s);

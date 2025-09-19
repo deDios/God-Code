@@ -652,7 +652,7 @@
                         <div id="media-noticia-edit">
                             <!-- mountNoticiaMediaEdit -->
                         </div>
-                        <div class="hint gc-soft">Formatos: JPG/PNG · Máx 2MB.</div>
+                        <div class="hint gc-soft">Formatos: JPG/PNG · Máx 10MB.</div>
                     </div>
                 </div>
 
@@ -778,7 +778,7 @@
                         <div id="media-tutor-edit">
                             <!-- en edicion -->
                         </div>
-                        <div class="hint gc-soft">Formatos: JPG/PNG · Máx 2MB.</div>
+                        <div class="hint gc-soft">Formatos: JPG/PNG · Máx 10MB.</div>
                     </div>
                 </div>
 
