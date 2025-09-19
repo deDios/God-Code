@@ -153,7 +153,6 @@
   if (!window.statusBadge) window.statusBadge = statusBadge;
 })();
 
-/* gc.searchbar.js — barra de búsqueda unificada por módulo */
 (() => {
   "use strict";
 
@@ -162,14 +161,13 @@
 
   const S = {
     routeKey: "", // '#/cursos' | '#/noticias' | …
-    q: "", // query actual
+    q: "",
     handlers: {}, // { '#/cursos': fn(q), … }
     placeholders: {
-      // por módulo (editable)
       "#/cursos": "Buscar cursos…",
       "#/noticias": "Buscar noticias…",
       "#/tutores": "Buscar tutores…",
-      "#/suscripciones": "Buscar por alumno o curso…",
+      "#/suscripciones": "Buscar por suscriptor o curso…",
       "#/usuarios": "Buscar usuarios…",
     },
     debounceMs: 120,
@@ -185,13 +183,11 @@
       .toLowerCase()
       .trim();
 
-  /** Filtro genérico: busca en JSON stringificado del item */
   function defaultMatcher(q) {
     const k = norm(q);
     return (row) => norm(JSON.stringify(row)).includes(k);
   }
 
-  /** Aplica filtro a un arreglo con un matcher opcional */
   function applyFilter(arr, q, matcher) {
     const m = typeof matcher === "function" ? matcher : defaultMatcher(q);
     return (Array.isArray(arr) ? arr : []).filter(m);
@@ -201,20 +197,18 @@
   function ensureWired() {
     if (S._wired) return;
     const inp = document.querySelector(ID);
-    if (!inp) return; // se conectará al llamarse otra vez
+    if (!inp) return;
     S._wired = true;
 
     // entrada
     inp.addEventListener("input", () => {
       const run = () => {
         S.q = inp.value || "";
-        // dispara evento global por si prefieres escuchar eventos
         document.dispatchEvent(
           new CustomEvent("gc:search-change", {
             detail: { routeKey: S.routeKey, q: S.q },
           })
         );
-        // llama handler registrado para el módulo activo
         const fn = S.handlers[S.routeKey];
         if (typeof fn === "function") {
           try {
@@ -246,16 +240,13 @@
     ensureWired();
   }
 
-  /** Registra el callback del módulo activo. Se llama en cada input. */
   function register(routeKey, onChange, { placeholder } = {}) {
     if (placeholder) S.placeholders[routeKey] = String(placeholder);
     S.handlers[routeKey] = onChange;
-    // si ya estamos en ese route, aplica placeholder y fuerza refresco
     if (S.routeKey === routeKey) {
       setPlaceholder(S.placeholders[routeKey] || defPh);
       const inp = document.querySelector(ID);
       if (inp) {
-        // forzar primer disparo con el valor actual
         const val = inp.value || "";
         if (val !== S.q) {
           S.q = val;

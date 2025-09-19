@@ -458,7 +458,7 @@
       home: getNavLink("home", "/VIEW/Home.php"),
       proyectos: getNavLink("proyectos", "/proyectos.php"),
       cursos: getNavLink("cursos", "/cursos.php"),
-      admin: getNavLink("admin", "/VIEW/admin/admin.php"),
+      admin: getNavLink("admin", "/VIEW/UAT/admin.php"),
     };
 
     function isActive(href) {
