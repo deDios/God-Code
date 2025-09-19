@@ -526,7 +526,7 @@
                         <div id="media-curso-edit">
                             <!-- mountCursoMedia(..., editable:true) -->
                         </div>
-                        <div class="hint gc-soft">Solo archivos PNG/JPG que pesen hasta 2MB.</div>
+                        <div class="hint gc-soft">Solo archivos PNG/JPG que pesen hasta 10MB.</div>
                     </div>
                 </div>
 
