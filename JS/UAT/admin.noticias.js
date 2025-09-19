@@ -1109,7 +1109,7 @@
       desc_uno: "",
       desc_dos: "",
       estatus: 1,
-      fecha_creacion: "",
+      fecha_creacion: "", 
       fecha_modif: "",
       creado_por: getCreatorId() ?? "",
     };

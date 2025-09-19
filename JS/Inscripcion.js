@@ -10,19 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const correoInput = form.querySelector('input[name="correo"]');
   const telefonoInput = form.querySelector('input[name="telefono"]');
 
-  function mostrarToast(mensaje, tipo = "exito", duracion = 5000) {
-    console.log(`[TOAST] tipo=${tipo} msg="${mensaje}"`);
-    const cont = document.querySelector(".toast-container");
-    if (!cont) return;
-    const t = document.createElement("div");
-    t.className = `toast ${tipo}`;
-    t.textContent = mensaje;
-    cont.appendChild(t);
-    setTimeout(() => t.classList.add("mostrar"), 10);
-    setTimeout(() => {
-      t.classList.remove("mostrar");
-      setTimeout(() => cont.removeChild(t), 400);
-    }, duracion);
+  function toast(msg, type = "info", ms = 2200) {
+    if (window.gcToast) return window.gcToast(msg, type, ms);
+    console.log(`${TAG} toast[${type}]:`, msg);
   }
 
   // valida FORMATO y marca alerta si falla
@@ -89,13 +79,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (Array.isArray(data) && data.length > 0) {
         const field = input === correoInput ? "correo" : "telefono";
         const val = input.value.trim().toLowerCase();
-        const existe = data.some(u => u[field] === val);
+        const existe = data.some((u) => u[field] === val);
         if (existe) {
           console.log(`Duplicado encontrado en ${field}: "${val}"`);
           cont.classList.add("alerta");
           cont.dataset.origen = "duplicado";
           cont.querySelector(".icono-alerta").textContent = "⚠️";
-          mostrarToast(`Ya existe una cuenta con ese ${field}.`, "warning");
+          toast(`Ya existe una cuenta con ese ${field}.`, "warning");
         } else {
           console.log(`No hay duplicado en ${field}`);
         }
@@ -116,13 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Listeners
-  [correoInput, telefonoInput].forEach(input => {
+  [correoInput, telefonoInput].forEach((input) => {
     input.addEventListener("blur", () => validarCampo(input));
     input.addEventListener("input", () => validarCampo(input));
   });
 
   // Submit
-  form.addEventListener("submit", async e => {
+  form.addEventListener("submit", async (e) => {
     console.log("Intento de submit...");
     e.preventDefault();
     btn.disabled = true;
@@ -138,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // campos vacios
     if (!nombre || !correo || !telefono || !pass || !conf || !fecha) {
       console.log("Error: hay campos vacíos");
-      mostrarToast("Por favor, completa todos los campos.", "warning");
+      toast("Por favor, completa todos los campos.", "warning");
       btn.disabled = false;
       btn.textContent = "Registrarse";
       return;
@@ -146,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // contraseñas
     if (pass !== conf) {
       console.log("Error: contraseñas no coinciden");
-      mostrarToast("Las contraseñas no coinciden.", "warning");
+      toast("Las contraseñas no coinciden.", "warning");
       btn.disabled = false;
       btn.textContent = "Registrarse";
       return;
@@ -157,10 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ).length;
     console.log("Alertas antes de enviar:", finalAlerts);
     if (finalAlerts) {
-      mostrarToast(
-        "Corrige los campos en rojo antes de continuar.",
-        "warning"
-      );
+      toast("Corrige los campos en rojo antes de continuar.", "warning");
       btn.disabled = false;
       btn.textContent = "Registrarse";
       return;
@@ -177,24 +164,24 @@ document.addEventListener("DOMContentLoaded", () => {
           telefono,
           fecha_nacimiento: fecha,
           tipo_contacto: 3,
-          password: pass
-        })
+          password: pass,
+        }),
       });
       const json = await res.json();
       console.log("Respuesta i_usuario.php:", json);
       if (json.mensaje === "Usuario registrado correctamente") {
-        mostrarToast("Registro exitoso. ¡Bienvenido!", "exito", 6000);
+        toast("Registro exitoso. ¡Bienvenido!", "exito");
         form.reset();
         document
           .querySelectorAll(".icono-alerta")
-          .forEach(el => (el.textContent = ""));
+          .forEach((el) => (el.textContent = ""));
       } else {
         console.log("Error al registrar:", json);
-        mostrarToast("No se pudo completar el registro.", "error");
+        toast("No se pudo completar el registro.", "error");
       }
     } catch (err) {
       console.error("Error en fetch registro:", err);
-      mostrarToast("Error de conexión. Intenta más tarde.", "error");
+      toast("Error de conexión. Intenta más tarde.", "error");
     }
 
     btn.disabled = false;
