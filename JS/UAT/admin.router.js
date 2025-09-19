@@ -67,7 +67,7 @@
       "#/noticias": "Noticias",
       "#/tutores": "Tutores",
       "#/suscripciones": "Suscripciones",
-      "#/cuenta": "Cuenta", // para cuando el guard manda a Cuenta
+      "#/cuenta": "Cuenta", // ruta por defecto del guard
     };
     const h = qs("#mod-title");
     if (h) h.textContent = map[route] || "—";
@@ -77,7 +77,9 @@
     const head = document.querySelector(
       ".recursos-box.desktop-only .table-header"
     );
-    if (!head) return;
+    const wrap = document.querySelector(".recursos-table");
+    if (!head || !wrap) return;
+
     let cols = [];
     if (route === "#/cursos") {
       cols = [
@@ -95,7 +97,7 @@
     } else if (route === "#/tutores") {
       cols = [
         ["col-nombre", "Nombre"],
-        ["col-fecha", "Creación"],
+        ["col-fecha", "Fecha de creación"],
         ["col-status", "Status"],
       ];
     } else if (route === "#/suscripciones") {
@@ -105,14 +107,24 @@
         ["col-fecha", "Fecha de suscripción"],
         ["col-status", "Status"],
       ];
-    } else if (route === "#/cuenta") {
-      cols = [];
     }
+
     head.innerHTML = cols
       .map(
         ([cls, lab]) => `<div class="${cls}" role="columnheader">${lab}</div>`
       )
       .join("");
+
+    const n = head.children.length || 0;
+    const template =
+      n <= 1
+        ? "1fr"
+        : `2.2fr ${Array(n - 1)
+            .fill("1fr")
+            .join(" ")}`;
+
+    wrap.style.setProperty("--grid-template", template);
+    wrap.setAttribute("data-cols", String(n));
   }
 
   async function waitGuardFlagOnce(maxMs = 250) {

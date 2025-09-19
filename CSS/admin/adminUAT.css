@@ -1313,3 +1313,11 @@ body.cuenta-only .topbar {
 .media-meta{ display:flex; align-items:center; justify-content:space-between; padding:.5rem .6rem; }
 .media-label{ font-weight:600; color:#333; }
 @media (max-width:560px){ .media-grid{ grid-template-columns:1fr; } }
+
+
+.recursos-table .table-header,
+.recursos-table .table-row {
+  display: grid;
+  grid-template-columns: var(--grid-template, 2.2fr 1fr 1fr 1fr); /* fallback a 4 */
+  align-items: center;
+}
