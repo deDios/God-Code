@@ -877,7 +877,21 @@
             tutorImgUrl(tid, "jpg"),
             noImageSvgDataURI()
           );
-          bindImagePreview(imgView, "Vista previa · Foto del tutor");
+          imgView.style.cursor = "zoom-in";
+          imgView.addEventListener("click", () => {
+            const src = imgView.getAttribute("src") || "";
+            if (!src) return;
+            if (window.gcPreview?.openImagePreview) {
+              window.gcPreview.openImagePreview({
+                src,
+                title: "Vista previa de foto",
+                details:
+                  "Solo lectura · Formatos permitidos: JPG / PNG · Máx 10MB",
+              });
+            } else {
+              window.open(src, "_blank", "noopener,noreferrer");
+            }
+          });
         }
       }
 
