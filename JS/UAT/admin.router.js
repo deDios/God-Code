@@ -121,7 +121,7 @@
     } else if (route === "#/noticias") {
       cols = [
         ["col-nombre", "Título"],
-        ["col-fecha", "Creación"],
+        ["col-fecha", "Fecha de creación"],
         ["col-status", "Status"],
       ];
     } else if (route === "#/tutores") {
