@@ -22,7 +22,7 @@ if (!isset($input['curso']) || !isset($input['usuario'])) {
 $curso = (int)$input['curso'];
 $usuario = (int)$input['usuario'];
 $comentario = isset($input['comentario']) ? trim($input['comentario']) : null;
-$estatus = 1;
+$estatus = 0;
 
 $con = conectar();
 if (!$con) {
