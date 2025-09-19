@@ -26,6 +26,36 @@
     },
   };
 
+  function syncRowsGridToHeader() {
+    const wrap = document.querySelector(".recursos-table");
+    const head = document.querySelector(".recursos-table .table-header");
+    const body = document.querySelector("#recursos-list");
+    if (!wrap || !head || !body) return;
+
+    const n = head.children.length || 0;
+    const template =
+      n <= 1
+        ? "1fr"
+        : `2.2fr ${Array(n - 1)
+            .fill("1fr")
+            .join(" ")}`;
+    wrap.style.setProperty("--grid-template", template);
+
+    body.querySelectorAll(".table-row").forEach((r) => {
+      r.style.gridTemplateColumns = template;
+    });
+
+    if (!body._autoGridObs) {
+      const mo = new MutationObserver(() => {
+        body.querySelectorAll(".table-row").forEach((r) => {
+          r.style.gridTemplateColumns = template;
+        });
+      });
+      mo.observe(body, { childList: true });
+      body._autoGridObs = mo;
+    }
+  }
+
   async function ensure(path, flag) {
     if (globalThis[flag]) return;
     const hasScript = !!document.querySelector(`script[src="${path}"]`);
@@ -169,6 +199,7 @@
     await ensure(mod.path, mod.flag);
     const api = mod.api && mod.api();
     if (api?.mount) await api.mount();
+    syncRowsGridToHeader();
   }
 
   function onCreate() {
