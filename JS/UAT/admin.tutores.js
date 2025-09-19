@@ -24,24 +24,16 @@
     page: 1,
     pageSize: 7,
     search: "",
-    tempNewTutorImage: null,
-    pendingEditTutorImage: null,
+    tempNewTutorImage: null, // archivo temporal cuando creas
   };
-  // flag para el router
   window.__TutoresState = S;
 
-  // Orden deseado en el listado: Activo → Pausado → Inactivo
+  // Orden deseado: Activo → Pausado → Inactivo
   const ORDER_TUTORES = [1, 2, 0];
 
-  /* ---------- Utils ---------- */
-
-  // --- Limite de subida (ahora son 10 mb para que no haya problemas)
+  /* ---------- Constantes / Utils ---------- */
   const MAX_UPLOAD_MB = 10;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
-
-  function formatMB(bytes) {
-    return (bytes / 1048576).toFixed(2);
-  }
 
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
@@ -76,42 +68,14 @@
     }
   };
 
-  const img = qs("#cm_img");
-  if (img && data?.id)
-    setImgWithFallback(
-      img,
-      cursoImgUrl(data.id, "png"),
-      cursoImgUrl(data.id, "jpg"),
-      noImageSvgDataURI()
-    );
-
-  const STATUS_LABEL_TUTOR = {
-    1: "Activo",
-    0: "Inactivo",
-    2: "Pausado",
-  };
-
-  // enlazar preview a la imagen del tutor
-  function bindImagePreview(el, title = "Vista previa") {
-    if (!el || el._previewBound) return;
-    el._previewBound = true;
-    el.style.cursor = "zoom-in";
-    el.addEventListener("click", () => {
-      const src = el.getAttribute("src") || "";
-      if (!src) return;
-      if (window.gcPreview?.openImagePreview) {
-        window.gcPreview.openImagePreview({ src, title });
-      } else if (window.openImagePreview) {
-        window.openImagePreview({ src, title, confirm: false });
-      } else {
-        window.open(src, "_blank", "noopener,noreferrer");
-      }
-    });
-  }
+  const STATUS_LABEL_TUTOR = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
 
   function toast(m, t = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(m, t, ms);
-    console.log(TAG, "toast[" + t + "]: ", m);
+    console.log(TAG, `toast[${t}]:`, m);
+  }
+  function formatMB(bytes) {
+    return (bytes / 1048576).toFixed(2);
   }
 
   async function postJSON(url, body) {
@@ -122,20 +86,22 @@
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
+    if (!text.trim()) return {};
     try {
       return JSON.parse(text);
     } catch {}
+    // intento “rescate” de JSON si viene con basura
     const fb = text.indexOf("{"),
       lb = text.lastIndexOf("}");
     const fb2 = text.indexOf("["),
       lb2 = text.lastIndexOf("]");
-    let candidate = "";
-    if (fb !== -1 && lb !== -1 && lb > fb) candidate = text.slice(fb, lb + 1);
+    let c = "";
+    if (fb !== -1 && lb !== -1 && lb > fb) c = text.slice(fb, lb + 1);
     else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2)
-      candidate = text.slice(fb2, lb2 + 1);
-    if (candidate) {
+      c = text.slice(fb2, lb2 + 1);
+    if (c) {
       try {
-        return JSON.parse(candidate);
+        return JSON.parse(c);
       } catch {}
     }
     return { _raw: text };
@@ -182,14 +148,12 @@
     imgEl.src = withBust(primary);
   }
 
-  function statusBadge(tipo, s) {
-    if (window.statusBadge) return window.statusBadge(tipo, s);
+  function statusBadge(_tipo, s) {
     const n = Number(s);
     const label = n === 1 ? "Activo" : n === 0 ? "Inactivo" : "Pausado";
     return `<span class="gc-chip">${label}</span>`;
   }
-  function statusSelect(id, val, tipo) {
-    if (window.statusSelect) return window.statusSelect(id, val, tipo);
+  function statusSelect(id, val) {
     const v = Number(val);
     return `<select id="${id}">
       <option value="1"${v === 1 ? " selected" : ""}>Activo</option>
@@ -207,7 +171,102 @@
       ? window.state
       : { currentDrawer: null, usuario: { id: 1 } };
 
-  /* ---------- Preview imagen (usa modal nativo si existe) ---------- */
+  /* ---------- Preview de imagen: usa modal nativo o lightbox embebido ---------- */
+  function __ensureSimpleImagePreview() {
+    if (window.__gcSimplePreview) return window.__gcSimplePreview;
+
+    const wrap = document.createElement("div");
+    wrap.id = "gc-simple-preview";
+    wrap.innerHTML = `
+      <div class="gc-sp-backdrop" role="dialog" aria-modal="true" aria-label="Vista previa" hidden>
+        <div class="gc-sp-body">
+          <img class="gc-sp-img" alt="Vista previa">
+          <button class="gc-sp-close" aria-label="Cerrar">×</button>
+        </div>
+      </div>`;
+    document.body.appendChild(wrap);
+
+    const root = wrap.querySelector(".gc-sp-backdrop");
+    const img = wrap.querySelector(".gc-sp-img");
+    const btn = wrap.querySelector(".gc-sp-close");
+
+    const api = {
+      open(src, title) {
+        if (!src) return;
+        img.src = src;
+        img.alt = title || "Vista previa";
+        root.hidden = false;
+        document.documentElement.style.overflow = "hidden";
+        setTimeout(() => root.classList.add("open"), 0);
+      },
+      close() {
+        root.classList.remove("open");
+        document.documentElement.style.overflow = "";
+        setTimeout(() => {
+          root.hidden = true;
+          img.src = "";
+        }, 150);
+      },
+    };
+
+    root.addEventListener("click", (e) => {
+      if (e.target === root) api.close();
+    });
+    btn.addEventListener("click", api.close);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !root.hidden) api.close();
+    });
+
+    const css = document.createElement("style");
+    css.textContent = `
+      #gc-simple-preview .gc-sp-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s ease}
+      #gc-simple-preview .gc-sp-backdrop.open{opacity:1}
+      #gc-simple-preview .gc-sp-body{position:relative;max-width:90vw;max-height:90vh}
+      #gc-simple-preview .gc-sp-img{max-width:90vw;max-height:90vh;display:block;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+      #gc-simple-preview .gc-sp-close{position:absolute;top:-10px;right:-10px;width:36px;height:36px;border:none;border-radius:50%;background:#fff;cursor:pointer;font-size:20px;line-height:1;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+    `;
+    document.head.appendChild(css);
+
+    window.__gcSimplePreview = api;
+    return api;
+  }
+
+  function bindImagePreview(el, title = "Vista previa") {
+    if (!el || el._previewBound) return;
+    el._previewBound = true;
+    el.style.cursor = "zoom-in";
+    el.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const src = el.getAttribute("src") || "";
+      if (!src) return;
+
+      // Modal nativo (como cursos/noticias)
+      if (window.gcPreview?.openImagePreview) {
+        window.gcPreview.openImagePreview({ src, title });
+        return;
+      }
+      if (window.openImagePreview) {
+        window.openImagePreview({ src, title, confirm: false });
+        return;
+      }
+      if (window.gcOpenImagePreview) {
+        window.gcOpenImagePreview({ src, title });
+        return;
+      }
+      if (window.gcImagePreview) {
+        try {
+          window.gcImagePreview({ src, title });
+          return;
+        } catch {}
+      }
+
+      // Fallback lightbox embebido
+      __ensureSimpleImagePreview().open(src, title);
+    });
+  }
+
+  /* ---------- Confirm de subida (usa modal si existe) ---------- */
   async function gcAskImageUpload({ file, title = "Vista previa de imagen" }) {
     const openers = [
       window.gcImagePreview,
@@ -229,7 +288,6 @@
         }
       });
     }
-    // Fallback hiper simple
     return window.confirm("¿Subir esta imagen?");
   }
 
@@ -373,9 +431,9 @@
         )
       );
       const flat = [];
-      ORDER_TUTORES.forEach((st, i) => {
-        flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []));
-      });
+      ORDER_TUTORES.forEach((st, i) =>
+        flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []))
+      );
       S.raw = flat;
 
       S.data = flat.map((t) => ({
@@ -386,7 +444,6 @@
         fecha_creacion: t.fecha_creacion,
         _all: t,
       }));
-      // reinicia página si cambia el dataset
       if (S.page < 1) S.page = 1;
       draw();
     } catch (e) {
@@ -397,7 +454,6 @@
 
   function renderPagination(total) {
     const totalPages = Math.max(1, Math.ceil(total / S.pageSize));
-    // corrige page si quedó fuera de rango
     if (S.page > totalPages) S.page = totalPages;
 
     [qs("#pagination-controls"), qs("#pagination-mobile")].forEach((cont) => {
@@ -424,7 +480,6 @@
           "arrow-btn"
         )
       );
-      // máximo 7 botones de página visibles
       for (let p = 1; p <= totalPages && p <= 7; p++) {
         const b = mk(String(p), false, () => {
           S.page = p;
@@ -555,13 +610,12 @@
           await reactivate(id);
           toast("Tutor reactivado", "exito");
           await load();
-        } catch (e) {
+        } catch {
           toast("No se pudo reactivar", "error");
         }
       });
     });
 
-    // pinta paginación
     renderPagination(filtered.length);
   }
 
@@ -591,7 +645,7 @@
 
     const viewHTML = `
       ${headActions}
-      <section id="tutor-view" class="mode-view"${isView ? "" : " hidden"}>
+      <section id="tutor-view" class="mode-view${isView ? "" : " hidden"}">
         <div class="field">
           <div class="label">Nombre <span class="req">*</span></div>
           <div class="value" id="tv_nombre">${esc(t.nombre)}</div>
@@ -651,9 +705,9 @@
     `;
 
     const editHTML = `
-      <section id="tutor-edit" class="mode-edit"${
+      <section id="tutor-edit" class="mode-edit${
         isCreate || isEdit ? "" : " hidden"
-      }>
+      }">
         <div class="field">
           <label for="tf_nombre">Nombre <span class="req">*</span></label>
           <input id="tf_nombre" type="text" value="${esc(
@@ -670,7 +724,7 @@
         </div>
         <div class="field">
           <label for="tf_estatus">Estatus</label>
-          ${statusSelect("tf_estatus", t.estatus, "tutores")}
+          ${statusSelect("tf_estatus", t.estatus)}
         </div>
 
         <div class="field">
@@ -688,7 +742,7 @@
                 </figure>
                 <div class="media-meta">
                   <div class="media-label">Foto</div>
-                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx 10MB</div>
+                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB</div>
                 </div>
               </div>
             </div>
@@ -812,6 +866,7 @@
         }
       });
 
+      // Imagen en modo vista + preview modal
       if (isView) {
         const tid = Number(t.id || item?.id || 0);
         const imgView = qs("#tutor-img-view");
@@ -826,21 +881,27 @@
         }
       }
 
+      // Imagen en edición/creación + selector + preview modal
       if (isEdit || isCreate) {
         const tid = Number(t.id || item?.id || 0);
         const imgEdit = qs("#tutor-img-edit");
         if (imgEdit) {
-          if (tid)
+          if (tid) {
             setImgWithFallback(
               imgEdit,
               tutorImgUrl(tid, "png"),
               tutorImgUrl(tid, "jpg"),
               noImageSvgDataURI()
             );
-          else if (S.tempNewTutorImage instanceof File) {
+          } else if (S.tempNewTutorImage instanceof File) {
             imgEdit.src = withBust(URL.createObjectURL(S.tempNewTutorImage));
-          } else imgEdit.src = noImageSvgDataURI();
+          } else {
+            imgEdit.src = noImageSvgDataURI();
+          }
+          // permite ver la imagen actual en modal
+          bindImagePreview(imgEdit, "Vista previa · Foto del tutor");
         }
+
         const pencil = qs("#tutor-pencil");
         if (pencil && !pencil._b) {
           pencil._b = true;
@@ -857,7 +918,7 @@
               if (!/image\/(png|jpeg)/.test(file.type))
                 return toast("Formato no permitido. Usa JPG o PNG.", "error");
               if (file.size > MAX_UPLOAD_BYTES)
-                return toast("La imagen excede 10MB.", "error");
+                return toast(`La imagen excede ${MAX_UPLOAD_MB}MB.`, "error");
 
               const confirmed = await gcAskImageUpload({
                 file,
@@ -902,6 +963,7 @@
 
       const tgt = isEdit || isCreate ? "#tutor-cursos-edit" : "#tutor-cursos";
       renderTutorCursosChips(Number(t.id || item?.id || 0), tgt);
+
       if (window.gcBindCharCounters) {
         window.gcBindCharCounters(document.getElementById("drawer-tutor-body"));
       }
@@ -1023,7 +1085,7 @@
     }
   }
 
-  /* ---------- Cursos ligados ---------- */
+  /* ---------- Cursos ligados (chips) ---------- */
   async function renderTutorCursosChips(
     tutorId,
     containerSel = "#tutor-cursos"
@@ -1109,7 +1171,7 @@
     }
   }
 
-  /* ---------- Mini Drawer de curso ---------- */
+  /* ---------- Mini Drawer de curso (solo lectura) ---------- */
   function ensureCursoMiniDOM() {
     if (qs("#drawer-curso-mini")) return;
     const tpl = document.createElement("div");
