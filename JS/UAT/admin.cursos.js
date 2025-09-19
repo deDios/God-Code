@@ -48,10 +48,15 @@
     4: "En curso",
     5: "Cancelado",
   };
-  // NUEVO ORDEN: Activo, En curso, Terminado, Pausado, Cancelado, Inactivo
+  // Activo, En curso, Terminado, Pausado, Cancelado, Inactivo
   const ORDER_CURSOS = [1, 4, 3, 2, 5, 0];
 
   /* ---------- Utils DOM/format ---------- */
+
+  // --- limite de subida de imagenes
+  const MAX_UPLOAD_MB = 10;
+  const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
@@ -279,7 +284,7 @@
                <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>`
             : `<div style="color:#666;">Solo lectura</div>`
         }
-        <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
+        <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
         ${
@@ -323,11 +328,11 @@
     return { close };
   }
 
-  function validarImagen(file, maxMB = 2) {
+  function validarImagen(file, maxMB = MAX_UPLOAD_MB) {
     if (!file) return { ok: false, error: "No seleccionaste archivo." };
     if (!/image\/(png|jpeg)/.test(file.type))
       return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
-    if (file.size > maxMB * 1048576)
+    if (file.size > (maxMB === MAX_UPLOAD_MB ? MAX_UPLOAD_BYTES : maxMB * 1048576))
       return { ok: false, error: `La imagen excede ${maxMB}MB.` };
     return { ok: true };
   }
@@ -992,7 +997,7 @@
     containerEl.innerHTML = `
       <div class="media-head">
         <div class="media-title">Imágenes</div>
-        <div class="media-help">JPG/PNG · Máx 2MB</div>
+        <div class="media-help">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div class="media-grid">
         <div class="media-card">
@@ -1032,7 +1037,7 @@
         const file = input.files && input.files[0];
         input.remove();
         if (!file) return;
-        const v = validarImagen(file, 2);
+        const v = validarImagen(file);
         if (!v.ok) {
           toast(v.error, "error");
           return;

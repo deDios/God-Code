@@ -36,16 +36,17 @@ if (!class_exists('finfo')) {
 }
 $finfo = new finfo(FILEINFO_MIME_TYPE);
 $mime = $finfo->file($_FILES['avatar']['tmp_name']);
+// variables de control para el tamaño del archivo
+$MAX_BYTES = 10 * 1024 * 1024;
+
 $allowed = ["image/jpeg" => "jpg", "image/png" => "png"];
 if (!isset($allowed[$mime])) {
     echo json_encode(["error" => "Formato no permitido. Solo JPG o PNG."]);
     exit;
 }
 
-// (Opcional) tamaño máx 2MB
-if ($_FILES['avatar']['size'] > 2 * 1024 * 1024) {
-    echo json_encode(["error" => "La imagen excede 2MB"]);
-    exit;
+if ($_FILES['avatar']['size'] > $MAX_BYTES) {
+  respond(["ok" => false, "error" => "La imagen excede 10MB"], 400);
 }
 
 // Directorio de almacenamiento
@@ -61,11 +62,10 @@ if (!is_writable($baseDir)) {
 
 $ext = $allowed[$mime];
 
-// ✅ Versión anterior: user_{ID}.{ext}
 $filename = "user_" . $usuario_id . "." . $ext;
 $destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
 
-// Limpiar archivos previos (misma convención pero distinta extensión)
+// Limpiar archivos previos 
 foreach (["jpg", "png"] as $oldExt) {
     $old = $baseDir . DIRECTORY_SEPARATOR . "user_" . $usuario_id . "." . $oldExt;
     if (file_exists($old) && $old !== $destPath) {
@@ -79,7 +79,7 @@ if (!move_uploaded_file($_FILES['avatar']['tmp_name'], $destPath)) {
     exit;
 }
 
-// URL pública
+// URL publica
 $publicBase = "/ASSETS/usuario/usuarioImg";
 $url = $publicBase . "/" . $filename;
 

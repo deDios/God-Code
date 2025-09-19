@@ -36,6 +36,10 @@
   };
 
   /* ---------- Utils ---------- */
+  // --- Limite de subida
+  const MAX_UPLOAD_MB = 10;
+  const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
@@ -134,23 +138,30 @@
   }
 
   /* ---------- Imágenes de noticia ---------- */
-  function noticiaImgUrl(id, pos) {
-    return `/ASSETS/noticia/NoticiasImg/noticia_img${pos}_${Number(id)}.png`;
+  function noticiaImgUrl(id, pos, ext = "png") {
+    return `/ASSETS/noticia/NoticiasImg/noticia_img${pos}_${Number(id)}.${ext}`;
   }
+
   function noImageSvgDataURI() {
     const svg =
       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M20 70 L60 35 L95 65 L120 50 L140 70' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
+
   async function resolveNoticiaImg(id, pos = 1) {
-    const url = withBust(noticiaImgUrl(id, pos));
-    const ok = await new Promise((res) => {
-      const i = new Image();
-      i.onload = () => res(true);
-      i.onerror = () => res(false);
-      i.src = url;
-    });
-    return ok ? url : noImageSvgDataURI();
+    const tryUrl = async (ext) => {
+      const url = withBust(noticiaImgUrl(id, pos, ext));
+      const ok = await new Promise((res) => {
+        const i = new Image();
+        i.onload = () => res(true);
+        i.onerror = () => res(false);
+        i.src = url;
+      });
+      return ok ? url : null;
+    };
+    return (
+      (await tryUrl("png")) || (await tryUrl("jpg")) || noImageSvgDataURI()
+    );
   }
 
   /* ---------- Overlay de preview ---------- */
@@ -259,7 +270,7 @@
                <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>`
             : `<div style="color:#666;">Solo lectura</div>`
         }
-        <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx 2MB</div>
+        <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
         ${
@@ -828,11 +839,13 @@
       .join("");
   }
 
-  function validarImagen(file, maxMB = 2) {
+  function validarImagen(file, maxMB = MAX_UPLOAD_MB) {
     if (!file) return { ok: false, error: "No seleccionaste archivo." };
     if (!/image\/(png|jpeg)/.test(file.type))
       return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
-    if (file.size > maxMB * 1048576)
+    if (
+      file.size > (maxMB === MAX_UPLOAD_MB ? MAX_UPLOAD_BYTES : maxMB * 1048576)
+    )
       return { ok: false, error: `La imagen excede ${maxMB}MB.` };
     return { ok: true };
   }
@@ -842,7 +855,7 @@
     containerEl.innerHTML = `
       <div class="media-head">
         <div class="media-title">Imágenes</div>
-        <div class="media-help">JPG/PNG · Máx 2MB</div>
+        <div class="media-help">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div class="media-grid">
         <div class="media-card">
@@ -903,7 +916,7 @@
           const file = input.files && input.files[0];
           input.remove();
           if (!file) return;
-          const v = validarImagen(file, 2);
+          const v = validarImagen(file);
           if (!v.ok) {
             toast(v.error, "error");
             return;
@@ -1109,7 +1122,7 @@
       desc_uno: "",
       desc_dos: "",
       estatus: 1,
-      fecha_creacion: "", 
+      fecha_creacion: "",
       fecha_modif: "",
       creado_por: getCreatorId() ?? "",
     };

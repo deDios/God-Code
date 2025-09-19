@@ -1,90 +1,95 @@
 <?php
-header("Access-Control-Allow-Origin: https://godcode.com.mx");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json");
+// u_cursoImg.php
+declare(strict_types=1);
 
-$path = realpath("/home/site/wwwroot/db/conn/Conexion.php");
-if ($path && file_exists($path)) {
-    include $path;
+// --- Config ---
+const MAX_MB     = 10;
+const MAX_BYTES  = MAX_MB * 1024 * 1024;
+const ALLOWED    = ['image/jpeg' => 'jpg', 'image/png' => 'png'];
+
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+header('Access-Control-Allow-Origin: *'); 
+
+function respond(array $data, int $status = 200): void {
+  http_response_code($status);
+  echo json_encode($data, JSON_UNESCAPED_UNICODE);
+  exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
-// POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["error" => "Método no permitido"]);
-    exit;
+  respond(['ok' => false, 'error' => 'Método no permitido'], 405);
 }
 
-// validar curso_id
-if (!isset($_POST['curso_id'])) {
-    echo json_encode(["error" => "Falta 'curso_id'"]);
-    exit;
-}
-$curso_id = (int)$_POST['curso_id'];
-
-// validar archivo subido
-if (!isset($_FILES['imagen']) || $_FILES['imagen']['error'] !== UPLOAD_ERR_OK) {
-    echo json_encode(["error" => "No se recibió el archivo o hubo un error en la carga"]);
-    exit;
+$cursoId = isset($_POST['curso_id']) ? (int)$_POST['curso_id'] : 0;
+if ($cursoId <= 0) {
+  respond(['ok' => false, 'error' => 'curso_id inválido'], 400);
 }
 
-if (!class_exists('finfo')) {
-    echo json_encode(["error" => "Extensión fileinfo no disponible en el servidor"]);
-    exit;
-}
-$finfo = new finfo(FILEINFO_MIME_TYPE);
-$mime = $finfo->file($_FILES['imagen']['tmp_name']);
-$allowed = ["image/jpeg" => "jpg", "image/png" => "png"];
-if (!isset($allowed[$mime])) {
-    echo json_encode(["error" => "Formato no permitido. Solo JPG o PNG."]);
-    exit;
+if (!isset($_FILES['imagen'])) {
+  respond(['ok' => false, 'error' => 'Falta archivo `imagen`'], 400);
 }
 
-// tamaño max 2MB 
-if ($_FILES['imagen']['size'] > 2 * 1024 * 1024) {
-    echo json_encode(["error" => "La imagen excede 2MB"]);
-    exit;
+$f = $_FILES['imagen'];
+
+// Errores en general solo por si acaso
+$errMap = [
+  UPLOAD_ERR_INI_SIZE   => 'Archivo excede límite del servidor',
+  UPLOAD_ERR_FORM_SIZE  => 'Archivo excede límite del formulario',
+  UPLOAD_ERR_PARTIAL    => 'Subida incompleta',
+  UPLOAD_ERR_NO_FILE    => 'No se subió archivo',
+  UPLOAD_ERR_NO_TMP_DIR => 'Falta carpeta temporal',
+  UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo',
+  UPLOAD_ERR_EXTENSION  => 'Extensión bloqueada por el servidor',
+];
+if ($f['error'] !== UPLOAD_ERR_OK) {
+  $msg = $errMap[$f['error']] ?? ('Error de subida (código '.$f['error'].')');
+  respond(['ok' => false, 'error' => $msg], 400);
 }
 
-// directirio
-$baseDir = realpath(__DIR__ . "/../../ASSETS/cursos");
-if ($baseDir === false) {
-    echo json_encode(["error" => "Directorio de destino no encontrado"]);
-    exit;
+if (!is_uploaded_file($f['tmp_name'])) {
+  respond(['ok' => false, 'error' => 'Archivo no válido'], 400);
 }
-if (!is_writable($baseDir)) {
-    echo json_encode(["error" => "El directorio de destino no es escribible"]);
-    exit;
+if ((int)$f['size'] > MAX_BYTES) {
+  respond(['ok' => false, 'error' => 'La imagen excede '.MAX_MB.'MB'], 400);
 }
 
-$ext = $allowed[$mime];
+$finfo = finfo_open(FILEINFO_MIME_TYPE);
+$mime  = $finfo ? finfo_file($finfo, $f['tmp_name']) : null;
+if ($finfo) finfo_close($finfo);
 
-// como va a quedar img{ID}.{ext}
-$filename = "img" . $curso_id . "." . $ext;
-$destPath = $baseDir . DIRECTORY_SEPARATOR . $filename;
-
-// limpiar lo que estaba antes 
-foreach (["jpg", "png"] as $oldExt) {
-    $old = $baseDir . DIRECTORY_SEPARATOR . "img" . $curso_id . "." . $oldExt;
-    if (file_exists($old) && $old !== $destPath) {
-        @unlink($old);
-    }
+if (!$mime || !isset(ALLOWED[$mime])) {
+  respond(['ok' => false, 'error' => 'Formato no permitido. Usa JPG o PNG.'], 400);
 }
 
-if (!move_uploaded_file($_FILES['imagen']['tmp_name'], $destPath)) {
-    echo json_encode(["error" => "No se pudo guardar la imagen"]);
-    exit;
+$ext = ALLOWED[$mime];
+
+// Ruta de destino
+$docRoot = rtrim($_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__), '/');
+$destDir = $docRoot . '/ASSETS/cursos';
+if (!is_dir($destDir)) {
+  if (!mkdir($destDir, 0775, true) && !is_dir($destDir)) {
+    respond(['ok' => false, 'error' => 'No se pudo crear el directorio de destino'], 500);
+  }
 }
 
-$publicBase = "/ASSETS/cursos";
-$url = $publicBase . "/" . $filename;
+// como queda guardado =  /ASSETS/cursos/img{ID}.{ext}
+$filename = 'img' . $cursoId . '.' . $ext;
+$destPath = $destDir . '/' . $filename;
 
-echo json_encode([
-    "mensaje" => "Imagen de curso actualizada correctamente",
-    "url" => $url
-]);
+// Mover archivo
+if (!move_uploaded_file($f['tmp_name'], $destPath)) {
+  respond(['ok' => false, 'error' => 'No se pudo guardar el archivo'], 500);
+}
+
+@chmod($destPath, 0644);
+
+// borra el anterior
+$otherExt = $ext === 'png' ? 'jpg' : 'png';
+$otherPath = $destDir . '/img' . $cursoId . '.' . $otherExt;
+if (is_file($otherPath)) { @unlink($otherPath); }
+
+// URL publica 
+$url = '/ASSETS/cursos/' . $filename . '?v=' . time();
+
+respond(['ok' => true, 'url' => $url]);

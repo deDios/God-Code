@@ -1,4 +1,4 @@
-/* ==================== TUTORES (UAT) — Núcleo + Listado + Drawer ==================== */
+/* ==================== TUTORES ==================== */
 (() => {
   "use strict";
 
@@ -34,6 +34,15 @@
   const ORDER_TUTORES = [1, 2, 0];
 
   /* ---------- Utils ---------- */
+
+  // --- Limite de subida (ahora son 10 mb para que no haya problemas)
+  const MAX_UPLOAD_MB = 10;
+  const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
+
+  function formatMB(bytes) {
+    return (bytes / 1048576).toFixed(2);
+  }
+
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
@@ -645,7 +654,7 @@
                 </figure>
                 <div class="media-meta">
                   <div class="media-label">Foto</div>
-                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx 2MB</div>
+                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx 10MB</div>
                 </div>
               </div>
             </div>
@@ -811,8 +820,8 @@
               if (!file) return;
               if (!/image\/(png|jpeg)/.test(file.type))
                 return toast("Formato no permitido. Usa JPG o PNG.", "error");
-              if (file.size > 2 * 1048576)
-                return toast("La imagen excede 2MB.", "error");
+              if (file.size > MAX_UPLOAD_BYTES)
+                return toast("La imagen excede 10MB.", "error");
 
               const confirmed = await gcAskImageUpload({
                 file,
@@ -826,9 +835,9 @@
                 imgEdit && (imgEdit.src = withBust(u));
                 S.tempNewTutorImage = file;
                 if (info)
-                  info.textContent = `Archivo: ${file.name} · ${(
-                    file.size / 1048576
-                  ).toFixed(2)} MB (se subirá al guardar)`;
+                  info.textContent = `Archivo: ${file.name} · ${formatMB(
+                    file.size
+                  )} MB (se subirá al guardar)`;
                 toast("Imagen lista; se subirá al guardar.", "info");
                 return;
               }
