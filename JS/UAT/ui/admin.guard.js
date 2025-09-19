@@ -44,19 +44,16 @@
   function injectGuardCSS() {
     if (document.getElementById("admin-guard-css")) return;
     const css = `
-      /* Oculto por defecto; se muestra con .guard-on */
       #home-main .guard-placeholder { display:none; }
 
-      /* En modo guard, ocultar por completo el panel de contenido */
       #home-main.guard-on .main-content { display:none !important; }
 
-      /* Mostrar el placeholder y centrarlo mejor en el panel derecho */
       #home-main.guard-on .guard-placeholder {
         display:flex !important;
-        align-items:center;           /* vertical */
-        justify-content:center;       /* horizontal */
+        align-items:center;          
+        justify-content:center;      
         padding: 20px 24px;
-        min-height: 60vh;             /* para centrar verticalmente */
+        min-height: 60vh;            
       }
 
       /* Tarjeta del placeholder */
@@ -88,6 +85,12 @@
       #home-main.guard-on .recursos-box.mobile-only,
       #home-main.guard-on #pagination-controls,
       #home-main.guard-on #pagination-mobile { display:none !important; }
+
+      #home-main.guard-on .guard-placeholder{
+      align-items: flex-start !important;  
+      padding-top: 2rem !important;        
+      min-height: 40vh !important;       
+      }
     `;
     const tag = document.createElement("style");
     tag.id = "admin-guard-css";
@@ -116,8 +119,8 @@
             <h1>Estamos trabajando en ello</h1>
             <p>Esta sección aún no está disponible para tu cuenta. Pronto tendrás más opciones aquí mismo.</p>
             <div class="guard-actions">
-              <a id="guard-link-cuenta" class="gc-btn" href="#">Ir a Cuenta</a>
-              <a id="guard-link-sitio"  class="gc-btn gc-btn--ghost" href="#">Volver al sitio</a>
+              <a id="guard-link-cuenta" class="gc-btn" href="#">Cuenta</a>
+              <a id="guard-link-sitio"  class="gc-btn gc-btn--ghost" href="#">Home</a>
             </div>
           </div>
         </div>`;
