@@ -1,6 +1,7 @@
 /* ==================== TUTORES ==================== */
 (() => {
   "use strict";
+
   const TAG = "[Tutores]";
 
   /* ---------- Config/API ---------- */
@@ -27,10 +28,12 @@
   };
   window.__TutoresState = S;
 
-  // Orden listado: Activo → Pausado → Inactivo
+  // Orden deseado en el listado: Activo → Pausado → Inactivo
   const ORDER_TUTORES = [1, 2, 0];
 
   /* ---------- Utils ---------- */
+
+  // Límite de subida (igual que el resto de módulos)
   const MAX_UPLOAD_MB = 10;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
@@ -64,7 +67,16 @@
       return dt;
     }
   };
-  const formatMB = (bytes) => (bytes / 1048576).toFixed(2);
+  const humanSize = (bytes) => {
+    const u = ["B", "KB", "MB", "GB"];
+    let i = 0;
+    let v = Number(bytes) || 0;
+    while (v >= 1024 && i < u.length - 1) {
+      v /= 1024;
+      i++;
+    }
+    return `${v.toFixed(i ? 1 : 0)}${u[i]}`;
+  };
 
   function toast(m, t = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(m, t, ms);
@@ -79,6 +91,7 @@
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
+    if (!text.trim()) return {};
     try {
       return JSON.parse(text);
     } catch {}
@@ -119,14 +132,10 @@
       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M18 74 L56 38 L92 66 L120 50 L142 74' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
-  const STATUS_LABEL_TUTOR = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
-
-  function tutorImgUrl(id, ext = "png") {
-    return `/ASSETS/tutor/tutor_${Number(id)}.${ext}`;
-  }
-  function cursoImgUrl(id, ext = "png") {
-    return `/ASSETS/cursos/img${Number(id)}.${ext}`;
-  }
+  const tutorImgUrl = (id, ext = "png") =>
+    `/ASSETS/tutor/tutor_${Number(id)}.${ext}`;
+  const cursoImgUrl = (id, ext = "png") =>
+    `/ASSETS/cursos/img${Number(id)}.${ext}`;
 
   function setImgWithFallback(imgEl, primary, secondary, finalDataURI) {
     if (!imgEl) return;
@@ -141,12 +150,158 @@
     imgEl.src = withBust(primary);
   }
 
-  function statusBadge(_, s) {
+  /* ---------- Modal de PREVIEW (clonado del módulo de Cursos) ---------- */
+  // Si ya existe global, lo reutilizamos (para que la UI sea idéntica).
+  if (!window.openImagePreview) {
+    window.openImagePreview = function openImagePreview(opts = {}) {
+      const {
+        src = "",
+        file = null,
+        title = "Vista previa",
+        confirm = false,
+        onConfirm,
+        onCancel,
+      } = opts;
+
+      // Inyecta estilos 1 sola vez
+      if (!window._gc_preview_css) {
+        window._gc_preview_css = true;
+        const CSS = `
+        .gc-prev-overlay{position:fixed;inset:0;background:rgba(18,18,18,.48);backdrop-filter:saturate(1.2) blur(2px);z-index:9998;opacity:0;transition:opacity .15s ease}
+        .gc-prev-overlay.open{opacity:1}
+        .gc-prev-modal{position:fixed;inset:auto;top:50%;left:50%;transform:translate(-50%,-46%) scale(.98);transition:transform .18s ease,opacity .18s ease;opacity:0;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.28);width:min(1040px,90vw);max-height:86vh;display:grid;grid-template-columns:1fr 300px;overflow:hidden}
+        .gc-prev-modal.open{opacity:1;transform:translate(-50%,-50%) scale(1)}
+        .gc-prev-header{grid-column:1/3;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #eee}
+        .gc-prev-title{font-weight:700}
+        .gc-prev-body{display:grid;grid-template-columns:1fr 300px;min-height:360px}
+        .gc-prev-image{padding:14px}
+        .gc-prev-image .pad{background:#f8f8f8;border-radius:8px;display:flex;align-items:center;justify-content:center;height:100%}
+        .gc-prev-image img{max-width:100%;max-height:68vh;border-radius:8px;display:block}
+        .gc-prev-sidebar{border-left:1px solid #eee;padding:14px}
+        .gc-soft{color:#777}
+        .gc-btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #ddd;background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+        .gc-btn--primary{background:#111;color:#fff;border-color:#111}
+        .gc-btns{display:flex;gap:.5rem;justify-content:flex-end;padding:12px;border-top:1px solid #eee;grid-column:1/3}
+        .gc-prev-close{width:28px;height:28px;border-radius:999px;border:1px solid #ddd;display:inline-grid;place-items:center;cursor:pointer;background:#fff}
+        `;
+        const st = document.createElement("style");
+        st.id = "gc-preview-styles";
+        st.textContent = CSS;
+        document.head.appendChild(st);
+      }
+
+      const overlay = document.createElement("div");
+      overlay.className = "gc-prev-overlay";
+      const modal = document.createElement("div");
+      modal.className = "gc-prev-modal";
+
+      const header = document.createElement("div");
+      header.className = "gc-prev-header";
+      const hTitle = document.createElement("div");
+      hTitle.className = "gc-prev-title";
+      hTitle.textContent = title || "Vista previa";
+      const close = document.createElement("button");
+      close.className = "gc-prev-close";
+      close.innerHTML = "&#10005;";
+
+      header.appendChild(hTitle);
+      header.appendChild(close);
+
+      const body = document.createElement("div");
+      body.className = "gc-prev-body";
+
+      const left = document.createElement("div");
+      left.className = "gc-prev-image";
+      left.innerHTML = `<div class="pad"><img alt="Preview"></div>`;
+      const img = left.querySelector("img");
+
+      if (file instanceof File) {
+        img.src = URL.createObjectURL(file);
+      } else if (src) {
+        img.src = src;
+      }
+
+      const right = document.createElement("div");
+      right.className = "gc-prev-sidebar";
+      right.innerHTML = `
+        <div style="font-weight:700;margin-bottom:.5rem;">Detalles</div>
+        <div class="gc-soft" style="margin-bottom:.75rem;">Solo lectura</div>
+        <div class="gc-soft" style="font-size:.95rem;line-height:1.6;">
+          Formatos permitidos: JPG / PNG<br>
+          · Máx ${MAX_UPLOAD_MB}MB
+        </div>
+      `;
+
+      const btns = document.createElement("div");
+      btns.className = "gc-btns";
+      const bClose = document.createElement("button");
+      bClose.className = "gc-btn";
+      bClose.textContent = "Cerrar";
+
+      btns.appendChild(bClose);
+
+      overlay.appendChild(modal);
+      modal.appendChild(header);
+      modal.appendChild(body);
+      body.appendChild(left);
+      body.appendChild(right);
+      modal.appendChild(btns);
+
+      function clean() {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = "";
+      }
+      function open() {
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => {
+          overlay.classList.add("open");
+          modal.classList.add("open");
+        });
+        document.body.style.overflow = "hidden";
+      }
+
+      const doClose = () => {
+        clean();
+        onCancel && onCancel();
+      };
+
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) doClose();
+      });
+      [bClose, close].forEach((b) => b.addEventListener("click", doClose));
+      document.addEventListener("keydown", function onEsc(ev) {
+        if (ev.key === "Escape") {
+          doClose();
+          document.removeEventListener("keydown", onEsc);
+        }
+      });
+
+      open();
+    };
+  }
+
+  // Helper para enlazar una IMG a ese modal de preview
+  function bindImagePreview(imgEl, title = "Vista previa") {
+    if (!imgEl || imgEl._previewBound) return;
+    imgEl._previewBound = true;
+    imgEl.style.cursor = "zoom-in";
+    imgEl.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const src = imgEl.getAttribute("src") || "";
+      if (!src) return;
+      window.openImagePreview?.({ src, title, confirm: false });
+    });
+  }
+
+  function statusBadge(tipo, s) {
+    if (window.statusBadge) return window.statusBadge(tipo, s);
     const n = Number(s);
     const label = n === 1 ? "Activo" : n === 0 ? "Inactivo" : "Pausado";
     return `<span class="gc-chip">${label}</span>`;
   }
   function statusSelect(id, val) {
+    if (window.statusSelect) return window.statusSelect(id, val, "tutores");
     const v = Number(val);
     return `<select id="${id}">
       <option value="1"${v === 1 ? " selected" : ""}>Activo</option>
@@ -155,149 +310,21 @@
     </select>`;
   }
 
-  const isAdminUser = "isAdminUser" in window ? window.isAdminUser : true;
-  const state = window.state || { currentDrawer: null, usuario: { id: 1 } };
-
-  /* ---------- *** Modal de preview (igual a Cursos) *** ---------- */
-  function openImagePreview({
-    src,
-    file,
-    title = "Vista previa de imagen",
-    confirm = false,
-    detailsHtml = "",
-    onConfirm,
-    onCancel,
-  } = {}) {
-    return new Promise((resolve) => {
-      // overlay
-      const ov = document.createElement("div");
-      ov.className = "gc-preview-overlay";
-      ov.style.cssText =
-        "position:fixed;inset:0;background:rgba(16,18,20,.6);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:saturate(1.1) blur(1px);";
-
-      // modal
-      const md = document.createElement("div");
-      md.className = "gc-preview-modal";
-      md.style.cssText =
-        "background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);width:min(1000px,96vw);max-width:1000px;max-height:90vh;display:grid;grid-template-columns:1fr 260px;overflow:hidden;position:relative;";
-
-      // header
-      const hd = document.createElement("div");
-      hd.style.cssText =
-        "grid-column:1/3;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee;";
-      hd.innerHTML = `<div style="font-weight:700;">${esc(title)}</div>
-        <button type="button" aria-label="Cerrar" id="gc-prev-close" style="border:none;background:#f3f3f3;border-radius:999px;width:28px;height:28px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;">×</button>`;
-
-      // body
-      const body = document.createElement("div");
-      body.style.cssText = "display:contents;";
-
-      const left = document.createElement("div");
-      left.style.cssText =
-        "padding:14px;display:flex;align-items:center;justify-content:center;background:#fafafa;min-height:420px;";
-
-      const img = document.createElement("img");
-      img.alt = "Vista previa";
-      img.style.cssText =
-        "max-width:100%;max-height:70vh;object-fit:contain;border-radius:8px;background:#fff";
-      if (file instanceof File) img.src = URL.createObjectURL(file);
-      else img.src = src || noImageSvgDataURI();
-      left.appendChild(img);
-
-      const right = document.createElement("aside");
-      right.style.cssText =
-        "padding:16px;border-left:1px solid #eee;display:flex;flex-direction:column;gap:10px;";
-
-      const details = document.createElement("div");
-      details.innerHTML = `
-        <div style="font-weight:600;">Detalles</div>
-        <div class="gc-soft" style="color:#666;">Solo lectura</div>
-        <div class="gc-soft" style="color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
-        ${detailsHtml || ""}`;
-      right.appendChild(details);
-
-      const actions = document.createElement("div");
-      actions.style.cssText =
-        "margin-top:auto;display:flex;gap:8px;justify-content:flex-end;";
-      const closeBtn = document.createElement("button");
-      closeBtn.className = "gc-btn";
-      closeBtn.textContent = "Cerrar";
-      closeBtn.style.cssText =
-        "padding:.55rem .9rem;border-radius:8px;border:none;background:#f3f3f3;cursor:pointer;";
-      actions.appendChild(closeBtn);
-      if (confirm) {
-        const ok = document.createElement("button");
-        ok.textContent = "Confirmar";
-        ok.className = "gc-btn gc-btn--success";
-        ok.style.cssText =
-          "padding:.55rem .9rem;border-radius:8px;border:none;background:#16a34a;color:#fff;cursor:pointer;";
-        actions.appendChild(ok);
-        ok.addEventListener("click", () => {
-          cleanup();
-          try {
-            onConfirm?.();
-          } catch {}
-          resolve(true);
-        });
-      }
-      right.appendChild(actions);
-
-      // compose
-      body.appendChild(left);
-      body.appendChild(right);
-      md.appendChild(hd);
-      md.appendChild(body);
-      ov.appendChild(md);
-      document.body.appendChild(ov);
-
-      function cleanup() {
-        try {
-          if (file instanceof File) URL.revokeObjectURL(img.src);
-        } catch {}
-        ov.remove();
-      }
-      function closeFlow() {
-        cleanup();
-        try {
-          onCancel?.();
-        } catch {}
-        resolve(false);
-      }
-
-      // close handlers
-      closeBtn.addEventListener("click", closeFlow);
-      qs("#gc-prev-close", md)?.addEventListener("click", closeFlow);
-      ov.addEventListener("click", (e) => {
-        if (e.target === ov) closeFlow();
-      });
-      document.addEventListener("keydown", function escH(ev) {
-        if (ev.key === "Escape") {
-          document.removeEventListener("keydown", escH);
-          closeFlow();
-        }
-      });
-    });
-  }
-
-  window.gcPreview = window.gcPreview || {};
-  window.gcPreview.openImagePreview = openImagePreview;
-
-  // Confirmación para subida (re-usa modal si existe)
-  async function gcAskImageUpload({ file, title = "Vista previa de imagen" }) {
-    // Si existe nuestro modal, úsalo
-    if (typeof openImagePreview === "function") {
-      return await openImagePreview({ file, title, confirm: true });
-    }
-    // Fallback mínimo
-    return window.confirm("¿Subir esta imagen?");
-  }
+  const isAdminUser =
+    typeof window !== "undefined" && "isAdminUser" in window
+      ? window.isAdminUser
+      : true;
+  const state =
+    typeof window !== "undefined" && window.state
+      ? window.state
+      : { currentDrawer: null, usuario: { id: 1 } };
 
   /* ---------- Drawer control ---------- */
   function openTutorDrawer(title, html) {
-    const aside = qs("#drawer-tutor");
-    const overlay = qs("#gc-dash-overlay");
-    const t = qs("#drawer-tutor-title");
-    const b = qs("#drawer-tutor-body");
+    const aside = document.getElementById("drawer-tutor");
+    const overlay = document.getElementById("gc-dash-overlay");
+    const t = document.getElementById("drawer-tutor-title");
+    const b = document.getElementById("drawer-tutor-body");
     if (!aside) return;
     if (t) t.textContent = title || "Tutor · —";
     if (b) b.innerHTML = html || "";
@@ -311,8 +338,8 @@
     }
   }
   function closeTutorDrawer() {
-    const aside = qs("#drawer-tutor");
-    const overlay = qs("#gc-dash-overlay");
+    const aside = document.getElementById("drawer-tutor");
+    const overlay = document.getElementById("gc-dash-overlay");
     if (!aside) return;
     try {
       document.activeElement?.blur?.();
@@ -336,7 +363,7 @@
     const ov = qs("#gc-dash-overlay");
     if (ov && !ov._b) {
       ov._b = true;
-      ov.addEventListener("click", closeTutorDrawer);
+      ov.addEventListener("click", () => closeTutorDrawer());
     }
     if (!window._gc_tutores_esc) {
       window._gc_tutores_esc = true;
@@ -362,7 +389,7 @@
           },
           { placeholder: ph }
         );
-        const inp = qs("#search-input");
+        const inp = document.querySelector("#search-input");
         if (inp) inp.title = tip;
       }
     } else {
@@ -423,9 +450,9 @@
         )
       );
       const flat = [];
-      ORDER_TUTORES.forEach((st, i) =>
-        flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []))
-      );
+      ORDER_TUTORES.forEach((st, i) => {
+        flat.push(...(Array.isArray(chunks[i]) ? chunks[i] : []));
+      });
       S.raw = flat;
 
       S.data = flat.map((t) => ({
@@ -452,6 +479,7 @@
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
+
       const mk = (txt, dis, cb, cls = "page-btn") => {
         const b = document.createElement("button");
         b.textContent = txt;
@@ -533,15 +561,13 @@
     pageRows.forEach((it) => {
       hostD?.insertAdjacentHTML(
         "beforeend",
-        `
-        <div class="table-row" data-id="${it.id}" data-type="tutor">
-          <div class="col-nombre"><span class="name-text">${esc(
-            it.nombre
-          )}</span></div>
-          <div class="col-fecha">${esc(fmtDateTime(it.fecha_creacion))}</div>
-          <div class="col-status">${statusBadge("tutores", it.estatus)}</div>
-        </div>
-      `
+        `<div class="table-row" data-id="${it.id}" data-type="tutor">
+           <div class="col-nombre"><span class="name-text">${esc(
+             it.nombre
+           )}</span></div>
+           <div class="col-fecha">${esc(fmtDateTime(it.fecha_creacion))}</div>
+           <div class="col-status">${statusBadge("tutores", it.estatus)}</div>
+         </div>`
       );
     });
 
@@ -549,31 +575,29 @@
     pageRows.forEach((it) => {
       hostM?.insertAdjacentHTML(
         "beforeend",
-        `
-        <div class="table-row-mobile" data-id="${it.id}" data-type="tutor">
-          <button class="row-toggle">
-            <div class="col-nombre">${esc(it.nombre)}</div>
-            <span class="icon-chevron">›</span>
-          </button>
-          <div class="row-details">
-            <div><strong>Creado:</strong> ${esc(
-              fmtDateTime(it.fecha_creacion)
-            )}</div>
-            <div><strong>Status:</strong> ${statusBadge(
-              "tutores",
-              it.estatus
-            )}</div>
-            <div style="display:flex;gap:8px;margin:.25rem 0 .5rem;">
-              <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
-              ${
-                Number(it.estatus) === 0
-                  ? `<button class="gc-btn gc-btn--success gc-reactivate" data-id="${it.id}">Reactivar</button>`
-                  : ""
-              }
-            </div>
-          </div>
-        </div>
-      `
+        `<div class="table-row-mobile" data-id="${it.id}" data-type="tutor">
+           <button class="row-toggle">
+             <div class="col-nombre">${esc(it.nombre)}</div>
+             <span class="icon-chevron">›</span>
+           </button>
+           <div class="row-details">
+             <div><strong>Creado:</strong> ${esc(
+               fmtDateTime(it.fecha_creacion)
+             )}</div>
+             <div><strong>Status:</strong> ${statusBadge(
+               "tutores",
+               it.estatus
+             )}</div>
+             <div style="display:flex;gap:8px;margin:.25rem 0 .5rem;">
+               <button class="gc-btn gc-btn--ghost open-drawer">Ver detalle</button>
+               ${
+                 Number(it.estatus) === 0
+                   ? `<button class="gc-btn gc-btn--success gc-reactivate" data-id="${it.id}">Reactivar</button>`
+                   : ""
+               }
+             </div>
+           </div>
+         </div>`
       );
     });
 
@@ -624,29 +648,29 @@
     const headActions =
       !isCreate && !isEdit && isAdminUser
         ? `<div class="gc-actions" id="tutor-actions-view">
-          <button class="gc-btn" id="btn-edit-tutor">Editar</button>
-          ${
-            Number(t.estatus) === 0
-              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
-              : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`
-          }
-        </div>`
+             <button class="gc-btn" id="btn-edit-tutor">Editar</button>
+             ${
+               Number(t.estatus) === 0
+                 ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
+                 : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`
+             }
+           </div>`
         : "";
 
     const viewHTML = `
       ${headActions}
-      <section id="tutor-view" class="mode-view"${
-        isView ? "" : ' hidden aria-hidden="true"'
-      }>
-        <div class="field"><div class="label">Nombre <span class="req">*</span></div><div class="value" id="tv_nombre">${esc(
-          t.nombre
-        )}</div></div>
-        <div class="field"><div class="label">Descripción <span class="req">*</span></div><div class="value" id="tv_descripcion">${esc(
-          t.descripcion
-        )}</div></div>
+      <section id="tutor-view" class="mode-view"${isView ? "" : " hidden"}>
+        <div class="field">
+          <div class="label">Nombre <span class="req">*</span></div>
+          <div class="value" id="tv_nombre">${esc(t.nombre)}</div>
+        </div>
+        <div class="field">
+          <div class="label">Descripción <span class="req">*</span></div>
+          <div class="value" id="tv_descripcion">${esc(t.descripcion)}</div>
+        </div>
         <div class="grid-3">
           <div class="field"><div class="label">Estatus</div><div class="value" id="tv_estatus">${esc(
-            STATUS_LABEL_TUTOR[t.estatus] ?? "—"
+            { 1: "Activo", 0: "Inactivo", 2: "Pausado" }[t.estatus] ?? "—"
           )}</div></div>
           <div class="field"><div class="label">ID</div><div class="value" id="tv_id">${esc(
             t.id
@@ -655,19 +679,24 @@
             fmtDateTime(t.fecha_creacion)
           )}</div></div>
         </div>
+
         <div class="field">
           <div class="label">Imagen</div>
           <div class="value">
-            <div class="media-grid">
-              <div class="media-card">
-                <figure class="media-thumb">
-                  <img id="tutor-img-view" alt="Foto" src="${noImageSvgDataURI()}">
-                </figure>
-                <div class="media-meta"><div class="media-label">Foto</div><div class="media-help gc-soft">Click para vista previa</div></div>
+            <div id="media-tutor" data-id="${t.id || item?.id || ""}">
+              <div class="media-head"><div class="media-title">Imágenes</div><div class="media-help" style="color:#888;">Solo lectura</div></div>
+              <div class="media-grid">
+                <div class="media-card">
+                  <figure class="media-thumb">
+                    <img id="tutor-img-view" alt="Foto" src="${noImageSvgDataURI()}">
+                  </figure>
+                  <div class="media-meta"><div class="media-label">Foto</div></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
         <details class="dev-json" id="tutor-json-box" open style="margin-top:16px;">
           <summary style="cursor:pointer;font-weight:600;">JSON · Tutor</summary>
           <div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="btn-copy-json-tutor">Copiar JSON</button></div>
@@ -679,8 +708,8 @@
 
     const editHTML = `
       <section id="tutor-edit" class="mode-edit"${
-        isCreate || isEdit ? "" : ' hidden aria-hidden="true"'
-      }> 
+        isCreate || isEdit ? "" : " hidden"
+      }>
         <div class="field">
           <label for="tf_nombre">Nombre <span class="req">*</span></label>
           <input id="tf_nombre" type="text" value="${esc(
@@ -695,14 +724,17 @@
           )}</textarea>
           <small class="char-counter" data-for="tf_descripcion"></small>
         </div>
-        <div class="field"><label for="tf_estatus">Estatus</label>${statusSelect(
-          "tf_estatus",
-          t.estatus
-        )}</div>
+        <div class="field">
+          <label for="tf_estatus">Estatus</label>
+          ${statusSelect("tf_estatus", t.estatus)}
+        </div>
+
         <div class="field">
           <label>Imagen</label>
           <div class="value">
-            <div class="media-grid">
+            <div id="media-tutor-edit" class="media-grid" data-id="${
+              t.id || item?.id || ""
+            }">
               <div class="media-card">
                 <figure class="media-thumb">
                   <img alt="Foto" id="tutor-img-edit" src="${noImageSvgDataURI()}">
@@ -712,12 +744,13 @@
                 </figure>
                 <div class="media-meta">
                   <div class="media-label">Foto</div>
-                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB · Click para vista previa</div>
+                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
         <div class="drawer-actions-row">
           <div class="row-right">
             <button class="gc-btn gc-btn--ghost" id="btn-cancel-tutor">Cancelar</button>
@@ -726,6 +759,7 @@
         </div>
       </section>`;
 
+    // Bind dinámicos
     setTimeout(async () => {
       const titleEl = qs("#drawer-tutor-title");
       if (isCreate) {
@@ -829,11 +863,10 @@
         }
       });
 
+      // VIEW: pinta imagen y enlaza preview
       if (isView) {
         const tid = Number(t.id || item?.id || 0);
         const imgView = qs("#tutor-img-view");
-
-        // VIEW
         if (imgView && tid) {
           setImgWithFallback(
             imgView,
@@ -841,36 +874,11 @@
             tutorImgUrl(tid, "jpg"),
             noImageSvgDataURI()
           );
-          imgView.style.cursor = "zoom-in";
-          imgView.addEventListener(
-            "click",
-            (ev) => {
-              ev.preventDefault();
-              ev.stopPropagation();
-              openImagePreview({
-                src: imgView.currentSrc || imgView.src,
-                title: "Vista previa · Foto del tutor",
-              });
-            },
-            { once: true }
-          );
-        }
-
-        // EDIT
-        if (imgEdit) {
-          imgEdit.style.cursor = "zoom-in";
-          imgEdit.addEventListener("click", (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            openImagePreview({
-              src: imgEdit.currentSrc || imgEdit.src,
-              title: "Vista previa · Foto del tutor",
-            });
-          });
+          bindImagePreview(imgView, "Vista previa de foto");
         }
       }
 
-      // Imagen EDIT/CREATE: cargar, cambiar y PREVIEW en modal
+      // EDIT/CREATE: imagen actual + botón lápiz
       if (isEdit || isCreate) {
         const tid = Number(t.id || item?.id || 0);
         const imgEdit = qs("#tutor-img-edit");
@@ -885,20 +893,8 @@
           else if (S.tempNewTutorImage instanceof File)
             imgEdit.src = withBust(URL.createObjectURL(S.tempNewTutorImage));
           else imgEdit.src = noImageSvgDataURI();
-
-          // click en la imagen = preview
-          imgEdit.style.cursor = "zoom-in";
-          imgEdit.addEventListener("click", (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            openImagePreview({
-              src: imgEdit.currentSrc || imgEdit.src,
-              title: "Vista previa · Foto del tutor",
-            });
-          });
+          bindImagePreview(imgEdit, "Vista previa de foto");
         }
-
-        // botón lápiz = seleccionar y confirmar subida
         const pencil = qs("#tutor-pencil");
         if (pencil && !pencil._b) {
           pencil._b = true;
@@ -917,20 +913,22 @@
               if (file.size > MAX_UPLOAD_BYTES)
                 return toast(`La imagen excede ${MAX_UPLOAD_MB}MB.`, "error");
 
-              const confirmed = await gcAskImageUpload({
+              // Preview confirm igual que Cursos (solo lectura; sin confirm obligatoria)
+              window.openImagePreview?.({
                 file,
-                title: "Vista previa de imagen",
+                title: "Vista previa de foto",
+                confirm: false,
               });
-              if (!confirmed) return;
 
               const info = qs("#tutor-img-info");
+              const u = URL.createObjectURL(file);
               if (!tid) {
-                imgEdit && (imgEdit.src = withBust(URL.createObjectURL(file)));
+                imgEdit && (imgEdit.src = withBust(u));
                 S.tempNewTutorImage = file;
                 if (info)
-                  info.textContent = `Archivo: ${file.name} · ${formatMB(
+                  info.textContent = `Archivo: ${file.name} · ${humanSize(
                     file.size
-                  )} MB (se subirá al guardar)`;
+                  )} (se subirá al guardar)`;
                 toast("Imagen lista; se subirá al guardar.", "info");
                 return;
               }
@@ -956,9 +954,11 @@
 
       if (window.bindCopyFromPre)
         window.bindCopyFromPre("#json-tutor", "#btn-copy-json-tutor");
+      if (window.gcBindCharCounters)
+        window.gcBindCharCounters(document.getElementById("drawer-tutor-body"));
     }, 0);
 
-    return isView ? viewHTML : editHTML;
+    return viewHTML + editHTML;
   }
 
   function getEmptyTutor() {
@@ -1059,7 +1059,9 @@
     if (!item || !item._all) return toast("Sin item para actualizar", "error");
     const p = readForm(item.id);
     if (!requireFields(p)) return;
+
     await postJSON(API.uTutores, p);
+
     toast("Cambios guardados", "exito");
     await load();
     const re = S.data.find((x) => x.id === item.id);
