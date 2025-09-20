@@ -37,7 +37,6 @@
   };
 
   /* ---------- Utils ---------- */
-  // --- Limite de subida
   const MAX_UPLOAD_MB = 10;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
@@ -84,20 +83,16 @@
   }
 
   async function postJSON(url, body) {
-    console.log(TAG, "POST", url, { body });
     const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
     const text = await r.text().catch(() => "");
-    console.log(TAG, "HTTP", r.status, "raw:", text);
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
 
     try {
-      const j = JSON.parse(text);
-      console.log(TAG, "JSON OK:", j);
-      return j;
+      return JSON.parse(text);
     } catch {}
 
     // Fallback: recorta bloque JSON {..} o [..]
@@ -112,12 +107,9 @@
       candidate = text.slice(firstBrack, lastBrack + 1);
     if (candidate) {
       try {
-        const j2 = JSON.parse(candidate);
-        console.warn(TAG, "JSON trimmed:", j2);
-        return j2;
+        return JSON.parse(candidate);
       } catch {}
     }
-    console.warn(TAG, "JSON parse failed; returning _raw");
     return { _raw: text };
   }
 
@@ -165,17 +157,19 @@
     );
   }
 
-  /* ---------- Overlay de preview ---------- */
+  /* ---------- Preview modal (unificado con Cursos/Tutores) ---------- */
   function humanSize(bytes) {
     if (!Number.isFinite(bytes)) return "—";
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / 1048576).toFixed(2) + " MB";
   }
-  function openImagePreview({
+
+  // Fallback local (solo si no existe un modal global)
+  function openImagePreviewLocal({
     src,
     file,
-    title = "Vista previa de imagen",
+    title = "Vista previa",
     confirm = false,
     onConfirm,
   }) {
@@ -314,34 +308,19 @@
     return { close };
   }
 
-  async function uploadNoticiaImg(noticiaId, pos, file) {
-    console.log(TAG, "uploadNoticiaImg id=", noticiaId, "pos=", pos, file);
-    const fd = new FormData();
-    fd.append("noticia_id", String(noticiaId));
-    fd.append("pos", String(pos));
-    fd.append("imagen", file);
-    const res = await fetch(API_UPLOAD.noticiaImg, {
-      method: "POST",
-      body: fd,
-    });
-    const text = await res.text().catch(() => "");
-    console.log(TAG, "upload HTTP", res.status, "raw:", text);
-    if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
-    const j = JSON.parse(text);
-    console.log(TAG, "upload JSON:", j);
-    if (!j.ok) throw new Error(j.error || "Upload fallo");
-    return j.url;
+  // Selector de modal (gcPreview.openImagePreview / openImagePreview / fallback local)
+  function getOpenImagePreview() {
+    if (window.gcPreview?.openImagePreview)
+      return window.gcPreview.openImagePreview;
+    if (window.openImagePreview) return window.openImagePreview;
+    return (opts) => openImagePreviewLocal(opts);
   }
 
   /* ---------- Drawer helpers ---------- */
   function openDrawerNoticia() {
-    console.log(TAG, "openDrawerNoticia()");
     const d = qs("#drawer-noticia"),
       ov = qs("#gc-dash-overlay");
-    if (!d) {
-      console.warn(TAG, "No existe #drawer-noticia en el DOM");
-      return;
-    }
+    if (!d) return;
     d.classList.add("open");
     d.removeAttribute("hidden");
     d.setAttribute("aria-hidden", "false");
@@ -371,7 +350,6 @@
     }
   }
   function closeDrawerNoticia() {
-    console.log(TAG, "closeDrawerNoticia()");
     const d = qs("#drawer-noticia"),
       ov = qs("#gc-dash-overlay");
     if (!d) return;
@@ -391,7 +369,6 @@
   }
 
   function setNoticiaDrawerMode(mode) {
-    console.log(TAG, "setNoticiaDrawerMode:", mode);
     const v = qs("#noticia-view"),
       e = qs("#noticia-edit"),
       act = qs("#noticia-actions-view");
@@ -399,10 +376,12 @@
       v && (v.hidden = false);
       e && (e.hidden = true);
       act && (act.style.display = "");
+      if (window.disableDrawerInputs) window.disableDrawerInputs(true);
     } else {
       v && (v.hidden = true);
       e && (e.hidden = false);
       act && (act.style.display = "none");
+      if (window.disableDrawerInputs) window.disableDrawerInputs(false);
     }
   }
   window.setNoticiaDrawerMode = setNoticiaDrawerMode;
@@ -420,7 +399,6 @@
 
   /* ==================== Cargar y renderizar listado ==================== */
   async function loadNoticias() {
-    console.log(TAG, "loadNoticias()...");
     const chunks = await Promise.all(
       ORDER_NOTICIAS.map((st) =>
         postJSON(API.noticias, { estatus: st }).catch(() => [])
@@ -433,7 +411,6 @@
     S.data = flat;
     S.page = 1;
     resortList();
-    console.log(TAG, "Noticias cargadas:", S.data.length);
     renderNoticias();
   }
 
@@ -442,7 +419,6 @@
   }
 
   function renderNoticias() {
-    console.log(TAG, "renderNoticias() page", S.page, "search=", S.search);
     const hostD = qs("#noticias-list") || qs("#recursos-list");
     const hostM = qs("#noticias-list-mobile") || qs("#recursos-list-mobile");
     if (hostD) hostD.innerHTML = "";
@@ -498,14 +474,13 @@
         qsa(".news-row", hostD).forEach((row) => {
           row.addEventListener("click", () => {
             const id = Number(row.dataset.id);
-            console.log(TAG, "click row id=", id);
             if (id) openNoticiaView(id);
           });
         });
       }
     }
 
-    // Mobile (todavia no esta terminado)
+    // Mobile
     if (hostM) {
       if (pageRows.length === 0) {
         hostM.insertAdjacentHTML(
@@ -532,7 +507,6 @@
             const id = Number(
               btn.closest(".table-row-mobile")?.dataset.id || 0
             );
-            console.log(TAG, "open mobile id=", id);
             if (id) openNoticiaView(id);
           });
         });
@@ -590,7 +564,7 @@
     });
   }
 
-  /* ---------- Búsqueda: gcSearch si existe, si no fallback ---------- */
+  /* ---------- Búsqueda ---------- */
   function wireSearch() {
     const ph = "Buscar por título, descripción o estatus…";
     const tip =
@@ -652,6 +626,7 @@
         </div>
       </div>
     `;
+    const openPreview = getOpenImagePreview();
     const i1 = containerEl.querySelector("#noticia-img-1-view");
     const i2 = containerEl.querySelector("#noticia-img-2-view");
     [i1, i2].forEach((img, idx) => {
@@ -662,7 +637,7 @@
       };
       img.style.cursor = "zoom-in";
       img.addEventListener("click", () => {
-        openImagePreview({
+        openPreview({
           src: img.src,
           confirm: false,
           title: `Vista previa · Imagen ${idx + 1}`,
@@ -755,7 +730,6 @@
   }
 
   async function fillNoticiaView(n) {
-    console.log(TAG, "fillNoticiaView id=", n?.id, n);
     const title = qs("#drawer-noticia-title");
     if (title) title.textContent = "Noticia · " + (n.titulo || "—");
 
@@ -790,16 +764,8 @@
   window.fillNoticiaView = fillNoticiaView;
 
   async function openNoticiaView(id) {
-    if (window.__activeModule && window.__activeModule !== "noticias") {
-      console.log(
-        TAG,
-        "openNoticiaView ignorado; módulo activo:",
-        window.__activeModule
-      );
-      return;
-    }
+    if (window.__activeModule && window.__activeModule !== "noticias") return;
     const it = (S.data || []).find((x) => +x.id === +id);
-    console.log(TAG, "openNoticiaView id=", id, "found:", !!it);
     if (!it) return;
     S.current = { id: it.id, _all: it };
     openDrawerNoticia();
@@ -903,6 +869,8 @@
     img1.onerror = () => (img1.src = noImageSvgDataURI());
     img2.onerror = () => (img2.src = noImageSvgDataURI());
 
+    const openPreview = getOpenImagePreview();
+
     qsa(".media-edit", containerEl).forEach((btn) => {
       if (btn._b) return;
       btn._b = true;
@@ -925,8 +893,7 @@
 
           const targetImg = pos === 1 ? img1 : img2;
 
-          // Overlay de confirmación de subida
-          openImagePreview({
+          openPreview({
             file,
             title: `Vista previa · Imagen ${pos}`,
             confirm: true,
@@ -941,7 +908,6 @@
               try {
                 const newUrl = await uploadNoticiaImg(noticiaId, pos, file);
                 targetImg.src = withBust(newUrl);
-                // refresca en vista si existe
                 const viewTarget = qs(`#noticia-img-${pos}-view`);
                 if (viewTarget) viewTarget.src = withBust(newUrl);
                 toast("Imagen actualizada", "exito");
@@ -958,8 +924,6 @@
   }
 
   function fillNoticiaEdit(n) {
-    console.log(TAG, "fillNoticiaEdit()", n);
-
     const model =
       S.current && S.current._all && (+S.current.id === +n.id || n.id == null)
         ? S.current._all
@@ -969,6 +933,11 @@
     setVal("nf_desc_uno", model.desc_uno);
     setVal("nf_desc_dos", model.desc_dos);
     putNoticiaStatus("nf_estatus", model.estatus ?? 1);
+
+    // contadores de caracteres (si existe util global)
+    if (window.gcBindCharCounters) {
+      window.gcBindCharCounters(qs("#noticia-edit"));
+    }
 
     mountNoticiaMediaEdit(qs("#media-noticia-edit"), model.id);
 
@@ -991,6 +960,22 @@
   }
   window.fillNoticiaEdit = fillNoticiaEdit;
 
+  async function uploadNoticiaImg(noticiaId, pos, file) {
+    const fd = new FormData();
+    fd.append("noticia_id", String(noticiaId));
+    fd.append("pos", String(pos));
+    fd.append("imagen", file);
+    const res = await fetch(API_UPLOAD.noticiaImg, {
+      method: "POST",
+      body: fd,
+    });
+    const text = await res.text().catch(() => "");
+    if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
+    const j = JSON.parse(text);
+    if (!j.ok) throw new Error(j.error || "Upload fallo");
+    return j.url;
+  }
+
   async function updateNoticiaStatus(id, estatus, extra = {}) {
     if (!id) return false;
     try {
@@ -998,9 +983,7 @@
         { id: Number(id), estatus: Number(estatus) },
         extra
       );
-      console.log(TAG, "updateNoticiaStatus →", payload);
       const res = await postJSON(API.uNoticias, payload);
-      console.log(TAG, "updateNoticiaStatus respuesta:", res);
       if (res && res.error) {
         toast(res.error, "error");
         return false;
@@ -1021,7 +1004,6 @@
       desc_dos: (qs("#nf_desc_dos")?.value || "").trim(),
       estatus: Number(qs("#nf_estatus")?.value || 1),
     };
-    console.log(TAG, "saveNoticia() body=", body);
 
     if (!body.titulo || !body.desc_uno) {
       toast("Título y Descripción 1 son obligatorios.", "error");
@@ -1098,7 +1080,6 @@
 
   /* ==================== API pública (router-lite) ==================== */
   async function mount() {
-    console.log(TAG, "mount() INICIO");
     window.__activeModule = "noticias";
     try {
       const hostD = qs("#noticias-list") || qs("#recursos-list");
@@ -1106,7 +1087,6 @@
         hostD.innerHTML = `<div class="table-row"><div class="col-nombre">Cargando…</div></div>`;
       await loadNoticias();
       wireSearch();
-      console.log(TAG, "mount() OK");
     } catch (e) {
       console.error(TAG, "mount() ERROR:", e);
       const hostD = qs("#noticias-list") || qs("#recursos-list");
@@ -1116,7 +1096,6 @@
   }
 
   function openNoticiaCreate() {
-    console.log(TAG, "openNoticiaCreate()");
     const blank = {
       id: null,
       titulo: "",
