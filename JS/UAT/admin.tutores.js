@@ -179,9 +179,6 @@
         .gc-prev-image img{max-width:100%;max-height:68vh;border-radius:8px;display:block}
         .gc-prev-sidebar{border-left:1px solid #eee;padding:14px}
         .gc-soft{color:#777}
-        .gc-btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #ddd;background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
-        .gc-btn--primary{background:#111;color:#fff;border-color:#111}
-        .gc-btns{display:flex;gap:.5rem;justify-content:flex-end;padding:12px;border-top:1px solid #eee;grid-column:1/3}
         .gc-prev-close{width:28px;height:28px;border-radius:999px;border:1px solid #ddd;display:inline-grid;place-items:center;cursor:pointer;background:#fff}
         `;
         const st = document.createElement("style");

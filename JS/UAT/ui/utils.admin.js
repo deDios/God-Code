@@ -312,3 +312,93 @@
     window.gcBindCharCounters(document);
   });
 })();
+
+
+// === Preview de imagenes hasta ahora aplicado en cursos, noticias y tutores (prox usuarios) =======================
+(() => {
+  if (window.gcPreview?.openImagePreview) return; 
+
+  function ensureModalDOM() {
+    if (document.getElementById("gc-image-modal")) return;
+
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `
+    <div id="gc-image-modal" class="gc-imgpv-overlay" aria-hidden="true" hidden>
+      <div class="gc-imgpv-dialog" role="dialog" aria-modal="true" aria-labelledby="gc-imgpv-title">
+        <button class="gc-imgpv-close" id="gc-imgpv-close" aria-label="Cerrar">×</button>
+        <div class="gc-imgpv-grid">
+          <div class="gc-imgpv-main">
+            <h3 class="gc-imgpv-title" id="gc-imgpv-title">Vista previa</h3>
+            <figure class="gc-imgpv-figure">
+              <img id="gc-imgpv-img" alt="Vista previa" />
+            </figure>
+          </div>
+          <aside class="gc-imgpv-side">
+            <div class="gc-imgpv-side-title">Detalles</div>
+            <div class="gc-imgpv-side-body" id="gc-imgpv-details">
+              <p>Solo lectura</p>
+              <p>Formatos permitidos: <strong>JPG / PNG</strong><br>· Máx <strong>10MB</strong></p>
+            </div>
+            <div class="gc-imgpv-actions">
+              <button class="gc-btn" id="gc-imgpv-btn-close">Cerrar</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+    `;
+    document.body.appendChild(wrap.firstElementChild);
+
+    const css = document.createElement("style");
+    css.textContent = `
+      .gc-imgpv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999}
+      .gc-imgpv-dialog{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.20);max-width:1120px;width:calc(100% - 40px);max-height:90vh;position:relative;overflow:hidden}
+      .gc-imgpv-close{position:absolute;right:10px;top:10px;border:0;background:#f3f3f3;border-radius:50%;width:28px;height:28px;font-size:18px;line-height:28px;cursor:pointer}
+      .gc-imgpv-grid{display:grid;grid-template-columns:minmax(320px,1fr) 320px;gap:0}
+      .gc-imgpv-title{margin:16px 16px 0;font-weight:600}
+      .gc-imgpv-main{background:#fafafa}
+      .gc-imgpv-figure{margin:12px 16px 16px;border-radius:10px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;max-height:74vh}
+      .gc-imgpv-figure img{max-width:100%;height:auto;object-fit:contain}
+      .gc-imgpv-side{padding:20px}
+      .gc-imgpv-side-title{font-weight:600;margin-bottom:8px}
+      .gc-imgpv-actions{margin-top:12px}
+    `;
+    document.head.appendChild(css);
+
+    const overlay = document.getElementById("gc-image-modal");
+    const btnX = document.getElementById("gc-imgpv-close");
+    const btnClose = document.getElementById("gc-imgpv-btn-close");
+
+    function close() {
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.hidden = true;
+    }
+    btnX.addEventListener("click", close);
+    btnClose.addEventListener("click", close);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) close();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (overlay.classList.contains("open") && e.key === "Escape") close();
+    });
+  }
+
+  function openImagePreview({ src, title = "Vista previa", detailsHTML = "" }) {
+    ensureModalDOM();
+    const overlay = document.getElementById("gc-image-modal");
+    const img = document.getElementById("gc-imgpv-img");
+    const ttl = document.getElementById("gc-imgpv-title");
+    const det = document.getElementById("gc-imgpv-details");
+    ttl.textContent = title || "Vista previa";
+    img.src = src;
+    if (detailsHTML) det.innerHTML = detailsHTML;
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.classList.add("open");
+  }
+
+  window.gcPreview = {
+    openImagePreview,
+  };
+})();

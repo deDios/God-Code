@@ -332,7 +332,9 @@
     if (!file) return { ok: false, error: "No seleccionaste archivo." };
     if (!/image\/(png|jpeg)/.test(file.type))
       return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
-    if (file.size > (maxMB === MAX_UPLOAD_MB ? MAX_UPLOAD_BYTES : maxMB * 1048576))
+    if (
+      file.size > (maxMB === MAX_UPLOAD_MB ? MAX_UPLOAD_BYTES : maxMB * 1048576)
+    )
       return { ok: false, error: `La imagen excede ${maxMB}MB.` };
     return { ok: true };
   }
@@ -759,21 +761,28 @@
         </div>
       </div>
     `;
-    const img = containerEl.querySelector("#curso-cover-view");
-    if (img) {
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = noImageSvgDataURI();
-      };
-      img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => {
-        openImagePreview({
-          src: img.src,
-          confirm: false,
-          title: "Vista previa de portada",
-        });
-      });
+    //test para visualizacion previa
+    const imgV = containerEl.querySelector("#curso-cover-view");
+    if (imgV) {
+      imgV.style.cursor = "zoom-in";
+      imgV.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const src = imgV.getAttribute("src") || "";
+          if (!src) return;
+
+          (window.openImagePreview || window.gcPreview?.openImagePreview)?.({
+            src,
+            confirm: false,
+            title: "Vista previa · Portada del curso",
+          });
+        },
+        { once: true }
+      );
     }
+
   }
 
   function paintActions(it) {
@@ -1058,15 +1067,18 @@
             try {
               const newUrl = await uploadCursoCover(cursoId, file);
               img.src = withBust(newUrl);
+
               const imgView = document.querySelector("#curso-cover-view");
               if (imgView) imgView.src = withBust(newUrl);
               toast("Imagen actualizada", "exito");
+
             } catch (err) {
               console.error(TAG, "upload error", err);
               toast("No se pudo subir la imagen", "error");
             }
           },
         });
+        
       });
       input.click();
     });
@@ -1207,6 +1219,7 @@
           try {
             const url = await uploadCursoCover(newId, S.tempNewCourseImage);
             S.tempNewCourseImage = null;
+
             const imgView = document.querySelector("#curso-cover-view");
             if (imgView) imgView.src = withBust(url);
             toast("Imagen subida", "exito");
