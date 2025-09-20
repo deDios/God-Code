@@ -362,6 +362,7 @@
       .gc-imgpv-side{padding:20px}
       .gc-imgpv-side-title{font-weight:600;margin-bottom:8px}
       .gc-imgpv-actions{margin-top:12px}
+      
     `;
     document.head.appendChild(css);
 
