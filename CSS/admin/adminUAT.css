@@ -1321,3 +1321,5 @@ body.cuenta-only .topbar {
   grid-template-columns: var(--grid-template, 2.2fr 1fr 1fr 1fr); /* fallback a 4 */
   align-items: center;
 }
+
+[hidden]{display:none !important}

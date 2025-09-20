@@ -1,7 +1,6 @@
 /* ==================== TUTORES ==================== */
 (() => {
   "use strict";
-
   const TAG = "[Tutores]";
 
   /* ---------- Config/API ---------- */
@@ -24,14 +23,14 @@
     page: 1,
     pageSize: 7,
     search: "",
-    tempNewTutorImage: null, // archivo temporal cuando creas
+    tempNewTutorImage: null,
   };
   window.__TutoresState = S;
 
-  // Orden deseado: Activo → Pausado → Inactivo
+  // Orden listado: Activo → Pausado → Inactivo
   const ORDER_TUTORES = [1, 2, 0];
 
-  /* ---------- Constantes / Utils ---------- */
+  /* ---------- Utils ---------- */
   const MAX_UPLOAD_MB = 10;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
@@ -49,14 +48,12 @@
           "'": "&#39;",
         }[c])
     );
-
   const norm = (s) =>
     String(s || "")
       .normalize("NFD")
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
-
   const fmtDateTime = (dt) => {
     if (!dt) return "-";
     try {
@@ -67,15 +64,11 @@
       return dt;
     }
   };
-
-  const STATUS_LABEL_TUTOR = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
+  const formatMB = (bytes) => (bytes / 1048576).toFixed(2);
 
   function toast(m, t = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(m, t, ms);
     console.log(TAG, `toast[${t}]:`, m);
-  }
-  function formatMB(bytes) {
-    return (bytes / 1048576).toFixed(2);
   }
 
   async function postJSON(url, body) {
@@ -86,11 +79,9 @@
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
-    if (!text.trim()) return {};
     try {
       return JSON.parse(text);
     } catch {}
-    // intento “rescate” de JSON si viene con basura
     const fb = text.indexOf("{"),
       lb = text.lastIndexOf("}");
     const fb2 = text.indexOf("["),
@@ -128,6 +119,7 @@
       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M18 74 L56 38 L92 66 L120 50 L142 74' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
     return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
   }
+  const STATUS_LABEL_TUTOR = { 1: "Activo", 0: "Inactivo", 2: "Pausado" };
 
   function tutorImgUrl(id, ext = "png") {
     return `/ASSETS/tutor/tutor_${Number(id)}.${ext}`;
@@ -135,6 +127,7 @@
   function cursoImgUrl(id, ext = "png") {
     return `/ASSETS/cursos/img${Number(id)}.${ext}`;
   }
+
   function setImgWithFallback(imgEl, primary, secondary, finalDataURI) {
     if (!imgEl) return;
     const trySecond = () => {
@@ -148,7 +141,7 @@
     imgEl.src = withBust(primary);
   }
 
-  function statusBadge(_tipo, s) {
+  function statusBadge(_, s) {
     const n = Number(s);
     const label = n === 1 ? "Activo" : n === 0 ? "Inactivo" : "Pausado";
     return `<span class="gc-chip">${label}</span>`;
@@ -162,141 +155,149 @@
     </select>`;
   }
 
-  const isAdminUser =
-    typeof window !== "undefined" && "isAdminUser" in window
-      ? window.isAdminUser
-      : true;
-  const state =
-    typeof window !== "undefined" && window.state
-      ? window.state
-      : { currentDrawer: null, usuario: { id: 1 } };
+  const isAdminUser = "isAdminUser" in window ? window.isAdminUser : true;
+  const state = window.state || { currentDrawer: null, usuario: { id: 1 } };
 
-  /* ---------- Preview de imagen: usa modal nativo o lightbox embebido ---------- */
-  function __ensureSimpleImagePreview() {
-    if (window.__gcSimplePreview) return window.__gcSimplePreview;
+  /* ---------- *** Modal de preview (igual a Cursos) *** ---------- */
+  function openImagePreview({
+    src,
+    file,
+    title = "Vista previa de imagen",
+    confirm = false,
+    detailsHtml = "",
+    onConfirm,
+    onCancel,
+  } = {}) {
+    return new Promise((resolve) => {
+      // overlay
+      const ov = document.createElement("div");
+      ov.className = "gc-preview-overlay";
+      ov.style.cssText =
+        "position:fixed;inset:0;background:rgba(16,18,20,.6);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:saturate(1.1) blur(1px);";
 
-    const wrap = document.createElement("div");
-    wrap.id = "gc-simple-preview";
-    wrap.innerHTML = `
-      <div class="gc-sp-backdrop" role="dialog" aria-modal="true" aria-label="Vista previa" hidden>
-        <div class="gc-sp-body">
-          <img class="gc-sp-img" alt="Vista previa">
-          <button class="gc-sp-close" aria-label="Cerrar">×</button>
-        </div>
-      </div>`;
-    document.body.appendChild(wrap);
+      // modal
+      const md = document.createElement("div");
+      md.className = "gc-preview-modal";
+      md.style.cssText =
+        "background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);width:min(1000px,96vw);max-width:1000px;max-height:90vh;display:grid;grid-template-columns:1fr 260px;overflow:hidden;position:relative;";
 
-    const root = wrap.querySelector(".gc-sp-backdrop");
-    const img = wrap.querySelector(".gc-sp-img");
-    const btn = wrap.querySelector(".gc-sp-close");
+      // header
+      const hd = document.createElement("div");
+      hd.style.cssText =
+        "grid-column:1/3;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee;";
+      hd.innerHTML = `<div style="font-weight:700;">${esc(title)}</div>
+        <button type="button" aria-label="Cerrar" id="gc-prev-close" style="border:none;background:#f3f3f3;border-radius:999px;width:28px;height:28px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;">×</button>`;
 
-    const api = {
-      open(src, title) {
-        if (!src) return;
-        img.src = src;
-        img.alt = title || "Vista previa";
-        root.hidden = false;
-        document.documentElement.style.overflow = "hidden";
-        setTimeout(() => root.classList.add("open"), 0);
-      },
-      close() {
-        root.classList.remove("open");
-        document.documentElement.style.overflow = "";
-        setTimeout(() => {
-          root.hidden = true;
-          img.src = "";
-        }, 150);
-      },
-    };
+      // body
+      const body = document.createElement("div");
+      body.style.cssText = "display:contents;";
 
-    root.addEventListener("click", (e) => {
-      if (e.target === root) api.close();
-    });
-    btn.addEventListener("click", api.close);
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !root.hidden) api.close();
-    });
+      const left = document.createElement("div");
+      left.style.cssText =
+        "padding:14px;display:flex;align-items:center;justify-content:center;background:#fafafa;min-height:420px;";
 
-    const css = document.createElement("style");
-    css.textContent = `
-      #gc-simple-preview .gc-sp-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s ease}
-      #gc-simple-preview .gc-sp-backdrop.open{opacity:1}
-      #gc-simple-preview .gc-sp-body{position:relative;max-width:90vw;max-height:90vh}
-      #gc-simple-preview .gc-sp-img{max-width:90vw;max-height:90vh;display:block;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-      #gc-simple-preview .gc-sp-close{position:absolute;top:-10px;right:-10px;width:36px;height:36px;border:none;border-radius:50%;background:#fff;cursor:pointer;font-size:20px;line-height:1;box-shadow:0 4px 16px rgba(0,0,0,.25)}
-    `;
-    document.head.appendChild(css);
+      const img = document.createElement("img");
+      img.alt = "Vista previa";
+      img.style.cssText =
+        "max-width:100%;max-height:70vh;object-fit:contain;border-radius:8px;background:#fff";
+      if (file instanceof File) img.src = URL.createObjectURL(file);
+      else img.src = src || noImageSvgDataURI();
+      left.appendChild(img);
 
-    window.__gcSimplePreview = api;
-    return api;
-  }
+      const right = document.createElement("aside");
+      right.style.cssText =
+        "padding:16px;border-left:1px solid #eee;display:flex;flex-direction:column;gap:10px;";
 
-  function bindImagePreview(el, title = "Vista previa") {
-    if (!el || el._previewBound) return;
-    el._previewBound = true;
-    el.style.cursor = "zoom-in";
-    el.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      const src = el.getAttribute("src") || "";
-      if (!src) return;
+      const details = document.createElement("div");
+      details.innerHTML = `
+        <div style="font-weight:600;">Detalles</div>
+        <div class="gc-soft" style="color:#666;">Solo lectura</div>
+        <div class="gc-soft" style="color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
+        ${detailsHtml || ""}`;
+      right.appendChild(details);
 
-      // Modal nativo (como cursos/noticias)
-      if (window.gcPreview?.openImagePreview) {
-        window.gcPreview.openImagePreview({ src, title });
-        return;
+      const actions = document.createElement("div");
+      actions.style.cssText =
+        "margin-top:auto;display:flex;gap:8px;justify-content:flex-end;";
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "gc-btn";
+      closeBtn.textContent = "Cerrar";
+      closeBtn.style.cssText =
+        "padding:.55rem .9rem;border-radius:8px;border:none;background:#f3f3f3;cursor:pointer;";
+      actions.appendChild(closeBtn);
+      if (confirm) {
+        const ok = document.createElement("button");
+        ok.textContent = "Confirmar";
+        ok.className = "gc-btn gc-btn--success";
+        ok.style.cssText =
+          "padding:.55rem .9rem;border-radius:8px;border:none;background:#16a34a;color:#fff;cursor:pointer;";
+        actions.appendChild(ok);
+        ok.addEventListener("click", () => {
+          cleanup();
+          try {
+            onConfirm?.();
+          } catch {}
+          resolve(true);
+        });
       }
-      if (window.openImagePreview) {
-        window.openImagePreview({ src, title, confirm: false });
-        return;
-      }
-      if (window.gcOpenImagePreview) {
-        window.gcOpenImagePreview({ src, title });
-        return;
-      }
-      if (window.gcImagePreview) {
+      right.appendChild(actions);
+
+      // compose
+      body.appendChild(left);
+      body.appendChild(right);
+      md.appendChild(hd);
+      md.appendChild(body);
+      ov.appendChild(md);
+      document.body.appendChild(ov);
+
+      function cleanup() {
         try {
-          window.gcImagePreview({ src, title });
-          return;
+          if (file instanceof File) URL.revokeObjectURL(img.src);
         } catch {}
+        ov.remove();
+      }
+      function closeFlow() {
+        cleanup();
+        try {
+          onCancel?.();
+        } catch {}
+        resolve(false);
       }
 
-      // Fallback lightbox embebido
-      __ensureSimpleImagePreview().open(src, title);
-    });
-  }
-
-  /* ---------- Confirm de subida (usa modal si existe) ---------- */
-  async function gcAskImageUpload({ file, title = "Vista previa de imagen" }) {
-    const openers = [
-      window.gcImagePreview,
-      window.openImagePreview,
-      window.gcOpenImagePreview,
-      window.imagePreview,
-    ].filter(Boolean);
-    if (openers.length) {
-      return await new Promise((resolve) => {
-        try {
-          openers[0]({
-            file,
-            title,
-            onConfirm: () => resolve(true),
-            onCancel: () => resolve(false),
-          });
-        } catch {
-          resolve(window.confirm("¿Subir esta imagen?"));
+      // close handlers
+      closeBtn.addEventListener("click", closeFlow);
+      qs("#gc-prev-close", md)?.addEventListener("click", closeFlow);
+      ov.addEventListener("click", (e) => {
+        if (e.target === ov) closeFlow();
+      });
+      document.addEventListener("keydown", function escH(ev) {
+        if (ev.key === "Escape") {
+          document.removeEventListener("keydown", escH);
+          closeFlow();
         }
       });
+    });
+  }
+
+  window.gcPreview = window.gcPreview || {};
+  window.gcPreview.openImagePreview = openImagePreview;
+
+  // Confirmación para subida (re-usa modal si existe)
+  async function gcAskImageUpload({ file, title = "Vista previa de imagen" }) {
+    // Si existe nuestro modal, úsalo
+    if (typeof openImagePreview === "function") {
+      return await openImagePreview({ file, title, confirm: true });
     }
+    // Fallback mínimo
     return window.confirm("¿Subir esta imagen?");
   }
 
   /* ---------- Drawer control ---------- */
   function openTutorDrawer(title, html) {
-    const aside = document.getElementById("drawer-tutor");
-    const overlay = document.getElementById("gc-dash-overlay");
-    const t = document.getElementById("drawer-tutor-title");
-    const b = document.getElementById("drawer-tutor-body");
+    const aside = qs("#drawer-tutor");
+    const overlay = qs("#gc-dash-overlay");
+    const t = qs("#drawer-tutor-title");
+    const b = qs("#drawer-tutor-body");
     if (!aside) return;
     if (t) t.textContent = title || "Tutor · —";
     if (b) b.innerHTML = html || "";
@@ -310,12 +311,11 @@
     }
   }
   function closeTutorDrawer() {
-    const aside = document.getElementById("drawer-tutor");
-    const overlay = document.getElementById("gc-dash-overlay");
+    const aside = qs("#drawer-tutor");
+    const overlay = qs("#gc-dash-overlay");
     if (!aside) return;
     try {
-      const ae = document.activeElement;
-      if (ae && aside.contains(ae)) ae.blur();
+      document.activeElement?.blur?.();
     } catch {}
     aside.classList.remove("open");
     aside.setAttribute("hidden", "");
@@ -336,20 +336,12 @@
     const ov = qs("#gc-dash-overlay");
     if (ov && !ov._b) {
       ov._b = true;
-      ov.addEventListener("click", () => {
-        const mini = qs("#drawer-curso-mini");
-        if (mini && !mini.hasAttribute("hidden")) closeCursoMiniDrawer();
-        else closeTutorDrawer();
-      });
+      ov.addEventListener("click", closeTutorDrawer);
     }
     if (!window._gc_tutores_esc) {
       window._gc_tutores_esc = true;
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          const mini = qs("#drawer-curso-mini");
-          if (mini && !mini.hasAttribute("hidden")) closeCursoMiniDrawer();
-          else closeTutorDrawer();
-        }
+        if (e.key === "Escape") closeTutorDrawer();
       });
     }
   })();
@@ -370,7 +362,7 @@
           },
           { placeholder: ph }
         );
-        const inp = document.querySelector("#search-input");
+        const inp = qs("#search-input");
         if (inp) inp.title = tip;
       }
     } else {
@@ -460,7 +452,6 @@
       if (!cont) return;
       cont.innerHTML = "";
       if (totalPages <= 1) return;
-
       const mk = (txt, dis, cb, cls = "page-btn") => {
         const b = document.createElement("button");
         b.textContent = txt;
@@ -632,28 +623,27 @@
 
     const headActions =
       !isCreate && !isEdit && isAdminUser
-        ? `
-      <div class="gc-actions" id="tutor-actions-view">
-        <button class="gc-btn" id="btn-edit-tutor">Editar</button>
-        ${
-          Number(t.estatus) === 0
-            ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
-            : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`
-        }
-      </div>`
+        ? `<div class="gc-actions" id="tutor-actions-view">
+          <button class="gc-btn" id="btn-edit-tutor">Editar</button>
+          ${
+            Number(t.estatus) === 0
+              ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
+              : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`
+          }
+        </div>`
         : "";
 
     const viewHTML = `
       ${headActions}
-      <section id="tutor-view" class="mode-view${isView ? "" : " hidden"}">
-        <div class="field">
-          <div class="label">Nombre <span class="req">*</span></div>
-          <div class="value" id="tv_nombre">${esc(t.nombre)}</div>
-        </div>
-        <div class="field">
-          <div class="label">Descripción <span class="req">*</span></div>
-          <div class="value" id="tv_descripcion">${esc(t.descripcion)}</div>
-        </div>
+      <section id="tutor-view" class="mode-view"${
+        isView ? "" : ' hidden aria-hidden="true"'
+      }>
+        <div class="field"><div class="label">Nombre <span class="req">*</span></div><div class="value" id="tv_nombre">${esc(
+          t.nombre
+        )}</div></div>
+        <div class="field"><div class="label">Descripción <span class="req">*</span></div><div class="value" id="tv_descripcion">${esc(
+          t.descripcion
+        )}</div></div>
         <div class="grid-3">
           <div class="field"><div class="label">Estatus</div><div class="value" id="tv_estatus">${esc(
             STATUS_LABEL_TUTOR[t.estatus] ?? "—"
@@ -665,35 +655,19 @@
             fmtDateTime(t.fecha_creacion)
           )}</div></div>
         </div>
-
         <div class="field">
           <div class="label">Imagen</div>
           <div class="value">
-            <div id="media-tutor" data-id="${t.id || item?.id || ""}">
-              <div class="media-head">
-                <div class="media-title">Imágenes</div>
-                <div class="media-help" style="color:#888;">Solo lectura</div>
-              </div>
-              <div class="media-grid">
-                <div class="media-card">
-                  <figure class="media-thumb">
-                    <img id="tutor-img-view" alt="Foto" src="${noImageSvgDataURI()}">
-                  </figure>
-                  <div class="media-meta"><div class="media-label">Foto</div></div>
-                </div>
+            <div class="media-grid">
+              <div class="media-card">
+                <figure class="media-thumb">
+                  <img id="tutor-img-view" alt="Foto" src="${noImageSvgDataURI()}">
+                </figure>
+                <div class="media-meta"><div class="media-label">Foto</div><div class="media-help gc-soft">Click para vista previa</div></div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="field">
-          <div class="label">Cursos ligados</div>
-          <div class="value">
-            <div class="tutor-cursos" id="tutor-cursos"></div>
-            <div class="hint gc-soft" style="margin-top:.35rem;">Toca una imagen para ver el curso (solo lectura).</div>
-          </div>
-        </div>
-
         <details class="dev-json" id="tutor-json-box" open style="margin-top:16px;">
           <summary style="cursor:pointer;font-weight:600;">JSON · Tutor</summary>
           <div style="display:flex;gap:.5rem;margin:.5rem 0;"><button class="gc-btn" id="btn-copy-json-tutor">Copiar JSON</button></div>
@@ -701,13 +675,12 @@
             JSON.stringify(t, null, 2)
           )}</pre>
         </details>
-      </section>
-    `;
+      </section>`;
 
     const editHTML = `
-      <section id="tutor-edit" class="mode-edit${
-        isCreate || isEdit ? "" : " hidden"
-      }">
+      <section id="tutor-edit" class="mode-edit"${
+        isCreate || isEdit ? "" : ' hidden aria-hidden="true"'
+      }> 
         <div class="field">
           <label for="tf_nombre">Nombre <span class="req">*</span></label>
           <input id="tf_nombre" type="text" value="${esc(
@@ -722,17 +695,14 @@
           )}</textarea>
           <small class="char-counter" data-for="tf_descripcion"></small>
         </div>
-        <div class="field">
-          <label for="tf_estatus">Estatus</label>
-          ${statusSelect("tf_estatus", t.estatus)}
-        </div>
-
+        <div class="field"><label for="tf_estatus">Estatus</label>${statusSelect(
+          "tf_estatus",
+          t.estatus
+        )}</div>
         <div class="field">
           <label>Imagen</label>
           <div class="value">
-            <div id="media-tutor-edit" class="media-grid" data-id="${
-              t.id || item?.id || ""
-            }">
+            <div class="media-grid">
               <div class="media-card">
                 <figure class="media-thumb">
                   <img alt="Foto" id="tutor-img-edit" src="${noImageSvgDataURI()}">
@@ -742,26 +712,19 @@
                 </figure>
                 <div class="media-meta">
                   <div class="media-label">Foto</div>
-                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB</div>
+                  <div class="media-help gc-soft" id="tutor-img-info">JPG/PNG · Máx ${MAX_UPLOAD_MB}MB · Click para vista previa</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="field">
-          <label>Cursos ligados</label>
-          <div class="value"><div class="tutor-cursos" id="tutor-cursos-edit"></div></div>
-        </div>
-
         <div class="drawer-actions-row">
           <div class="row-right">
             <button class="gc-btn gc-btn--ghost" id="btn-cancel-tutor">Cancelar</button>
             <button class="gc-btn gc-btn--success" id="btn-save-tutor">Guardar</button>
           </div>
         </div>
-      </section>
-    `;
+      </section>`;
 
     setTimeout(async () => {
       const titleEl = qs("#drawer-tutor-title");
@@ -866,10 +829,11 @@
         }
       });
 
-      // Imagen en modo vista + preview modal
       if (isView) {
         const tid = Number(t.id || item?.id || 0);
         const imgView = qs("#tutor-img-view");
+
+        // VIEW
         if (imgView && tid) {
           setImgWithFallback(
             imgView,
@@ -878,44 +842,63 @@
             noImageSvgDataURI()
           );
           imgView.style.cursor = "zoom-in";
-          imgView.addEventListener("click", () => {
-            const src = imgView.getAttribute("src") || "";
-            if (!src) return;
-            if (window.gcPreview?.openImagePreview) {
-              window.gcPreview.openImagePreview({
-                src,
-                title: "Vista previa de foto",
-                details:
-                  "Solo lectura · Formatos permitidos: JPG / PNG · Máx 10MB",
+          imgView.addEventListener(
+            "click",
+            (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              openImagePreview({
+                src: imgView.currentSrc || imgView.src,
+                title: "Vista previa · Foto del tutor",
               });
-            } else {
-              window.open(src, "_blank", "noopener,noreferrer");
-            }
+            },
+            { once: true }
+          );
+        }
+
+        // EDIT
+        if (imgEdit) {
+          imgEdit.style.cursor = "zoom-in";
+          imgEdit.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openImagePreview({
+              src: imgEdit.currentSrc || imgEdit.src,
+              title: "Vista previa · Foto del tutor",
+            });
           });
         }
       }
 
-      // Imagen en edición/creación + selector + preview modal
+      // Imagen EDIT/CREATE: cargar, cambiar y PREVIEW en modal
       if (isEdit || isCreate) {
         const tid = Number(t.id || item?.id || 0);
         const imgEdit = qs("#tutor-img-edit");
         if (imgEdit) {
-          if (tid) {
+          if (tid)
             setImgWithFallback(
               imgEdit,
               tutorImgUrl(tid, "png"),
               tutorImgUrl(tid, "jpg"),
               noImageSvgDataURI()
             );
-          } else if (S.tempNewTutorImage instanceof File) {
+          else if (S.tempNewTutorImage instanceof File)
             imgEdit.src = withBust(URL.createObjectURL(S.tempNewTutorImage));
-          } else {
-            imgEdit.src = noImageSvgDataURI();
-          }
-          // permite ver la imagen actual en modal
-          bindImagePreview(imgEdit, "Vista previa · Foto del tutor");
+          else imgEdit.src = noImageSvgDataURI();
+
+          // click en la imagen = preview
+          imgEdit.style.cursor = "zoom-in";
+          imgEdit.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            openImagePreview({
+              src: imgEdit.currentSrc || imgEdit.src,
+              title: "Vista previa · Foto del tutor",
+            });
+          });
         }
 
+        // botón lápiz = seleccionar y confirmar subida
         const pencil = qs("#tutor-pencil");
         if (pencil && !pencil._b) {
           pencil._b = true;
@@ -941,9 +924,8 @@
               if (!confirmed) return;
 
               const info = qs("#tutor-img-info");
-              const u = URL.createObjectURL(file);
               if (!tid) {
-                imgEdit && (imgEdit.src = withBust(u));
+                imgEdit && (imgEdit.src = withBust(URL.createObjectURL(file)));
                 S.tempNewTutorImage = file;
                 if (info)
                   info.textContent = `Archivo: ${file.name} · ${formatMB(
@@ -974,16 +956,9 @@
 
       if (window.bindCopyFromPre)
         window.bindCopyFromPre("#json-tutor", "#btn-copy-json-tutor");
-
-      const tgt = isEdit || isCreate ? "#tutor-cursos-edit" : "#tutor-cursos";
-      renderTutorCursosChips(Number(t.id || item?.id || 0), tgt);
-
-      if (window.gcBindCharCounters) {
-        window.gcBindCharCounters(document.getElementById("drawer-tutor-body"));
-      }
     }, 0);
 
-    return viewHTML + editHTML;
+    return isView ? viewHTML : editHTML;
   }
 
   function getEmptyTutor() {
@@ -1084,9 +1059,7 @@
     if (!item || !item._all) return toast("Sin item para actualizar", "error");
     const p = readForm(item.id);
     if (!requireFields(p)) return;
-
     await postJSON(API.uTutores, p);
-
     toast("Cambios guardados", "exito");
     await load();
     const re = S.data.find((x) => x.id === item.id);
@@ -1099,210 +1072,7 @@
     }
   }
 
-  /* ---------- Cursos ligados (chips) ---------- */
-  async function renderTutorCursosChips(
-    tutorId,
-    containerSel = "#tutor-cursos"
-  ) {
-    const host = qs(containerSel);
-    if (!host) return;
-
-    try {
-      const statuses = [1, 4, 2, 3, 0, 5];
-      const chunks = await Promise.all(
-        statuses.map((st) =>
-          postJSON(API.cursos, { estatus: st }).catch(() => [])
-        )
-      );
-      const all = chunks.flat().filter(Boolean);
-      const list = all.filter(
-        (c) =>
-          Number(c.tutor) === Number(tutorId) ||
-          Number(c.id_tutor) === Number(tutorId)
-      );
-
-      if (!list.length) {
-        host.innerHTML = '<span class="chip-empty">Sin cursos ligados</span>';
-        return;
-      }
-
-      const orderKey = (v) =>
-        ({ 1: 1, 4: 2, 2: 3, 3: 4, 0: 5, 5: 5 }[Number(v)] || 9);
-      list.sort(
-        (a, b) =>
-          orderKey(a.estatus) - orderKey(b.estatus) ||
-          String(a.nombre).localeCompare(String(b.nombre))
-      );
-
-      const statusCls = (v) => {
-        const n = Number(v);
-        if (n === 1) return "s-1";
-        if (n === 2) return "s-2";
-        if (n === 3) return "s-3";
-        if (n === 4) return "s-3";
-        return "s-0";
-      };
-
-      host.innerHTML = list
-        .map(
-          (cr) => `
-        <button class="curso-chip ${statusCls(cr.estatus)}" data-id="${
-            cr.id
-          }" aria-label="Abrir curso: ${esc(cr.nombre || "")}" title="${esc(
-            cr.nombre || ""
-          )}">
-          <img alt="Portada" id="chip-img-${cr.id}">
-          <span>${esc((cr.nombre || "").slice(0, 18))}</span>
-        </button>
-      `
-        )
-        .join("");
-
-      list.forEach((cr) => {
-        const im = qs(`#chip-img-${cr.id}`, host);
-        if (im)
-          setImgWithFallback(
-            im,
-            cursoImgUrl(cr.id, "png"),
-            cursoImgUrl(cr.id, "jpg"),
-            noImageSvgDataURI()
-          );
-      });
-
-      host.querySelectorAll(".curso-chip").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          const cid = Number(btn.getAttribute("data-id"));
-          const data = list.find((x) => +x.id === +cid);
-          if (!data) return toast("Curso no encontrado", "error");
-          openCursoMiniDrawer(data);
-        });
-      });
-    } catch (e) {
-      console.error(TAG, "chips error", e);
-      host.innerHTML =
-        '<span class="chip-empty">No fue posible cargar los cursos</span>';
-    }
-  }
-
-  /* ---------- Mini Drawer de curso (solo lectura) ---------- */
-  function ensureCursoMiniDOM() {
-    if (qs("#drawer-curso-mini")) return;
-    const tpl = document.createElement("div");
-    tpl.innerHTML = `
-      <aside id="drawer-curso-mini" class="drawer gc-dash" aria-hidden="true" hidden>
-        <div class="drawer-header">
-          <div class="drawer-title" id="drawer-curso-mini-title">Curso · —</div>
-          <div class="drawer-actions"><button class="btn" id="drawer-curso-mini-close">Cerrar</button></div>
-        </div>
-        <div class="drawer-body" id="drawer-curso-mini-body">
-          <section id="curso-mini-view" class="mode-view">
-            <div class="field"><div class="label">Nombre</div><div class="value" id="cm_nombre">—</div></div>
-            <div class="grid-3">
-              <div class="field"><div class="label">Estatus</div><div class="value" id="cm_estatus">—</div></div>
-              <div class="field"><div class="label">Fecha inicio</div><div class="value" id="cm_fecha">—</div></div>
-              <div class="field"><div class="label">Tutor</div><div class="value" id="cm_tutor">—</div></div>
-            </div>
-            <div class="field">
-              <div class="label">Portada</div>
-              <div class="value">
-                <div class="media-grid"><div class="media-card">
-                  <figure class="media-thumb"><img id="cm_img" alt="Portada" src=""></figure>
-                  <div class="media-meta"><div class="media-label">Portada</div><div class="media-help" style="color:#888;">Solo lectura</div></div>
-                </div></div>
-              </div>
-            </div>
-            <details class="dev-json" open style="margin-top:12px;">
-              <summary style="cursor:pointer;font-weight:600;">JSON · Curso</summary>
-              <pre id="cm_json" class="value" style="white-space:pre-wrap;max-height:220px;overflow:auto;">{}</pre>
-            </details>
-          </section>
-        </div>
-      </aside>`;
-    document.body.appendChild(tpl.firstElementChild);
-    const btn = qs("#drawer-curso-mini-close");
-    if (btn && !btn._b) {
-      btn._b = true;
-      btn.addEventListener("click", closeCursoMiniDrawer);
-    }
-  }
-  function openCursoMiniDrawer(data) {
-    ensureCursoMiniDOM();
-    const aside = qs("#drawer-curso-mini");
-    const overlay = qs("#gc-dash-overlay");
-    const put = (sel, val) => {
-      const el = qs(sel);
-      if (el) el.textContent = val ?? "—";
-    };
-
-    qs("#drawer-curso-mini-title") &&
-      (qs("#drawer-curso-mini-title").textContent =
-        "Curso · " + (data?.nombre || "—"));
-    put("#cm_nombre", data?.nombre || "—");
-    const STATUS_LABEL = {
-      1: "Activo",
-      0: "Inactivo",
-      2: "Pausado",
-      3: "Terminado",
-      4: "En curso",
-      5: "Cancelado",
-    };
-    put(
-      "#cm_estatus",
-      STATUS_LABEL[data?.estatus] || String(data?.estatus ?? "—")
-    );
-    put("#cm_fecha", data?.fecha_inicio || "—");
-    let tutorLabel = data?.tutor ?? "-";
-    try {
-      tutorLabel =
-        window.gcUtils?.mapLabel?.(
-          window.__CursosState?.maps?.tutores || {},
-          data?.tutor
-        ) ||
-        (data?.tutor ?? "-");
-    } catch {}
-    put("#cm_tutor", String(tutorLabel));
-
-    const img = qs("#cm_img");
-    if (img && data?.id)
-      setImgWithFallback(
-        img,
-        cursoImgUrl(data.id, "png"),
-        cursoImgUrl(data.id, "jpg"),
-        noImageSvgDataURI()
-      );
-    qs("#cm_json") &&
-      (qs("#cm_json").textContent = JSON.stringify(data || {}, null, 2));
-
-    aside.hidden = false;
-    aside.setAttribute("aria-hidden", "false");
-    aside.classList.add("open");
-    if (overlay) {
-      overlay.classList.add("open");
-      overlay.hidden = false;
-      overlay.setAttribute("aria-hidden", "false");
-    }
-  }
-  function closeCursoMiniDrawer() {
-    const aside = qs("#drawer-curso-mini");
-    const overlay = qs("#gc-dash-overlay");
-    if (!aside) return;
-    try {
-      const ae = document.activeElement;
-      if (ae && aside.contains(ae)) ae.blur();
-    } catch {}
-    aside.classList.remove("open");
-    aside.setAttribute("hidden", "");
-    aside.setAttribute("aria-hidden", "true");
-    if (overlay) {
-      overlay.classList.remove("open");
-      overlay.hidden = true;
-      overlay.setAttribute("aria-hidden", "true");
-    }
-  }
-
   /* ---------- API pública ---------- */
   window.tutores = { mount, openCreate };
-
   console.log(TAG, "Módulo tutores cargado.");
 })();
