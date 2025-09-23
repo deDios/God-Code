@@ -481,7 +481,7 @@ body {
 .recursos-table .table-header,
 .recursos-table .table-body .table-row {
   display: grid;
-  /*grid-template-columns: 40% 25% 20% 15%;*/
+  grid-template-columns: 40% 25% 20% 15%;
   align-items: center;
 }
 
@@ -504,9 +504,9 @@ body {
   display: block;
 }
 
-/*.recursos-table .table-body .table-row {
+.recursos-table .table-body .table-row {
   border-top: 1px solid #eef0f3;
-}*/
+}
 
 .recursos-table .table-body .table-row:hover {
   background: #f7fbff;
