@@ -8,10 +8,10 @@
   const API_BASE =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/";
   const API = {
-    tutores: (window.API?.tutores || API_BASE + "c_tutor.php"),
+    tutores:  (window.API?.tutores  || API_BASE + "c_tutor.php"),
     iTutores: (window.API?.iTutores || API_BASE + "i_tutor.php"),
     uTutores: (window.API?.uTutores || API_BASE + "u_tutor.php"),
-    cursos:  (window.API?.cursos  || API_BASE + "c_cursos.php"),
+    cursos:   (window.API?.cursos   || API_BASE + "c_cursos.php"),
   };
   const API_UPLOAD = window.API?.API_UPLOAD || {
     tutorImg: API_BASE + "u_tutorImg.php",
@@ -35,7 +35,7 @@
   const MAX_UPLOAD_MB = 10;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
-  const qs = (s, r = document) => r.querySelector(s);
+  const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [].slice.call(r.querySelectorAll(s));
   const esc = (s) =>
     String(s ?? "").replace(/[&<>"']/g, (c) => ({
@@ -66,14 +66,14 @@
     });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
-    try { return JSON.parse(text); } catch { }
+    try { return JSON.parse(text); } catch {}
     // Fallback: intenta recortar JSON válido
     const fb = text.indexOf("{"), lb = text.lastIndexOf("}");
     const fb2 = text.indexOf("["), lb2 = text.lastIndexOf("]");
     let candidate = "";
     if (fb !== -1 && lb !== -1 && lb > fb) candidate = text.slice(fb, lb + 1);
     else if (fb2 !== -1 && lb2 !== -1 && lb2 > fb2) candidate = text.slice(fb2, lb2 + 1);
-    if (candidate) { try { return JSON.parse(candidate); } catch { } }
+    if (candidate) { try { return JSON.parse(candidate); } catch {} }
     return { _raw: text };
   }
 
@@ -126,14 +126,7 @@
     </select>`;
   }
 
-  /* ---------- Preview modal ---------- */
-  function humanSize(bytes) {
-    if (!Number.isFinite(bytes)) return "—";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / 1048576).toFixed(2) + " MB";
-  }
-
+  /* ---------- Preview imagen (igual que Noticias) ---------- */
   function openImagePreviewLocal({ src, file, title = "Vista previa", confirm = false, onConfirm }) {
     const ov = document.createElement("div");
     ov.className = "gc-preview-overlay";
@@ -142,35 +135,39 @@
     Object.assign(ov.style, {
       position: "fixed", inset: "0", zIndex: "99999",
       display: "flex", alignItems: "center", justifyContent: "center",
-      background: "rgba(17,24,39,.55)", backdropFilter: "saturate(120%) blur(2px)"
+      background: "rgba(17,24,39,.55)", backdropFilter: "saturate(120%) blur(2px)",
     });
 
     const modal = document.createElement("div");
+    modal.className = "gc-preview-modal";
     Object.assign(modal.style, {
       background: "#fff", borderRadius: "14px", boxShadow: "0 20px 40px rgba(0,0,0,.25)",
       width: "min(920px,94vw)", maxHeight: "90vh", overflow: "hidden",
-      display: "flex", flexDirection: "column"
+      display: "flex", flexDirection: "column",
     });
 
     const head = document.createElement("div");
     Object.assign(head.style, {
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      gap: "8px", padding: "12px 16px", borderBottom: "1px solid #eee"
+      gap: "8px", padding: "12px 16px", borderBottom: "1px solid #eee",
     });
     head.innerHTML = `<div style="font-weight:700;font-size:1.05rem;">${esc(title)}</div>
       <button class="gc-btn gc-btn--ghost" data-act="close" aria-label="Cerrar" style="min-width:auto;padding:.35rem .6rem;">✕</button>`;
 
     const body = document.createElement("div");
-    Object.assign(body.style, { display: "grid", gridTemplateColumns: "1fr 280px", gap: "16px", padding: "16px", alignItems: "start" });
+    Object.assign(body.style, {
+      display: "grid", gridTemplateColumns: "1fr 280px", gap: "16px", padding: "16px", alignItems: "start",
+    });
 
     const left = document.createElement("div");
     Object.assign(left.style, {
       border: "1px solid #eee", borderRadius: "12px", padding: "8px", background: "#fafafa",
-      display: "flex", alignItems: "center", justifyContent: "center", minHeight: "320px", maxHeight: "60vh"
+      display: "flex", alignItems: "center", justifyContent: "center",
+      minHeight: "320px", maxHeight: "60vh",
     });
     const img = document.createElement("img");
-    Object.assign(img.style, { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" });
     img.alt = "Vista previa";
+    Object.assign(img.style, { maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "8px" });
     img.src = src || (file ? URL.createObjectURL(file) : "");
     left.appendChild(img);
 
@@ -179,11 +176,10 @@
     right.innerHTML = `
       <div style="font-weight:600;">Detalles</div>
       <div style="font-size:.92rem;color:#444;line-height:1.35;">
-        ${file
-          ? `<div><strong>Archivo:</strong> ${esc(file.name || "-")}</div>
-             <div><strong>Peso:</strong> ${esc(humanSize(file.size || 0))}</div>
-             <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>`
-          : `<div style="color:#666;">Solo lectura</div>`}
+        ${file ? `
+          <div><strong>Archivo:</strong> ${esc(file.name || "-")}</div>
+          <div><strong>Peso:</strong> ${ (file.size/1048576).toFixed(2) } MB</div>
+          <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>` : `<div style="color:#666;">Solo lectura</div>`}
         <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
@@ -205,17 +201,17 @@
     ov.querySelector('[data-act="close"]')?.addEventListener("click", close);
     ov.querySelector('[data-act="cancel"]')?.addEventListener("click", close);
     ov.querySelector('[data-act="confirm"]')?.addEventListener("click", async () => {
-      try { typeof onConfirm === "function" && await onConfirm(); } finally { close(); }
+      try { if (typeof onConfirm === "function") await onConfirm(); }
+      finally { close(); }
     });
 
     return { close };
   }
 
-  // ÚNICA: usa modal global si existe; si confirm:true, fuerza el local (igual que Noticias)
   function getOpenImagePreview() {
     const external = (window.gcPreview?.openImagePreview) || window.openImagePreview;
     return (opts = {}) => {
-      if (opts.confirm) return openImagePreviewLocal(opts);
+      if (opts.confirm) return openImagePreviewLocal(opts); // forzamos local si hay confirm
       return external ? external(opts) : openImagePreviewLocal(opts);
     };
   }
@@ -225,6 +221,36 @@
     if (!/image\/(png|jpeg)/.test(file.type)) return { ok: false, error: "Formato no permitido. Usa JPG o PNG." };
     if (file.size > maxMB * 1048576) return { ok: false, error: `La imagen excede ${maxMB}MB.` };
     return { ok: true };
+  }
+
+  async function pickImageAndPreview({ title = "Vista previa · Foto del tutor", accept = "image/png,image/jpeg", maxMB = MAX_UPLOAD_MB, onConfirm }) {
+    return new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = accept;
+      input.style.display = "none";
+      document.body.appendChild(input);
+
+      input.addEventListener("change", async () => {
+        const file = input.files && input.files[0];
+        input.remove();
+        if (!file) { resolve(null); return; }
+
+        const v = validarImagen(file, maxMB);
+        if (!v.ok) { toast(v.error, "error"); resolve(null); return; }
+
+        const openPreview = getOpenImagePreview();
+        openPreview({
+          file, title, confirm: true,
+          onConfirm: async () => {
+            try { if (typeof onConfirm === "function") await onConfirm(file); resolve(file); }
+            catch (e) { console.error(TAG, "pickImageAndPreview onConfirm", e); toast("No se pudo completar la carga.", "error"); resolve(null); }
+          }
+        });
+      });
+
+      input.click();
+    });
   }
 
   /* ---------- Drawer control ---------- */
@@ -249,7 +275,10 @@
     const aside = qs("#drawer-tutor");
     const overlay = qs("#gc-dash-overlay");
     if (!aside) return;
-    try { const ae = document.activeElement; if (ae && aside.contains(ae)) ae.blur(); } catch {}
+    try {
+      const ae = document.activeElement;
+      if (ae && aside.contains(ae)) ae.blur();
+    } catch {}
     aside.classList.remove("open");
     aside.setAttribute("hidden", "");
     aside.setAttribute("aria-hidden", "true");
@@ -304,7 +333,9 @@
         s.placeholder = ph;
         s.title = tip;
         s.addEventListener("input", (e) => {
-          S.search = e.target.value || ""; S.page = 1; draw();
+          S.search = e.target.value || "";
+          S.page = 1;
+          draw();
         });
       }
     }
@@ -315,15 +346,13 @@
     // Ajusta encabezados de tabla si existen
     const hdr = qs(".recursos-box.desktop-only .table-header");
     if (hdr) {
-      hdr.querySelector(".col-nombre") &&
-        (hdr.querySelector(".col-nombre").textContent = "Nombre");
+      hdr.querySelector(".col-nombre") && (hdr.querySelector(".col-nombre").textContent = "Nombre");
       const c2 = hdr.querySelector(".col-fecha") || hdr.querySelector(".col-tipo");
       if (c2) { c2.textContent = "Fecha de creación"; c2.classList.add("col-fecha"); }
-      hdr.querySelector(".col-status") &&
-        (hdr.querySelector(".col-status").textContent = "Status");
+      hdr.querySelector(".col-status") && (hdr.querySelector(".col-status").textContent = "Status");
     }
     qs("#mod-title") && (qs("#mod-title").textContent = "Tutores");
-    qs(".tt-title") && (qs(".tt-title").textContent = "Tutores:");
+    qs(".tt-title")  && (qs(".tt-title").textContent  = "Tutores:");
     const st = qs("#tt-status");
     if (st) { st.textContent = "Todos los estatus"; st.classList.remove("badge-inactivo"); st.classList.add("badge-activo"); }
 
@@ -333,7 +362,7 @@
 
   async function openCreate() {
     S.tempNewTutorImage = null;
-    openTutorDrawer("Tutor · Crear", renderDrawer({ id: "", mode: "create" }));
+    openTutorDrawer("Tutor · Crear", renderDrawer({ id: "" }));
   }
 
   /* ---------- Carga & Listado ---------- */
@@ -453,14 +482,14 @@
     qsa("#recursos-list .table-row").forEach((row) => {
       row.addEventListener("click", () => {
         const id = Number(row.dataset.id);
-        openTutorDrawer("Tutor · —", renderDrawer({ id: String(id), mode: "view" }));
+        openTutorDrawer("Tutor · —", renderDrawer({ id: String(id) }));
       });
     });
     qsa("#recursos-list-mobile .open-drawer").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = Number(btn.closest(".table-row-mobile")?.dataset.id || 0);
-        openTutorDrawer("Tutor · —", renderDrawer({ id: String(id), mode: "view" }));
+        openTutorDrawer("Tutor · —", renderDrawer({ id: String(id) }));
       });
     });
     qsa(".gc-reactivate").forEach((btn) => {
@@ -478,24 +507,22 @@
   /* ---------- Drawer (view/edit/create) ---------- */
   function renderDrawer(dataset) {
     const item = S.data.find((x) => String(x.id) === String(dataset.id));
-    const mode = dataset.mode || (item ? "view" : "create");
+    const mode = item ? "view" : "create";
     const isCreate = mode === "create";
-    const isEdit   = mode === "edit";
-    const isView   = mode === "view";
     const t = isCreate ? getEmptyTutor() : (item?._all || null);
     if (!t) return "<p>No encontrado.</p>";
 
-    const headActions = (isView && window.isAdminUser !== false) ? `
+    const headActions = (!isCreate && window.isAdminUser !== false) ? `
       <div class="gc-actions" id="tutor-actions-view">
         <button class="gc-btn" id="btn-edit-tutor">Editar</button>
-        ${Number(t.estatus) === 0
-          ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
-          : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`}
+        ${ Number(t.estatus) === 0
+            ? `<button class="gc-btn gc-btn--success" id="btn-reactivar-tutor">Reactivar</button>`
+            : `<button class="gc-btn gc-btn--danger" id="btn-delete-tutor" data-step="1">Eliminar</button>`}
       </div>` : "";
 
     const viewHTML = `
       ${headActions}
-      <section id="tutor-view" class="mode-view"${isView ? "" : " hidden"}>
+      <section id="tutor-view" class="mode-view"${isCreate ? " hidden" : ""}>
         <div class="field"><div class="label">Nombre <span class="req">*</span></div><div class="value" id="tv_nombre">${esc(t.nombre)}</div></div>
         <div class="field"><div class="label">Descripción <span class="req">*</span></div><div class="value" id="tv_descripcion">${esc(t.descripcion)}</div></div>
         <div class="grid-3">
@@ -533,7 +560,7 @@
     `;
 
     const editHTML = `
-      <section id="tutor-edit" class="mode-edit"${(isCreate || isEdit) ? "" : " hidden"}>
+      <section id="tutor-edit" class="mode-edit"${isCreate ? "" : " hidden"}>
         <div class="field">
           <label for="tf_nombre">Nombre <span class="req">*</span></label>
           <input id="tf_nombre" type="text" value="${esc(t.nombre || "")}" maxlength="120" data-max="120" />
@@ -588,17 +615,17 @@
 
       // Título + bloqueo de inputs
       const titleEl = qs("#drawer-tutor-title");
-      if (isCreate)      { titleEl && (titleEl.textContent = "Tutor · Crear"); }
-      else if (isEdit)   { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""} (edición)`); }
-      else               { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""}`); }
+      if (isCreate) { titleEl && (titleEl.textContent = "Tutor · Crear"); }
+      else { titleEl && (titleEl.textContent = `Tutor · ${item ? item.nombre : ""}`); }
+      if (window.disableDrawerInputs) window.disableDrawerInputs(isCreate ? false : true);
 
-      window.disableDrawerInputs && window.disableDrawerInputs(isView);
-
-      // Acciones (vista)
+      // Botones vista
       qs("#btn-edit-tutor")?.addEventListener("click", () => {
-        openTutorDrawer(`Tutor · ${item?.nombre || ""} (edición)`,
-          renderDrawer({ id: String(item?.id || ""), mode: "edit" })
-        );
+        qs("#drawer-tutor-body").innerHTML = renderDrawer({ id: String(item?.id || "") })
+          .replace('class="mode-view"', 'class="mode-view" hidden')
+          .replace('class="mode-edit" hidden', 'class="mode-edit"');
+        // hacemos un hack rápido: re-render para modo edición
+        openTutorDrawer(`Tutor · ${item?.nombre || ""} (edición)`, renderDrawer({ id: String(item?.id || "") }));
       });
       qs("#btn-delete-tutor")?.addEventListener("click", async (e) => {
         const btn = e.currentTarget;
@@ -630,122 +657,80 @@
           toast("Tutor reactivado", "exito");
           await load();
           const re = S.data.find((x) => x.id === item.id);
-          if (re) openTutorDrawer("Tutor · " + re.nombre, renderDrawer({ id: String(re.id), mode: "view" }));
+          if (re) openTutorDrawer("Tutor · " + re.nombre, renderDrawer({ id: String(re.id) }));
         } catch (err) {
           console.error(TAG, "reactivar", err);
           toast("No se pudo reactivar", "error");
         }
       });
 
-      // Guardar / Cancelar (edición/creación)
+      // Guardar / Cancelar (modo creación)
       qs("#btn-cancel-tutor")?.addEventListener("click", () => {
-        if (isCreate) {
-          S.tempNewTutorImage = null;
-          closeTutorDrawer();
-        } else {
-          openTutorDrawer(`Tutor · ${item?.nombre || ""}`,
-            renderDrawer({ id: String(item?.id || ""), mode: "view" })
-          );
-        }
+        S.tempNewTutorImage = null;
+        closeTutorDrawer();
       });
       qs("#btn-save-tutor")?.addEventListener("click", async () => {
-        try {
-          if (isCreate) await saveCreate();
-          else await saveUpdate(item);
-        } catch (err) {
-          console.error(TAG, "save", err);
-          toast("Error al guardar", "error");
-        }
+        try { await saveCreate(); } catch (err) { console.error(TAG, "save", err); toast("Error al guardar", "error"); }
       });
 
       // Imagen en vista
-      if (isView) {
+      if (!isCreate) {
         const imgView = qs("#tutor-img-view");
         if (imgView && existId) {
           setImgWithFallback(imgView, tutorImgUrl(existId, "png"), tutorImgUrl(existId, "jpg"), noImageSvgDataURI());
-          const openPreview = getOpenImagePreview();
-          imgView.style.cursor = "zoom-in";
-          imgView.addEventListener("click", () =>
-            openPreview({ src: imgView.src, title: "Vista previa · Foto del tutor", confirm: false })
-          );
+          bindImagePreview(imgView, { title: "Vista previa · Foto del tutor" });
         }
       }
 
       // Imagen en edición/creación
-      if (isCreate || isEdit) {
-        const imgEdit = qs("#tutor-img-edit");
-        const info    = qs("#tutor-img-info");
-        if (imgEdit) {
-          if (existId) {
-            setImgWithFallback(imgEdit, tutorImgUrl(existId, "png"), tutorImgUrl(existId, "jpg"), noImageSvgDataURI());
-          } else if (S.tempNewTutorImage instanceof File) {
-            imgEdit.src = withBust(URL.createObjectURL(S.tempNewTutorImage));
-          } else {
-            imgEdit.src = noImageSvgDataURI();
-          }
+      const imgEdit = qs("#tutor-img-edit");
+      const info   = qs("#tutor-img-info");
+      if (imgEdit) {
+        if (existId) {
+          setImgWithFallback(imgEdit, tutorImgUrl(existId, "png"), tutorImgUrl(existId, "jpg"), noImageSvgDataURI());
+        } else if (S.tempNewTutorImage instanceof File) {
+          imgEdit.src = withBust(URL.createObjectURL(S.tempNewTutorImage));
+        } else {
+          imgEdit.src = noImageSvgDataURI();
         }
-
-        const pencil = qs("#tutor-pencil");
-        if (pencil && !pencil._b) {
-          pencil._b = true;
-          const openPreview = getOpenImagePreview();
-
-          pencil.addEventListener("click", () => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = "image/png,image/jpeg";
-            input.style.display = "none";
-            document.body.appendChild(input);
-
-            input.addEventListener("change", async () => {
-              const file = input.files && input.files[0];
-              input.remove();
-              if (!file) return;
-
-              const v = validarImagen(file, MAX_UPLOAD_MB);
-              if (!v.ok) return toast(v.error, "error");
-
-              openPreview({
-                file,
-                title: "Vista previa · Foto del tutor",
-                confirm: true,
-                onConfirm: async () => {
-                  if (!existId) {
-                    const u = URL.createObjectURL(file);
-                    if (imgEdit) imgEdit.src = withBust(u);
-                    S.tempNewTutorImage = file;
-                    if (info) info.textContent = `Archivo: ${file.name} · ${(file.size / 1048576).toFixed(2)} MB (se subirá al guardar)`;
-                    toast("Imagen lista; se subirá al guardar.", "info");
-                    return;
-                  }
-                  try {
-                    await uploadTutorImagen(existId, file);
-                    setImgWithFallback(
-                      imgEdit,
-                      `/ASSETS/tutor/tutor_${existId}.png?v=${Date.now()}`,
-                      `/ASSETS/tutor/tutor_${existId}.jpg?v=${Date.now()}`,
-                      noImageSvgDataURI()
-                    );
-                    if (info) info.textContent = "Imagen actualizada";
-                    toast("Imagen actualizada", "exito");
-                  } catch (err) {
-                    console.error(TAG, "upload tutor img", err);
-                    toast("No se pudo subir la imagen", "error");
-                  }
-                },
-              });
-            });
-
-            input.click();
+      }
+      const pencil = qs("#tutor-pencil");
+      if (pencil && !pencil._b) {
+        pencil._b = true;
+        pencil.addEventListener("click", async () => {
+          await pickImageAndPreview({
+            async onConfirm(file) {
+              if (!existId) {
+                // aún no existe el tutor → buffer
+                const url = URL.createObjectURL(file);
+                imgEdit && (imgEdit.src = withBust(url));
+                S.tempNewTutorImage = file;
+                if (info) info.textContent = `Archivo: ${file.name} · ${(file.size/1048576).toFixed(2)} MB (se subirá al guardar)`;
+                toast("Imagen lista; se subirá al guardar.", "info");
+                return;
+              }
+              // tutor existente → subida inmediata
+              try {
+                const res = await uploadTutorImagen(existId, file);
+                const url = res?.url || res?.data?.url || res?.location || res?.path;
+                if (url) imgEdit && (imgEdit.src = withBust(url));
+                else setImgWithFallback(imgEdit, tutorImgUrl(existId, "png"), tutorImgUrl(existId, "jpg"), noImageSvgDataURI());
+                if (info) info.textContent = "Imagen actualizada";
+                toast("Imagen actualizada", "exito");
+              } catch (err) {
+                console.error(TAG, "upload tutor img", err);
+                toast("No se pudo subir la imagen", "error");
+              }
+            }
           });
-        }
+        });
       }
 
       // Copiar JSON
       if (window.bindCopyFromPre) window.bindCopyFromPre("#json-tutor", "#btn-copy-json-tutor");
 
       // Cursos ligados
-      const tgt = (isCreate || isEdit) ? "#tutor-cursos-edit" : "#tutor-cursos";
+      const tgt = isCreate ? "#tutor-cursos-edit" : "#tutor-cursos";
       renderTutorCursosChips(existId, tgt);
 
       // Contadores de caracteres
@@ -755,12 +740,26 @@
     return viewHTML + editHTML;
   }
 
+  function bindImagePreview(el, { title = "Vista previa" } = {}) {
+    if (!el || el._previewBound) return;
+    el._previewBound = true;
+    el.style.cursor = "zoom-in";
+    el.addEventListener("click", (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const src = el.currentSrc || el.getAttribute("src") || "";
+      if (!src) return;
+      const openPreview = getOpenImagePreview();
+      openPreview({ src, confirm: false, title });
+    });
+  }
+
   function getEmptyTutor() {
-    const uid = Number(window.usuario?.id || window.state?.usuario?.id || 1) || 1;
+    const uid =
+      Number(window.usuario?.id || window.state?.usuario?.id || 1) || 1;
     return { nombre: "", descripcion: "", estatus: 1, creado_por: uid };
   }
 
-  function readForm(existingId) {
+  function readFormForCreate() {
     const v = (id) => (qs("#" + id)?.value || "").trim();
     const n = (id) => Number(v(id) || 0);
     const payload = {
@@ -768,8 +767,8 @@
       descripcion: v("tf_descripcion"),
       estatus: n("tf_estatus") || 1,
     };
-    if (existingId != null) payload.id = Number(existingId);
-    else payload.creado_por = Number(window.usuario?.id || window.state?.usuario?.id || 1) || 1;
+    // creado_por ya lo pone el backend si lo requiere; agrega si es necesario:
+    payload.creado_por = Number(window.usuario?.id || window.state?.usuario?.id || 1) || 1;
     return payload;
   }
 
@@ -798,11 +797,12 @@
     const r = await fetch(API_UPLOAD.tutorImg, { method: "POST", body: fd });
     const text = await r.text().catch(() => "");
     if (!r.ok) throw new Error("HTTP " + r.status + " " + text);
-    try { return JSON.parse(text); } catch { return { _raw: text }; }
+    let j = null; try { j = JSON.parse(text); } catch { j = { _raw: text }; }
+    return j; // dejamos que el caller intente leer j.url / j.data.url ...
   }
 
   async function saveCreate() {
-    const p = readForm(null);
+    const p = readFormForCreate();
     if (!requireFields(p)) return;
 
     const res = await postJSON(API.iTutores, p);
@@ -825,21 +825,8 @@
     await load();
     if (newId) {
       const re = S.data.find((x) => x.id === newId);
-      if (re) openTutorDrawer("Tutor · " + re.nombre, renderDrawer({ id: String(re.id), mode: "view" }));
+      if (re) openTutorDrawer("Tutor · " + re.nombre, renderDrawer({ id: String(re.id) }));
     }
-  }
-
-  async function saveUpdate(item) {
-    if (!item || !item._all) return toast("Sin item para actualizar", "error");
-    const p = readForm(item.id);
-    if (!requireFields(p)) return;
-
-    await postJSON(API.uTutores, p);
-
-    toast("Cambios guardados", "exito");
-    await load();
-    const re = S.data.find((x) => x.id === item.id);
-    if (re) openTutorDrawer("Tutor · " + re.nombre, renderDrawer({ id: String(re.id), mode: "view" }));
   }
 
   /* ---------- Cursos ligados ---------- */
@@ -849,24 +836,19 @@
 
     try {
       const statuses = [1, 4, 2, 3, 0, 5];
-      const chunks = await Promise.all(
-        statuses.map((st) => postJSON(API.cursos, { estatus: st }).catch(() => []))
-      );
+      const chunks = await Promise.all(statuses.map((st) =>
+        postJSON(API.cursos, { estatus: st }).catch(() => [])
+      ));
       const all = chunks.flat().filter(Boolean);
-      const list = all.filter(
-        (c) => Number(c.tutor) === Number(tutorId) || Number(c.id_tutor) === Number(tutorId)
+      const list = all.filter((c) =>
+        Number(c.tutor) === Number(tutorId) ||
+        Number(c.id_tutor) === Number(tutorId)
       );
 
-      if (!list.length) {
-        host.innerHTML = '<span class="chip-empty">Sin cursos ligados</span>';
-        return;
-      }
+      if (!list.length) { host.innerHTML = '<span class="chip-empty">Sin cursos ligados</span>'; return; }
 
       const orderKey = (v) => ({ 1: 1, 4: 2, 2: 3, 3: 4, 0: 5, 5: 5 }[Number(v)] || 9);
-      list.sort(
-        (a, b) => orderKey(a.estatus) - orderKey(b.estatus) ||
-                  String(a.nombre).localeCompare(String(b.nombre))
-      );
+      list.sort((a, b) => orderKey(a.estatus) - orderKey(b.estatus) || String(a.nombre).localeCompare(String(b.nombre)));
 
       const statusCls = (v) => {
         const n = Number(v);
@@ -878,8 +860,7 @@
       };
 
       host.innerHTML = list.map((cr) => `
-        <button class="curso-chip ${statusCls(cr.estatus)}" data-id="${cr.id}"
-                aria-label="Abrir curso: ${esc(cr.nombre || "")}" title="${esc(cr.nombre || "")}">
+        <button class="curso-chip ${statusCls(cr.estatus)}" data-id="${cr.id}" aria-label="Abrir curso: ${esc(cr.nombre || "")}" title="${esc(cr.nombre || "")}">
           <img alt="Portada" id="chip-img-${cr.id}">
           <span>${esc((cr.nombre || "").slice(0, 18))}</span>
         </button>
@@ -949,8 +930,7 @@
     const overlay = qs("#gc-dash-overlay");
     const put = (sel, val) => { const el = qs(sel); if (el) el.textContent = val ?? "—"; };
 
-    qs("#drawer-curso-mini-title") &&
-      (qs("#drawer-curso-mini-title").textContent = "Curso · " + (data?.nombre || "—"));
+    qs("#drawer-curso-mini-title") && (qs("#drawer-curso-mini-title").textContent = "Curso · " + (data?.nombre || "—"));
     put("#cm_nombre", data?.nombre || "—");
     const STATUS_LABEL = { 1: "Activo", 0: "Inactivo", 2: "Pausado", 3: "Terminado", 4: "En curso", 5: "Cancelado" };
     put("#cm_estatus", STATUS_LABEL[data?.estatus] || String(data?.estatus ?? "—"));
@@ -978,7 +958,9 @@
     const aside = qs("#drawer-curso-mini");
     const overlay = qs("#gc-dash-overlay");
     if (!aside) return;
-    try { const ae = document.activeElement; if (ae && aside.contains(ae)) ae.blur(); } catch {}
+    try {
+      const ae = document.activeElement; if (ae && aside.contains(ae)) ae.blur();
+    } catch {}
     aside.classList.remove("open");
     aside.setAttribute("hidden", "");
     aside.setAttribute("aria-hidden", "true");

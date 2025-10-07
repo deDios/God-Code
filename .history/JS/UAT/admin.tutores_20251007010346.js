@@ -24,7 +24,7 @@
     page: 1,
     pageSize: 7,
     search: "",
-    tempNewTutorImage: null, 
+    tempNewTutorImage: null, // buffer para creación
   };
   window.__TutoresState = S;
 
