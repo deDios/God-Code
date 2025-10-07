@@ -32,7 +32,7 @@
   const ORDER_TUTORES = [1, 2, 0];
 
   /* ---------- Utils ---------- */
-  const MAX_UPLOAD_MB = 10;
+  const MAX_UPLOAD_MB = 1;
   const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 
   const qs  = (s, r = document) => r.querySelector(s);
