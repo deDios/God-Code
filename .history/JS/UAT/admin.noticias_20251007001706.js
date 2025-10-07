@@ -714,7 +714,7 @@
           return;
         }
 
-        toast(isInactive ? "Noticia reactivada" : "Noticia movida a inactivo", "exito");
+        toast(isInactive ? "Noticia reactivada" : "Noticia cancelada", "exito");
         resortList();
         renderNoticias();
         fillNoticiaView(it);

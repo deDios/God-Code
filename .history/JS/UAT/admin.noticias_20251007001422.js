@@ -714,7 +714,7 @@
           return;
         }
 
-        toast(isInactive ? "Noticia reactivada" : "Noticia movida a inactivo", "exito");
+        toast(isInactive ? "Noticia reactivada" : "Noticia cancelada", "exito");
         resortList();
         renderNoticias();
         fillNoticiaView(it);
@@ -765,44 +765,13 @@
 
   async function openNoticiaView(id) {
     if (window.__activeModule && window.__activeModule !== "noticias") return;
-
-    const nid = Number(id);
-    if (!Number.isFinite(nid) || nid <= 0) {
-      console.warn("[Noticias] openNoticiaView: id inválido ->", id);
-      toast("ID de noticia inválido.", "error");
-      return;
-    }
-
-    let it = (S.data || []).find((x) => +x.id === nid);
-
-    if (!it) {
-      try {
-        await loadNoticias();
-        it = (S.data || []).find((x) => +x.id === nid);
-      } catch (e) {
-        console.error("[Noticias] openNoticiaView -> loadNoticias() falló:", e);
-      }
-    }
-
-    if (!it) {
-      console.warn("[Noticias] openNoticiaView: noticia no encontrada ->", nid);
-      toast("No se encontró la noticia solicitada.", "error");
-      return;
-    }
-
+    const it = (S.data || []).find((x) => +x.id === +id);
+    if (!it) return;
     S.current = { id: it.id, _all: it };
     openDrawerNoticia();
     setNoticiaDrawerMode("view");
-
-    try {
-      await fillNoticiaView(it);
-    } catch (err) {
-      console.error("[Noticias] openNoticiaView -> fillNoticiaView() error:", err);
-      toast("No se pudo cargar el detalle de la noticia.", "error");
-    }
+    await fillNoticiaView(it);
   }
-
-
   window.openNoticiaView = openNoticiaView;
 
   /* ==================== Drawer: Edicion/Creacion ==================== */
@@ -813,7 +782,6 @@
   function val(id) {
     return (qs("#" + id)?.value || "").trim();
   }
-
   function num(id) {
     const v = val(id);
     return v === "" ? null : Number(v);
@@ -955,38 +923,30 @@
   }
 
   function fillNoticiaEdit(n) {
-    if (n && n.id == null && S.current?.id != null) {
-      n = { ...n, id: S.current.id };
-    }
-
     const model =
-      S.current && S.current._all && (+S.current.id === +n?.id || n?.id == null)
+      S.current && S.current._all && (+S.current.id === +n.id || n.id == null)
         ? S.current._all
-        : (n || {});
+        : n || {};
 
     setVal("nf_titulo", model.titulo);
     setVal("nf_desc_uno", model.desc_uno);
     setVal("nf_desc_dos", model.desc_dos);
     putNoticiaStatus("nf_estatus", model.estatus ?? 1);
 
-    try {
-      if (window.gcBindCharCounters) {
-        const scope = qs("#noticia-edit");
-        if (scope) window.gcBindCharCounters(scope);
-      }
-    } catch (e) {
-      console.warn("[Noticias] gcBindCharCounters error:", e);
+    // contadores de caracteres (si existe util global)
+    if (window.gcBindCharCounters) {
+      window.gcBindCharCounters(qs("#noticia-edit"));
     }
 
     mountNoticiaMediaEdit(qs("#media-noticia-edit"), model.id);
 
+    // Rebind seguro
     const bSave = qs("#btn-save-noticia");
     if (bSave) {
       const clone = bSave.cloneNode(true);
       bSave.replaceWith(clone);
       clone.addEventListener("click", saveNoticia);
     }
-
     const bCancel = qs("#btn-cancel-noticia");
     if (bCancel) {
       const c = bCancel.cloneNode(true);
@@ -996,14 +956,7 @@
         fillNoticiaView(S.current ? S.current._all : model);
       });
     }
-
-    // ---- Diagnóstico opcional (útil si vuelve a aparecer "undefined") ----
-    if (model.id == null) {
-      console.warn("[Noticias] fillNoticiaEdit sin id válido. model:", model, "state:", S);
-    }
   }
-
-
   window.fillNoticiaEdit = fillNoticiaEdit;
 
   async function uploadNoticiaImg(noticiaId, pos, file) {

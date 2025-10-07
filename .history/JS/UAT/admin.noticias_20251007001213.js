@@ -46,13 +46,13 @@
     String(s ?? "").replace(
       /[&<>"']/g,
       (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[c])
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
     );
   const fmtDate = (d) => (!d ? "—" : String(d));
   const normalize = (s) =>
@@ -93,7 +93,7 @@
 
     try {
       return JSON.parse(text);
-    } catch { }
+    } catch {}
 
     // Fallback: recorta bloque JSON {..} o [..]
     const firstBrace = text.indexOf("{");
@@ -108,7 +108,7 @@
     if (candidate) {
       try {
         return JSON.parse(candidate);
-      } catch { }
+      } catch {}
     }
     return { _raw: text };
   }
@@ -258,19 +258,21 @@
     right.innerHTML = `
       <div style="font-weight:600;">Detalles</div>
       <div style="font-size:.92rem;color:#444;line-height:1.35;">
-        ${file
-        ? `<div><strong>Archivo:</strong> ${esc(file.name || "-")}</div>
+        ${
+          file
+            ? `<div><strong>Archivo:</strong> ${esc(file.name || "-")}</div>
                <div><strong>Peso:</strong> ${humanSize(file.size || 0)}</div>
                <div><strong>Tipo:</strong> ${esc(file.type || "-")}</div>`
-        : `<div style="color:#666;">Solo lectura</div>`
-      }
+            : `<div style="color:#666;">Solo lectura</div>`
+        }
         <div style="margin-top:6px;color:#666;">Formatos permitidos: JPG / PNG · Máx ${MAX_UPLOAD_MB}MB</div>
       </div>
       <div style="margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;">
-        ${confirm
-        ? `<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>`
-        : ``
-      }
+        ${
+          confirm
+            ? `<button class="gc-btn gc-btn--primary" data-act="confirm">Subir</button>`
+            : ``
+        }
         <button class="gc-btn gc-btn--ghost" data-act="cancel">Cerrar</button>
       </div>
     `;
@@ -283,7 +285,7 @@
     const close = () => {
       try {
         document.activeElement && document.activeElement.blur();
-      } catch { }
+      } catch {}
       ov.remove();
       if (file && img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
     };
@@ -308,13 +310,13 @@
 
   // Selector de modal (gcPreview.openImagePreview / openImagePreview / fallback local)
   function getOpenImagePreview() {
-    const useLocal = (opts) => openImagePreviewLocal(opts);
-    const external = (window.gcPreview?.openImagePreview) || window.openImagePreview;
-    return (opts = {}) => {
-      if (opts.confirm) return useLocal(opts);
-      return external ? external(opts) : useLocal(opts);
-    };
-  }
+  const useLocal = (opts) => openImagePreviewLocal(opts);
+  const external = (window.gcPreview?.openImagePreview) || window.openImagePreview;
+  return (opts = {}) => {
+    if (opts.confirm) return useLocal(opts);
+    return external ? external(opts) : useLocal(opts);
+  };
+}
 
   /* ---------- Drawer helpers ---------- */
   function openDrawerNoticia() {
@@ -356,7 +358,7 @@
     try {
       const ae = document.activeElement;
       if (ae && d.contains(ae)) ae.blur();
-    } catch { }
+    } catch {}
     d.classList.remove("open");
     d.setAttribute("hidden", "");
     d.setAttribute("aria-hidden", "true");
@@ -427,10 +429,10 @@
     const term = normalize(S.search);
     const filtered = term
       ? S.data.filter((row) =>
-        normalize(
-          `${row.titulo} ${row.desc_uno} ${row.desc_dos} ${row.estatus} ${row.fecha_creacion}`
-        ).includes(term)
-      )
+          normalize(
+            `${row.titulo} ${row.desc_uno} ${row.desc_dos} ${row.estatus} ${row.fecha_creacion}`
+          ).includes(term)
+        )
       : S.data;
 
     // meta
@@ -464,8 +466,8 @@
             <div class="table-row news-row" role="row" data-id="${it.id}">
               <div class="col-nombre" role="cell">${esc(it.titulo || "-")}</div>
               <div class="col-fecha"  role="cell">${esc(
-              fmtDate(it.fecha_creacion)
-            )}</div>
+                fmtDate(it.fecha_creacion)
+              )}</div>
               <div class="col-status" role="cell" data-col="status">${statusHTML}</div>
             </div>
           `
@@ -714,7 +716,7 @@
           return;
         }
 
-        toast(isInactive ? "Noticia reactivada" : "Noticia movida a inactivo", "exito");
+        toast(isInactive ? "Noticia reactivada" : "Noticia cancelada", "exito");
         resortList();
         renderNoticias();
         fillNoticiaView(it);
@@ -765,44 +767,13 @@
 
   async function openNoticiaView(id) {
     if (window.__activeModule && window.__activeModule !== "noticias") return;
-
-    const nid = Number(id);
-    if (!Number.isFinite(nid) || nid <= 0) {
-      console.warn("[Noticias] openNoticiaView: id inválido ->", id);
-      toast("ID de noticia inválido.", "error");
-      return;
-    }
-
-    let it = (S.data || []).find((x) => +x.id === nid);
-
-    if (!it) {
-      try {
-        await loadNoticias();
-        it = (S.data || []).find((x) => +x.id === nid);
-      } catch (e) {
-        console.error("[Noticias] openNoticiaView -> loadNoticias() falló:", e);
-      }
-    }
-
-    if (!it) {
-      console.warn("[Noticias] openNoticiaView: noticia no encontrada ->", nid);
-      toast("No se encontró la noticia solicitada.", "error");
-      return;
-    }
-
+    const it = (S.data || []).find((x) => +x.id === +id);
+    if (!it) return;
     S.current = { id: it.id, _all: it };
     openDrawerNoticia();
     setNoticiaDrawerMode("view");
-
-    try {
-      await fillNoticiaView(it);
-    } catch (err) {
-      console.error("[Noticias] openNoticiaView -> fillNoticiaView() error:", err);
-      toast("No se pudo cargar el detalle de la noticia.", "error");
-    }
+    await fillNoticiaView(it);
   }
-
-
   window.openNoticiaView = openNoticiaView;
 
   /* ==================== Drawer: Edicion/Creacion ==================== */
@@ -813,7 +784,6 @@
   function val(id) {
     return (qs("#" + id)?.value || "").trim();
   }
-
   function num(id) {
     const v = val(id);
     return v === "" ? null : Number(v);
@@ -831,7 +801,8 @@
     el.innerHTML = opts
       .map(
         (o) =>
-          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${o.l
+          `<option value="${o.v}"${+o.v === +sel ? " selected" : ""}>${
+            o.l
           }</option>`
       )
       .join("");
@@ -955,38 +926,30 @@
   }
 
   function fillNoticiaEdit(n) {
-    if (n && n.id == null && S.current?.id != null) {
-      n = { ...n, id: S.current.id };
-    }
-
     const model =
-      S.current && S.current._all && (+S.current.id === +n?.id || n?.id == null)
+      S.current && S.current._all && (+S.current.id === +n.id || n.id == null)
         ? S.current._all
-        : (n || {});
+        : n || {};
 
     setVal("nf_titulo", model.titulo);
     setVal("nf_desc_uno", model.desc_uno);
     setVal("nf_desc_dos", model.desc_dos);
     putNoticiaStatus("nf_estatus", model.estatus ?? 1);
 
-    try {
-      if (window.gcBindCharCounters) {
-        const scope = qs("#noticia-edit");
-        if (scope) window.gcBindCharCounters(scope);
-      }
-    } catch (e) {
-      console.warn("[Noticias] gcBindCharCounters error:", e);
+    // contadores de caracteres (si existe util global)
+    if (window.gcBindCharCounters) {
+      window.gcBindCharCounters(qs("#noticia-edit"));
     }
 
     mountNoticiaMediaEdit(qs("#media-noticia-edit"), model.id);
 
+    // Rebind seguro
     const bSave = qs("#btn-save-noticia");
     if (bSave) {
       const clone = bSave.cloneNode(true);
       bSave.replaceWith(clone);
       clone.addEventListener("click", saveNoticia);
     }
-
     const bCancel = qs("#btn-cancel-noticia");
     if (bCancel) {
       const c = bCancel.cloneNode(true);
@@ -996,44 +959,24 @@
         fillNoticiaView(S.current ? S.current._all : model);
       });
     }
-
-    // ---- Diagnóstico opcional (útil si vuelve a aparecer "undefined") ----
-    if (model.id == null) {
-      console.warn("[Noticias] fillNoticiaEdit sin id válido. model:", model, "state:", S);
-    }
   }
-
-
   window.fillNoticiaEdit = fillNoticiaEdit;
 
   async function uploadNoticiaImg(noticiaId, pos, file) {
-    if (!noticiaId) throw new Error("[uploadNoticiaImg] noticiaId requerido");
-    if (!(file instanceof File)) throw new Error("[uploadNoticiaImg] file inválido");
-
     const fd = new FormData();
     fd.append("noticia_id", String(noticiaId));
     fd.append("pos", String(pos));
     fd.append("imagen", file);
-
-    const res = await fetch(API_UPLOAD.noticiaImg, { method: "POST", body: fd });
+    const res = await fetch(API_UPLOAD.noticiaImg, {
+      method: "POST",
+      body: fd,
+    });
     const text = await res.text().catch(() => "");
     if (!res.ok) throw new Error("HTTP " + res.status + " " + text);
-
-    let j = null;
-    try { j = JSON.parse(text); } catch { }
-    if (!j || j.ok === false) throw new Error(j?.error || "Upload falló");
-
-    const url = j.url || j.data?.url || j.location || j.path;
-    if (url) return url;
-
-    const tryExt = async (ext) => {
-      const u = withBust(`/ASSETS/noticia/NoticiasImg/noticia_img${pos}_${noticiaId}.${ext}`);
-      const ok = await new Promise(r => { const i = new Image(); i.onload = () => r(true); i.onerror = () => r(false); i.src = u; });
-      return ok ? u : null;
-    };
-    return (await tryExt("png")) || (await tryExt("jpg")) || noImageSvgDataURI();
+    const j = JSON.parse(text);
+    if (!j.ok) throw new Error(j.error || "Upload fallo");
+    return j.url;
   }
-
 
   async function updateNoticiaStatus(id, estatus, extra = {}) {
     if (!id) return false;
