@@ -1323,3 +1323,61 @@ body.cuenta-only .topbar {
 }
 
 [hidden]{display:none !important}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*parche para resoluciones en tableta*/
+
+@media (max-width: 1024px) {
+  /* Un solo slot por fila dentro de los drawers */
+  #drawer-curso .media-grid,
+  #drawer-noticia .media-grid,
+  #drawer-tutor .media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Que el cuadro de la imagen no se aplaste */
+  #drawer-curso .media-thumb,
+  #drawer-noticia .media-thumb,
+  #drawer-tutor .media-thumb {
+    min-height: 180px; /* puedes subir/bajar este valor si quieres */
+  }
+
+  /* Asegurar tamaño cómodo del botón lápiz */
+  #drawer-curso .icon-btn.media-edit,
+  #drawer-noticia .icon-btn.media-edit,
+  #drawer-tutor .icon-btn.media-edit {
+    width: 36px;
+    height: 36px;
+    top: 8px;
+    right: 8px;
+  }
+
+  #drawer-curso .icon-btn.media-edit svg,
+  #drawer-noticia .icon-btn.media-edit svg,
+  #drawer-tutor .icon-btn.media-edit svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* En móviles muy chicos mantenemos 1 columna (refuerza tu regla de 560px) */
+@media (max-width: 600px) {
+  #drawer-curso .media-grid,
+  #drawer-noticia .media-grid,
+  #drawer-tutor .media-grid {
+    grid-template-columns: 1fr;
+  }
+}
