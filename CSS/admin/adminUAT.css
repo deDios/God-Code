@@ -1381,3 +1381,53 @@ body.cuenta-only .topbar {
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* ============================================================
+   FIX específico Safari / iOS para placeholders de imagen
+   (Curso / Noticia / Tutor en drawers)
+   ============================================================ */
+@supports (-webkit-touch-callout: none) {
+  /* Forzamos layout estable sin depender de aspect-ratio */
+  #drawer-curso .media-thumb,
+  #drawer-noticia .media-thumb,
+  #drawer-tutor .media-thumb {
+    position: relative;
+    aspect-ratio: auto;       /* desactivar para Safari viejo */
+    height: auto;
+    padding-top: 56.25%;      /* 16:9 clásico */
+    background: #f6f6f6;
+    overflow: hidden;
+  }
+
+  #drawer-curso .media-thumb img,
+  #drawer-noticia .media-thumb img,
+  #drawer-tutor .media-thumb img {
+    position: absolute;
+    inset: 0;                 /* top:0; right:0; bottom:0; left:0 */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Aseguramos que el lápiz quede siempre visible en la esquina */
+  #drawer-curso .icon-btn.media-edit,
+  #drawer-noticia .icon-btn.media-edit,
+  #drawer-tutor .icon-btn.media-edit {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    z-index: 5;
+  }
+
+  #drawer-curso .icon-btn.media-edit svg,
+  #drawer-noticia .icon-btn.media-edit svg,
+  #drawer-tutor .icon-btn.media-edit svg {
+    width: 18px;
+    height: 18px;
+  }
+}
