@@ -7,7 +7,7 @@
   const ADMIN_IDS =
     globalThis.__ADMIN_IDS && Array.isArray(globalThis.__ADMIN_IDS)
       ? globalThis.__ADMIN_IDS.map((n) => Number(n)).filter(Number.isFinite)
-      : [1, 12, 13, 17, 18];
+      : [1, 12, 13, 18];
 
   const LINKS = Object.assign(
     { cuenta: "/VIEW/Home.php", sitio: "/index.php" },
