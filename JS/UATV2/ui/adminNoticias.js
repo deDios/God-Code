@@ -208,6 +208,8 @@
             <div class="admin-pagination__controls" id="admin-noticias-pagination"></div>
           </div>
         </div>
+
+        ${drawerTemplate()}
       </section>
     `;
   }
@@ -317,112 +319,124 @@
     host.innerHTML = html;
   }
 
-  function openEditor(row = null) {
-    S.current = row;
+  function drawerTemplate() {
+    return `
+    <div class="admin-drawer-overlay" id="admin-noticia-overlay" hidden></div>
 
-    const title = row ? "Editar noticia" : "Nueva noticia";
+    <aside class="admin-drawer" id="admin-noticia-drawer" hidden aria-hidden="true">
+      <div class="admin-drawer__head">
+        <div>
+          <h2 class="admin-drawer__title" id="admin-noticia-drawer-title">Nueva noticia</h2>
+          <p class="admin-drawer__subtitle">Completa la información de la noticia.</p>
+        </div>
 
-    const html = `
-      <div class="admin-news-editor" id="admin-news-editor">
-        <div class="admin-card">
-          <div class="admin-module__head">
-            <div class="admin-module__titlebox">
-              <h2 class="admin-module__title">${title}</h2>
-              <p class="admin-module__subtitle">Completa la información de la noticia.</p>
-            </div>
+        <button class="admin-drawer__close" type="button" id="btn-admin-noticia-close" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
 
-            <button class="admin-btn admin-btn--ghost" type="button" id="btn-admin-noticia-cancel">
-              Volver
-            </button>
+      <div class="admin-drawer__body">
+        <div class="admin-news-form">
+          <div class="admin-field">
+            <label for="nf_titulo">Título</label>
+            <input id="nf_titulo" type="text">
           </div>
 
-          <div class="admin-news-form">
-            <div class="admin-field">
-              <label for="nf_titulo">Título</label>
-              <input id="nf_titulo" type="text" value="${esc(row?.titulo || "")}">
-            </div>
+          <div class="admin-field">
+            <label for="nf_desc_uno">Descripción 1</label>
+            <textarea id="nf_desc_uno"></textarea>
+          </div>
 
-            <div class="admin-field">
-              <label for="nf_desc_uno">Descripción 1</label>
-              <textarea id="nf_desc_uno">${esc(row?.desc_uno || "")}</textarea>
-            </div>
+          <div class="admin-field">
+            <label for="nf_desc_dos">Descripción 2</label>
+            <textarea id="nf_desc_dos"></textarea>
+          </div>
 
-            <div class="admin-field">
-              <label for="nf_desc_dos">Descripción 2</label>
-              <textarea id="nf_desc_dos">${esc(row?.desc_dos || "")}</textarea>
-            </div>
+          <div class="admin-field">
+            <label for="nf_estatus">Estatus</label>
+            <select id="nf_estatus">
+              <option value="1">Activo</option>
+              <option value="2">En pausa</option>
+              <option value="3">Temporal</option>
+              <option value="0">Inactivo</option>
+              <option value="4">Cancelado</option>
+            </select>
+          </div>
 
-            <div class="admin-field">
-              <label for="nf_estatus">Estatus</label>
-              <select id="nf_estatus">
-                <option value="1" ${Number(row?.estatus ?? 1) === 1 ? "selected" : ""}>Activo</option>
-                <option value="2" ${Number(row?.estatus) === 2 ? "selected" : ""}>En pausa</option>
-                <option value="3" ${Number(row?.estatus) === 3 ? "selected" : ""}>Temporal</option>
-                <option value="0" ${Number(row?.estatus) === 0 ? "selected" : ""}>Inactivo</option>
-                <option value="4" ${Number(row?.estatus) === 4 ? "selected" : ""}>Cancelado</option>
-              </select>
-            </div>
-
-            <div class="admin-news-preview">
-              <p class="admin-module__subtitle">Imagen principal</p>
-              <img id="admin-news-preview-img" alt="Imagen de noticia" src="${noImageSvgDataURI()}">
-            </div>
-
-            <div class="admin-module__toolbar">
-              <button class="admin-btn admin-btn--primary" type="button" id="btn-admin-noticia-save">
-                Guardar noticia
-              </button>
-              <button class="admin-btn admin-btn--ghost" type="button" id="btn-admin-noticia-cancel-2">
-                Cancelar
-              </button>
-            </div>
+          <div class="admin-news-preview">
+            <p class="admin-module__subtitle">Imagen principal</p>
+            <img id="admin-news-preview-img" alt="Imagen de noticia" src="${noImageSvgDataURI()}">
           </div>
         </div>
       </div>
-    `;
 
-    const body = qs(".admin-module__body");
-    if (body) body.innerHTML = html;
+      <div class="admin-drawer__foot">
+        <button class="admin-btn admin-btn--ghost" type="button" id="btn-admin-noticia-cancel">
+          Cancelar
+        </button>
 
-    bindEditor();
+        <button class="admin-btn admin-btn--primary" type="button" id="btn-admin-noticia-save">
+          Guardar noticia
+        </button>
+      </div>
+    </aside>
+  `;
+  }
 
-    if (row?.id) {
-      resolveNoticiaImg(row.id, 1).then((src) => {
-        const img = qs("#admin-news-preview-img");
-        if (img) img.src = src;
-      });
+  function openEditor(row = null) {
+    S.current = row;
+
+    const drawer = qs("#admin-noticia-drawer");
+    const overlay = qs("#admin-noticia-overlay");
+    const title = qs("#admin-noticia-drawer-title");
+
+    if (!drawer || !overlay) return;
+
+    if (title) {
+      title.textContent = row ? "Editar noticia" : "Nueva noticia";
     }
+
+    qs("#nf_titulo").value = row?.titulo || "";
+    qs("#nf_desc_uno").value = row?.desc_uno || "";
+    qs("#nf_desc_dos").value = row?.desc_dos || "";
+    qs("#nf_estatus").value = String(row?.estatus ?? 1);
+
+    const img = qs("#admin-news-preview-img");
+    if (img) {
+      img.src = noImageSvgDataURI();
+
+      if (row?.id) {
+        resolveNoticiaImg(row.id, 1).then((src) => {
+          img.src = src;
+        });
+      }
+    }
+
+    overlay.hidden = false;
+    drawer.hidden = false;
+
+    requestAnimationFrame(() => {
+      overlay.classList.add("is-open");
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+    });
   }
 
   function closeEditor() {
-    const body = qs(".admin-module__body");
-    if (!body) return;
+    const drawer = qs("#admin-noticia-drawer");
+    const overlay = qs("#admin-noticia-overlay");
 
-    body.innerHTML = `
-      <div class="table-wrap">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Imagen</th>
-              <th>Título</th>
-              <th>Descripción</th>
-              <th>Fecha</th>
-              <th>Estatus</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="admin-noticias-tbody"></tbody>
-        </table>
-      </div>
+    if (!drawer || !overlay) return;
 
-      <div class="admin-pagination">
-        <div class="admin-pagination__info" id="admin-noticias-info"></div>
-        <div class="admin-pagination__controls" id="admin-noticias-pagination"></div>
-      </div>
-    `;
+    drawer.classList.remove("is-open");
+    overlay.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
 
-    bindTableEvents();
-    paintTable();
+    setTimeout(() => {
+      drawer.hidden = true;
+      overlay.hidden = true;
+      S.current = null;
+    }, 220);
   }
 
   async function saveNoticia() {
@@ -469,6 +483,7 @@
 
       S.loaded = false;
       await loadNoticias();
+      await paintTable();
       closeEditor();
     } catch (error) {
       console.error(TAG, error);
@@ -515,6 +530,10 @@
   function bind() {
     paintTable();
 
+    qs("#btn-admin-noticia-close")?.addEventListener("click", closeEditor);
+    qs("#btn-admin-noticia-cancel")?.addEventListener("click", closeEditor);
+    qs("#admin-noticia-overlay")?.addEventListener("click", closeEditor);
+    qs("#btn-admin-noticia-save")?.addEventListener("click", saveNoticia);
     const search = qs("#admin-noticias-search");
     const btnNew = qs("#btn-admin-noticia-new");
 

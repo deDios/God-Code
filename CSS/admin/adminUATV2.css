@@ -797,6 +797,84 @@ main.home-samapa.admin-dashboard {
   background: #f3f4f6;
 }
 
+.home-samapa.admin-dashboard .admin-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+  z-index: 1200;
+}
+
+.home-samapa.admin-dashboard .admin-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.home-samapa.admin-dashboard .admin-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(560px, 94vw);
+  height: 100vh;
+  background: #fff;
+  box-shadow: -18px 0 40px rgba(15, 23, 42, 0.22);
+  transform: translateX(104%);
+  transition: transform 0.24s ease;
+  z-index: 1201;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-samapa.admin-dashboard .admin-drawer.is-open {
+  transform: translateX(0);
+}
+
+.home-samapa.admin-dashboard .admin-drawer__head,
+.home-samapa.admin-dashboard .admin-drawer__foot {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.home-samapa.admin-dashboard .admin-drawer__foot {
+  border-top: 1px solid var(--admin-border);
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.home-samapa.admin-dashboard .admin-drawer__body {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.home-samapa.admin-dashboard .admin-drawer__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--admin-text);
+}
+
+.home-samapa.admin-dashboard .admin-drawer__subtitle {
+  margin: 4px 0 0;
+  color: var(--admin-text-soft);
+  font-size: 0.92rem;
+}
+
+.home-samapa.admin-dashboard .admin-drawer__close {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
 
 
 
