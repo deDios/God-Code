@@ -1,5 +1,5 @@
 (function () {
-    //JS/UATV2/admin.js
+  //JS/UATV2/admin.js
   "use strict";
 
   function bootAdmin() {
@@ -11,7 +11,7 @@
     window.AdminRouter.init({
       rootSelector: "#admin-view-root",
       navSelector: ".admin-panel__item",
-      defaultView: "carrusel",
+      defaultView: "noticias",
     });
   }
 

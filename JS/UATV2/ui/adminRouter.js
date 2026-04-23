@@ -7,55 +7,82 @@
   const STORAGE_KEY = "admin_active_view";
 
   const VIEWS = {
-    carrusel: {
+    noticias: {
       init: () =>
-        window.AdminCarrusel && typeof window.AdminCarrusel.init === "function"
-          ? window.AdminCarrusel.init()
+        window.AdminNoticias && typeof window.AdminNoticias.init === "function"
+          ? window.AdminNoticias.init()
           : Promise.resolve(),
 
       render: () =>
-        window.AdminCarrusel && typeof window.AdminCarrusel.render === "function"
-          ? window.AdminCarrusel.render()
-          : "<div class='admin-module'><div class='admin-placeholder'><div class='admin-placeholder__inner'><h2 class='admin-placeholder__title'>Carrusel no disponible</h2><p class='admin-placeholder__text'>No se pudo cargar el módulo de carrusel.</p></div></div></div>",
+        window.AdminNoticias && typeof window.AdminNoticias.render === "function"
+          ? window.AdminNoticias.render()
+          : `
+        <div class="admin-module">
+          <div class="admin-placeholder">
+            <div class="admin-placeholder__inner">
+              <h2 class="admin-placeholder__title">Noticias no disponible</h2>
+              <p class="admin-placeholder__text">No se pudo cargar el módulo de noticias.</p>
+            </div>
+          </div>
+        </div>
+      `,
 
       bind: () =>
-        window.AdminCarrusel && typeof window.AdminCarrusel.bind === "function"
-          ? window.AdminCarrusel.bind()
+        window.AdminNoticias && typeof window.AdminNoticias.bind === "function"
+          ? window.AdminNoticias.bind()
           : null,
     },
+    
+    cursos: {
+      init: () => Promise.resolve(),
 
-    departamentos: {
-      init: () =>
-        window.AdminDepartamentos && typeof window.AdminDepartamentos.init === "function"
-          ? window.AdminDepartamentos.init()
-          : Promise.resolve(),
+      render: () => `
+      <section class="admin-module admin-module--cursos">
+        <div class="admin-module__head">
+          <div class="admin-module__titlebox">
+            <h1 class="admin-module__title">Cursos</h1>
+            <p class="admin-module__subtitle">Administra cursos, contenido y estatus.</p>
+          </div>
+        </div>
 
-      render: () =>
-        window.AdminDepartamentos && typeof window.AdminDepartamentos.render === "function"
-          ? window.AdminDepartamentos.render()
-          : "<div class='admin-module'><div class='admin-placeholder'><div class='admin-placeholder__inner'><h2 class='admin-placeholder__title'>Departamentos no disponible</h2><p class='admin-placeholder__text'>No se pudo cargar el módulo de departamentos.</p></div></div></div>",
+        <div class="admin-module__body">
+          <div class="admin-placeholder">
+            <div class="admin-placeholder__inner">
+              <h2 class="admin-placeholder__title">Módulo de cursos</h2>
+              <p class="admin-placeholder__text">Aquí se cargará el administrador de cursos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
 
-      bind: () =>
-        window.AdminDepartamentos && typeof window.AdminDepartamentos.bind === "function"
-          ? window.AdminDepartamentos.bind()
-          : null,
+      bind: () => null,
     },
 
-    tramites: {
-      init: () =>
-        window.AdminTramites && typeof window.AdminTramites.init === "function"
-          ? window.AdminTramites.init()
-          : Promise.resolve(),
+    tutores: {
+      init: () => Promise.resolve(),
 
-      render: () =>
-        window.AdminTramites && typeof window.AdminTramites.render === "function"
-          ? window.AdminTramites.render()
-          : "<div class='admin-module'><div class='admin-placeholder'><div class='admin-placeholder__inner'><h2 class='admin-placeholder__title'>Trámites no disponible</h2><p class='admin-placeholder__text'>No se pudo cargar el módulo de trámites.</p></div></div></div>",
+      render: () => `
+      <section class="admin-module admin-module--tutores">
+        <div class="admin-module__head">
+          <div class="admin-module__titlebox">
+            <h1 class="admin-module__title">Tutores</h1>
+            <p class="admin-module__subtitle">Administra tutores, perfiles y disponibilidad.</p>
+          </div>
+        </div>
 
-      bind: () =>
-        window.AdminTramites && typeof window.AdminTramites.bind === "function"
-          ? window.AdminTramites.bind()
-          : null,
+        <div class="admin-module__body">
+          <div class="admin-placeholder">
+            <div class="admin-placeholder__inner">
+              <h2 class="admin-placeholder__title">Módulo de tutores</h2>
+              <p class="admin-placeholder__text">Aquí se cargará el administrador de tutores.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+
+      bind: () => null,
     },
   };
 
@@ -183,7 +210,7 @@
     const {
       rootSelector = "#admin-view-root",
       navSelector = ".admin-panel__item",
-      defaultView = "carrusel",
+      defaultView = "noticias",
     } = options;
 
     state.root = document.querySelector(rootSelector);
