@@ -796,3 +796,76 @@ main.home-samapa.admin-dashboard {
   border: 1px solid var(--admin-border);
   background: #f3f4f6;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   FOOTER FIX PARA ADMIN
+   ========================================================= */
+
+body:has(main.admin-dashboard) {
+  min-height: 100vh;
+}
+
+main.home-samapa.admin-dashboard {
+  flex: 1 0 auto;
+  min-height: calc(100vh - var(--admin-top-offset));
+}
+
+.home-samapa.admin-dashboard .hs-wrap {
+  min-height: calc(100vh - var(--admin-top-offset));
+}
+
+.home-samapa.admin-dashboard .hs-main {
+  min-height: calc(100vh - var(--admin-top-offset));
+}
+
+.home-samapa.admin-dashboard #admin-view-root {
+  min-height: calc(100vh - var(--admin-top-offset));
+  padding-bottom: 80px;
+}
+
+footer,
+.gc-footer,
+#site-footer {
+  flex-shrink: 0;
+}
