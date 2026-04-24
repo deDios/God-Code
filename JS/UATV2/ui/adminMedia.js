@@ -2,7 +2,7 @@
   "use strict";
 
   const API_MEDIA =
-    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/u_media.php";
+    "https://godcode.com.mx/db/web/u_media.php";
 
   const MAX_MB = 10;
   const MAX_BYTES = MAX_MB * 1024 * 1024;
