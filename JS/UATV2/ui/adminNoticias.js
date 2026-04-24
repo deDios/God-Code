@@ -19,6 +19,10 @@
     search: "",
     loaded: false,
     current: null,
+    tempImages: {
+      1: null,
+      2: null,
+    },
   };
 
   const STATUS_LABEL = {
@@ -40,12 +44,36 @@
       "'": "&#39;",
     }[c]));
 
+
   const normalize = (v) =>
     String(v ?? "")
       .normalize("NFD")
       .replace(/\p{M}/gu, "")
       .toLowerCase()
       .trim();
+
+  function mediaSlotTemplate(pos) {
+    return `
+    <div class="admin-news-preview" data-media-slot="${pos}">
+      <p class="admin-module__subtitle">Imagen ${pos}</p>
+
+      <img 
+        id="admin-news-preview-img-${pos}" 
+        alt="Imagen ${pos} de noticia" 
+        src="${noImageSvgDataURI()}"
+      >
+
+      <button 
+        class="admin-btn admin-btn--ghost" 
+        type="button" 
+        data-action="pick-media" 
+        data-pos="${pos}"
+      >
+        Subir imagen
+      </button>
+    </div>
+  `;
+  }
 
   function toast(msg, type = "info", ms = 2200) {
     if (window.gcToast) return window.gcToast(msg, type, ms);
@@ -125,6 +153,7 @@
     };
 
     return (
+      (await tryUrl("webp")) ||
       (await tryUrl("png")) ||
       (await tryUrl("jpg")) ||
       (await tryUrl("jpeg")) ||
@@ -363,9 +392,9 @@
             </select>
           </div>
 
-          <div class="admin-news-preview">
-            <p class="admin-module__subtitle">Imagen principal</p>
-            <img id="admin-news-preview-img" alt="Imagen de noticia" src="${noImageSvgDataURI()}">
+          <div class="admin-news-media-grid">
+            ${mediaSlotTemplate(1)}
+            ${mediaSlotTemplate(2)}
           </div>
         </div>
       </div>
@@ -401,13 +430,20 @@
     qs("#nf_desc_dos").value = row?.desc_dos || "";
     qs("#nf_estatus").value = String(row?.estatus ?? 1);
 
-    const img = qs("#admin-news-preview-img");
-    if (img) {
-      img.src = noImageSvgDataURI();
+    S.tempImages[1] = null;
+    S.tempImages[2] = null;
+
+    for (const pos of [1, 2]) {
+      const img = qs(`#admin-news-preview-img-${pos}`);
+      const btn = qs(`[data-action="pick-media"][data-pos="${pos}"]`);
+
+      if (img) img.src = noImageSvgDataURI();
+      if (btn) btn.textContent = "Subir imagen";
 
       if (row?.id) {
-        resolveNoticiaImg(row.id, 1).then((src) => {
-          img.src = src;
+        resolveNoticiaImg(row.id, pos).then((src) => {
+          if (img) img.src = src;
+          if (btn) btn.textContent = "Cambiar imagen";
         });
       }
     }
@@ -437,6 +473,52 @@
       overlay.hidden = true;
       S.current = null;
     }, 220);
+  }
+
+  async function handlePickMedia(pos) {
+    if (!window.AdminMedia) {
+      toast("AdminMedia no está cargado.", "error");
+      return;
+    }
+
+    const file = await window.AdminMedia.pickImageFile();
+    if (!file) return;
+
+    const validation = window.AdminMedia.validateImageFile(file);
+    if (!validation.ok) {
+      toast(validation.error, "error");
+      return;
+    }
+
+    const img = qs(`#admin-news-preview-img-${pos}`);
+    const btn = qs(`[data-action="pick-media"][data-pos="${pos}"]`);
+    const previewUrl = window.AdminMedia.createObjectPreview(file);
+
+    if (img && previewUrl) img.src = previewUrl;
+    if (btn) btn.textContent = "Cambiar imagen";
+
+    if (!S.current?.id) {
+      S.tempImages[pos] = file;
+      toast(`Imagen ${pos} lista; se subirá al guardar.`, "info");
+      return;
+    }
+
+    try {
+      const res = await window.AdminMedia.uploadAdminMedia({
+        modulo: "noticias",
+        id: S.current.id,
+        pos,
+        file,
+      });
+
+      if (img && res.url) img.src = res.url;
+
+      toast(`Imagen ${pos} actualizada correctamente.`, "exito");
+      await paintTable();
+    } catch (error) {
+      console.error(TAG, error);
+      toast(error.message || "No se pudo subir la imagen.", "error");
+    }
   }
 
   async function saveNoticia() {
@@ -470,13 +552,32 @@
           return;
         }
 
-        await postJSON(API.crear, {
+        const created = await postJSON(API.crear, {
           titulo,
           desc_uno,
           desc_dos,
           creado_por,
           estatus,
         });
+
+        const newId = Number(created?.id || 0);
+
+        if (newId && window.AdminMedia) {
+          for (const pos of [1, 2]) {
+            const file = S.tempImages[pos];
+
+            if (file instanceof File) {
+              await window.AdminMedia.uploadAdminMedia({
+                modulo: "noticias",
+                id: newId,
+                pos,
+                file,
+              });
+
+              S.tempImages[pos] = null;
+            }
+          }
+        }
 
         toast("Noticia creada correctamente.", "exito");
       }
@@ -545,6 +646,17 @@
         paintTable();
       });
     }
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action='pick-media']");
+      if (!btn) return;
+
+      const drawer = qs("#admin-noticia-drawer");
+      if (!drawer || !drawer.contains(btn)) return;
+
+      const pos = Number(btn.dataset.pos);
+      handlePickMedia(pos);
+    });
 
     btnNew?.addEventListener("click", () => openEditor(null));
     bindTableEvents();

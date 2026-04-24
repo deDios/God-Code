@@ -199,6 +199,7 @@
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
+    <script src="/JS/UATV2/adminMedia.js"></script>
     <script src="/JS/UATV2/ui/adminNoticias.js"></script>
 
     <!-- Router -->
