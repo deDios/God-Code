@@ -201,6 +201,7 @@
     <!-- Carga de modulos -->
     <script src="/JS/UATV2/ui/adminMedia.js"></script>
     <script src="/JS/UATV2/ui/adminNoticias.js"></script>
+    <script src="/JS/UATV2/ui/adminCursos.js"></script>
 
     <!-- Router -->
     <script src="/JS/UATV2/ui/adminRouter.js"></script>

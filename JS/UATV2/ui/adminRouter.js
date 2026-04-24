@@ -32,31 +32,31 @@
           ? window.AdminNoticias.bind()
           : null,
     },
-    
+
     cursos: {
-      init: () => Promise.resolve(),
+      init: () =>
+        window.AdminCursos && typeof window.AdminCursos.init === "function"
+          ? window.AdminCursos.init()
+          : Promise.resolve(),
 
-      render: () => `
-      <section class="admin-module admin-module--cursos">
-        <div class="admin-module__head">
-          <div class="admin-module__titlebox">
-            <h1 class="admin-module__title">Cursos</h1>
-            <p class="admin-module__subtitle">Administra cursos, contenido y estatus.</p>
-          </div>
-        </div>
-
-        <div class="admin-module__body">
+      render: () =>
+        window.AdminCursos && typeof window.AdminCursos.render === "function"
+          ? window.AdminCursos.render()
+          : `
+        <div class="admin-module">
           <div class="admin-placeholder">
             <div class="admin-placeholder__inner">
-              <h2 class="admin-placeholder__title">Módulo de cursos</h2>
-              <p class="admin-placeholder__text">Aquí se cargará el administrador de cursos.</p>
+              <h2 class="admin-placeholder__title">Cursos no disponible</h2>
+              <p class="admin-placeholder__text">No se pudo cargar el módulo de cursos.</p>
             </div>
           </div>
         </div>
-      </section>
-    `,
+      `,
 
-      bind: () => null,
+      bind: () =>
+        window.AdminCursos && typeof window.AdminCursos.bind === "function"
+          ? window.AdminCursos.bind()
+          : null,
     },
 
     tutores: {

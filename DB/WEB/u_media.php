@@ -1,5 +1,5 @@
 <?php
-//DB/WEB/u_media.php
+//DBWEB/u_media.php
 declare(strict_types=1);
 
 header("Access-Control-Allow-Origin: https://godcode.com.mx");
