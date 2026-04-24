@@ -325,7 +325,6 @@
                   <th>Suscriptor</th>
                   <th>Curso</th>
                   <th>Fecha</th>
-                  <th>Comentario</th>
                   <th>Estatus</th>
                   <th>Acciones</th>
                 </tr>
@@ -401,7 +400,6 @@
           <td><strong>${esc(row.alumnoNombre || "—")}</strong></td>
           <td>${esc(mapCursoLabel(row.curso))}</td>
           <td>${esc(fmtDate(row.fecha_creacion))}</td>
-          <td>${esc(row.comentario || "—")}</td>
           <td>${statusBadge(row.estatus)}</td>
           <td>
             <button class="admin-btn admin-btn--ghost" type="button" data-action="edit" data-id="${esc(row.id)}">
