@@ -123,6 +123,18 @@
     }
   }
 
+  function getCreatedId(response) {
+    return Number(
+      response?.id ||
+      response?.data?.id ||
+      response?.noticia?.id ||
+      response?.insert_id ||
+      response?.last_id ||
+      response?.meta?.id ||
+      0
+    );
+  }
+
   function withBust(url) {
     if (!url || url.startsWith("data:") || url.startsWith("blob:")) return url;
     return url + (url.includes("?") ? "&" : "?") + "v=" + Date.now();
@@ -560,9 +572,12 @@
           estatus,
         });
 
-        const newId = Number(created?.id || 0);
+        const newId = getCreatedId(created);
 
-        if (newId && window.AdminMedia) {
+        if (!newId) {
+          console.warn(TAG, "No se pudo detectar el ID creado:", created);
+          toast("La noticia se creó, pero no se pudo subir la imagen porque no llegó el ID.", "warning");
+        } else if (window.AdminMedia) {
           for (const pos of [1, 2]) {
             const file = S.tempImages[pos];
 
@@ -595,7 +610,6 @@
   function bindEditor() {
     qs("#btn-admin-noticia-save")?.addEventListener("click", saveNoticia);
     qs("#btn-admin-noticia-cancel")?.addEventListener("click", closeEditor);
-    qs("#btn-admin-noticia-cancel-2")?.addEventListener("click", closeEditor);
   }
 
   function bindTableEvents() {
