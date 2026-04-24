@@ -24,6 +24,12 @@
       render: () => window.AdminTutores?.render?.() || unavailable("Tutores"),
       bind: () => window.AdminTutores?.bind?.() || null,
     },
+
+    Suscripciones: {
+      init: () => window.AdminSuscripciones?.init?.() || Promise.resolve(),
+      render: () => window.AdminSuscripciones?.render?.() || unavailable("Suscripciones"),
+      bind: () => window.AdminSuscripciones?.bind?.() || null,
+    },
   };
 
   function unavailable(nombre) {

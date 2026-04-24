@@ -184,6 +184,11 @@
                             <span class="admin-panel__icon">🧾</span>
                             <span class="admin-panel__text">Tutores</span>
                         </a>
+
+                        <a href="#" class="admin-panel__item" data-admin-view="suscripciones">
+                            <span class="admin-panel__icon">🎓</span>
+                            <span class="admin-panel__text">Suscripciones</span>
+                        </a>
                     </nav>
                 </section>
             </aside>
@@ -204,7 +209,8 @@
     <script src="/JS/UATV2/ui/adminNoticias.js"></script>
     <script src="/JS/UATV2/ui/adminCursos.js"></script>
     <script src="/JS/UATV2/ui/adminTutores.js"></script>
-
+    <script src="/JS/UATV2/ui/adminSuscripciones.js"></script>
+    
     <!-- Router -->
     <script src="/JS/UATV2/ui/adminRouter.js"></script>
     <script src="/JS/UATV2/admin.js"></script>
