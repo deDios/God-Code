@@ -8,83 +8,36 @@
 
   const VIEWS = {
     noticias: {
-      init: () =>
-        window.AdminNoticias && typeof window.AdminNoticias.init === "function"
-          ? window.AdminNoticias.init()
-          : Promise.resolve(),
-
-      render: () =>
-        window.AdminNoticias && typeof window.AdminNoticias.render === "function"
-          ? window.AdminNoticias.render()
-          : `
-        <div class="admin-module">
-          <div class="admin-placeholder">
-            <div class="admin-placeholder__inner">
-              <h2 class="admin-placeholder__title">Noticias no disponible</h2>
-              <p class="admin-placeholder__text">No se pudo cargar el módulo de noticias.</p>
-            </div>
-          </div>
-        </div>
-      `,
-
-      bind: () =>
-        window.AdminNoticias && typeof window.AdminNoticias.bind === "function"
-          ? window.AdminNoticias.bind()
-          : null,
+      init: () => window.AdminNoticias?.init?.() || Promise.resolve(),
+      render: () => window.AdminNoticias?.render?.() || unavailable("Noticias"),
+      bind: () => window.AdminNoticias?.bind?.() || null,
     },
 
     cursos: {
-      init: () =>
-        window.AdminCursos && typeof window.AdminCursos.init === "function"
-          ? window.AdminCursos.init()
-          : Promise.resolve(),
-
-      render: () =>
-        window.AdminCursos && typeof window.AdminCursos.render === "function"
-          ? window.AdminCursos.render()
-          : `
-        <div class="admin-module">
-          <div class="admin-placeholder">
-            <div class="admin-placeholder__inner">
-              <h2 class="admin-placeholder__title">Cursos no disponible</h2>
-              <p class="admin-placeholder__text">No se pudo cargar el módulo de cursos.</p>
-            </div>
-          </div>
-        </div>
-      `,
-
-      bind: () =>
-        window.AdminCursos && typeof window.AdminCursos.bind === "function"
-          ? window.AdminCursos.bind()
-          : null,
+      init: () => window.AdminCursos?.init?.() || Promise.resolve(),
+      render: () => window.AdminCursos?.render?.() || unavailable("Cursos"),
+      bind: () => window.AdminCursos?.bind?.() || null,
     },
 
     tutores: {
-      init: () => Promise.resolve(),
-
-      render: () => `
-      <section class="admin-module admin-module--tutores">
-        <div class="admin-module__head">
-          <div class="admin-module__titlebox">
-            <h1 class="admin-module__title">Tutores</h1>
-            <p class="admin-module__subtitle">Administra tutores, perfiles y disponibilidad.</p>
-          </div>
-        </div>
-
-        <div class="admin-module__body">
-          <div class="admin-placeholder">
-            <div class="admin-placeholder__inner">
-              <h2 class="admin-placeholder__title">Módulo de tutores</h2>
-              <p class="admin-placeholder__text">Aquí se cargará el administrador de tutores.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    `,
-
-      bind: () => null,
+      init: () => window.AdminTutores?.init?.() || Promise.resolve(),
+      render: () => window.AdminTutores?.render?.() || unavailable("Tutores"),
+      bind: () => window.AdminTutores?.bind?.() || null,
     },
   };
+
+  function unavailable(nombre) {
+    return `
+    <div class="admin-module">
+      <div class="admin-placeholder">
+        <div class="admin-placeholder__inner">
+          <h2 class="admin-placeholder__title">${nombre} no disponible</h2>
+          <p class="admin-placeholder__text">No se pudo cargar el módulo de ${nombre.toLowerCase()}.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  }
 
   const state = {
     root: null,
