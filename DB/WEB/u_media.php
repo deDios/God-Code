@@ -1,5 +1,5 @@
 <?php
-
+//DB/WEB/u_media.php
 declare(strict_types=1);
 
 header("Access-Control-Allow-Origin: https://godcode.com.mx");
@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 ini_set("display_errors", "0");
 error_reporting(E_ALL);
 
-const MAX_MB = 10;
+const MAX_MB = 1;
 const MAX_BYTES = MAX_MB * 1024 * 1024;
 
 function respond(bool $ok, array|string $payload = [], int $status = 200): void

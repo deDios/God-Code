@@ -2,9 +2,9 @@
   "use strict";
 
   const API_MEDIA =
-    "https://godcode.com.mx/db/web/u_media.php";
+    "https://godcode.com.mx/DB/WEB/u_media.php";
 
-  const MAX_MB = 10;
+  const MAX_MB = 1;
   const MAX_BYTES = MAX_MB * 1024 * 1024;
 
   function validateImageFile(file) {
