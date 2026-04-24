@@ -25,9 +25,10 @@
       bind: () => window.AdminTutores?.bind?.() || null,
     },
 
-    Suscripciones: {
+    suscripciones: {
       init: () => window.AdminSuscripciones?.init?.() || Promise.resolve(),
-      render: () => window.AdminSuscripciones?.render?.() || unavailable("Suscripciones"),
+      render: () =>
+        window.AdminSuscripciones?.render?.() || unavailable("Suscripciones"),
       bind: () => window.AdminSuscripciones?.bind?.() || null,
     },
   };
