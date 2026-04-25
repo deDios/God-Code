@@ -882,8 +882,40 @@ main.home-samapa.admin-dashboard {
   color: var(--admin-text);
 }
 
+.home-samapa.admin-dashboard .admin-course-chip--more {
+  background: #f3f6fb;
+  color: var(--admin-text-soft);
+  cursor: default;
+}
 
+.home-samapa.admin-dashboard .admin-drawer--mini {
+  width: min(460px, 90vw);
+  z-index: 1202;
+}
 
+.home-samapa.admin-dashboard .admin-course-mini {
+  display: grid;
+  gap: 16px;
+}
+
+.home-samapa.admin-dashboard .admin-course-mini img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--admin-border);
+  background: #f3f4f6;
+}
+
+.home-samapa.admin-dashboard .admin-readonly {
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--admin-text);
+  line-height: 1.45;
+}
 
 
 

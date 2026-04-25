@@ -13,6 +13,8 @@
     cursos: API_BASE + "c_cursos.php",
   };
 
+  const MAX_LINKED_COURSES_VISIBLE = 12;
+
   const S = {
     data: [],
     page: 1,
@@ -173,6 +175,69 @@
       (await tryUrl("jpeg")) ||
       noImageSvgDataURI()
     );
+  }
+
+  function openCourseMiniDrawer(curso) {
+    const drawer = qs("#admin-course-mini-drawer");
+    const title = qs("#admin-course-mini-title");
+    const img = qs("#admin-course-mini-img");
+    const name = qs("#admin-course-mini-name");
+    const desc = qs("#admin-course-mini-desc");
+
+    if (!drawer || !curso) return;
+
+    if (title) title.textContent = curso.nombre || "Curso";
+    if (name) name.textContent = curso.nombre || "—";
+    if (desc) {
+      desc.textContent =
+        curso.descripcion_breve ||
+        curso.descripcion_curso ||
+        curso.descripcion ||
+        "—";
+    }
+
+    const statusHost = qs("#admin-course-mini-status");
+    if (statusHost) {
+      statusHost.innerHTML = statusBadgeCurso(curso.estatus);
+    }
+
+    if (img) {
+      img.src = noImageSvgDataURI();
+      resolveCursoImg(curso.id).then((src) => {
+        img.src = src;
+      });
+    }
+
+    drawer.hidden = false;
+
+    requestAnimationFrame(() => {
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+    });
+  }
+
+  function closeCourseMiniDrawer() {
+    const drawer = qs("#admin-course-mini-drawer");
+    if (!drawer) return;
+
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+
+    setTimeout(() => {
+      drawer.hidden = true;
+    }, 220);
+  }
+
+  function statusBadgeCurso(estatus) {
+    const n = Number(estatus);
+
+    if (n === 1) return `<span class="admin-badge admin-badge--active">Activo</span>`;
+    if (n === 4) return `<span class="admin-badge admin-badge--warning">En curso</span>`;
+    if (n === 3) return `<span class="admin-badge admin-badge--warning">Terminado</span>`;
+    if (n === 5) return `<span class="admin-badge admin-badge--danger">Cancelado</span>`;
+    if (n === 2) return `<span class="admin-badge admin-badge--inactive">Pausado</span>`;
+
+    return `<span class="admin-badge admin-badge--inactive">Inactivo</span>`;
   }
 
   async function handlePickMedia() {
@@ -449,6 +514,44 @@
     host.innerHTML = html;
   }
 
+  function miniCourseDrawerTemplate() {
+    return `
+    <aside class="admin-drawer admin-drawer--mini" id="admin-course-mini-drawer" hidden aria-hidden="true">
+      <div class="admin-drawer__head">
+        <div>
+          <h2 class="admin-drawer__title" id="admin-course-mini-title">Curso</h2>
+          <p class="admin-drawer__subtitle">Vista rápida del curso ligado.</p>
+        </div>
+
+        <button class="admin-drawer__close" type="button" id="btn-admin-course-mini-close" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
+
+      <div class="admin-drawer__body">
+        <div class="admin-course-mini">
+          <img id="admin-course-mini-img" alt="Imagen del curso" src="${noImageSvgDataURI()}">
+
+          <div class="admin-field">
+            <label>Nombre</label>
+            <div class="admin-readonly" id="admin-course-mini-name">—</div>
+          </div>
+
+          <div class="admin-field">
+            <label>Descripción</label>
+            <div class="admin-readonly" id="admin-course-mini-desc">—</div>
+          </div>
+
+          <div class="admin-field">
+            <label>Estatus</label>
+            <div id="admin-course-mini-status">—</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  `;
+  }
+
   function drawerTemplate() {
     return `
       <div class="admin-drawer-overlay" id="admin-tutor-overlay" hidden></div>
@@ -517,6 +620,7 @@
           </button>
         </div>
       </aside>
+      ${miniCourseDrawerTemplate()}
     `;
   }
 
@@ -550,14 +654,25 @@
         return;
       }
 
-      host.innerHTML = cursos.map((curso) => `
-      <button class="admin-course-chip" type="button" data-course-id="${esc(curso.id)}">
+      const visibleCursos = cursos.slice(0, MAX_LINKED_COURSES_VISIBLE);
+      const hiddenCount = cursos.length - visibleCursos.length;
+
+      host.innerHTML = `
+      ${visibleCursos.map((curso) => `
+     <button class="admin-course-chip" type="button" data-course-id="${esc(curso.id)}">
         <img data-linked-course-img="${esc(curso.id)}" alt="${esc(curso.nombre || "Curso")}" src="${noImageSvgDataURI()}">
         <span>${esc(curso.nombre || "Curso sin nombre")}</span>
       </button>
-    `).join("");
+    `).join("")}
 
-      for (const curso of cursos) {
+    ${hiddenCount > 0 ? `
+    <span class="admin-course-chip admin-course-chip--more">
+      +${hiddenCount} más
+    </span>
+    ` : ""}
+    `;
+
+      for (const curso of visibleCursos) {
         const img = qs(`[data-linked-course-img="${CSS.escape(String(curso.id))}"]`, host);
         if (!img) continue;
 
@@ -567,6 +682,20 @@
           img.src = noImageSvgDataURI();
         };
       }
+
+      host.querySelectorAll(".admin-course-chip[data-course-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = Number(btn.dataset.courseId);
+          const curso = cursos.find((item) => Number(item.id) === id);
+
+          if (!curso) {
+            toast("Curso no encontrado.", "error");
+            return;
+          }
+
+          openCourseMiniDrawer(curso);
+        });
+      });
     } catch (error) {
       console.error(TAG, error);
       host.innerHTML = `<p class="admin-module__subtitle">No fue posible cargar los cursos ligados.</p>`;
@@ -739,8 +868,18 @@
     qs("#btn-admin-tutor-new")?.addEventListener("click", () => openEditor(null));
     qs("#btn-admin-tutor-close")?.addEventListener("click", closeEditor);
     qs("#btn-admin-tutor-cancel")?.addEventListener("click", closeEditor);
-    qs("#admin-tutor-overlay")?.addEventListener("click", closeEditor);
+    qs("#admin-tutor-overlay")?.addEventListener("click", () => {
+      const mini = qs("#admin-course-mini-drawer");
+
+      if (mini && !mini.hidden) {
+        closeCourseMiniDrawer();
+        return;
+      }
+
+      closeEditor();
+    });
     qs("#btn-admin-tutor-save")?.addEventListener("click", saveTutor);
+    qs("#btn-admin-course-mini-close")?.addEventListener("click", closeCourseMiniDrawer);
 
     const search = qs("#admin-tutores-search");
 
