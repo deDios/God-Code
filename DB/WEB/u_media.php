@@ -1,5 +1,5 @@
 <?php
-//DBWEB/u_media.php
+// DBWEB/u_media.php
 declare(strict_types=1);
 
 header("Access-Control-Allow-Origin: https://godcode.com.mx");
@@ -24,8 +24,12 @@ function respond(bool $ok, array|string $payload = [], int $status = 200): void
     http_response_code($status);
 
     if (!$ok) {
-        $msg = is_string($payload) ? $payload : ($payload["error"] ?? "Error desconocido");
-        echo json_encode(["ok" => false, "error" => $msg], JSON_UNESCAPED_UNICODE);
+        if (is_array($payload)) {
+            echo json_encode(array_merge(["ok" => false], $payload), JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode(["ok" => false, "error" => $payload], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -42,6 +46,7 @@ function cleanModulo(string $modulo): string
 function getDocRoot(): string
 {
     $root = $_SERVER["DOCUMENT_ROOT"] ?? "";
+
     if ($root && is_dir($root)) {
         return rtrim($root, "/\\");
     }
@@ -77,53 +82,11 @@ function getMediaConfig(string $modulo, int $id, int $pos): array
     }
 
     respond(false, "Módulo no permitido. Usa noticias, cursos o tutores.", 400);
+
     return [
         "dir" => "",
         "base" => "",
     ];
-}
-
-function createImageFromUpload(string $tmpPath, string $mime)
-{
-    if ($mime === "image/jpeg") {
-        return @imagecreatefromjpeg($tmpPath);
-    }
-
-    if ($mime === "image/png") {
-        return @imagecreatefrompng($tmpPath);
-    }
-
-    if ($mime === "image/webp" && function_exists("imagecreatefromwebp")) {
-        return @imagecreatefromwebp($tmpPath);
-    }
-
-    return false;
-}
-
-function saveAsWebp($src, string $destPath, int $quality = 82): bool
-{
-    if (!function_exists("imagewebp")) {
-        return false;
-    }
-
-    $w = imagesx($src);
-    $h = imagesy($src);
-
-    $dst = imagecreatetruecolor($w, $h);
-
-    imagealphablending($dst, false);
-    imagesavealpha($dst, true);
-
-    $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-    imagefilledrectangle($dst, 0, 0, $w, $h, $transparent);
-
-    imagecopy($dst, $src, 0, 0, 0, 0, $w, $h);
-
-    $ok = imagewebp($dst, $destPath, $quality);
-
-    imagedestroy($dst);
-
-    return $ok;
 }
 
 function deleteOldVariants(string $destDir, string $base): array
@@ -134,10 +97,8 @@ function deleteOldVariants(string $destDir, string $base): array
     foreach ($exts as $ext) {
         $path = $destDir . DIRECTORY_SEPARATOR . $base . "." . $ext;
 
-        if (is_file($path)) {
-            if (@unlink($path)) {
-                $deleted[] = basename($path);
-            }
+        if (is_file($path) && @unlink($path)) {
+            $deleted[] = basename($path);
         }
     }
 
@@ -197,14 +158,8 @@ try {
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file["tmp_name"]);
 
-    $allowed = [
-        "image/jpeg" => "jpg",
-        "image/png" => "png",
-        "image/webp" => "webp",
-    ];
-
-    if (!isset($allowed[$mime])) {
-        respond(false, "Formato no permitido. Usa JPG, PNG o WEBP.", 400);
+    if ($mime !== "image/webp") {
+        respond(false, "El servidor solo acepta WEBP procesado desde el frontend.", 400);
     }
 
     $config = getMediaConfig($modulo, $id, $pos);
@@ -221,33 +176,24 @@ try {
         }
     }
 
-    $src = createImageFromUpload($file["tmp_name"], $mime);
-
-    if (!$src) {
-        respond(false, "No se pudo procesar la imagen en el servidor.", 400);
-    }
-
     $deleted = deleteOldVariants($destDir, $baseName);
 
     $fileName = $baseName . ".webp";
     $destPath = $destDir . DIRECTORY_SEPARATOR . $fileName;
 
-    $saved = saveAsWebp($src, $destPath, 82);
-
-    imagedestroy($src);
-
-    if (!$saved) {
-        respond(false, "No se pudo guardar la imagen como WEBP. Verifica que GD tenga soporte WebP.", 500);
+    if (!move_uploaded_file($file["tmp_name"], $destPath)) {
+        respond(false, "No se pudo guardar la imagen en el servidor.", 500);
     }
 
     @chmod($destPath, 0664);
 
-    $publicUrl = "/" . trim($relativeDir, "/") . "/" . $fileName . "?v=" . time();
+    $publicPath = "/" . trim($relativeDir, "/") . "/" . $fileName;
+    $publicUrl = $publicPath . "?v=" . time();
 
     respond(true, [
         "mensaje" => "Media subida correctamente.",
         "url" => $publicUrl,
-        "path" => "/" . trim($relativeDir, "/") . "/" . $fileName,
+        "path" => $publicPath,
         "filename" => $fileName,
         "modulo" => $modulo,
         "id" => $id,
