@@ -10,6 +10,7 @@
     listar: API_BASE + "c_tutor.php",
     crear: API_BASE + "i_tutor.php",
     editar: API_BASE + "u_tutor.php",
+    cursos: API_BASE + "c_cursos.php",
   };
 
   const S = {
@@ -19,6 +20,7 @@
     search: "",
     loaded: false,
     current: null,
+    tempImage: null,
   };
 
   const ORDER_TUTORES = [1, 2, 0];
@@ -74,6 +76,7 @@
     if (Array.isArray(response)) return response;
     if (Array.isArray(response?.data)) return response.data;
     if (Array.isArray(response?.tutores)) return response.tutores;
+    if (Array.isArray(response?.cursos)) return response.cursos;
     return [];
   }
 
@@ -92,6 +95,19 @@
     } catch {
       return null;
     }
+  }
+
+  function getCreatedId(response) {
+    return Number(
+      response?.id ||
+      response?.data?.id ||
+      response?.tutor?.id ||
+      response?.tutor_id ||
+      response?.insert_id ||
+      response?.last_id ||
+      response?.meta?.id ||
+      0
+    );
   }
 
   function withBust(url) {
@@ -130,6 +146,78 @@
       (await tryUrl("jpeg")) ||
       noImageSvgDataURI()
     );
+  }
+
+  function cursoImgUrl(id, ext = "png") {
+    return `/ASSETS/cursos/img${Number(id)}.${ext}`;
+  }
+
+  async function resolveCursoImg(id) {
+    const tryUrl = async (ext) => {
+      const url = withBust(cursoImgUrl(id, ext));
+
+      const ok = await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+
+      return ok ? url : null;
+    };
+
+    return (
+      (await tryUrl("webp")) ||
+      (await tryUrl("png")) ||
+      (await tryUrl("jpg")) ||
+      (await tryUrl("jpeg")) ||
+      noImageSvgDataURI()
+    );
+  }
+
+  async function handlePickMedia() {
+    if (!window.AdminMedia) {
+      toast("AdminMedia no está cargado.", "error");
+      return;
+    }
+
+    const file = await window.AdminMedia.pickImageFile();
+    if (!file) return;
+
+    const validation = window.AdminMedia.validateImageFile(file);
+    if (!validation.ok) {
+      toast(validation.error, "error");
+      return;
+    }
+
+    const img = qs("#admin-tutor-preview-img");
+    const btn = qs("[data-action='pick-tutor-media']");
+    const previewUrl = window.AdminMedia.createObjectPreview(file);
+
+    if (img && previewUrl) img.src = previewUrl;
+    if (btn) btn.textContent = "Cambiar imagen";
+
+    if (!S.current?.id) {
+      S.tempImage = file;
+      toast("Imagen lista; se subirá al guardar.", "info");
+      return;
+    }
+
+    try {
+      const res = await window.AdminMedia.uploadAdminMedia({
+        modulo: "tutores",
+        id: S.current.id,
+        file,
+      });
+
+      if (img && res.url) img.src = res.url;
+
+      toast("Imagen actualizada correctamente.", "exito");
+      await paintTable();
+    } catch (error) {
+      console.error(TAG, error);
+      toast(error.message || "No se pudo subir la imagen.", "error");
+    }
   }
 
   function statusText(estatus) {
@@ -401,9 +489,20 @@
             <div class="admin-news-preview">
               <p class="admin-module__subtitle">Foto</p>
               <img id="admin-tutor-preview-img" alt="Foto del tutor" src="${noImageSvgDataURI()}">
-              <button class="admin-btn admin-btn--ghost" type="button" disabled>
-                Media pendiente
+              <button 
+              class="admin-btn admin-btn--ghost" 
+              type="button" 
+              data-action="pick-tutor-media"
+              >
+                Subir imagen
               </button>
+            </div>
+
+            <div class="admin-field">
+              <label>Cursos ligados</label>
+              <div class="admin-linked-courses" id="admin-tutor-cursos">
+                <p class="admin-module__subtitle">Cargando cursos ligados...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -419,6 +518,59 @@
         </div>
       </aside>
     `;
+  }
+
+  async function renderTutorCursos(tutorId) {
+    const host = qs("#admin-tutor-cursos");
+    if (!host) return;
+
+    if (!tutorId) {
+      host.innerHTML = `<p class="admin-module__subtitle">Guarda el tutor para ligar cursos.</p>`;
+      return;
+    }
+
+    try {
+      const statuses = [1, 4, 2, 3, 0, 5];
+
+      const chunks = await Promise.all(
+        statuses.map((estatus) =>
+          postJSON(API.cursos, { estatus }).catch(() => [])
+        )
+      );
+
+      const cursos = chunks
+        .flatMap(getRowsFromResponse)
+        .filter((curso) =>
+          Number(curso.tutor) === Number(tutorId) ||
+          Number(curso.id_tutor) === Number(tutorId)
+        );
+
+      if (!cursos.length) {
+        host.innerHTML = `<p class="admin-module__subtitle">Sin cursos ligados.</p>`;
+        return;
+      }
+
+      host.innerHTML = cursos.map((curso) => `
+      <button class="admin-course-chip" type="button" data-course-id="${esc(curso.id)}">
+        <img data-linked-course-img="${esc(curso.id)}" alt="${esc(curso.nombre || "Curso")}" src="${noImageSvgDataURI()}">
+        <span>${esc(curso.nombre || "Curso sin nombre")}</span>
+      </button>
+    `).join("");
+
+      for (const curso of cursos) {
+        const img = qs(`[data-linked-course-img="${CSS.escape(String(curso.id))}"]`, host);
+        if (!img) continue;
+
+        img.src = await resolveCursoImg(curso.id);
+        img.onerror = () => {
+          img.onerror = null;
+          img.src = noImageSvgDataURI();
+        };
+      }
+    } catch (error) {
+      console.error(TAG, error);
+      host.innerHTML = `<p class="admin-module__subtitle">No fue posible cargar los cursos ligados.</p>`;
+    }
   }
 
   function setValue(id, value) {
@@ -437,6 +589,7 @@
 
   function openEditor(row = null) {
     S.current = row;
+    S.tempImage = null;
 
     const drawer = qs("#admin-tutor-drawer");
     const overlay = qs("#admin-tutor-overlay");
@@ -462,6 +615,8 @@
         });
       }
     }
+
+    renderTutorCursos(row?.id || null);
 
     overlay.hidden = false;
     drawer.hidden = false;
@@ -514,7 +669,27 @@
         const insertBody = { ...body, creado_por };
         delete insertBody.id;
 
-        await postJSON(API.crear, insertBody);
+        const created = await postJSON(API.crear, insertBody);
+        const newId = getCreatedId(created);
+
+        if (!newId) {
+          console.warn(TAG, "No se pudo detectar el ID creado:", created);
+          toast("Tutor creado, pero no se pudo subir la imagen porque no llegó el ID.", "warning");
+        } else if (window.AdminMedia && S.tempImage instanceof File) {
+          try {
+            await window.AdminMedia.uploadAdminMedia({
+              modulo: "tutores",
+              id: newId,
+              file: S.tempImage,
+            });
+
+            S.tempImage = null;
+          } catch (mediaError) {
+            console.error(TAG, mediaError);
+            toast("Tutor creado, pero no se pudo subir la imagen.", "warning");
+          }
+        }
+
         toast("Tutor creado correctamente.", "exito");
       }
 
@@ -579,6 +754,16 @@
     }
 
     bindTableEvents();
+
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action='pick-tutor-media']");
+      if (!btn) return;
+
+      const drawer = qs("#admin-tutor-drawer");
+      if (!drawer || !drawer.contains(btn)) return;
+
+      handlePickMedia();
+    });
   }
 
   async function init() {
