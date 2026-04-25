@@ -317,7 +317,7 @@
         </td>
         <td><strong>${esc(row.titulo || "Sin título")}</strong></td>
         <td class="admin-table__desc" title="${esc(row.desc_uno || "")}">
-          ${esc(excerpt(row.desc_uno, 160))}
+          ${esc(excerpt(row.desc_uno, 80))}
         </td>
         <td>${esc(row.fecha_creacion || "—")}</td>
         <td>${statusBadge(row.estatus)}</td>
