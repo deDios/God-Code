@@ -52,6 +52,15 @@
       .toLowerCase()
       .trim();
 
+  function excerpt(value, max = 150) {
+    const text = String(value ?? "").replace(/\s+/g, " ").trim();
+
+    if (!text) return "—";
+    if (text.length <= max) return text;
+
+    return text.slice(0, max).trim() + "…";
+  }
+
   function mediaSlotTemplate(pos) {
     return `
     <div class="admin-news-preview" data-media-slot="${pos}">
@@ -307,7 +316,9 @@
           </div>
         </td>
         <td><strong>${esc(row.titulo || "Sin título")}</strong></td>
-        <td>${esc(row.desc_uno || "—")}</td>
+        <td class="admin-table__desc" title="${esc(row.desc_uno || "")}">
+          ${esc(excerpt(row.desc_uno, 160))}
+        </td>
         <td>${esc(row.fecha_creacion || "—")}</td>
         <td>${statusBadge(row.estatus)}</td>
         <td>
