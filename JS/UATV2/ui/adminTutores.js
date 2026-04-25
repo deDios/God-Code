@@ -23,6 +23,11 @@
     loaded: false,
     current: null,
     tempImage: null,
+    bindReady: false,
+    tableEventsBound: false,
+    tutorImageToken: 0,
+    courseMiniImageToken: 0,
+    cursosRenderToken: 0,
   };
 
   const ORDER_TUTORES = [1, 2, 0];
@@ -56,6 +61,32 @@
     console.log(`${TAG} ${type}: ${msg}`);
   }
 
+  function parseJSONLoose(text) {
+    try {
+      return JSON.parse(text);
+    } catch {
+      const firstObj = text.indexOf("{");
+      const lastObj = text.lastIndexOf("}");
+      const firstArr = text.indexOf("[");
+      const lastArr = text.lastIndexOf("]");
+      let candidate = "";
+
+      if (firstObj !== -1 && lastObj !== -1 && lastObj > firstObj) {
+        candidate = text.slice(firstObj, lastObj + 1);
+      } else if (firstArr !== -1 && lastArr !== -1 && lastArr > firstArr) {
+        candidate = text.slice(firstArr, lastArr + 1);
+      }
+
+      if (!candidate) return null;
+
+      try {
+        return JSON.parse(candidate);
+      } catch {
+        return null;
+      }
+    }
+  }
+
   async function postJSON(url, body = {}) {
     const res = await fetch(url, {
       method: "POST",
@@ -67,11 +98,7 @@
 
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
 
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { _raw: text };
-    }
+    return parseJSONLoose(text) ?? { _raw: text };
   }
 
   function getRowsFromResponse(response) {
@@ -187,13 +214,13 @@
     if (!drawer || !curso) return;
 
     if (title) title.textContent = curso.nombre || "Curso";
-    if (name) name.textContent = curso.nombre || "—";
+    if (name) name.textContent = curso.nombre || "-";
     if (desc) {
       desc.textContent =
         curso.descripcion_breve ||
         curso.descripcion_curso ||
         curso.descripcion ||
-        "—";
+        "-";
     }
 
     const statusHost = qs("#admin-course-mini-status");
@@ -202,8 +229,10 @@
     }
 
     if (img) {
+      const token = ++S.courseMiniImageToken;
       img.src = noImageSvgDataURI();
       resolveCursoImg(curso.id).then((src) => {
+        if (token !== S.courseMiniImageToken) return;
         img.src = src;
       });
     }
@@ -220,6 +249,7 @@
     const drawer = qs("#admin-course-mini-drawer");
     if (!drawer) return;
 
+    S.courseMiniImageToken++;
     drawer.classList.remove("is-open");
     drawer.setAttribute("aria-hidden", "true");
 
@@ -242,7 +272,7 @@
 
   async function handlePickMedia() {
     if (!window.AdminMedia) {
-      toast("AdminMedia no está cargado.", "error");
+      toast("AdminMedia no esta cargado.", "error");
       return;
     }
 
@@ -264,7 +294,7 @@
 
     if (!S.current?.id) {
       S.tempImage = file;
-      toast("Imagen lista; se subirá al guardar.", "info");
+      toast("Imagen lista; se subira al guardar.", "info");
       return;
     }
 
@@ -307,7 +337,7 @@
   }
 
   function fmtDate(value) {
-    if (!value) return "—";
+    if (!value) return "-";
 
     try {
       const [date, time = ""] = String(value).split(" ");
@@ -367,7 +397,7 @@
 
           <div class="admin-module__toolbar">
             <label class="admin-search" aria-label="Buscar tutores">
-              <span>🔎</span>
+              <span>Buscar</span>
               <input id="admin-tutores-search" type="search" placeholder="Buscar tutor..." />
             </label>
 
@@ -384,8 +414,8 @@
                 <tr>
                   <th>Imagen</th>
                   <th>Nombre</th>
-                  <th>Descripción</th>
-                  <th>Fecha creación</th>
+                  <th>Descripcion</th>
+                  <th>Fecha creacion</th>
                   <th>Estatus</th>
                   <th>Acciones</th>
                 </tr>
@@ -461,7 +491,7 @@
           </div>
         </td>
         <td><strong>${esc(row.nombre || "Sin nombre")}</strong></td>
-        <td>${esc(row.descripcion || "—")}</td>
+        <td>${esc(row.descripcion || "-")}</td>
         <td>${esc(fmtDate(row.fecha_creacion))}</td>
         <td>${statusBadge(row.estatus)}</td>
         <td>
@@ -473,12 +503,17 @@
     `).join("");
 
     paintPagination(totalPages);
+    const renderToken = Date.now() + Math.random();
+    tbody.dataset.renderToken = String(renderToken);
 
     for (const row of pageRows) {
       const img = qs(`[data-tutor-img="${CSS.escape(String(row.id))}"]`, tbody);
       if (!img) continue;
 
-      img.src = await resolveTutorImg(row.id);
+      const src = await resolveTutorImg(row.id);
+      if (tbody.dataset.renderToken !== String(renderToken)) return;
+
+      img.src = src;
       img.onerror = () => {
         img.onerror = null;
         img.src = noImageSvgDataURI();
@@ -496,7 +531,7 @@
     }
 
     let html = `
-      <button class="admin-pagination__btn" type="button" data-page="prev" ${S.page === 1 ? "disabled" : ""}>‹</button>
+      <button class="admin-pagination__btn" type="button" data-page="prev" ${S.page === 1 ? "disabled" : ""}>&lsaquo;</button>
     `;
 
     for (let i = 1; i <= totalPages; i++) {
@@ -508,7 +543,7 @@
     }
 
     html += `
-      <button class="admin-pagination__btn" type="button" data-page="next" ${S.page === totalPages ? "disabled" : ""}>›</button>
+      <button class="admin-pagination__btn" type="button" data-page="next" ${S.page === totalPages ? "disabled" : ""}>&rsaquo;</button>
     `;
 
     host.innerHTML = html;
@@ -520,11 +555,11 @@
       <div class="admin-drawer__head">
         <div>
           <h2 class="admin-drawer__title" id="admin-course-mini-title">Curso</h2>
-          <p class="admin-drawer__subtitle">Vista rápida del curso ligado.</p>
+          <p class="admin-drawer__subtitle">Vista rapida del curso ligado.</p>
         </div>
 
         <button class="admin-drawer__close" type="button" id="btn-admin-course-mini-close" aria-label="Cerrar">
-          ✕
+          X
         </button>
       </div>
 
@@ -534,17 +569,17 @@
 
           <div class="admin-field">
             <label>Nombre</label>
-            <div class="admin-readonly" id="admin-course-mini-name">—</div>
+            <div class="admin-readonly" id="admin-course-mini-name">-</div>
           </div>
 
           <div class="admin-field">
-            <label>Descripción</label>
-            <div class="admin-readonly" id="admin-course-mini-desc">—</div>
+            <label>Descripcion</label>
+            <div class="admin-readonly" id="admin-course-mini-desc">-</div>
           </div>
 
           <div class="admin-field">
             <label>Estatus</label>
-            <div id="admin-course-mini-status">—</div>
+            <div id="admin-course-mini-status">-</div>
           </div>
         </div>
       </div>
@@ -560,11 +595,11 @@
         <div class="admin-drawer__head">
           <div>
             <h2 class="admin-drawer__title" id="admin-tutor-drawer-title">Nuevo tutor</h2>
-            <p class="admin-drawer__subtitle">Completa la información del tutor.</p>
+            <p class="admin-drawer__subtitle">Completa la informacion del tutor.</p>
           </div>
 
           <button class="admin-drawer__close" type="button" id="btn-admin-tutor-close" aria-label="Cerrar">
-            ✕
+            X
           </button>
         </div>
 
@@ -576,7 +611,7 @@
             </div>
 
             <div class="admin-field">
-              <label for="tf_descripcion">Descripción</label>
+              <label for="tf_descripcion">Descripcion</label>
               <textarea id="tf_descripcion" maxlength="800"></textarea>
             </div>
 
@@ -628,6 +663,8 @@
     const host = qs("#admin-tutor-cursos");
     if (!host) return;
 
+    const renderToken = ++S.cursosRenderToken;
+
     if (!tutorId) {
       host.innerHTML = `<p class="admin-module__subtitle">Guarda el tutor para ligar cursos.</p>`;
       return;
@@ -667,7 +704,7 @@
 
     ${hiddenCount > 0 ? `
     <span class="admin-course-chip admin-course-chip--more">
-      +${hiddenCount} más
+      +${hiddenCount} mas
     </span>
     ` : ""}
     `;
@@ -676,7 +713,10 @@
         const img = qs(`[data-linked-course-img="${CSS.escape(String(curso.id))}"]`, host);
         if (!img) continue;
 
-        img.src = await resolveCursoImg(curso.id);
+        const src = await resolveCursoImg(curso.id);
+        if (renderToken !== S.cursosRenderToken) return;
+
+        img.src = src;
         img.onerror = () => {
           img.onerror = null;
           img.src = noImageSvgDataURI();
@@ -719,6 +759,7 @@
   function openEditor(row = null) {
     S.current = row;
     S.tempImage = null;
+    S.tutorImageToken++;
 
     const drawer = qs("#admin-tutor-drawer");
     const overlay = qs("#admin-tutor-overlay");
@@ -736,10 +777,12 @@
 
     const img = qs("#admin-tutor-preview-img");
     if (img) {
+      const token = S.tutorImageToken;
       img.src = noImageSvgDataURI();
 
       if (row?.id) {
         resolveTutorImg(row.id).then((src) => {
+          if (token !== S.tutorImageToken) return;
           img.src = src;
         });
       }
@@ -763,6 +806,8 @@
 
     if (!drawer || !overlay) return;
 
+    S.tutorImageToken++;
+    S.cursosRenderToken++;
     drawer.classList.remove("is-open");
     overlay.classList.remove("is-open");
     drawer.setAttribute("aria-hidden", "true");
@@ -785,7 +830,7 @@
     };
 
     if (!body.nombre || !body.descripcion) {
-      toast("Nombre y descripción son obligatorios.", "error");
+      toast("Nombre y descripcion son obligatorios.", "error");
       return;
     }
 
@@ -803,7 +848,7 @@
 
         if (!newId) {
           console.warn(TAG, "No se pudo detectar el ID creado:", created);
-          toast("Tutor creado, pero no se pudo subir la imagen porque no llegó el ID.", "warning");
+          toast("Tutor creado, pero no se pudo subir la imagen porque no llego el ID.", "warning");
         } else if (window.AdminMedia && S.tempImage instanceof File) {
           try {
             await window.AdminMedia.uploadAdminMedia({
@@ -833,6 +878,9 @@
   }
 
   function bindTableEvents() {
+    if (S.tableEventsBound) return;
+    S.tableEventsBound = true;
+
     const tbody = qs("#admin-tutores-tbody");
     const pagination = qs("#admin-tutores-pagination");
 
@@ -863,6 +911,9 @@
   }
 
   function bind() {
+    if (S.bindReady) return;
+    S.bindReady = true;
+
     paintTable();
 
     qs("#btn-admin-tutor-new")?.addEventListener("click", () => openEditor(null));
@@ -918,3 +969,5 @@
     reload: loadTutores,
   };
 })(window, document);
+
+
