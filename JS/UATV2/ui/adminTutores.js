@@ -23,8 +23,7 @@
     loaded: false,
     current: null,
     tempImage: null,
-    bindReady: false,
-    tableEventsBound: false,
+    documentEventsBound: false,
     tutorImageToken: 0,
     courseMiniImageToken: 0,
     cursosRenderToken: 0,
@@ -878,9 +877,6 @@
   }
 
   function bindTableEvents() {
-    if (S.tableEventsBound) return;
-    S.tableEventsBound = true;
-
     const tbody = qs("#admin-tutores-tbody");
     const pagination = qs("#admin-tutores-pagination");
 
