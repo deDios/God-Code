@@ -945,15 +945,20 @@
 
     bindTableEvents();
 
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-action='pick-tutor-media']");
-      if (!btn) return;
+    if (!S.documentEventsBound) {
+      S.documentEventsBound = true;
 
-      const drawer = qs("#admin-tutor-drawer");
-      if (!drawer || !drawer.contains(btn)) return;
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action='pick-tutor-media']");
+        if (!btn) return;
 
-      handlePickMedia();
-    });
+        const drawer = qs("#admin-tutor-drawer");
+        if (!drawer || !drawer.contains(btn)) return;
+
+        handlePickMedia();
+      });
+    }
+
   }
 
   async function init() {
