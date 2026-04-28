@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
+    // Para obtener la noticia específica, primero obtenemos todas y luego filtramos por ID
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -61,7 +62,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         img.src = `${url}?t=${Date.now()}`;
       });
     }
-
+    
+    // intentamos cargar la imagen con diferentes extenciones, si no existe se usa una default.
     async function resolverImagenNoticia(numero, id) {
       const extensiones = ["webp", "png", "jpg", "jpeg", "gif"];
 

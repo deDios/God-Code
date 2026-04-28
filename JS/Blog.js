@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const contenedor = document.querySelector("#blog-godcode .grid-cards");
 
   function cargarImagenConFallback(imgEl, basePath) {
-    const exts = ["png", "jpg"];
+    const exts = ["webp", "png", "jpg", "jpeg", "gif"];
     let idx = 0;
 
     function intentar() {
@@ -15,12 +15,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         imgEl.onerror = null;
         return;
       }
-      imgEl.src = `${basePath}.${exts[idx]}`;
+
       imgEl.onerror = () => {
         idx++;
         intentar();
       };
+
+      imgEl.src = `${basePath}.${exts[idx]}`;
     }
+
     intentar();
   }
 
@@ -93,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let prioridadesData = [];
 
   function cargarImagenCurso(imgEl, id) {
-    const exts = ["png", "jpg"];
+    const exts = ["webp", "png", "jpg", "jpeg", "gif"];
     let idx = 0;
 
     function intentar() {
@@ -102,12 +105,15 @@ document.addEventListener("DOMContentLoaded", () => {
         imgEl.onerror = null;
         return;
       }
-      imgEl.src = `../ASSETS/cursos/img${id}.${exts[idx]}`;
+
       imgEl.onerror = () => {
         idx++;
         intentar();
       };
+
+      imgEl.src = `../ASSETS/cursos/img${id}.${exts[idx]}`;
     }
+
     intentar();
   }
 
