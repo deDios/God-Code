@@ -33,7 +33,22 @@
       tipoEval: {},
       actividades: {},
     },
+    tempImage: null,
+    documentEventsBound: false,
   };
+
+  function getCreatedId(response) {
+    return Number(
+      response?.id ||
+      response?.data?.id ||
+      response?.curso?.id ||
+      response?.curso_id ||
+      response?.insert_id ||
+      response?.last_id ||
+      response?.meta?.id ||
+      0
+    );
+  }
 
   const ORDER_CURSOS = [1, 4, 3, 2, 5, 0];
 
@@ -558,8 +573,12 @@
             <div class="admin-news-preview">
               <p class="admin-module__subtitle">Portada</p>
               <img id="admin-course-preview-img" alt="Portada del curso" src="${noImageSvgDataURI()}">
-              <button class="admin-btn admin-btn--ghost" type="button" disabled>
-                Media pendiente
+              <button 
+                class="admin-btn admin-btn--ghost" 
+                type="button" 
+                data-action="pick-course-media" 
+                >
+                  Subir imagen
               </button>
             </div>
           </div>
@@ -578,6 +597,51 @@
     `;
   }
 
+  async function handlePickMedia() {
+    if (!window.AdminMedia) {
+      toast("AdminMedia no está cargado.", "error");
+      return;
+    }
+
+    const file = await window.AdminMedia.pickImageFile();
+    if (!file) return;
+
+    const validation = window.AdminMedia.validateImageFile(file);
+    if (!validation.ok) {
+      toast(validation.error, "error");
+      return;
+    }
+
+    const img = qs("#admin-curso-preview-img");
+    const btn = qs("[data-action='pick-course-media']");
+    const previewUrl = window.AdminMedia.createObjectPreview(file);
+
+    if (img && previewUrl) img.src = previewUrl;
+    if (btn) btn.textContent = "Cambiar imagen";
+
+    if (!S.current?.id) {
+      S.tempImage = file;
+      toast("Imagen lista; se subirá al guardar.", "info");
+      return;
+    }
+
+    try {
+      const res = await window.AdminMedia.uploadAdminMedia({
+        modulo: "cursos",
+        id: S.current.id,
+        file,
+      });
+
+      if (img && res.url) img.src = res.url;
+
+      toast("Imagen actualizada correctamente.", "exito");
+      await paintTable();
+    } catch (error) {
+      console.error(TAG, error);
+      toast(error.message || "No se pudo subir la imagen.", "error");
+    }
+  }
+
   function setValue(id, value) {
     const el = qs(`#${id}`);
     if (el) el.value = value == null ? "" : String(value);
@@ -594,6 +658,7 @@
 
   function openEditor(row = null) {
     S.current = row;
+    S.tempImage = null;
 
     const drawer = qs("#admin-curso-drawer");
     const overlay = qs("#admin-curso-overlay");
@@ -714,7 +779,26 @@
         const insertBody = { ...body, creado_por };
         delete insertBody.id;
 
-        await postJSON(API.crear, insertBody);
+        const created = await postJSON(API.crear, insertBody);
+        const newId = getCreatedId(created);
+
+        if (!newId) {
+          console.warn(TAG, "No se pudo detectar el ID creado:", created);
+          toast("Curso creado, pero no se pudo subir la imagen porque no llegó el ID.", "warning");
+        } else if (window.AdminMedia && S.tempImage instanceof File) {
+          try {
+            await window.AdminMedia.uploadAdminMedia({
+              modulo: "cursos",
+              id: newId,
+              file: S.tempImage,
+            });
+
+            S.tempImage = null;
+          } catch (mediaError) {
+            console.error(TAG, mediaError);
+            toast("Curso creado, pero no se pudo subir la imagen.", "warning");
+          }
+        }
         toast("Curso creado correctamente.", "exito");
       }
 
@@ -776,6 +860,20 @@
         S.search = e.target.value || "";
         S.page = 1;
         paintTable();
+      });
+    }
+
+    if (!S.documentEventsBound) {
+      S.documentEventsBound = true;
+
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action='pick-course-media']");
+        if (!btn) return;
+
+        const drawer = qs("#admin-curso-drawer");
+        if (!drawer || !drawer.contains(btn)) return;
+
+        handlePickMedia();
       });
     }
 

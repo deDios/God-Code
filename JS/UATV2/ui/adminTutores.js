@@ -911,14 +911,12 @@
   }
 
   function bind() {
-    if (S.bindReady) return;
-    S.bindReady = true;
-
     paintTable();
 
     qs("#btn-admin-tutor-new")?.addEventListener("click", () => openEditor(null));
     qs("#btn-admin-tutor-close")?.addEventListener("click", closeEditor);
     qs("#btn-admin-tutor-cancel")?.addEventListener("click", closeEditor);
+
     qs("#admin-tutor-overlay")?.addEventListener("click", () => {
       const mini = qs("#admin-course-mini-drawer");
 
@@ -929,6 +927,7 @@
 
       closeEditor();
     });
+
     qs("#btn-admin-tutor-save")?.addEventListener("click", saveTutor);
     qs("#btn-admin-course-mini-close")?.addEventListener("click", closeCourseMiniDrawer);
 
@@ -958,7 +957,6 @@
         handlePickMedia();
       });
     }
-
   }
 
   async function init() {
