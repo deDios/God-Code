@@ -49,8 +49,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("Noticia encontrada:", noticia);
 
-    elementos.img1.src = `../ASSETS/noticia/NoticiasImg/noticia_img1_${id}.png`;
-    elementos.img2.src = `../ASSETS/noticia/NoticiasImg/noticia_img2_${id}.png`;
+    const IMG_BASE = "../ASSETS/noticia/NoticiasImg";
+
+    async function existeImagen(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+
+        img.src = `${url}?t=${Date.now()}`;
+      });
+    }
+
+    async function resolverImagenNoticia(numero, id) {
+      const extensiones = ["webp", "png", "jpg", "jpeg", "gif"];
+
+      for (const ext of extensiones) {
+        const url = `${IMG_BASE}/noticia_img${numero}_${id}.${ext}`;
+
+        if (await existeImagen(url)) {
+          return url;
+        }
+      }
+
+      return `${IMG_BASE}/noticia_img${numero}_default.png`;
+    }
+
+    elementos.img1.src = await resolverImagenNoticia(1, id);
+    elementos.img2.src = await resolverImagenNoticia(2, id);
+
     elementos.img1.alt = noticia.titulo;
     elementos.img2.alt = noticia.titulo;
 
@@ -149,7 +177,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function setAvatar(imgEl, userId, isCurrentUser = false) {
     if (!imgEl) return;
-    imgEl.src = AVATAR_DEFAULT; 
+    imgEl.src = AVATAR_DEFAULT;
     try {
       const url = isCurrentUser ? await resolveCurrentUserAvatar() : await resolvePublicAvatar(userId);
       imgEl.src = url;
