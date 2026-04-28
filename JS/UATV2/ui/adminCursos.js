@@ -612,7 +612,7 @@
       return;
     }
 
-    const img = qs("#admin-curso-preview-img");
+    const img = qs("#admin-course-preview-img");
     const btn = qs("[data-action='pick-course-media']");
     const previewUrl = window.AdminMedia.createObjectPreview(file);
 
@@ -632,7 +632,13 @@
         file,
       });
 
-      if (img && res.url) img.src = res.url;
+      if (img && res.url) {
+        img.src = withBust(res.url);
+      }
+
+      if (btn) {
+        btn.textContent = "Cambiar imagen";
+      }
 
       toast("Imagen actualizada correctamente.", "exito");
       await paintTable();
