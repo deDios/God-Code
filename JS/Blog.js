@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  //JS\Blog.js
   //--------------------------- inicia el js para noticias
   const endpoint =
     "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_noticia.php";
