@@ -7,7 +7,7 @@
     <title>GodCode</title>
 
     <link rel="stylesheet" href="/CSS/plantilla.css" />
-    <link rel="stylesheet" href="/CSS/admin/adminUATV2.css" />
+    <link rel="stylesheet" href="/CSS/blogV2.css" />
 </head>
 
 <body>
@@ -164,9 +164,33 @@
     <main class="home-samapa admin-dashboard">
         <!-- Contenido principal -->
         <!-- Section 1 modulo de noticias, casi igual que antes (Blog godcode) -->
+        <section id="blog-v2-hero" class="blog-v2-section">
+            <div class="blog-v2-limit">
+                <header class="blog-v2-header">
+                    <h1>Blog GodCode</h1>
+                    <h2>Lo Nuevo, lo importante,<br>lo que viene</h2>
+                    <p>
+                        Explora el futuro hoy<br>
+                        Descubre las últimas noticias en tecnología, innovación y avances que están transformando el
+                        mundo.<br>
+                        Explora las últimas noticias en tecnología y avances que están transformando el mundo
+                    </p>
+                </header>
 
-        <!-- Section 2 carrusel de cursos (Explorar categorias) -->
-        
+                <div class="blog-v2-carousel">
+                    <div class="blog-v2-viewport">
+                        <div class="blog-v2-track" id="blog-v2-noticias-track">
+                            <!-- Noticias dinámicas -->
+                        </div>
+                    </div>
+
+                    <div class="blog-v2-dots" id="blog-v2-dots"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2 noticias de la comunidad -->
+
 
     </main>
 
@@ -174,7 +198,7 @@
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
-    
+
 
 </body>
 
