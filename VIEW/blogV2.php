@@ -161,8 +161,8 @@
         </div>
     </header>
 
-        <!-- Contenido principal -->
-    <main class="home-samapa admin-dashboard">
+    <!-- Contenido principal -->
+    <main class="blog-v2-main">
         <!-- Section 1 modulo de noticias, casi igual que antes (Blog godcode) -->
         <section id="blog-v2-hero" class="blog-v2-section">
             <div class="blog-v2-limit">

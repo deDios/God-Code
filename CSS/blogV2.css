@@ -72,7 +72,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 280px));
     justify-content: center;
-    gap: clamp(1.5rem, 4vw, 4.5rem);
+    gap: clamp(1.25rem, 3vw, 3.5rem);
     align-items: stretch;
     padding: 0.25rem 1rem 0.5rem;
     box-sizing: border-box;
@@ -318,4 +318,32 @@
     #blog-v2-hero .blog-v2-card-img {
         height: 165px;
     }
+}
+
+.blog-v2-main {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+#blog-v2-hero,
+#blog-v2-hero * {
+    box-sizing: border-box;
+}
+
+#blog-v2-hero .blog-v2-limit {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+#blog-v2-hero .blog-v2-track {
+    gap: 0;
+}
+
+#blog-v2-hero .blog-v2-slide {
+    min-width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
