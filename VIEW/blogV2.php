@@ -161,8 +161,8 @@
         </div>
     </header>
 
-    <main class="home-samapa admin-dashboard">
         <!-- Contenido principal -->
+    <main class="home-samapa admin-dashboard">
         <!-- Section 1 modulo de noticias, casi igual que antes (Blog godcode) -->
         <section id="blog-v2-hero" class="blog-v2-section">
             <div class="blog-v2-limit">
@@ -180,7 +180,7 @@
                 <div class="blog-v2-carousel">
                     <div class="blog-v2-viewport">
                         <div class="blog-v2-track" id="blog-v2-noticias-track">
-                            <!-- Noticias dinámicas -->
+                            <!-- Noticias dinamicas -->
                         </div>
                     </div>
 
@@ -198,6 +198,7 @@
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
+    <script src="/JS/blogV2.js"></script>
 
 
 </body>
