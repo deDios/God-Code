@@ -68,11 +68,14 @@
 
 #blog-v2-hero .blog-v2-slide {
     flex: 0 0 100%;
+    width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.25rem, 4vw, 5rem);
+    grid-template-columns: repeat(3, minmax(0, 280px));
+    justify-content: center;
+    gap: clamp(1.5rem, 4vw, 4.5rem);
     align-items: stretch;
-    padding: 0.25rem 1.25rem 0.5rem;
+    padding: 0.25rem 1rem 0.5rem;
+    box-sizing: border-box;
 }
 
 #blog-v2-hero .blog-v2-card {
@@ -113,7 +116,8 @@
     top: 0.65rem;
     left: 0.75rem;
     z-index: 2;
-    display: inline-flex;
+    /*display: inline-flex; la pill esta oculta porque no tiene de donde obtener el texto de momento*/
+    display: none;
     align-items: center;
     max-width: calc(100% - 1.5rem);
     padding: 0.25rem 0.55rem;
@@ -256,31 +260,28 @@
     }
 
     #blog-v2-hero .blog-v2-viewport {
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-    }
-
-    #blog-v2-hero .blog-v2-viewport::-webkit-scrollbar {
-        display: none;
+        overflow: hidden;
     }
 
     #blog-v2-hero .blog-v2-track {
-        transform: none !important;
-        gap: 1rem;
-        transition: none;
+        gap: 0;
+        transition: transform 0.45s ease;
     }
 
     #blog-v2-hero .blog-v2-slide {
-        flex: 0 0 88%;
+        flex: 0 0 100%;
+        width: 100%;
         grid-template-columns: 1fr;
-        gap: 1rem;
-        padding: 0.25rem 0;
-        scroll-snap-align: center;
+        justify-content: center;
+        gap: 1.25rem;
+        padding: 0.25rem 0.65rem 0.5rem;
+        box-sizing: border-box;
     }
 
     #blog-v2-hero .blog-v2-card {
+        width: 100%;
+        max-width: 380px;
+        margin: 0 auto;
         min-height: auto;
     }
 
@@ -306,41 +307,15 @@
         padding: 2.75rem 0.75rem 2.4rem;
     }
 
-    #blog-v2-hero .blog-v2-header h1 {
-        font-size: 2.25rem;
-    }
-
-    #blog-v2-hero .blog-v2-header h2 {
-        font-size: 1.45rem;
-    }
-
-    #blog-v2-hero .blog-v2-header p {
-        font-size: 0.82rem;
-        line-height: 1.5;
-    }
-
     #blog-v2-hero .blog-v2-slide {
-        flex-basis: 92%;
+        padding-inline: 0.25rem;
+    }
+
+    #blog-v2-hero .blog-v2-card {
+        max-width: 100%;
     }
 
     #blog-v2-hero .blog-v2-card-img {
         height: 165px;
-    }
-
-    #blog-v2-hero .blog-v2-card-body h3 {
-        font-size: 1rem;
-    }
-
-    #blog-v2-hero .blog-v2-card-body p {
-        font-size: 0.88rem;
-    }
-
-    #blog-v2-hero .blog-v2-date {
-        font-size: 0.82rem;
-    }
-
-    #blog-v2-hero .blog-v2-dot {
-        width: 13px;
-        height: 13px;
     }
 }
