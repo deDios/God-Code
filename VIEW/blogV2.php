@@ -190,7 +190,69 @@
         </section>
 
         <!-- Section 2 noticias de la comunidad -->
+        <section id="blog-v2-community">
+            <div class="blog-v2-community-limit">
+                <header class="blog-v2-community-title">
+                    <img src="/ASSETS/icons/icon_tag.png" alt="" aria-hidden="true">
+                    <h2>Noticias de la comunidad</h2>
+                </header>
 
+                <div class="blog-v2-community-grid">
+                    <article class="blog-v2-ranking">
+                        <h3>📰 Lo mas leído esta semana</h3>
+
+                        <div class="blog-v2-ranking-list">
+                            <div class="blog-v2-ranking-item">
+                                <strong>1.</strong>
+                                <img src="/ASSETS/Blog/blog_img1.png" alt="">
+                                <p>Microsoft anuncia Windows 12: Todo lo que sabemos</p>
+                            </div>
+
+                            <div class="blog-v2-ranking-item">
+                                <strong>2.</strong>
+                                <img src="/ASSETS/Blog/blog_img2.png" alt="">
+                                <p>OpenAI presenta GPT-4o: Más rápido y potente</p>
+                            </div>
+
+                            <div class="blog-v2-ranking-item">
+                                <strong>3.</strong>
+                                <img src="/ASSETS/Blog/blog_img3.png" alt="">
+                                <p>Android 15: Novedades y dispositivos compatibles.</p>
+                            </div>
+
+                            <div class="blog-v2-ranking-item">
+                                <strong>4.</strong>
+                                <img src="/ASSETS/Blog/blog_img1.png" alt="">
+                                <p>Apple Vision Pro 2 en camino: Nuevas filtraciones</p>
+                            </div>
+                        </div>
+
+                        <a href="#" class="blog-v2-ranking-link">Ver ranking completo <span>→</span></a>
+                    </article>
+
+                    <article class="blog-v2-submit">
+                        <img class="blog-v2-submit-icon" src="/ASSETS/icons/icon_email.png" alt="" aria-hidden="true">
+
+                        <h3>Envíanos noticias interesantes</h3>
+                        <p>
+                            Envía tus mejores noticias, nosotros las aprobaremos y las publicaremos en nuestra página,
+                            dándole los créditos en nuestras redes.
+                        </p>
+
+                        <form class="blog-v2-submit-form">
+                            <input type="text" name="titulo" placeholder="Título o URL">
+                            <textarea name="descripcion" placeholder="Descripción"></textarea>
+                            <button type="submit">Enviar</button>
+                        </form>
+
+                        <div class="blog-v2-spam-note">
+                            <img src="/ASSETS/icons/icon_spam.png" alt="" aria-hidden="true">
+                            <span>Sin Spam. Envía noticias interesantes</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
 
     </main>
 
