@@ -718,12 +718,22 @@
     const total = cursos.length;
 
     return `
-      <section class="admin-linked-course-group admin-linked-course-group--${esc(group.key)}">
-        <div class="admin-linked-course-group__head">
-          <h4>${esc(group.title)}</h4>
-          <span>${total} ${total === 1 ? "curso" : "cursos"}</span>
-        </div>
+    <section class="admin-linked-course-group admin-linked-course-group--${esc(group.key)}">
+      <button 
+        class="admin-linked-course-group__head" 
+        type="button"
+        data-action="toggle-course-group"
+        aria-expanded="false"
+      >
+        <h4>${esc(group.title)}</h4>
 
+        <span class="admin-linked-course-group__meta">
+          ${total} ${total === 1 ? "curso" : "cursos"}
+          <b class="admin-linked-course-group__chev">⌄</b>
+        </span>
+      </button>
+
+      <div class="admin-linked-course-group__body" hidden>
         ${total
         ? `
               <div class="admin-linked-course-list">
@@ -737,8 +747,9 @@
             `
         : `<p class="admin-module__subtitle admin-linked-course-empty">${esc(group.empty)}</p>`
       }
-      </section>
-    `;
+      </div>
+    </section>
+  `;
   }
 
   async function renderTutorCursos(tutorId) {
@@ -793,6 +804,20 @@
           ${groupsHTML}
         </div>
       `;
+      
+      host.querySelectorAll("[data-action='toggle-course-group']").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const group = btn.closest(".admin-linked-course-group");
+          const body = group?.querySelector(".admin-linked-course-group__body");
+          if (!group || !body) return;
+
+          const isOpen = btn.getAttribute("aria-expanded") === "true";
+
+          btn.setAttribute("aria-expanded", String(!isOpen));
+          group.classList.toggle("is-open", !isOpen);
+          body.hidden = isOpen;
+        });
+      });
 
       for (const curso of cursos) {
         const img = qs(`[data-linked-course-img="${CSS.escape(String(curso.id))}"]`, host);
