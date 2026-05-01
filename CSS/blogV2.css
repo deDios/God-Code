@@ -52,11 +52,13 @@
 #blog-v2-hero .blog-v2-carousel {
     position: relative;
     width: 100%;
+    padding-bottom: 1.75rem;
 }
 
 #blog-v2-hero .blog-v2-viewport {
     width: 100%;
     overflow: hidden;
+    padding-bottom: 1rem;
 }
 
 #blog-v2-hero .blog-v2-track {
@@ -168,10 +170,6 @@
     font-weight: 600;
 }
 
-#blog-v2-hero .blog-v2-date::before {
-    content: "📰 ";
-}
-
 #blog-v2-hero .blog-v2-btn {
     width: 100%;
     margin-top: 1rem;
@@ -196,17 +194,17 @@
     justify-content: center;
     align-items: center;
     gap: 0.7rem;
-    margin-top: 1.45rem;
+    margin-top: 1.75rem;
+    padding-bottom: 0.5rem;
 }
 
 #blog-v2-hero .blog-v2-dot {
     width: 15px;
     height: 15px;
     padding: 0;
-    border: 2px solid #ffffff;
+    border: 2px solid #dfdfdf;
     border-radius: 999px;
     background: #ffffff;
-    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.22);
     cursor: pointer;
     transition: background 0.25s ease, transform 0.25s ease;
 }
@@ -246,6 +244,20 @@
 }
 
 @media (max-width: 768px) {
+
+    #blog-v2-hero .blog-v2-carousel {
+        padding-bottom: 2rem;
+    }
+
+    #blog-v2-hero .blog-v2-viewport {
+        padding-bottom: 1.25rem;
+    }
+
+    #blog-v2-hero .blog-v2-dots {
+        margin-top: 1.5rem;
+        padding-bottom: 0.75rem;
+    }
+
     #blog-v2-hero {
         padding: 3.25rem 0.85rem 2.75rem;
     }
@@ -346,4 +358,25 @@
     min-width: 100%;
     max-width: 100%;
     overflow: hidden;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.blog-v2-main {
+    flex: 0 0 auto;
+    padding-bottom: 0;
 }

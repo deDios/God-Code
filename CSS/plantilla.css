@@ -19,10 +19,12 @@ main {
     flex: 1;
 }
 
+/*
 header {
     background-color: white;
     border-bottom: 1px solid #ddd;
 }
+*/
 
 .top-bar {
     position: fixed;
