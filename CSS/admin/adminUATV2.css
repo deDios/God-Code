@@ -986,6 +986,57 @@ main.home-samapa.admin-dashboard {
   text-overflow: ellipsis;
 }
 
+.home-samapa.admin-dashboard .admin-linked-courses--readonly {
+  display: block;
+}
+
+.home-samapa.admin-dashboard .admin-linked-courses-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-group__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-group__head h4 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-group__head span {
+  color: var(--admin-text-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-samapa.admin-dashboard .admin-course-chip--readonly {
+  max-width: 100%;
+}
+
+.home-samapa.admin-dashboard .admin-linked-course-empty {
+  padding: 4px 0 2px;
+}
 
 
 

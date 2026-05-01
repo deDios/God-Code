@@ -13,8 +13,6 @@
     cursos: API_BASE + "c_cursos.php",
   };
 
-  const MAX_LINKED_COURSES_VISIBLE = 12;
-
   const S = {
     data: [],
     page: 1,
@@ -36,6 +34,33 @@
     2: "Pausado",
     0: "Inactivo",
   };
+
+  const COURSE_GROUPS = [
+    {
+      key: "activos",
+      title: "Cursos activos",
+      statuses: [1, 4],
+      empty: "Sin cursos activos ligados.",
+    },
+    {
+      key: "pausados",
+      title: "Cursos pausados",
+      statuses: [2],
+      empty: "Sin cursos pausados ligados.",
+    },
+    {
+      key: "terminados",
+      title: "Cursos terminados",
+      statuses: [3],
+      empty: "Sin cursos terminados ligados.",
+    },
+    {
+      key: "otros",
+      title: "Otros cursos",
+      statuses: [0, 5],
+      empty: "Sin otros cursos ligados.",
+    },
+  ];
 
   const qs = (s, r = document) => r.querySelector(s);
 
@@ -147,6 +172,10 @@
     return `/ASSETS/tutor/tutor_${Number(id)}.${ext}`;
   }
 
+  function cursoImgUrl(id, ext = "png") {
+    return `/ASSETS/cursos/img${Number(id)}.${ext}`;
+  }
+
   function noImageSvgDataURI() {
     const svg =
       "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'><rect width='100%' height='100%' fill='#f3f3f3'/><path d='M18 74 L56 38 L92 66 L120 50 L142 74' stroke='#c9c9c9' stroke-width='4' fill='none'/><circle cx='52' cy='30' r='8' fill='#c9c9c9'/></svg>";
@@ -176,10 +205,6 @@
     );
   }
 
-  function cursoImgUrl(id, ext = "png") {
-    return `/ASSETS/cursos/img${Number(id)}.${ext}`;
-  }
-
   async function resolveCursoImg(id) {
     const tryUrl = async (ext) => {
       const url = withBust(cursoImgUrl(id, ext));
@@ -201,6 +226,52 @@
       (await tryUrl("jpeg")) ||
       noImageSvgDataURI()
     );
+  }
+
+  function statusText(estatus) {
+    if (window.gcTone?.statusLabel) {
+      return window.gcTone.statusLabel("tutores", estatus);
+    }
+
+    return STATUS_LABEL[Number(estatus)] ?? "Desconocido";
+  }
+
+  function statusBadge(estatus) {
+    if (window.gcTone?.statusBadge) {
+      return window.gcTone.statusBadge("tutores", estatus);
+    }
+
+    const n = Number(estatus);
+
+    if (n === 1) return `<span class="admin-badge admin-badge--active">Activo</span>`;
+    if (n === 2) return `<span class="admin-badge admin-badge--warning">Pausado</span>`;
+
+    return `<span class="admin-badge admin-badge--inactive">Inactivo</span>`;
+  }
+
+  function statusBadgeCurso(estatus) {
+    const n = Number(estatus);
+
+    if (n === 1) return `<span class="admin-badge admin-badge--active">Activo</span>`;
+    if (n === 4) return `<span class="admin-badge admin-badge--warning">En curso</span>`;
+    if (n === 3) return `<span class="admin-badge admin-badge--warning">Terminado</span>`;
+    if (n === 5) return `<span class="admin-badge admin-badge--danger">Cancelado</span>`;
+    if (n === 2) return `<span class="admin-badge admin-badge--inactive">Pausado</span>`;
+
+    return `<span class="admin-badge admin-badge--inactive">Inactivo</span>`;
+  }
+
+  function fmtDate(value) {
+    if (!value) return "-";
+
+    try {
+      const [date, time = ""] = String(value).split(" ");
+      const [y, m, d] = date.split("-");
+      if (!y || !m || !d) return String(value);
+      return `${d}/${m}/${y} ${time}`.trim();
+    } catch {
+      return String(value);
+    }
   }
 
   function openCourseMiniDrawer(curso) {
@@ -230,6 +301,7 @@
     if (img) {
       const token = ++S.courseMiniImageToken;
       img.src = noImageSvgDataURI();
+
       resolveCursoImg(curso.id).then((src) => {
         if (token !== S.courseMiniImageToken) return;
         img.src = src;
@@ -255,18 +327,6 @@
     setTimeout(() => {
       drawer.hidden = true;
     }, 220);
-  }
-
-  function statusBadgeCurso(estatus) {
-    const n = Number(estatus);
-
-    if (n === 1) return `<span class="admin-badge admin-badge--active">Activo</span>`;
-    if (n === 4) return `<span class="admin-badge admin-badge--warning">En curso</span>`;
-    if (n === 3) return `<span class="admin-badge admin-badge--warning">Terminado</span>`;
-    if (n === 5) return `<span class="admin-badge admin-badge--danger">Cancelado</span>`;
-    if (n === 2) return `<span class="admin-badge admin-badge--inactive">Pausado</span>`;
-
-    return `<span class="admin-badge admin-badge--inactive">Inactivo</span>`;
   }
 
   async function handlePickMedia() {
@@ -311,40 +371,6 @@
     } catch (error) {
       console.error(TAG, error);
       toast(error.message || "No se pudo subir la imagen.", "error");
-    }
-  }
-
-  function statusText(estatus) {
-    if (window.gcTone?.statusLabel) {
-      return window.gcTone.statusLabel("tutores", estatus);
-    }
-
-    return STATUS_LABEL[Number(estatus)] ?? "Desconocido";
-  }
-
-  function statusBadge(estatus) {
-    if (window.gcTone?.statusBadge) {
-      return window.gcTone.statusBadge("tutores", estatus);
-    }
-
-    const n = Number(estatus);
-
-    if (n === 1) return `<span class="admin-badge admin-badge--active">Activo</span>`;
-    if (n === 2) return `<span class="admin-badge admin-badge--warning">Pausado</span>`;
-
-    return `<span class="admin-badge admin-badge--inactive">Inactivo</span>`;
-  }
-
-  function fmtDate(value) {
-    if (!value) return "-";
-
-    try {
-      const [date, time = ""] = String(value).split(" ");
-      const [y, m, d] = date.split("-");
-      if (!y || !m || !d) return String(value);
-      return `${d}/${m}/${y} ${time}`.trim();
-    } catch {
-      return String(value);
     }
   }
 
@@ -502,6 +528,7 @@
     `).join("");
 
     paintPagination(totalPages);
+
     const renderToken = Date.now() + Math.random();
     tbody.dataset.renderToken = String(renderToken);
 
@@ -550,40 +577,40 @@
 
   function miniCourseDrawerTemplate() {
     return `
-    <aside class="admin-drawer admin-drawer--mini" id="admin-course-mini-drawer" hidden aria-hidden="true">
-      <div class="admin-drawer__head">
-        <div>
-          <h2 class="admin-drawer__title" id="admin-course-mini-title">Curso</h2>
-          <p class="admin-drawer__subtitle">Vista rapida del curso ligado.</p>
+      <aside class="admin-drawer admin-drawer--mini" id="admin-course-mini-drawer" hidden aria-hidden="true">
+        <div class="admin-drawer__head">
+          <div>
+            <h2 class="admin-drawer__title" id="admin-course-mini-title">Curso</h2>
+            <p class="admin-drawer__subtitle">Vista rapida del curso ligado.</p>
+          </div>
+
+          <button class="admin-drawer__close" type="button" id="btn-admin-course-mini-close" aria-label="Cerrar">
+            X
+          </button>
         </div>
 
-        <button class="admin-drawer__close" type="button" id="btn-admin-course-mini-close" aria-label="Cerrar">
-          X
-        </button>
-      </div>
+        <div class="admin-drawer__body">
+          <div class="admin-course-mini">
+            <img id="admin-course-mini-img" alt="Imagen del curso" src="${noImageSvgDataURI()}">
 
-      <div class="admin-drawer__body">
-        <div class="admin-course-mini">
-          <img id="admin-course-mini-img" alt="Imagen del curso" src="${noImageSvgDataURI()}">
+            <div class="admin-field">
+              <label>Nombre</label>
+              <div class="admin-readonly" id="admin-course-mini-name">-</div>
+            </div>
 
-          <div class="admin-field">
-            <label>Nombre</label>
-            <div class="admin-readonly" id="admin-course-mini-name">-</div>
-          </div>
+            <div class="admin-field">
+              <label>Descripcion</label>
+              <div class="admin-readonly" id="admin-course-mini-desc">-</div>
+            </div>
 
-          <div class="admin-field">
-            <label>Descripcion</label>
-            <div class="admin-readonly" id="admin-course-mini-desc">-</div>
-          </div>
-
-          <div class="admin-field">
-            <label>Estatus</label>
-            <div id="admin-course-mini-status">-</div>
+            <div class="admin-field">
+              <label>Estatus</label>
+              <div id="admin-course-mini-status">-</div>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
-  `;
+      </aside>
+    `;
   }
 
   function drawerTemplate() {
@@ -627,9 +654,9 @@
               <p class="admin-module__subtitle">Foto</p>
               <img id="admin-tutor-preview-img" alt="Foto del tutor" src="${noImageSvgDataURI()}">
               <button 
-              class="admin-btn admin-btn--ghost" 
-              type="button" 
-              data-action="pick-tutor-media"
+                class="admin-btn admin-btn--ghost" 
+                type="button" 
+                data-action="pick-tutor-media"
               >
                 Subir imagen
               </button>
@@ -637,7 +664,7 @@
 
             <div class="admin-field">
               <label>Cursos ligados</label>
-              <div class="admin-linked-courses" id="admin-tutor-cursos">
+              <div class="admin-linked-courses admin-linked-courses--readonly" id="admin-tutor-cursos">
                 <p class="admin-module__subtitle">Cargando cursos ligados...</p>
               </div>
             </div>
@@ -654,7 +681,63 @@
           </button>
         </div>
       </aside>
+
       ${miniCourseDrawerTemplate()}
+    `;
+  }
+
+  function getCourseStatus(curso) {
+    return Number(curso.estatus ?? curso.status ?? 0);
+  }
+
+  function sortCursosLigados(cursos) {
+    const rank = new Map([
+      [1, 1],
+      [4, 2],
+      [2, 3],
+      [3, 4],
+      [5, 5],
+      [0, 6],
+    ]);
+
+    return [...cursos].sort((a, b) => {
+      const ra = rank.get(getCourseStatus(a)) ?? 999;
+      const rb = rank.get(getCourseStatus(b)) ?? 999;
+
+      if (ra !== rb) return ra - rb;
+
+      return String(a.nombre || "").localeCompare(String(b.nombre || ""));
+    });
+  }
+
+  function courseBelongsToGroup(curso, group) {
+    return group.statuses.includes(getCourseStatus(curso));
+  }
+
+  function renderCourseGroup(group, cursos) {
+    const total = cursos.length;
+
+    return `
+      <section class="admin-linked-course-group admin-linked-course-group--${esc(group.key)}">
+        <div class="admin-linked-course-group__head">
+          <h4>${esc(group.title)}</h4>
+          <span>${total} ${total === 1 ? "curso" : "cursos"}</span>
+        </div>
+
+        ${total
+        ? `
+              <div class="admin-linked-course-list">
+                ${cursos.map((curso) => `
+                  <button class="admin-course-chip admin-course-chip--readonly" type="button" data-course-id="${esc(curso.id)}">
+                    <img data-linked-course-img="${esc(curso.id)}" alt="${esc(curso.nombre || "Curso")}" src="${noImageSvgDataURI()}">
+                    <span>${esc(curso.nombre || "Curso sin nombre")}</span>
+                  </button>
+                `).join("")}
+              </div>
+            `
+        : `<p class="admin-module__subtitle admin-linked-course-empty">${esc(group.empty)}</p>`
+      }
+      </section>
     `;
   }
 
@@ -665,7 +748,7 @@
     const renderToken = ++S.cursosRenderToken;
 
     if (!tutorId) {
-      host.innerHTML = `<p class="admin-module__subtitle">Guarda el tutor para ligar cursos.</p>`;
+      host.innerHTML = `<p class="admin-module__subtitle">Guarda el tutor para visualizar sus cursos ligados.</p>`;
       return;
     }
 
@@ -678,37 +761,40 @@
         )
       );
 
-      const cursos = chunks
-        .flatMap(getRowsFromResponse)
-        .filter((curso) =>
-          Number(curso.tutor) === Number(tutorId) ||
-          Number(curso.id_tutor) === Number(tutorId)
-        );
+      const cursos = sortCursosLigados(
+        chunks
+          .flatMap(getRowsFromResponse)
+          .filter((curso) =>
+            Number(curso.tutor) === Number(tutorId) ||
+            Number(curso.id_tutor) === Number(tutorId)
+          )
+      );
+
+      if (renderToken !== S.cursosRenderToken) return;
 
       if (!cursos.length) {
-        host.innerHTML = `<p class="admin-module__subtitle">Sin cursos ligados.</p>`;
+        host.innerHTML = `
+          <div class="admin-linked-courses-empty-state">
+            <p class="admin-module__subtitle">Este tutor no tiene cursos ligados.</p>
+          </div>
+        `;
         return;
       }
 
-      const visibleCursos = cursos.slice(0, MAX_LINKED_COURSES_VISIBLE);
-      const hiddenCount = cursos.length - visibleCursos.length;
+      const groupsHTML = COURSE_GROUPS
+        .map((group) => {
+          const groupCursos = cursos.filter((curso) => courseBelongsToGroup(curso, group));
+          return renderCourseGroup(group, groupCursos);
+        })
+        .join("");
 
       host.innerHTML = `
-      ${visibleCursos.map((curso) => `
-     <button class="admin-course-chip" type="button" data-course-id="${esc(curso.id)}">
-        <img data-linked-course-img="${esc(curso.id)}" alt="${esc(curso.nombre || "Curso")}" src="${noImageSvgDataURI()}">
-        <span>${esc(curso.nombre || "Curso sin nombre")}</span>
-      </button>
-    `).join("")}
+        <div class="admin-linked-courses-readonly">
+          ${groupsHTML}
+        </div>
+      `;
 
-    ${hiddenCount > 0 ? `
-    <span class="admin-course-chip admin-course-chip--more">
-      +${hiddenCount} mas
-    </span>
-    ` : ""}
-    `;
-
-      for (const curso of visibleCursos) {
+      for (const curso of cursos) {
         const img = qs(`[data-linked-course-img="${CSS.escape(String(curso.id))}"]`, host);
         if (!img) continue;
 
@@ -807,6 +893,8 @@
 
     S.tutorImageToken++;
     S.cursosRenderToken++;
+    closeCourseMiniDrawer();
+
     drawer.classList.remove("is-open");
     overlay.classList.remove("is-open");
     drawer.setAttribute("aria-hidden", "true");
@@ -968,5 +1056,3 @@
     reload: loadTutores,
   };
 })(window, document);
-
-

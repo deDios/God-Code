@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const exts = ["webp", "png", "jpg", "jpeg", "gif"];
     let idx = 0;
 
+    // intenta cargar cada formato hasta que uno funcione o se agoten las opciones
     function intentar() {
       if (idx >= exts.length) {
         imgEl.src = "../ASSETS/noticia/NoticiasImg/noticia_noEncontrada.png";
