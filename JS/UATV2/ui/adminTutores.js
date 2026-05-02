@@ -111,6 +111,15 @@
     }
   }
 
+  function excerpt(value, max = 50) {
+    const text = String(value ?? "").replace(/\s+/g, " ").trim();
+
+    if (!text) return "";
+    if (text.length <= max) return text;
+
+    return text.slice(0, max).trim() + "…";
+  }
+
   async function postJSON(url, body = {}) {
     const res = await fetch(url, {
       method: "POST",
@@ -516,7 +525,7 @@
           </div>
         </td>
         <td><strong>${esc(row.nombre || "Sin nombre")}</strong></td>
-        <td>${esc(row.descripcion || "-")}</td>
+        <td>${esc(excerpt(row.descripcion || "-", 50))}</td>
         <td>${esc(fmtDate(row.fecha_creacion))}</td>
         <td>${statusBadge(row.estatus)}</td>
         <td>
@@ -804,7 +813,7 @@
           ${groupsHTML}
         </div>
       `;
-      
+
       host.querySelectorAll("[data-action='toggle-course-group']").forEach((btn) => {
         btn.addEventListener("click", () => {
           const group = btn.closest(".admin-linked-course-group");

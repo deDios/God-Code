@@ -104,6 +104,15 @@
     }
   }
 
+  function excerpt(value, max = 50) {
+    const text = String(value ?? "").replace(/\s+/g, " ").trim();
+
+    if (!text) return "";
+    if (text.length <= max) return text;
+
+    return text.slice(0, max).trim() + "…";
+  }
+
   function getRowsFromResponse(response) {
     if (Array.isArray(response)) return response;
     if (Array.isArray(response?.data)) return response.data;
@@ -355,14 +364,7 @@
     if (!term) return S.data;
 
     return S.data.filter((row) =>
-      normalize(`
-        ${row.nombre}
-        ${row.descripcion_breve}
-        ${row.descripcion_curso}
-        ${mapLabel(S.maps.tutores, row.tutor)}
-        ${row.fecha_inicio}
-        ${statusText(row.estatus)}
-      `).includes(term)
+      normalize(row.nombre).includes(term)
     );
   }
 
@@ -404,7 +406,7 @@
         </td>
         <td>
           <strong>${esc(row.nombre || "Sin nombre")}</strong>
-          <div class="admin-table-muted">${esc(row.descripcion_breve || "")}</div>
+          <div class="admin-table-muted">${esc(excerpt(row.descripcion_breve || "", 50))}</div>
         </td>
         <td>${esc(mapLabel(S.maps.tutores, row.tutor))}</td>
         <td>${esc(fmtDate(row.fecha_inicio))}</td>
