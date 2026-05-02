@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function cargarRankingNoticias() {
     try {
-      console.log("[BlogV2 Ranking] Consultando endpoint:", endpointTools);
+      //console.log("[BlogV2 Ranking] Consultando endpoint:", endpointTools);
 
       const res = await fetch(endpointTools, {
         method: "POST",
@@ -268,8 +268,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      console.log("[BlogV2 Ranking] Respuesta completa:", data);
-      console.log("[BlogV2 Ranking] Noticias recibidas:", data?.data);
+      //console.log("[BlogV2 Ranking] Respuesta completa:", data);
+      //console.log("[BlogV2 Ranking] Noticias recibidas:", data?.data);
 
       if (!res.ok || !data.ok || !Array.isArray(data.data)) {
         throw new Error(data?.error || "Respuesta inválida del ranking");

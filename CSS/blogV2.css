@@ -708,9 +708,68 @@
     }
 }
 
+#blog-v2-community .blog-v2-ranking-item {
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
 
+#blog-v2-community .blog-v2-ranking-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(5, 98, 239, 0.45);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+}
 
+#blog-v2-community .blog-v2-ranking-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(5, 98, 239, 0.08), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+    pointer-events: none;
+}
 
+#blog-v2-community .blog-v2-ranking-item:hover::before {
+    opacity: 1;
+}
+
+#blog-v2-community .blog-v2-ranking-item strong {
+    transition: color 0.22s ease, transform 0.22s ease;
+}
+
+#blog-v2-community .blog-v2-ranking-item:hover strong {
+    color: #0562ef;
+    transform: scale(1.08);
+}
+
+#blog-v2-community .blog-v2-ranking-item img {
+    transition: transform 0.28s ease, filter 0.28s ease;
+}
+
+#blog-v2-community .blog-v2-ranking-item:hover img {
+    transform: scale(1.04);
+    filter: saturate(1.08);
+}
+
+#blog-v2-community .blog-v2-ranking-item p {
+    transition: color 0.22s ease;
+}
+
+#blog-v2-community .blog-v2-ranking-item:hover p {
+    color: #0a3f94;
+}
+
+#blog-v2-community .blog-v2-ranking-link {
+    transition: gap 0.22s ease, color 0.22s ease;
+}
+
+#blog-v2-community .blog-v2-ranking-link:hover {
+    gap: 0.9rem;
+    color: #004fd0;
+}
 
 
 
