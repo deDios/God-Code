@@ -186,3 +186,119 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cargarNoticias();
 });
+
+
+
+
+
+
+
+
+
+// --------------------------- Section 2 - Ranking noticias comunidad
+document.addEventListener("DOMContentLoaded", () => {
+  const endpointTools =
+    "https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/godcode01_tools.php";
+
+  const rankingList = document.querySelector(".blog-v2-ranking-list");
+
+  if (!rankingList) {
+    console.warn("[BlogV2 Ranking] No existe .blog-v2-ranking-list en el DOM");
+    return;
+  }
+
+  function cargarImagenRanking(imgEl, id) {
+    const exts = ["webp", "png", "jpg", "jpeg", "gif"];
+    let idx = 0;
+
+    function intentar() {
+      if (idx >= exts.length) {
+        imgEl.src = "/ASSETS/noticia/NoticiasImg/noticia_noEncontrada.png";
+        imgEl.onerror = null;
+        return;
+      }
+
+      imgEl.onerror = () => {
+        idx++;
+        intentar();
+      };
+
+      imgEl.src = `/ASSETS/noticia/NoticiasImg/noticia_img1_${id}.${exts[idx]}`;
+    }
+
+    intentar();
+  }
+
+  function crearItemRanking(noticia, index) {
+    const link = document.createElement("a");
+    link.className = "blog-v2-ranking-item";
+    link.href = `/VIEW/Noticia.php?id=${noticia.id}`;
+
+    const numero = document.createElement("strong");
+    numero.textContent = `${index + 1}.`;
+
+    const img = document.createElement("img");
+    cargarImagenRanking(img, noticia.id);
+    img.alt = noticia.titulo || `Noticia ${noticia.id}`;
+
+    const texto = document.createElement("p");
+    texto.textContent = noticia.titulo || "Noticia GodCode";
+
+    link.appendChild(numero);
+    link.appendChild(img);
+    link.appendChild(texto);
+
+    return link;
+  }
+
+  async function cargarRankingNoticias() {
+    try {
+      console.log("[BlogV2 Ranking] Consultando endpoint:", endpointTools);
+
+      const res = await fetch(endpointTools, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "ranking_noticias_comentarios",
+          estatus_noticia: 1,
+          estatus_comentario: 1,
+          limit: 4,
+        }),
+      });
+
+      const data = await res.json();
+
+      console.log("[BlogV2 Ranking] Respuesta completa:", data);
+      console.log("[BlogV2 Ranking] Noticias recibidas:", data?.data);
+
+      if (!res.ok || !data.ok || !Array.isArray(data.data)) {
+        throw new Error(data?.error || "Respuesta inválida del ranking");
+      }
+
+      rankingList.innerHTML = "";
+
+      if (data.data.length === 0) {
+        rankingList.innerHTML = `
+          <p class="blog-v2-ranking-empty">
+            Aún no hay noticias comentadas.
+          </p>
+        `;
+        return;
+      }
+
+      data.data.forEach((noticia, index) => {
+        rankingList.appendChild(crearItemRanking(noticia, index));
+      });
+    } catch (error) {
+      console.error("[BlogV2 Ranking] Error al cargar ranking:", error);
+
+      rankingList.innerHTML = `
+        <p class="blog-v2-ranking-empty">
+          No se pudo cargar el ranking por ahora.
+        </p>
+      `;
+    }
+  }
+
+  cargarRankingNoticias();
+});

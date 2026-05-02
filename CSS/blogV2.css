@@ -453,6 +453,8 @@
     border: 1px solid rgba(127, 29, 29, 0.25);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(15, 23, 42, 0.13);
+    text-decoration: none;
+    color: inherit;
 }
 
 #blog-v2-community .blog-v2-ranking-item strong {
@@ -495,6 +497,15 @@
 
 #blog-v2-community .blog-v2-ranking-link:hover {
     text-decoration: underline;
+}
+
+#blog-v2-community .blog-v2-ranking-empty {
+    margin: 0;
+    padding: 1rem;
+    color: #737373;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 #blog-v2-community .blog-v2-submit {

@@ -199,7 +199,7 @@
 
                 <div class="blog-v2-community-grid">
                     <article class="blog-v2-ranking">
-                        <h3>📰 Lo mas leído esta semana</h3>
+                        <h3>Lo mas leído esta semana</h3>
 
                         <div class="blog-v2-ranking-list">
                             <div class="blog-v2-ranking-item">
