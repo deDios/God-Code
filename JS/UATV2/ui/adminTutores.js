@@ -431,7 +431,7 @@
 
           <div class="admin-module__toolbar">
             <label class="admin-search" aria-label="Buscar tutores">
-              <span>Buscar</span>
+              <span>🔎</span>
               <input id="admin-tutores-search" type="search" placeholder="Buscar tutor..." />
             </label>
 
