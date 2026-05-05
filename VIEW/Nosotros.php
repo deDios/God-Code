@@ -194,13 +194,12 @@
             <div class="carrusel">
                 <div class="slide activo">
                     <div class="texto">
-                        <p>“Aún sigo invirtiendo en mi Perfil de Google y me ha funcionado bien en lo que cabe de esta
-                            pandemia.”</p>
-                        <span>Cerrautho - Medellín de Bravo, México</span>
+                        <p>“Varios clientes estan satisfechos con
+                            los diversos cursos que imparten en GodCode”</p>
+                        <span>Ixltahuacan de los membrillos - Jalisco, Mexico</span>
                     </div>
                     <div class="imagen">
-                        <img src="https://www.gstatic.com/marketing-cms/assets/images/ads/68/fa/ffd1460f46bc84a5b9e1b54d9fe2/overview1.png=s538-fcrop64=1,00000000ffffffff-rw"
-                            alt="Cliente 1">
+                        <img src="/ASSETS/Nosotros/seccion2_imgCliente1.png" alt="Cliente 1">
                     </div>
                 </div>
 
@@ -247,7 +246,7 @@
 
             <div class="proyecto fila invertida2 animado">
                 <div class="texto">
-                    <h3>Mobility Solutions Plataforma web empresarial</h3>
+                    <h3>Mobility Solutions - Plataforma web empresarial</h3>
                     <p>Diseñamos y desarrollamos una plataforma web completa para la empresa Mobility Solutions, con un
                         enfoque integral:</p>
                     <ul class="lista-puntos">
@@ -269,7 +268,7 @@
                     <img src="../ASSETS/Nosotros/seccion3_img2.png" alt="Luna Café">
                 </div>
                 <div class="texto">
-                    <h3>Luna Café Punto de venta inteligente</h3>
+                    <h3>Luna Café - Punto de venta inteligente</h3>
                     <p>Creamos un sistema POS personalizado, diseñado para facilitar y automatizar la operación diaria
                         del negocio:</p>
                     <ul class="lista-puntos">
@@ -280,6 +279,26 @@
                     </ul>
                     <p>Como resultado, una herramienta clave para la operación eficiente del negocio y la toma de
                         decisiones basada en datos.</p>
+                </div>
+            </div>
+
+            <div class="proyecto fila invertida2 animado">
+                <div class="texto">
+                    <h3>Ixtla-app - Plataforma de requerimientos
+                        para la atención ciudadano</h3>
+                    <p>Diseñamos y desarrollamos una plataforma web y mobile completa para
+                        el ayuntamiento de Ixtlahucan de los membrillos, con un enfoque integral:</p>
+                    <ul class="lista-puntos">
+                        <li>La facilidad para el ciudadano de comunicar sus necesidades, reportes
+                            o solicitudes de manera rápida y sencilla.</li>
+                        <li>Facilidad de manejo de requerimientos ciudadanos, por parte de los
+                            departamentos.</li>
+                    </ul>
+                    <p>Como resultado, una herramienta flexible y profesional que mejora
+                        la experiencia del ciudadano y optimiza la gestión para los departamentos.</p>
+                </div>
+                <div class="imagenNosotros">
+                    <img src="/assets/Nosotros/seccion3_img3.png" alt="plataforma web">
                 </div>
             </div>
         </section>
