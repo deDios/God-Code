@@ -18,7 +18,7 @@
     actividades: API_BASE + "c_actividades.php",
   };
 
-  const COURSE_FIELD_LIMITS = {
+  const FIELD_LIMITS = {
     cf_nombre: 100,
     cf_desc_breve: 250,
     cf_desc_media: 350,
