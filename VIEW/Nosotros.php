@@ -189,6 +189,7 @@
             </div>
         </section>
 
+        <!-- section para los testimonios de los clientes -->
         <section class="testimonios">
             <h2>La imagen del éxito</h2>
             <div class="carrusel">
@@ -241,6 +242,7 @@
             </div>
         </section>
 
+        <!-- section para los proyectos realizados por GodCode -->
         <section class="proyectos">
             <h2>Proyectos de <span>GodCode</span></h2>
 
@@ -303,6 +305,28 @@
             </div>
         </section>
 
+        <!-- section para el frame de googlemaps -->
+        <section id="nosotros-ubicacion" class="nosotros-ubicacion">
+            <div class="ubicacion-wrap">
+                <div class="ubicacion-texto">
+                    <h2>Ubicación:</h2>
+                    <p>
+                        Francisco I. Madero #1C, 45850<br>
+                        Ixtlahuacán de los Membrillos, Jal.<br>
+                        Colonia: Centro.
+                    </p>
+                </div>
+
+                <div class="ubicacion-mapa">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3740.8122219814013!2d-103.19552622516804!3d20.349374610766763!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x842f41369f3d0243%3A0x31a373c8a5de2839!2sGodCode!5e0!3m2!1ses!2smx!4v1778022932111!5m2!1ses!2smx"
+                        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- section para el bloque de carreras -->
         <section id="creciendoJuntos" class="creciendoJuntos">
             <h2>Creciendo juntos <span>#GodCode</span></h2>
 
