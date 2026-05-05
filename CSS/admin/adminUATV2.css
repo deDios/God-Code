@@ -1132,3 +1132,37 @@ footer,
 #site-footer {
   flex-shrink: 0;
 }
+
+
+/* =========================================================
+   CONTADORES DE CARACTERES - CURSOS
+   ========================================================= */
+
+.home-samapa.admin-dashboard .admin-char-counter {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: right;
+  line-height: 1.2;
+}
+
+.home-samapa.admin-dashboard .admin-char-counter.is-warning {
+  color: #b7791f;
+}
+
+.home-samapa.admin-dashboard .admin-char-counter.is-full {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.home-samapa.admin-dashboard .admin-field:has(.admin-char-counter.is-warning) input,
+.home-samapa.admin-dashboard .admin-field:has(.admin-char-counter.is-warning) textarea {
+  border-color: #f59e0b;
+}
+
+.home-samapa.admin-dashboard .admin-field:has(.admin-char-counter.is-full) input,
+.home-samapa.admin-dashboard .admin-field:has(.admin-char-counter.is-full) textarea {
+  border-color: #dc2626;
+}

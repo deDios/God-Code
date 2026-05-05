@@ -18,6 +18,15 @@
     actividades: API_BASE + "c_actividades.php",
   };
 
+  const COURSE_FIELD_LIMITS = {
+    cf_nombre: 100,
+    cf_desc_breve: 250,
+    cf_desc_media: 350,
+    cf_desc_curso: 2000,
+    cf_dirigido: 250,
+    cf_competencias: 250,
+  };
+
   const S = {
     data: [],
     page: 1,
@@ -482,32 +491,38 @@
           <div class="admin-news-form">
             <div class="admin-field">
               <label for="cf_nombre">Nombre</label>
-              <input id="cf_nombre" type="text">
+              <input id="cf_nombre" type="text" maxlength="${FIELD_LIMITS.cf_nombre}">
+              ${charCounter("cf_nombre")}
             </div>
 
             <div class="admin-field">
               <label for="cf_desc_breve">Descripción breve</label>
-              <textarea id="cf_desc_breve"></textarea>
+              <textarea id="cf_desc_breve" maxlength="${FIELD_LIMITS.cf_desc_breve}"></textarea>
+              ${charCounter("cf_desc_breve")}
             </div>
 
             <div class="admin-field">
               <label for="cf_desc_media">Descripción media</label>
-              <textarea id="cf_desc_media"></textarea>
+              <textarea id="cf_desc_media" maxlength="${FIELD_LIMITS.cf_desc_media}"></textarea>
+              ${charCounter("cf_desc_media")}
             </div>
 
             <div class="admin-field">
               <label for="cf_desc_curso">Descripción del curso</label>
-              <textarea id="cf_desc_curso"></textarea>
+              <textarea id="cf_desc_curso" maxlength="${FIELD_LIMITS.cf_desc_curso}"></textarea>
+              ${charCounter("cf_desc_curso")}
             </div>
 
             <div class="admin-field">
               <label for="cf_dirigido">Dirigido a</label>
-              <textarea id="cf_dirigido"></textarea>
+              <textarea id="cf_dirigido" maxlength="${FIELD_LIMITS.cf_dirigido}"></textarea>
+              ${charCounter("cf_dirigido")}
             </div>
 
             <div class="admin-field">
               <label for="cf_competencias">Competencias</label>
-              <textarea id="cf_competencias"></textarea>
+              <textarea id="cf_competencias" maxlength="${FIELD_LIMITS.cf_competencias}"></textarea>
+              ${charCounter("cf_competencias")}
             </div>
 
             <div class="admin-field">
@@ -664,6 +679,54 @@
     return value === "" ? null : Number(value);
   }
 
+  function charCounter(id) {
+    const max = FIELD_LIMITS[id];
+
+    if (!max) return "";
+
+    return `
+    <small class="admin-char-counter" data-counter-for="${esc(id)}">
+      0 / ${max}
+    </small>
+  `;
+  }
+
+  function updateCharCounter(id) {
+    const el = qs(`#${id}`);
+    const counter = qs(`[data-counter-for="${id}"]`);
+    const max = FIELD_LIMITS[id];
+
+    if (!el || !counter || !max) return;
+
+    const current = String(el.value || "").length;
+
+    counter.textContent = `${current} / ${max}`;
+    counter.classList.toggle("is-warning", current >= Math.floor(max * 0.9));
+    counter.classList.toggle("is-full", current >= max);
+  }
+
+  function updateAllCharCounters() {
+    Object.keys(FIELD_LIMITS).forEach(updateCharCounter);
+  }
+
+  function bindCharCounters() {
+    const drawer = qs("#admin-curso-drawer");
+    if (!drawer) return;
+
+    Object.entries(FIELD_LIMITS).forEach(([id, max]) => {
+      const el = qs(`#${id}`, drawer);
+      if (!el) return;
+
+      el.setAttribute("maxlength", String(max));
+
+      el.addEventListener("input", () => {
+        updateCharCounter(id);
+      });
+    });
+
+    updateAllCharCounters();
+  }
+
   function openEditor(row = null) {
     S.current = row;
     S.tempImage = null;
@@ -688,6 +751,7 @@
     setValue("cf_precio", row?.precio);
     setValue("cf_fecha", row?.fecha_inicio);
     setValue("cf_estatus", row?.estatus ?? 1);
+    updateAllCharCounters();
 
     const cert = qs("#cf_certificado");
     if (cert) cert.checked = Number(row?.certificado || 0) === 1;
@@ -859,6 +923,7 @@
     qs("#btn-admin-curso-cancel")?.addEventListener("click", closeEditor);
     qs("#admin-curso-overlay")?.addEventListener("click", closeEditor);
     qs("#btn-admin-curso-save")?.addEventListener("click", saveCurso);
+    bindCharCounters();
 
     const search = qs("#admin-cursos-search");
 
