@@ -35,6 +35,11 @@
     0: "Inactivo",
   };
 
+  const FIELD_LIMITS = {
+    tf_nombre: 50,
+    tf_descripcion: 500,
+  };
+
   const COURSE_GROUPS = [
     {
       key: "activos",
@@ -170,6 +175,54 @@
       response?.meta?.id ||
       0
     );
+  }
+
+  function charCounter(id) {
+    const max = FIELD_LIMITS[id];
+
+    if (!max) return "";
+
+    return `
+    <small class="admin-char-counter" data-counter-for="${esc(id)}">
+      0 / ${max}
+    </small>
+  `;
+  }
+
+  function updateCharCounter(id) {
+    const el = qs(`#${id}`);
+    const counter = qs(`[data-counter-for="${id}"]`);
+    const max = FIELD_LIMITS[id];
+
+    if (!el || !counter || !max) return;
+
+    const current = String(el.value || "").length;
+
+    counter.textContent = `${current} / ${max}`;
+    counter.classList.toggle("is-warning", current >= Math.floor(max * 0.9));
+    counter.classList.toggle("is-full", current >= max);
+  }
+
+  function updateAllCharCounters() {
+    Object.keys(FIELD_LIMITS).forEach(updateCharCounter);
+  }
+
+  function bindCharCounters() {
+    const drawer = qs("#admin-tutor-drawer");
+    if (!drawer) return;
+
+    Object.entries(FIELD_LIMITS).forEach(([id, max]) => {
+      const el = qs(`#${id}`, drawer);
+      if (!el) return;
+
+      el.setAttribute("maxlength", String(max));
+
+      el.addEventListener("input", () => {
+        updateCharCounter(id);
+      });
+    });
+
+    updateAllCharCounters();
   }
 
   function withBust(url) {
@@ -642,12 +695,14 @@
           <div class="admin-news-form">
             <div class="admin-field">
               <label for="tf_nombre">Nombre</label>
-              <input id="tf_nombre" type="text" maxlength="120">
+              <input id="tf_nombre" type="text" maxlength="${FIELD_LIMITS.tf_nombre}">
+              ${charCounter("tf_nombre")}
             </div>
 
             <div class="admin-field">
               <label for="tf_descripcion">Descripcion</label>
-              <textarea id="tf_descripcion" maxlength="800"></textarea>
+              <textarea id="tf_descripcion" maxlength="${FIELD_LIMITS.tf_descripcion}"></textarea>
+              ${charCounter("tf_descripcion")}
             </div>
 
             <div class="admin-field">
@@ -893,6 +948,7 @@
     setValue("tf_nombre", row?.nombre);
     setValue("tf_descripcion", row?.descripcion);
     setValue("tf_estatus", row?.estatus ?? 1);
+    updateAllCharCounters();
 
     const img = qs("#admin-tutor-preview-img");
     if (img) {
@@ -1048,6 +1104,7 @@
 
     qs("#btn-admin-tutor-save")?.addEventListener("click", saveTutor);
     qs("#btn-admin-course-mini-close")?.addEventListener("click", closeCourseMiniDrawer);
+    bindCharCounters();
 
     const search = qs("#admin-tutores-search");
 
