@@ -39,6 +39,10 @@
     3: "Terminado",
   };
 
+  const FIELD_LIMITS = {
+    sf_comentario: 800,
+  };
+
   const ORDER_SUSCRIPCIONES = [2, 1, 3, 0];
 
   const qs = (s, r = document) => r.querySelector(s);
@@ -462,6 +466,54 @@
     return `<option value="">Selecciona un curso</option>${opts}`;
   }
 
+  function charCounter(id) {
+    const max = FIELD_LIMITS[id];
+
+    if (!max) return "";
+
+    return `
+    <small class="admin-char-counter" data-counter-for="${esc(id)}">
+      0 / ${max}
+    </small>
+  `;
+  }
+
+  function updateCharCounter(id) {
+    const el = qs(`#${id}`);
+    const counter = qs(`[data-counter-for="${id}"]`);
+    const max = FIELD_LIMITS[id];
+
+    if (!el || !counter || !max) return;
+
+    const current = String(el.value || "").length;
+
+    counter.textContent = `${current} / ${max}`;
+    counter.classList.toggle("is-warning", current >= Math.floor(max * 0.9));
+    counter.classList.toggle("is-full", current >= max);
+  }
+
+  function updateAllCharCounters() {
+    Object.keys(FIELD_LIMITS).forEach(updateCharCounter);
+  }
+
+  function bindCharCounters() {
+    const drawer = qs("#admin-suscripcion-drawer");
+    if (!drawer) return;
+
+    Object.entries(FIELD_LIMITS).forEach(([id, max]) => {
+      const el = qs(`#${id}`, drawer);
+      if (!el) return;
+
+      el.setAttribute("maxlength", String(max));
+
+      el.addEventListener("input", () => {
+        updateCharCounter(id);
+      });
+    });
+
+    updateAllCharCounters();
+  }
+
   function drawerTemplate() {
     return `
       <div class="admin-drawer-overlay" id="admin-suscripcion-overlay" hidden></div>
@@ -517,7 +569,8 @@
 
         <div class="admin-field">
           <label for="sf_comentario">Comentario</label>
-          <textarea id="sf_comentario">${esc(row.comentario || "")}</textarea>
+          <textarea id="sf_comentario" maxlength="${FIELD_LIMITS.sf_comentario}">${esc(row.comentario || "")}</textarea>
+          ${charCounter("sf_comentario")}
         </div>
       </div>
     `;
@@ -550,7 +603,8 @@
 
         <div class="admin-field">
           <label for="sf_comentario">Comentario</label>
-          <textarea id="sf_comentario" placeholder="Opcional"></textarea>
+          <textarea id="sf_comentario" maxlength="${FIELD_LIMITS.sf_comentario}" placeholder="Opcional"></textarea>
+          ${charCounter("sf_comentario")}
         </div>
       </div>
     `;
@@ -570,6 +624,9 @@
 
     if (title) title.textContent = row ? "Editar suscripción" : "Nueva suscripción";
     host.innerHTML = row ? editForm(row) : createForm();
+
+    bindCharCounters();
+    updateAllCharCounters();
 
     if (saveBtn) {
       saveBtn.textContent = row ? "Guardar cambios" : "Inscribir";
