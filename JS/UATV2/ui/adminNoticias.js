@@ -12,6 +12,12 @@
     editar: API_BASE + "u_noticia.php",
   };
 
+  const FIELD_LIMITS = {
+    nf_titulo: 150,
+    nf_desc_uno: 2500,
+    nf_desc_dos: 2500,
+  };
+
   const S = {
     data: [],
     page: 1,
@@ -142,6 +148,54 @@
       response?.meta?.id ||
       0
     );
+  }
+
+  function charCounter(id) {
+    const max = FIELD_LIMITS[id];
+
+    if (!max) return "";
+
+    return `
+    <small class="admin-char-counter" data-counter-for="${esc(id)}">
+      0 / ${max}
+    </small>
+  `;
+  }
+
+  function updateCharCounter(id) {
+    const el = qs(`#${id}`);
+    const counter = qs(`[data-counter-for="${id}"]`);
+    const max = FIELD_LIMITS[id];
+
+    if (!el || !counter || !max) return;
+
+    const current = String(el.value || "").length;
+
+    counter.textContent = `${current} / ${max}`;
+    counter.classList.toggle("is-warning", current >= Math.floor(max * 0.9));
+    counter.classList.toggle("is-full", current >= max);
+  }
+
+  function updateAllCharCounters() {
+    Object.keys(FIELD_LIMITS).forEach(updateCharCounter);
+  }
+
+  function bindCharCounters() {
+    const drawer = qs("#admin-noticia-drawer");
+    if (!drawer) return;
+
+    Object.entries(FIELD_LIMITS).forEach(([id, max]) => {
+      const el = qs(`#${id}`, drawer);
+      if (!el) return;
+
+      el.setAttribute("maxlength", String(max));
+
+      el.addEventListener("input", () => {
+        updateCharCounter(id);
+      });
+    });
+
+    updateAllCharCounters();
   }
 
   function withBust(url) {
@@ -391,17 +445,20 @@
         <div class="admin-news-form">
           <div class="admin-field">
             <label for="nf_titulo">Título</label>
-            <input id="nf_titulo" type="text">
+            <input id="nf_titulo" type="text" maxlength="${FIELD_LIMITS.nf_titulo}">
+            ${charCounter("nf_titulo")}
           </div>
 
           <div class="admin-field">
             <label for="nf_desc_uno">Descripción 1</label>
-            <textarea id="nf_desc_uno"></textarea>
+            <textarea id="nf_desc_uno" maxlength="${FIELD_LIMITS.nf_desc_uno}"></textarea>
+            ${charCounter("nf_desc_uno")}
           </div>
 
           <div class="admin-field">
             <label for="nf_desc_dos">Descripción 2</label>
-            <textarea id="nf_desc_dos"></textarea>
+            <textarea id="nf_desc_dos" maxlength="${FIELD_LIMITS.nf_desc_dos}"></textarea>
+            ${charCounter("nf_desc_dos")}
           </div>
 
           <div class="admin-field">
@@ -452,6 +509,8 @@
     qs("#nf_desc_uno").value = row?.desc_uno || "";
     qs("#nf_desc_dos").value = row?.desc_dos || "";
     qs("#nf_estatus").value = String(row?.estatus ?? 1);
+
+    updateAllCharCounters();
 
     S.tempImages[1] = null;
     S.tempImages[2] = null;
@@ -618,11 +677,6 @@
     }
   }
 
-  function bindEditor() {
-    qs("#btn-admin-noticia-save")?.addEventListener("click", saveNoticia);
-    qs("#btn-admin-noticia-cancel")?.addEventListener("click", closeEditor);
-  }
-
   function bindTableEvents() {
     const tbody = qs("#admin-noticias-tbody");
     const pagination = qs("#admin-noticias-pagination");
@@ -660,6 +714,7 @@
     qs("#btn-admin-noticia-cancel")?.addEventListener("click", closeEditor);
     qs("#admin-noticia-overlay")?.addEventListener("click", closeEditor);
     qs("#btn-admin-noticia-save")?.addEventListener("click", saveNoticia);
+    bindCharCounters();
     const search = qs("#admin-noticias-search");
     const btnNew = qs("#btn-admin-noticia-new");
 
