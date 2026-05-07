@@ -109,7 +109,7 @@
     const ASSETS_BASE = "/ASSETS/usuario/usuarioImg";
     const DEFAULT_URL = DEFAULT_AVATAR;
 
-    const cookieUrl = usuario?.avatarUrl || usuario?.avatar || null; 
+    const cookieUrl = usuario?.avatarUrl || usuario?.avatar || null;
     const id = usuario?.id != null ? String(usuario.id).trim() : null;
 
     const basesSinExt = id
@@ -125,7 +125,7 @@
     const candidates = [
       ...primary,
       ...basesSinExt,
-      DEFAULT_URL, 
+      DEFAULT_URL,
     ];
 
     setImgWithExtFallback(imgEl, candidates, {
@@ -236,14 +236,14 @@
             <ul>
               <li role="menuitem" tabindex="-1">
                 <img src="${asset(
-                  "usuario/usuarioSubmenu/homebtn.png"
-                )}" alt="" aria-hidden="true" />
+          "usuario/usuarioSubmenu/homebtn.png"
+        )}" alt="" aria-hidden="true" />
                 Ir a Home
               </li>
               <li id="logout-btn" role="menuitem" tabindex="-1">
                 <img src="${asset(
-                  "usuario/usuarioSubmenu/logoutbtn.png"
-                )}" alt="" aria-hidden="true" />
+          "usuario/usuarioSubmenu/logoutbtn.png"
+        )}" alt="" aria-hidden="true" />
                 Logout
               </li>
             </ul>
@@ -302,8 +302,8 @@
         loginIcon.className = "user-icon";
         loginIcon.innerHTML = `
           <img src="${withBust(
-            DEFAULT_AVATAR
-          )}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
+          DEFAULT_AVATAR
+        )}" alt="Usuario" title="Iniciar sesión" class="img-perfil" />
         `;
         loginIcon.addEventListener(
           "click",
@@ -340,14 +340,14 @@
       <ul>
         <li>
           <img src="${asset(
-            "usuario/usuarioSubmenu/homebtn.png"
-          )}" alt="" aria-hidden="true" />
+          "usuario/usuarioSubmenu/homebtn.png"
+        )}" alt="" aria-hidden="true" />
           Ir a Home
         </li>
         <li id="logout-btn-mobile">
           <img src="${asset(
-            "usuario/usuarioSubmenu/logoutbtn.png"
-          )}" alt="" aria-hidden="true" />
+          "usuario/usuarioSubmenu/logoutbtn.png"
+        )}" alt="" aria-hidden="true" />
           Logout
         </li>
       </ul>
@@ -395,155 +395,174 @@
     }
   });
 
-  // -------------------- subnav --------------------
+  // -------------------- subnav operativo --------------------
   document.addEventListener("DOMContentLoaded", () => {
+    const header = document.getElementById("header");
+    if (!header) return;
+
+    if (header.dataset.gcSubnavBound === "1") return;
+    header.dataset.gcSubnavBound = "1";
+
+    const ADMIN_ALLOWED_USER_IDS = [1, 2, 12, 13, 18];
+
     function abs(path) {
       if (!path) return "/";
       const p = String(path);
-      if (p.startsWith("http://") || p.startsWith("https://")) return p; 
-      const clean = "/" + p.replace(/^\/+/, ""); 
-      return clean;
-    }
-
-    function asset(relPath) {
-      const base = (window.ASSET_BASE || "/assets/").replace(/\/+$/, "") + "/";
-      const rel = String(relPath || "").replace(/^\/+/, "");
-      return abs(base + rel);
+      if (p.startsWith("http://") || p.startsWith("https://")) return p;
+      return "/" + p.replace(/^\/+/, "");
     }
 
     function getNavLink(key, fallback) {
-      const header = document.getElementById("header");
-      const ds = header ? header.dataset : {};
+      const ds = header.dataset || {};
       const map = window.NAV_LINKS || {};
-      const dataKey = `link${key[0].toUpperCase()}${key.slice(1)}`; // e.g. linkHome
-      const dsVal = ds && typeof ds[dataKey] === "string" ? ds[dataKey] : null;
+      const dataKey = `link${key[0].toUpperCase()}${key.slice(1)}`;
+      const dsVal = typeof ds[dataKey] === "string" ? ds[dataKey] : null;
       return abs(dsVal || map[key] || fallback);
     }
 
-    const setVH = () => {
-      document.documentElement.style.setProperty(
-        "--vh",
-        `${window.innerHeight * 0.01}px`
-      );
-    };
-    setVH();
-    window.addEventListener("resize", setVH);
+    function normPath(u) {
+      try {
+        const url = new URL(u, window.location.origin);
+        return decodeURIComponent(url.pathname.toLowerCase().replace(/\/+$/, ""));
+      } catch {
+        return "";
+      }
+    }
 
-    // -------------------------------------------------------- Views operativas
-    const operativeViews = ["home.php", "admin.php"].map((s) =>
-      s.toLowerCase()
-    );
-    const currentPage = (
-      window.location.pathname.split("/").pop() || ""
-    ).toLowerCase();
+    function isActive(href) {
+      return normPath(href) === normPath(window.location.pathname);
+    }
 
-    const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
-    subnavs.forEach((nav) => (nav.dataset.originalHtml = nav.innerHTML));
+    function canViewAdmin() {
+      const usuario = getUsuarioFromCookie();
+      const userId = Number(usuario?.id ?? NaN);
+      return Number.isFinite(userId) && ADMIN_ALLOWED_USER_IDS.includes(userId);
+    }
 
-    const socialMarkup = `
-    <div class="social-icons">
-      <div class="circle-icon"><img src="${asset(
-        "index/Facebook.png"
-      )}" alt="Facebook" /></div>
-      <div class="circle-icon"><img src="${asset(
-        "index/Instagram.png"
-      )}" alt="Instagram" /></div>
-      <div class="circle-icon"><img src="${asset(
-        "index/Tiktok.png"
-      )}" alt="TikTok" /></div>
-    </div>
-  `;
+    function attachSocialClicks(root) {
+      if (!root) return;
+
+      const socialMap = {
+        facebook: "https://www.facebook.com/profile.php?id=61578204608103",
+        instagram: "https://www.instagram.com/god_code_mx/",
+        tiktok: "https://www.tiktok.com/@godcodemx",
+      };
+
+      root.querySelectorAll(".icon-mobile, .circle-icon").forEach((el) => {
+        if (el.__gcSocialBound) return;
+
+        const img = el.querySelector("img") || el;
+        const key = (img.alt || "").trim().toLowerCase();
+        const url = socialMap[key];
+
+        if (!url) return;
+
+        el.style.cursor = "pointer";
+        el.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.open(url, "_blank", "noopener");
+        });
+
+        el.__gcSocialBound = true;
+      });
+    }
 
     const LINKS = {
       home: getNavLink("home", "/VIEW/Home.php"),
       proyectos: getNavLink("proyectos", "/proyectos.php"),
       cursos: getNavLink("cursos", "/cursos.php"),
-      admin: getNavLink("admin", "/VIEW/UAT/admin.php"),
+      admin: getNavLink("admin", "/VIEW/admin/adminV2.php"),
     };
 
-    function isActive(href) {
-      try {
-        const a = document.createElement("a");
-        a.href = href;
-        const navPath = new URL(
-          a.href,
-          window.location.origin
-        ).pathname.toLowerCase();
-        const curPath = window.location.pathname.toLowerCase();
-        return navPath === curPath;
-      } catch {
-        return false;
+    const operativeViews = ["home.php", "admin.php", "adminv2.php"].map((s) =>
+      s.toLowerCase()
+    );
+
+    const currentPage = (
+      window.location.pathname.split("/").pop() || ""
+    ).toLowerCase();
+
+    const subnavs = Array.from(document.querySelectorAll("#header .subnav"));
+
+    subnavs.forEach((nav) => {
+      if (!nav.dataset.originalHtml) {
+        nav.dataset.originalHtml = nav.innerHTML;
       }
-    }
+    });
 
-    if (operativeViews.includes(currentPage)) {
-      const mk = (label, href) => {
-        const active = isActive(href) ? "active" : "";
-        return `<a href="${href}" class="${active}">${label}</a>`;
-      };
+    const socialMarkup = `
+    <div class="social-icons">
+      <div class="circle-icon"><img src="${asset("index/Facebook.png")}" alt="Facebook" /></div>
+      <div class="circle-icon"><img src="${asset("index/Instagram.png")}" alt="Instagram" /></div>
+      <div class="circle-icon"><img src="${asset("index/Tiktok.png")}" alt="TikTok" /></div>
+    </div>
+  `;
 
-      const markup = [
+    const mk = (label, href) => {
+      const active = isActive(href) ? "active" : "";
+      return `<a href="${href}" class="${active}">${label}</a>`;
+    };
+
+    function renderOperativeSubnav(nav) {
+      const links = [
         mk("Home", LINKS.home),
         mk("Proyectos", LINKS.proyectos),
         mk("Cursos", LINKS.cursos),
-        mk("Admin", LINKS.admin),
-        socialMarkup,
-      ].join("");
+      ];
 
-      subnavs.forEach((nav) => (nav.innerHTML = markup));
-    } else {
-      subnavs.forEach((nav) => (nav.innerHTML = nav.dataset.originalHtml));
+      if (canViewAdmin()) {
+        links.push(mk("Admin", LINKS.admin));
+      }
+
+      nav.innerHTML = links.join("") + socialMarkup;
+      attachSocialClicks(nav);
     }
 
-    // megamenu Productos
+    function restoreOriginalSubnav(nav) {
+      nav.innerHTML = nav.dataset.originalHtml || nav.innerHTML;
+      attachSocialClicks(nav);
+    }
+
+    if (operativeViews.includes(currentPage)) {
+      subnavs.forEach(renderOperativeSubnav);
+    } else {
+      subnavs.forEach(restoreOriginalSubnav);
+    }
+
     const submenu = document.getElementById("submenu-productos");
     if (submenu) {
       const mega = submenu.querySelector(".megamenu");
       if (mega) {
         mega.classList.remove("show");
         const link = [...submenu.children].find((c) => c.tagName === "A");
-        if (link) {
+
+        if (link && link.dataset.megaBound !== "1") {
           link.addEventListener("click", (e) => {
             e.preventDefault();
             mega.classList.toggle("show");
           });
+          link.dataset.megaBound = "1";
         }
+
         document.addEventListener("click", (e) => {
           if (!submenu.contains(e.target)) mega.classList.remove("show");
         });
       }
     }
 
-    // logo redirige a index
     const logoBtn = document.getElementById("logo-btn");
-    if (logoBtn) {
+    if (logoBtn && logoBtn.dataset.logoBound !== "1") {
       logoBtn.style.cursor = "pointer";
       logoBtn.addEventListener("click", () => {
         const to = getNavLink("home", "/index.php");
         window.location.href = to;
       });
+      logoBtn.dataset.logoBound = "1";
     }
 
-    const socialMap = {
-      tiktok: "https://www.tiktok.com/@godcodemx",
-      instagram: "https://www.instagram.com/god_code_mx/",
-      facebook: "https://www.facebook.com/profile.php?id=61578204608103",
-    };
-    const socialIcons = document.querySelectorAll(
-      "#header .icon-mobile, #header .circle-icon"
-    );
-    socialIcons.forEach((el) => {
-      const img = el.querySelector("img") || el;
-      const key = (img.alt || "").trim().toLowerCase();
-      const url = socialMap[key];
-      if (!url) return;
-      el.style.cursor = "pointer";
-      el.addEventListener("click", (e) => {
-        e.stopPropagation();
-        window.open(url, "_blank", "noopener");
-      });
-    });
-  }); // ------------------------------------- fin del js para para el subnav para las vistas operativas
+    attachSocialClicks(header.querySelector(".social-bar-mobile"));
+  });
+  // -------------------- fin subnav operativo --------------------
 
   // -------------------- cotizar deshabilitado --------------------
   document.addEventListener("DOMContentLoaded", () => {

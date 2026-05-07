@@ -152,7 +152,8 @@
                             adaptan a las necesidades de cada empresa. Desarrollamos plataformas
                             web, apps móviles, sistemas inteligentes y procesos conectados que
                             ayudan a nuestros clientes a alcanzar sus objetivos y crecer de forma
-                            sostenible.</p>
+                            sostenible. Contando con oficinas publicas y privadas con servicio de coworking,
+                            contamos con diferentes escritorios y sillas para una comoda estadia. </p>
                     </div>
                 </div>
 
@@ -167,7 +168,8 @@
                             global, creando experiencias digitales innovadoras, integradas
                             y accesibles, que transformen la manera en que las empresas
                             se conectan con su audiencia, sin importar el canal o el
-                            dispositivo.</p>
+                            dispositivo. Para innovar la tecnología en negocios y futuros
+                            emprendedores. </p>
                     </div>
                 </div>
 
