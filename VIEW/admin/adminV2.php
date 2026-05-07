@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../DB/WEB/Auth.php';
+godcode_require_session();
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -210,7 +214,7 @@
     <script src="/JS/UATV2/ui/adminCursos.js"></script>
     <script src="/JS/UATV2/ui/adminTutores.js"></script>
     <script src="/JS/UATV2/ui/adminSuscripciones.js"></script>
-    
+
     <!-- Router -->
     <script src="/JS/UATV2/ui/adminRouter.js"></script>
     <script src="/JS/UATV2/admin.js"></script>
