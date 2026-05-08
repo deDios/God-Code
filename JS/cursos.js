@@ -14,6 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let cursosOriginales = [];
     let busquedaActual = "";
 
+    function normalizarTexto(valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    }
+
     function cargarImagenCurso(imgEl, id) {
         const exts = ["webp", "png", "jpg", "jpeg", "gif"];
         let idx = 0;
@@ -92,13 +100,13 @@ document.addEventListener("DOMContentLoaded", () => {
     explorarSelect?.addEventListener("change", aplicarFiltros);
 
     buscarBtn?.addEventListener("click", () => {
-        busquedaActual = buscarInput?.value.trim().toLowerCase() || "";
+        busquedaActual = normalizarTexto(buscarInput?.value || "");
         aplicarFiltros();
     });
 
     buscarInput?.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-            busquedaActual = buscarInput.value.trim().toLowerCase();
+            busquedaActual = normalizarTexto(buscarInput.value);
             aplicarFiltros();
         }
     });
@@ -152,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (busquedaActual) {
             cursosFiltrados = cursosFiltrados.filter((curso) =>
-                String(curso.nombre || "").toLowerCase().includes(busquedaActual)
+                normalizarTexto(curso.nombre).includes(normalizarTexto(busquedaActual))
             );
         }
 
@@ -253,5 +261,126 @@ document.addEventListener("DOMContentLoaded", () => {
             prevButton.style.display = "flex";
             nextButton.style.display = "flex";
         }
+    }
+
+
+
+
+
+
+
+
+
+    // ------------------------------------------------------ section 2 - cursos finalizados
+    const cursosFinalizadosCarrusel = document.getElementById("cursos-finalizados-carrusel");
+    const cursosFinalizadosPrev = document.querySelector(".cursos-finalizados__btn.prev");
+    const cursosFinalizadosNext = document.querySelector(".cursos-finalizados__btn.next");
+
+    let cursosFinalizados = [];
+    let indiceFinalizados = 0;
+
+    if (cursosFinalizadosCarrusel) {
+        fetch("https://godcode-dqcwaceacpf2bfcd.mexicocentral-01.azurewebsites.net/db/web/c_cursos.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ estatus: 3 }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                cursosFinalizados = Array.isArray(data) ? data : [];
+
+                renderizarCursosFinalizados(cursosFinalizados);
+                mostrarCursoFinalizado(0);
+
+                const mostrarBotones = cursosFinalizados.length > 1;
+
+                if (cursosFinalizadosPrev) {
+                    cursosFinalizadosPrev.style.display = mostrarBotones ? "flex" : "none";
+                }
+
+                if (cursosFinalizadosNext) {
+                    cursosFinalizadosNext.style.display = mostrarBotones ? "flex" : "none";
+                }
+
+                console.log("[Cursos finalizados] Cursos cargados:", cursosFinalizados);
+            })
+            .catch((err) => {
+                console.error("[Cursos finalizados] Error:", err);
+
+                renderizarCursosFinalizados([]);
+            });
+    }
+
+    cursosFinalizadosPrev?.addEventListener("click", () => {
+        mostrarCursoFinalizado(indiceFinalizados - 1);
+    });
+
+    cursosFinalizadosNext?.addEventListener("click", () => {
+        mostrarCursoFinalizado(indiceFinalizados + 1);
+    });
+
+    function renderizarCursosFinalizados(cursos) {
+        if (!cursosFinalizadosCarrusel) return;
+
+        cursosFinalizadosCarrusel.innerHTML = "";
+
+        if (!Array.isArray(cursos) || cursos.length === 0) {
+            cursosFinalizadosCarrusel.innerHTML = `
+            <div class="cursos-finalizados__empty">
+                No hay cursos finalizados disponibles.
+            </div>
+        `;
+
+            if (cursosFinalizadosPrev) cursosFinalizadosPrev.style.display = "none";
+            if (cursosFinalizadosNext) cursosFinalizadosNext.style.display = "none";
+
+            return;
+        }
+
+        cursos.forEach((curso) => {
+            const slide = document.createElement("article");
+            slide.classList.add("cursos-finalizados__slide");
+
+            const img = document.createElement("img");
+            cargarImagenCurso(img, curso.id);
+            img.alt = curso.nombre || "Curso finalizado";
+
+            slide.innerHTML = `
+            <div class="cursos-finalizados__imagen"></div>
+
+            <div class="cursos-finalizados__texto">
+                <h3>${curso.nombre || "Curso finalizado"}</h3>
+                <p>${curso.descripcion_media || curso.descripcion_breve || "Descripción no disponible."}</p>
+                <span>${formatearFechaCurso(curso.fecha_inicio)}</span>
+            </div>
+        `;
+
+            slide.querySelector(".cursos-finalizados__imagen").appendChild(img);
+            cursosFinalizadosCarrusel.appendChild(slide);
+        });
+    }
+
+    function mostrarCursoFinalizado(n) {
+        const slides = document.querySelectorAll(".cursos-finalizados__slide");
+        if (!slides.length) return;
+
+        slides.forEach((slide) => slide.classList.remove("activo"));
+
+        indiceFinalizados = (n + slides.length) % slides.length;
+        slides[indiceFinalizados].classList.add("activo");
+    }
+
+    function formatearFechaCurso(fecha) {
+        if (!fecha) return "Fecha no disponible";
+
+        const date = new Date(`${fecha}T00:00:00`);
+
+        if (Number.isNaN(date.getTime())) return fecha;
+
+        return date.toLocaleDateString("es-MX", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        });
     }
 });

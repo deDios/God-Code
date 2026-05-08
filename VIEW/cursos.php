@@ -162,6 +162,8 @@
     </header>
 
     <main class="cursos-main">
+
+        <!-- secction 1 - carrusel y busqueda de cursos -->
         <section id="cursos-view" class="cursos-view">
             <div class="cursos-view__limite">
 
@@ -238,6 +240,30 @@
 
             </div>
         </section>
+
+        <!-- section 2 - cursos finalizados -->
+        <section id="cursos-finalizados" class="cursos-finalizados">
+            <h2>Cursos finalizados</h2>
+
+            <div class="cursos-finalizados__wrap">
+                <button class="cursos-finalizados__btn prev" type="button" aria-label="Curso anterior">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                    </svg>
+                </button>
+
+                <div class="cursos-finalizados__carrusel" id="cursos-finalizados-carrusel">
+                    <!-- Slides insertados desde JS -->
+                </div>
+
+                <button class="cursos-finalizados__btn next" type="button" aria-label="Curso siguiente">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
     </main>
 
 
