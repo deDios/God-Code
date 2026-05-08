@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -163,7 +162,82 @@
     </header>
 
     <main class="cursos-main">
+        <section id="cursos-view" class="cursos-view">
+            <div class="cursos-view__limite">
 
+                <div class="cursos-view__header">
+                    <h1>Cursos destacados</h1>
+                    <h2>Explora nuestras mejores opciones</h2>
+                    <p>
+                        Accede a nuestros cursos más buscados y con mayor impacto. Aprende a tu ritmo,
+                        con contenido actualizado y práctico.
+                    </p>
+                </div>
+
+                <div class="cursos-view__filtros">
+                    <div class="cursos-view__busqueda">
+                        <div class="cursos-view__searchbox">
+                            <span class="cursos-view__search-icon">⌕</span>
+                            <input type="search" id="buscar-curso" placeholder="Buscar curso..." autocomplete="off" />
+                        </div>
+
+                        <button type="button" id="btn-buscar-curso" class="cursos-view__btn-primary">
+                            Buscar
+                        </button>
+                    </div>
+
+                    <div class="cursos-view__selects">
+                        <div class="cursos-view__campo">
+                            <label for="categoria">Categoria de cursos</label>
+                            <select id="categoria" name="categoria">
+                                <option value="">Selecciona una categoría</option>
+                            </select>
+                        </div>
+
+                        <div class="cursos-view__campo">
+                            <label for="explorar">Explorar</label>
+                            <select id="explorar" name="explorar">
+                                <option value="">Selecciona un Opción</option>
+                            </select>
+                        </div>
+
+                        <div class="cursos-view__limpiar">
+                            <button type="button" id="limpiar-filtros" class="cursos-view__btn-outline">
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cursos-view__subheader">
+                    <h3>Cursos disponibles</h3>
+                    <button type="button" id="ver-todos-cursos" class="cursos-view__ver-todos">
+                        Ver todos los cursos
+                    </button>
+                </div>
+
+                <div class="cursos-view__carousel" id="carousel-container">
+                    <button class="carousel-btn prev" aria-label="Anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
+
+                    <div class="carousel-track-container">
+                        <div class="carousel-track" id="cursos-container">
+                            <!-- Cards insertadas desde JS -->
+                        </div>
+                    </div>
+
+                    <button class="carousel-btn next" aria-label="Siguiente">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </section>
     </main>
 
 
