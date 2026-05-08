@@ -615,7 +615,7 @@
     // ---- Contenido personalizable ----
     contactTitle: "Contacto",
     phoneLabel: "Teléfono:",
-    phone: "+52 1 33 1977 4088",
+    phone: "+52 33 1156 5422",
     locationLabel: "Ubicación:",
     location: "Francisco Madero 1C, Ixtlahuacán de los Membrillos",
 
