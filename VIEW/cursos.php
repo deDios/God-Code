@@ -1,7 +1,3 @@
-<?php
-require_once __DIR__ . '/../DB/WEB/Auth.php';
-godcode_require_session();
-?>
 
 <!DOCTYPE html>
 <html lang="es">
