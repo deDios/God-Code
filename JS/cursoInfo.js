@@ -9,7 +9,7 @@ let idCursoGlobal = 0;
   function setImageWithFallback(
     img,
     base,
-    exts = ["png", "jpg"],
+    exts = ["webp", "png", "jpg", "jpeg", "gif"],
     placeholder = PLACEHOLDER_CURSO
   ) {
     let attempt = 0;

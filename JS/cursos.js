@@ -288,7 +288,11 @@ document.addEventListener("DOMContentLoaded", () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                cursosFinalizados = Array.isArray(data) ? data : [];
+                cursosFinalizados = Array.isArray(data)
+                    ? data
+                        .sort((a, b) => Number(b.id) - Number(a.id))
+                        .slice(0, 5)
+                    : [];
 
                 renderizarCursosFinalizados(cursosFinalizados);
                 mostrarCursoFinalizado(0);
