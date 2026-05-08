@@ -1,5 +1,5 @@
 (function () {
-  //JS/UATV2/admin.js
+  //JS/admin.js
   "use strict";
 
   function bootAdmin() {

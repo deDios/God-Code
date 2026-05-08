@@ -209,16 +209,16 @@ godcode_require_session();
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
-    <script src="/JS/UATV2/ui/adminMedia.js"></script>
+    <script src="/JS/ui/adminMedia.js"></script>
 
-    <script src="/JS/UATV2/ui/adminNoticias.js"></script>
-    <script src="/JS/UATV2/ui/adminCursos.js"></script>
-    <script src="/JS/UATV2/ui/adminTutores.js"></script>
-    <script src="/JS/UATV2/ui/adminSuscripciones.js"></script>
+    <script src="/JS/ui/adminNoticias.js"></script>
+    <script src="/JS/ui/adminCursos.js"></script>
+    <script src="/JS/ui/adminTutores.js"></script>
+    <script src="/JS/ui/adminSuscripciones.js"></script>
 
     <!-- Router -->
-    <script src="/JS/UATV2/ui/adminRouter.js"></script>
-    <script src="/JS/UATV2/admin.js"></script>
+    <script src="/JS/ui/adminRouter.js"></script>
+    <script src="/JS/admin.js"></script>
 
 </body>
 

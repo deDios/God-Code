@@ -471,7 +471,7 @@
       home: getNavLink("home", "/VIEW/Home.php"),
       proyectos: getNavLink("proyectos", "/proyectos.php"),
       cursos: getNavLink("cursos", "/cursos.php"),
-      admin: getNavLink("admin", "/VIEW/admin/adminV2.php"),
+      admin: getNavLink("admin", "/VIEW/admin/admin.php"),
     };
 
     const operativeViews = ["home.php", "admin.php", "adminv2.php"].map((s) =>

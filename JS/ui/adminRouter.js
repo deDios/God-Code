@@ -1,5 +1,5 @@
 (function (window, document) {
-  //JS/UATV2/ui/adminRouter.js
+  //JS/ui/adminRouter.js
   // ajustar con la nueva plantilla de godcode, este es el router
   // que ayudara a cambiar entre los modulos de admin.
   "use strict";
