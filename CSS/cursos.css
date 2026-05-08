@@ -47,7 +47,7 @@
     margin: 0 auto 1rem;
     padding: 0.7rem 2.6rem 0.9rem;
     background: #fff;
-    border: 1.5px solid #0562ef;
+    border: 2px solid #0562ef;
     border-radius: 14px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
 }
@@ -85,7 +85,7 @@
 .cursos-view__search-icon {
     position: absolute;
     left: 1rem;
-    top: 50%;
+    top: 40%;
     transform: translateY(-53%);
     font-size: 2rem;
     color: #111;
@@ -133,7 +133,7 @@
     padding: 0 0.55rem;
     border: 1px solid #d8d8d8;
     border-radius: 7px;
-    background: #eee;
+    background: #ffffff;
     color: #111;
     font-size: 1rem;
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
@@ -171,7 +171,7 @@
 }
 
 .cursos-view__ver-todos {
-    border-radius: 3px;
+    border-radius: 30px;
     padding: 0.35rem 0.7rem;
     font-size: 0.95rem;
     box-shadow: none;
@@ -194,7 +194,7 @@
 
 .cursos-view__subheader h3 {
     margin: 0;
-    color: #808080;
+    color: #111;
     font-size: clamp(1.8rem, 3vw, 2.35rem);
     font-weight: 700;
     text-align: center;

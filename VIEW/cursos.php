@@ -244,7 +244,7 @@
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
-
+    <script src="/JS/cursos.js"></script>
 
 </body>
 
