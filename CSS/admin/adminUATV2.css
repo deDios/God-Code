@@ -1166,3 +1166,51 @@ footer,
 .home-samapa.admin-dashboard .admin-field:has(.admin-char-counter.is-full) textarea {
   border-color: #dc2626;
 }
+
+
+
+
+
+
+/* =========================================================
+   FIX para resoluciones verticales de 900px
+   ========================================================= */
+
+@media (max-width: 900px) {
+  main.home-samapa.admin-dashboard {
+    min-height: auto !important;
+  }
+
+  .home-samapa.admin-dashboard .hs-wrap {
+    display: block;
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  .home-samapa.admin-dashboard .hs-sidebar.admin-sidebar {
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  .home-samapa.admin-dashboard .admin-panel {
+    position: static !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible;
+  }
+
+  .home-samapa.admin-dashboard .hs-main,
+  .home-samapa.admin-dashboard #admin-view-root {
+    min-height: auto !important;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 900px) {
+  .home-samapa.admin-dashboard .admin-panel__menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.home-samapa.admin-dashboard .hs-sidebar.admin-sidebar {
+  min-height: 100%;
+}
