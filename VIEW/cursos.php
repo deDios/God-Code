@@ -245,16 +245,18 @@
         <section id="cursos-finalizados" class="cursos-finalizados">
             <h2>Cursos finalizados</h2>
 
-            <div class="cursos-finalizados__wrap">
+            <div class="cursos-finalizados__carrusel" id="cursos-finalizados-carrusel">
+                <!-- Slides insertados desde JS -->
+            </div>
+
+            <div class="cursos-finalizados__controles">
                 <button class="cursos-finalizados__btn prev" type="button" aria-label="Curso anterior">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                     </svg>
                 </button>
 
-                <div class="cursos-finalizados__carrusel" id="cursos-finalizados-carrusel">
-                    <!-- Slides insertados desde JS -->
-                </div>
+                <span id="cursos-finalizados-indicador">1 / 1</span>
 
                 <button class="cursos-finalizados__btn next" type="button" aria-label="Curso siguiente">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

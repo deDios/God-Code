@@ -510,45 +510,38 @@
 
 
 
-/* section 2 - cursos finalizados */
 /* ------------------------------------------------------ section 2 - cursos finalizados */
 
 #cursos-finalizados {
-    width: 100%;
-    padding: 2rem 1.5rem 3rem;
+    padding: 3rem 1.5rem 4rem;
     background: #f7f7f7;
+    text-align: center;
     color: #222;
 }
 
 #cursos-finalizados h2 {
-    margin: 0 0 1.4rem;
+    margin: 0 0 2.5rem;
     color: #7d7d7d;
-    text-align: center;
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-size: clamp(2rem, 3vw, 2.8rem);
     font-weight: 700;
 }
 
-.cursos-finalizados__wrap {
-    position: relative;
-    max-width: 1150px;
-    margin: 0 auto;
-    padding: 2.4rem 2.6rem;
-    background: #efefef;
-    border: 1px solid #e2e2e2;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
-}
-
 .cursos-finalizados__carrusel {
-    width: 100%;
-    min-height: 330px;
+    position: relative;
+    max-width: 1250px;
+    margin: 0 auto;
 }
 
 .cursos-finalizados__slide {
     display: none;
-    align-items: stretch;
-    justify-content: center;
-    gap: 3rem;
-    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3.5rem;
+    min-height: 430px;
+    padding: 3.5rem 4rem;
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.06);
 }
 
 .cursos-finalizados__slide.activo {
@@ -557,170 +550,138 @@
 
 .cursos-finalizados__imagen {
     flex: 0 0 42%;
-    max-width: 430px;
-    min-height: 310px;
-    background: #fff;
-    border: 3px solid #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.28);
+    max-width: 520px;
     overflow: hidden;
+    border-radius: 18px;
 }
 
 .cursos-finalizados__imagen img {
     display: block;
     width: 100%;
-    height: 100%;
-    min-height: 310px;
+    height: 330px;
     object-fit: cover;
+    border-radius: 18px;
 }
 
 .cursos-finalizados__texto {
     flex: 1;
-    min-height: 310px;
-    padding: 2.2rem 2.6rem;
-    background: #fff;
-    border: 1px solid #f0f0f0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    text-align: center;
 }
 
 .cursos-finalizados__texto h3 {
-    margin: 0 0 1rem;
+    margin: 0 0 1.4rem;
     color: #111;
-    font-size: clamp(1.55rem, 2.5vw, 2.35rem);
+    font-size: clamp(1.7rem, 2.6vw, 2.6rem);
     line-height: 1.15;
     font-weight: 800;
 }
 
 .cursos-finalizados__texto p {
-    margin: 0;
+    max-width: 620px;
+    margin: 0 auto;
     color: #111;
-    font-size: clamp(1.1rem, 1.8vw, 1.75rem);
-    line-height: 1.25;
+    font-size: clamp(1.05rem, 1.7vw, 1.55rem);
+    line-height: 1.4;
     font-weight: 400;
 }
 
 .cursos-finalizados__texto span {
+    display: block;
+    margin-top: 1.8rem;
+    color: #777;
+    font-size: 1rem;
+}
+
+.cursos-finalizados__controles {
     margin-top: 2rem;
-    color: #8a8a8a;
-    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .cursos-finalizados__btn {
-    position: absolute;
-    top: 50%;
-    width: 26px;
-    height: 26px;
-    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
     border: none;
     border-radius: 50%;
     background: #fff;
-    color: #0562ef;
     cursor: pointer;
-    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    box-shadow: 0 2px 6px rgba(5, 98, 239, 0.18);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 .cursos-finalizados__btn:hover {
-    transform: translateY(-50%) scale(1.08);
-    box-shadow: 0 5px 12px rgba(5, 98, 239, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(5, 98, 239, 0.2);
 }
 
-.cursos-finalizados__btn.prev {
-    left: 2.15rem;
-}
-
-.cursos-finalizados__btn.next {
-    right: 2.15rem;
+.cursos-finalizados__btn:active {
+    transform: scale(0.96);
+    background: rgba(0, 0, 0, 0.06);
 }
 
 .cursos-finalizados__btn svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     fill: #0562ef;
     pointer-events: none;
 }
 
+#cursos-finalizados-indicador {
+    min-width: 48px;
+    color: #111;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
 .cursos-finalizados__empty {
-    min-height: 230px;
+    min-height: 260px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #666;
     background: #fff;
-    border: 1px dashed #c5c5c5;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 1rem;
+    border-radius: 30px;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.06);
 }
 
 /* Tablet */
 @media (max-width: 1024px) {
-    .cursos-finalizados__wrap {
-        padding: 2rem 2.2rem;
-    }
-
     .cursos-finalizados__slide {
         gap: 2rem;
-    }
-
-    .cursos-finalizados__imagen {
-        flex-basis: 40%;
-        min-height: 280px;
-    }
-
-    .cursos-finalizados__imagen img,
-    .cursos-finalizados__texto {
-        min-height: 280px;
-    }
-
-    .cursos-finalizados__texto {
-        padding: 1.8rem 2rem;
-    }
-}
-
-/* Mobile / tablet pequeña */
-@media (max-width: 768px) {
-    #cursos-finalizados {
-        padding: 2rem 1rem 2.5rem;
-    }
-
-    .cursos-finalizados__wrap {
-        padding: 1.4rem;
-    }
-
-    .cursos-finalizados__carrusel {
-        min-height: auto;
-    }
-
-    .cursos-finalizados__slide.activo {
-        flex-direction: column;
-        gap: 1.4rem;
-    }
-
-    .cursos-finalizados__imagen {
-        flex: none;
-        width: 100%;
-        max-width: 520px;
-        min-height: 260px;
-        margin: 0 auto;
+        padding: 2.5rem;
     }
 
     .cursos-finalizados__imagen img {
-        min-height: 260px;
+        height: 300px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #cursos-finalizados {
+        padding: 2.5rem 1rem 3rem;
     }
 
-    .cursos-finalizados__texto {
-        min-height: auto;
-        padding: 1.5rem;
-        text-align: center;
+    .cursos-finalizados__slide.activo {
+        flex-direction: column-reverse;
+        gap: 1.8rem;
+        padding: 2rem 1.4rem;
+    }
+
+    .cursos-finalizados__imagen {
+        width: 100%;
+        max-width: 420px;
+        flex: none;
+    }
+
+    .cursos-finalizados__imagen img {
+        height: 260px;
     }
 
     .cursos-finalizados__texto h3 {
@@ -728,68 +689,32 @@
     }
 
     .cursos-finalizados__texto p {
-        font-size: 1.05rem;
+        font-size: 1rem;
         line-height: 1.45;
     }
 
-    .cursos-finalizados__texto span {
-        margin-top: 1.2rem;
-    }
-
     .cursos-finalizados__btn {
-        top: 38%;
-    }
-
-    .cursos-finalizados__btn.prev {
-        left: 0.8rem;
-    }
-
-    .cursos-finalizados__btn.next {
-        right: 0.8rem;
+        width: 46px;
+        height: 46px;
     }
 }
 
 /* Teléfonos */
 @media (max-width: 480px) {
     #cursos-finalizados {
-        padding: 1.6rem 0.8rem 2rem;
+        padding: 2rem 0.8rem 2.5rem;
     }
 
-    .cursos-finalizados__wrap {
-        padding: 1rem;
-    }
-
-    .cursos-finalizados__imagen {
-        min-height: 220px;
+    .cursos-finalizados__slide.activo {
+        padding: 1.5rem 1rem;
+        border-radius: 22px;
     }
 
     .cursos-finalizados__imagen img {
-        min-height: 220px;
+        height: 220px;
     }
 
-    .cursos-finalizados__texto {
-        padding: 1.2rem;
-    }
-
-    .cursos-finalizados__texto h3 {
-        font-size: 1.35rem;
-    }
-
-    .cursos-finalizados__texto p {
-        font-size: 0.98rem;
-    }
-
-    .cursos-finalizados__btn {
-        width: 28px;
-        height: 28px;
-        top: 34%;
-    }
-
-    .cursos-finalizados__btn.prev {
-        left: 0.45rem;
-    }
-
-    .cursos-finalizados__btn.next {
-        right: 0.45rem;
+    .cursos-finalizados__controles {
+        margin-top: 1.5rem;
     }
 }

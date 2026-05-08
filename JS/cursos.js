@@ -275,6 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cursosFinalizadosCarrusel = document.getElementById("cursos-finalizados-carrusel");
     const cursosFinalizadosPrev = document.querySelector(".cursos-finalizados__btn.prev");
     const cursosFinalizadosNext = document.querySelector(".cursos-finalizados__btn.next");
+    const cursosFinalizadosIndicador = document.getElementById("cursos-finalizados-indicador");
 
     let cursosFinalizados = [];
     let indiceFinalizados = 0;
@@ -368,6 +369,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         indiceFinalizados = (n + slides.length) % slides.length;
         slides[indiceFinalizados].classList.add("activo");
+
+        if (cursosFinalizadosIndicador) {
+            cursosFinalizadosIndicador.textContent = `${indiceFinalizados + 1} / ${slides.length}`;
+        }
     }
 
     function formatearFechaCurso(fecha) {
