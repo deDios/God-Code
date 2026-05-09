@@ -293,7 +293,7 @@
                     </div>
 
                     <div class="cursos-instructor__imagen">
-                        <img src="/ASSETS/cursos/instructor_curso.png" alt="Espacio para impartir cursos">
+                        <img src="/ASSETS/cursosview/cursosImage.png" alt="Espacio para impartir cursos">
                     </div>
                 </div>
             </div>
