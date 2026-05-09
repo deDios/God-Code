@@ -745,7 +745,7 @@
 #cursos-instructor h2 {
     margin: 0 0 1.8rem;
     text-align: center;
-    color: #7d7d7d;
+    color: #111;
     font-size: clamp(1.8rem, 3vw, 2.5rem);
     font-weight: 700;
 }
