@@ -266,6 +266,39 @@
             </div>
         </section>
 
+        <!-- section 3 - "estas interesado en dar un curso?" -->
+        <section id="cursos-instructor" class="cursos-instructor">
+            <div class="cursos-instructor__limite">
+                <h2>¿Estas interesado en dar un curso?</h2>
+
+                <div class="cursos-instructor__contenido">
+                    <div class="cursos-instructor__texto">
+                        <h3>¿Te gustaría impartir un curso?</h3>
+
+                        <p>
+                            Estamos buscando personas con talento, experiencia y ganas de compartir su conocimiento.
+                            Si tienes habilidades en algún tema y te apasiona enseñar, ¡esta es tu oportunidad!
+                        </p>
+
+                        <p>
+                            💡 Tú pones el conocimiento, nosotros te ayudamos a llevarlo a más personas.<br>
+                            📩 Envíanos un mensaje para más información y forma parte de nuestra comunidad de
+                            instructores.
+                        </p>
+
+                        <div class="cursos-instructor__acciones">
+                            <a href="#" class="cursos-instructor__btn">Descargar programa</a>
+                            <a href="/VIEW/Contacto.php" class="cursos-instructor__btn">¡Contáctanos!</a>
+                        </div>
+                    </div>
+
+                    <div class="cursos-instructor__imagen">
+                        <img src="/ASSETS/cursos/instructor_curso.png" alt="Espacio para impartir cursos">
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
 

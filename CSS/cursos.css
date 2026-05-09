@@ -521,7 +521,7 @@
 
 #cursos-finalizados h2 {
     margin: 0 0 2.5rem;
-    color: #7d7d7d;
+    color: #111;
     font-size: clamp(2rem, 3vw, 2.8rem);
     font-weight: 700;
 }
@@ -716,5 +716,143 @@
 
     .cursos-finalizados__controles {
         margin-top: 1.5rem;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------ section 3 - instructor */
+
+#cursos-instructor {
+    width: 100%;
+    padding: 2.5rem 1.5rem 3rem;
+    background: #fff;
+    color: #111;
+}
+
+.cursos-instructor__limite {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+#cursos-instructor h2 {
+    margin: 0 0 1.8rem;
+    text-align: center;
+    color: #7d7d7d;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 700;
+}
+
+.cursos-instructor__contenido {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.9fr);
+    align-items: center;
+    gap: 3rem;
+}
+
+.cursos-instructor__texto h3 {
+    margin: 0 0 0.4rem;
+    color: #0562ef;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.cursos-instructor__texto p {
+    margin: 0 0 1.6rem;
+    max-width: 760px;
+    color: #111;
+    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    line-height: 1.45;
+    font-weight: 600;
+}
+
+.cursos-instructor__acciones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.cursos-instructor__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.55rem 1.4rem;
+    border-radius: 999px;
+    background: #f8fbff;
+    color: #0562ef;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.cursos-instructor__btn:hover {
+    background: #0562ef;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.cursos-instructor__imagen {
+    justify-self: center;
+    width: 100%;
+    max-width: 430px;
+    background: #fff;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+}
+
+.cursos-instructor__imagen img {
+    display: block;
+    width: 100%;
+    height: 330px;
+    object-fit: cover;
+}
+
+@media (max-width: 900px) {
+    .cursos-instructor__contenido {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .cursos-instructor__texto p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cursos-instructor__imagen {
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 480px) {
+    #cursos-instructor {
+        padding: 2rem 1rem 2.5rem;
+    }
+
+    .cursos-instructor__acciones {
+        gap: 1rem;
+    }
+
+    .cursos-instructor__btn {
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .cursos-instructor__imagen img {
+        height: 240px;
     }
 }
