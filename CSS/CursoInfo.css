@@ -240,8 +240,14 @@
 #curso-detalle-extra .instructor img {
     width: 90px;
     height: 90px;
+    min-width: 90px;
+    min-height: 90px;
     border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
     background-color: #eee;
+    overflow: hidden;
 }
 
 
@@ -407,8 +413,13 @@
     }
 
     #curso-detalle-extra .instructor img {
-        width: 60px;
-        height: 60px;
+        width: 64px;
+        height: 64px;
+        min-width: 64px;
+        min-height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
     }
 
     #curso-detalle-extra .contenido p {
@@ -949,13 +960,13 @@ input[type="checkbox"] {
 }
 
 .input-alerta-container.alerta .icono-alerta.valido {
-  display: none !important;
+    display: none !important;
 }
 
 .input-alerta-container:not(.alerta) .icono-alerta.valido {
-  display: inline;
+    display: inline;
 }
 
 .input-alerta-container:not(.alerta) .icono-alerta:not(.valido) {
-  display: none;
+    display: none;
 }

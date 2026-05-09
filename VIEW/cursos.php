@@ -301,7 +301,6 @@
 
     </main>
 
-
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
