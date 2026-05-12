@@ -1,3 +1,5 @@
+import { encode } from "https://cdn.jsdelivr.net/npm/@jsquash/webp@1.5.0/+esm";
+
 (function (window) {
   "use strict";
 
@@ -12,13 +14,13 @@
   const OUTPUT_MIME = "image/webp";
   const OUTPUT_EXT = "webp";
 
-  const MIN_QUALITY = 0.45;
-  const QUALITY_STEP = 0.08;
-  const START_QUALITY = 0.86;
+  const START_QUALITY = 75;
+  const MIN_QUALITY = 42;
+  const QUALITY_STEP = 8;
 
   const MAX_WIDTH = 1600;
   const MAX_HEIGHT = 1200;
-  const MIN_WIDTH = 640;
+  const MIN_WIDTH = 560;
 
   function validateImageFile(file) {
     if (!(file instanceof File)) {
@@ -49,10 +51,29 @@
     };
   }
 
-  async function canvasToBlob(canvas, quality) {
-    return await new Promise((resolve) => {
-      canvas.toBlob(resolve, OUTPUT_MIME, quality);
+  function bufferToFile(buffer, fileName) {
+    const blob = new Blob([buffer], { type: OUTPUT_MIME });
+
+    return new File([blob], fileName, {
+      type: OUTPUT_MIME,
+      lastModified: Date.now(),
     });
+  }
+
+  async function encodeCanvasToWebpFile(canvas, fileName, quality) {
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    if (!ctx) {
+      throw new Error("No se pudo procesar la imagen.");
+    }
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const webpBuffer = await encode(imageData, {
+      quality,
+    });
+
+    return bufferToFile(webpBuffer, fileName);
   }
 
   async function imageFileToWebp(file) {
@@ -62,10 +83,11 @@
 
     const bitmap = await createImageBitmap(file);
     const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+    const fileName = `${baseName}.${OUTPUT_EXT}`;
 
     let maxWidth = MAX_WIDTH;
     let maxHeight = MAX_HEIGHT;
-    let lastBlob = null;
+    let lastFile = null;
 
     try {
       while (maxWidth >= MIN_WIDTH) {
@@ -76,20 +98,33 @@
         canvas.height = size.height;
 
         const ctx = canvas.getContext("2d", { alpha: false });
+
+        if (!ctx) {
+          throw new Error("No se pudo preparar la imagen.");
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, size.width, size.height);
         ctx.drawImage(bitmap, 0, 0, size.width, size.height);
 
-        for (let quality = START_QUALITY; quality >= MIN_QUALITY; quality -= QUALITY_STEP) {
-          const blob = await canvasToBlob(canvas, Number(quality.toFixed(2)));
+        for (
+          let quality = START_QUALITY;
+          quality >= MIN_QUALITY;
+          quality -= QUALITY_STEP
+        ) {
+          const webpFile = await encodeCanvasToWebpFile(canvas, fileName, quality);
+          lastFile = webpFile;
 
-          if (!blob) continue;
+          console.log("[AdminMedia] WEBP generado:", {
+            width: size.width,
+            height: size.height,
+            quality,
+            sizeKB: Math.round(webpFile.size / 1024),
+            type: webpFile.type,
+          });
 
-          lastBlob = blob;
-
-          if (blob.size <= MAX_BYTES) {
-            return new File([blob], `${baseName}.${OUTPUT_EXT}`, {
-              type: OUTPUT_MIME,
-              lastModified: Date.now(),
-            });
+          if (webpFile.size <= MAX_BYTES) {
+            return webpFile;
           }
         }
 
@@ -97,11 +132,8 @@
         maxHeight = Math.floor(maxHeight * 0.82);
       }
 
-      if (lastBlob && lastBlob.size <= MAX_BYTES) {
-        return new File([lastBlob], `${baseName}.${OUTPUT_EXT}`, {
-          type: OUTPUT_MIME,
-          lastModified: Date.now(),
-        });
+      if (lastFile && lastFile.size <= MAX_BYTES) {
+        return lastFile;
       }
 
       throw new Error(`No se pudo comprimir la imagen por debajo de ${MAX_MB}MB.`);
@@ -149,6 +181,10 @@
     }
 
     const webpFile = await imageFileToWebp(file);
+
+    if (webpFile.type !== OUTPUT_MIME) {
+      throw new Error("La imagen procesada no es WEBP.");
+    }
 
     if (webpFile.size > MAX_BYTES) {
       throw new Error(`La imagen procesada excede ${MAX_MB}MB.`);
