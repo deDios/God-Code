@@ -1210,3 +1210,15 @@ footer,
 .home-samapa.admin-dashboard .hs-sidebar.admin-sidebar {
   min-height: 100%;
 }
+
+
+/* =========================================================
+   FIX para el footer que tiene un hueco raro en resoluciones verticales de 900px
+   ========================================================= */
+   body {
+  min-height: 100dvh;
+}
+
+main.home-samapa.admin-dashboard {
+  flex: 1 0 auto;
+}
