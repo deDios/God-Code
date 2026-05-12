@@ -1222,3 +1222,34 @@ footer,
 main.home-samapa.admin-dashboard {
   flex: 1 0 auto;
 }
+
+
+/* =========================================================
+   FIX ALTURA ADMIN EN TABLET / IPAD
+   Evita campo vacío antes del footer
+   ========================================================= */
+
+main.home-samapa.admin-dashboard {
+  min-height: auto;
+  flex: 0 0 auto;
+}
+
+.home-samapa.admin-dashboard .hs-wrap {
+  min-height: auto;
+}
+
+.home-samapa.admin-dashboard .hs-sidebar.admin-sidebar {
+  min-height: auto;
+}
+
+.home-samapa.admin-dashboard .hs-main {
+  min-height: auto;
+}
+
+.home-samapa.admin-dashboard #admin-view-root {
+  min-height: auto;
+}
+
+.home-samapa.admin-dashboard .admin-module__body {
+  min-height: auto;
+}
