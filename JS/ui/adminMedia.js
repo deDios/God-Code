@@ -1,7 +1,7 @@
-import { encode } from "https://cdn.jsdelivr.net/npm/@jsquash/webp@1.5.0/+esm";
-console.log("[AdminMedia] version 20260512-2 cargada");
 (function (window) {
   "use strict";
+
+  console.log("[AdminMedia] version canvas-fallback-20260512 cargada");
 
   const API_MEDIA = "https://godcode.com.mx/db/web/u_media.php";
 
@@ -11,16 +11,34 @@ console.log("[AdminMedia] version 20260512-2 cargada");
   const INPUT_MAX_MB = 20;
   const INPUT_MAX_BYTES = INPUT_MAX_MB * 1024 * 1024;
 
-  const OUTPUT_MIME = "image/webp";
-  const OUTPUT_EXT = "webp";
-
-  const START_QUALITY = 70;
-  const MIN_QUALITY = 25;
-  const QUALITY_STEP = 7;
+  const START_QUALITY = 0.78;
+  const MIN_QUALITY = 0.35;
+  const QUALITY_STEP = 0.07;
 
   const MAX_WIDTH = 1200;
   const MAX_HEIGHT = 900;
   const MIN_WIDTH = 360;
+
+  const MIME_WEBP = "image/webp";
+  const MIME_JPEG = "image/jpeg";
+
+  async function supportsMimeEncode(mime) {
+    const canvas = document.createElement("canvas");
+    canvas.width = 2;
+    canvas.height = 2;
+
+    const blob = await new Promise((resolve) => {
+      canvas.toBlob(resolve, mime, 0.8);
+    });
+
+    return !!blob && blob.type === mime;
+  }
+
+  function getExtensionFromMime(mime) {
+    if (mime === MIME_WEBP) return "webp";
+    if (mime === MIME_JPEG) return "jpg";
+    return "jpg";
+  }
 
   function validateImageFile(file) {
     if (!(file instanceof File)) {
@@ -29,9 +47,9 @@ console.log("[AdminMedia] version 20260512-2 cargada");
 
     const allowedTypes = [
       "image/jpeg",
+      "image/jpg",
       "image/png",
       "image/webp",
-      "image/jpg",
     ];
 
     if (!allowedTypes.includes(file.type)) {
@@ -43,7 +61,10 @@ console.log("[AdminMedia] version 20260512-2 cargada");
     }
 
     if (file.size > INPUT_MAX_BYTES) {
-      return { ok: false, error: `La imagen original excede ${INPUT_MAX_MB}MB.` };
+      return {
+        ok: false,
+        error: `La imagen original excede ${INPUT_MAX_MB}MB.`,
+      };
     }
 
     return { ok: true };
@@ -58,43 +79,30 @@ console.log("[AdminMedia] version 20260512-2 cargada");
     };
   }
 
-  function bufferToFile(buffer, fileName) {
-    const blob = new Blob([buffer], { type: OUTPUT_MIME });
-
-    return new File([blob], fileName, {
-      type: OUTPUT_MIME,
-      lastModified: Date.now(),
+  async function canvasToBlob(canvas, mime, quality) {
+    return await new Promise((resolve) => {
+      canvas.toBlob(resolve, mime, quality);
     });
   }
 
-  async function encodeCanvasToWebpFile(canvas, fileName, quality) {
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-    if (!ctx) {
-      throw new Error("No se pudo procesar la imagen.");
-    }
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    const webpBuffer = await encode(imageData, {
-      quality,
-    });
-
-    return bufferToFile(webpBuffer, fileName);
-  }
-
-  async function imageFileToWebp(file) {
+  async function imageFileToOptimized(file) {
     if (!(file instanceof File)) {
       throw new Error("Archivo inválido.");
     }
 
+    const canWebp = await supportsMimeEncode(MIME_WEBP);
+    const outputMime = canWebp ? MIME_WEBP : MIME_JPEG;
+    const outputExt = getExtensionFromMime(outputMime);
+
+    console.log("[AdminMedia] formato de salida:", outputMime);
+
     const bitmap = await createImageBitmap(file);
     const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
-    const fileName = `${baseName}.${OUTPUT_EXT}`;
+    const fileName = `${baseName}.${outputExt}`;
 
     let maxWidth = MAX_WIDTH;
     let maxHeight = MAX_HEIGHT;
-    let lastFile = null;
+    let lastBlob = null;
 
     try {
       while (maxWidth >= MIN_WIDTH) {
@@ -119,19 +127,25 @@ console.log("[AdminMedia] version 20260512-2 cargada");
           quality >= MIN_QUALITY;
           quality -= QUALITY_STEP
         ) {
-          const webpFile = await encodeCanvasToWebpFile(canvas, fileName, quality);
-          lastFile = webpFile;
+          const blob = await canvasToBlob(canvas, outputMime, Number(quality.toFixed(2)));
 
-          console.log("[AdminMedia] WEBP generado:", {
+          if (!blob) continue;
+
+          lastBlob = blob;
+
+          console.log("[AdminMedia] imagen procesada:", {
             width: size.width,
             height: size.height,
-            quality,
-            sizeKB: Math.round(webpFile.size / 1024),
-            type: webpFile.type,
+            quality: Number(quality.toFixed(2)),
+            sizeKB: Math.round(blob.size / 1024),
+            type: blob.type,
           });
 
-          if (webpFile.size <= MAX_BYTES) {
-            return webpFile;
+          if (blob.size <= MAX_BYTES) {
+            return new File([blob], fileName, {
+              type: outputMime,
+              lastModified: Date.now(),
+            });
           }
         }
 
@@ -139,8 +153,11 @@ console.log("[AdminMedia] version 20260512-2 cargada");
         maxHeight = Math.floor(maxHeight * 0.82);
       }
 
-      if (lastFile && lastFile.size <= MAX_BYTES) {
-        return lastFile;
+      if (lastBlob && lastBlob.size <= MAX_BYTES) {
+        return new File([lastBlob], fileName, {
+          type: outputMime,
+          lastModified: Date.now(),
+        });
       }
 
       throw new Error(`No se pudo comprimir la imagen por debajo de ${MAX_MB}MB.`);
@@ -187,20 +204,16 @@ console.log("[AdminMedia] version 20260512-2 cargada");
       throw new Error("Falta el ID del registro.");
     }
 
-    const webpFile = await imageFileToWebp(file);
+    const optimizedFile = await imageFileToOptimized(file);
 
-    if (webpFile.type !== OUTPUT_MIME) {
-      throw new Error("La imagen procesada no es WEBP.");
-    }
-
-    if (webpFile.size > MAX_BYTES) {
+    if (optimizedFile.size > MAX_BYTES) {
       throw new Error(`La imagen procesada excede ${MAX_MB}MB.`);
     }
 
     const fd = new FormData();
     fd.append("modulo", String(modulo));
     fd.append("id", String(id));
-    fd.append("imagen", webpFile);
+    fd.append("imagen", optimizedFile);
 
     if (modulo === "noticias") {
       if (![1, 2].includes(Number(pos))) {
@@ -209,6 +222,15 @@ console.log("[AdminMedia] version 20260512-2 cargada");
 
       fd.append("pos", String(pos));
     }
+
+    console.log("[AdminMedia] subiendo media:", {
+      modulo,
+      id,
+      pos,
+      name: optimizedFile.name,
+      type: optimizedFile.type,
+      sizeKB: Math.round(optimizedFile.size / 1024),
+    });
 
     const res = await fetch(API_MEDIA, {
       method: "POST",
@@ -252,6 +274,7 @@ console.log("[AdminMedia] version 20260512-2 cargada");
     uploadAdminMedia,
     createObjectPreview,
     revokeObjectPreview,
-    imageFileToWebp,
+    imageFileToOptimized,
+    imageFileToWebp: imageFileToOptimized,
   };
 })(window);

@@ -209,7 +209,7 @@ godcode_require_session();
     <script src="/JS/JSglobal.js"></script>
 
     <!-- Carga de modulos -->
-    <script type="module" src="/JS/ui/adminMedia.js"></script>
+    <script src="/JS/ui/adminMedia.js?v=20260512-3"></script>
 
     <script src="/JS/ui/adminNoticias.js"></script>
     <script src="/JS/ui/adminCursos.js"></script>

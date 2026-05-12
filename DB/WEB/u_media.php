@@ -1,5 +1,5 @@
 <?php
-// DBWEB/u_media.php
+// DB/WEB/u_media.php
 declare(strict_types=1);
 
 header("Access-Control-Allow-Origin: https://godcode.com.mx");
@@ -83,10 +83,7 @@ function getMediaConfig(string $modulo, int $id, int $pos): array
 
     respond(false, "Módulo no permitido. Usa noticias, cursos o tutores.", 400);
 
-    return [
-        "dir" => "",
-        "base" => "",
-    ];
+    return ["dir" => "", "base" => ""];
 }
 
 function deleteOldVariants(string $destDir, string $base): array
@@ -158,9 +155,17 @@ try {
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file["tmp_name"]);
 
-    if ($mime !== "image/webp") {
-        respond(false, "El servidor solo acepta WEBP procesado desde el frontend.", 400);
+    $allowedMimes = [
+        "image/webp" => "webp",
+        "image/jpeg" => "jpg",
+        "image/png" => "png",
+    ];
+
+    if (!isset($allowedMimes[$mime])) {
+        respond(false, "Formato procesado no permitido. Usa WEBP, JPG o PNG.", 400);
     }
+
+    $ext = $allowedMimes[$mime];
 
     $config = getMediaConfig($modulo, $id, $pos);
 
@@ -178,7 +183,7 @@ try {
 
     $deleted = deleteOldVariants($destDir, $baseName);
 
-    $fileName = $baseName . ".webp";
+    $fileName = $baseName . "." . $ext;
     $destPath = $destDir . DIRECTORY_SEPARATOR . $fileName;
 
     if (!move_uploaded_file($file["tmp_name"], $destPath)) {
@@ -195,6 +200,8 @@ try {
         "url" => $publicUrl,
         "path" => $publicPath,
         "filename" => $fileName,
+        "mime" => $mime,
+        "ext" => $ext,
         "modulo" => $modulo,
         "id" => $id,
         "pos" => $modulo === "noticias" ? $pos : null,

@@ -28,10 +28,10 @@ let idCursoGlobal = 0;
 
   window.__gcImgFallback = {
     setCourse(img, base) {
-      setImageWithFallback(img, base, ["png", "jpg", "webp"], PLACEHOLDER_CURSO);
+      setImageWithFallback(img, base, ["webp", "png", "jpg", "jpeg", "gif"], PLACEHOLDER_CURSO);
     },
     setTutor(img, base) {
-      setImageWithFallback(img, base, ["png", "jpg", "webp"], PLACEHOLDER_TUTOR);
+      setImageWithFallback(img, base, ["webp", "png", "jpg", "jpeg", "gif"], PLACEHOLDER_TUTOR);
     },
   };
 })();
