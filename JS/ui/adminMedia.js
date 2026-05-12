@@ -1,5 +1,5 @@
 import { encode } from "https://cdn.jsdelivr.net/npm/@jsquash/webp@1.5.0/+esm";
-
+console.log("[AdminMedia] version 20260512-2 cargada");
 (function (window) {
   "use strict";
 
@@ -14,20 +14,27 @@ import { encode } from "https://cdn.jsdelivr.net/npm/@jsquash/webp@1.5.0/+esm";
   const OUTPUT_MIME = "image/webp";
   const OUTPUT_EXT = "webp";
 
-  const START_QUALITY = 75;
-  const MIN_QUALITY = 42;
-  const QUALITY_STEP = 8;
+  const START_QUALITY = 70;
+  const MIN_QUALITY = 25;
+  const QUALITY_STEP = 7;
 
-  const MAX_WIDTH = 1600;
-  const MAX_HEIGHT = 1200;
-  const MIN_WIDTH = 560;
+  const MAX_WIDTH = 1200;
+  const MAX_HEIGHT = 900;
+  const MIN_WIDTH = 360;
 
   function validateImageFile(file) {
     if (!(file instanceof File)) {
       return { ok: false, error: "Archivo inválido." };
     }
 
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
       return { ok: false, error: "Formato no permitido. Usa JPG, PNG o WEBP." };
     }
 
@@ -36,7 +43,7 @@ import { encode } from "https://cdn.jsdelivr.net/npm/@jsquash/webp@1.5.0/+esm";
     }
 
     if (file.size > INPUT_MAX_BYTES) {
-      return { ok: false, error: `La imagen excede ${INPUT_MAX_MB}MB.` };
+      return { ok: false, error: `La imagen original excede ${INPUT_MAX_MB}MB.` };
     }
 
     return { ok: true };
