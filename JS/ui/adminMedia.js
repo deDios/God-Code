@@ -6,41 +6,19 @@
   const MAX_MB = 1;
   const MAX_BYTES = MAX_MB * 1024 * 1024;
 
+  const INPUT_MAX_MB = 20;
+  const INPUT_MAX_BYTES = INPUT_MAX_MB * 1024 * 1024;
+
   const OUTPUT_MIME = "image/webp";
   const OUTPUT_EXT = "webp";
-  const OUTPUT_QUALITY = 0.82;
 
-  async function imageFileToWebp(file) {
-    if (!(file instanceof File)) {
-      throw new Error("Archivo inválido.");
-    }
+  const MIN_QUALITY = 0.45;
+  const QUALITY_STEP = 0.08;
+  const START_QUALITY = 0.86;
 
-    const bitmap = await createImageBitmap(file);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(bitmap, 0, 0);
-
-    const blob = await new Promise((resolve) => {
-      canvas.toBlob(resolve, OUTPUT_MIME, OUTPUT_QUALITY);
-    });
-
-    bitmap.close?.();
-
-    if (!blob) {
-      throw new Error("No se pudo convertir la imagen a WEBP.");
-    }
-
-    const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
-
-    return new File([blob], `${baseName}.${OUTPUT_EXT}`, {
-      type: OUTPUT_MIME,
-      lastModified: Date.now(),
-    });
-  }
+  const MAX_WIDTH = 1600;
+  const MAX_HEIGHT = 1200;
+  const MIN_WIDTH = 640;
 
   function validateImageFile(file) {
     if (!(file instanceof File)) {
@@ -55,11 +33,81 @@
       return { ok: false, error: "La imagen está vacía." };
     }
 
-    if (file.size > MAX_BYTES) {
-      return { ok: false, error: `La imagen excede ${MAX_MB}MB.` };
+    if (file.size > INPUT_MAX_BYTES) {
+      return { ok: false, error: `La imagen excede ${INPUT_MAX_MB}MB.` };
     }
 
     return { ok: true };
+  }
+
+  function getTargetSize(width, height, maxWidth, maxHeight) {
+    const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+
+    return {
+      width: Math.max(1, Math.round(width * ratio)),
+      height: Math.max(1, Math.round(height * ratio)),
+    };
+  }
+
+  async function canvasToBlob(canvas, quality) {
+    return await new Promise((resolve) => {
+      canvas.toBlob(resolve, OUTPUT_MIME, quality);
+    });
+  }
+
+  async function imageFileToWebp(file) {
+    if (!(file instanceof File)) {
+      throw new Error("Archivo inválido.");
+    }
+
+    const bitmap = await createImageBitmap(file);
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "imagen";
+
+    let maxWidth = MAX_WIDTH;
+    let maxHeight = MAX_HEIGHT;
+    let lastBlob = null;
+
+    try {
+      while (maxWidth >= MIN_WIDTH) {
+        const size = getTargetSize(bitmap.width, bitmap.height, maxWidth, maxHeight);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = size.width;
+        canvas.height = size.height;
+
+        const ctx = canvas.getContext("2d", { alpha: false });
+        ctx.drawImage(bitmap, 0, 0, size.width, size.height);
+
+        for (let quality = START_QUALITY; quality >= MIN_QUALITY; quality -= QUALITY_STEP) {
+          const blob = await canvasToBlob(canvas, Number(quality.toFixed(2)));
+
+          if (!blob) continue;
+
+          lastBlob = blob;
+
+          if (blob.size <= MAX_BYTES) {
+            return new File([blob], `${baseName}.${OUTPUT_EXT}`, {
+              type: OUTPUT_MIME,
+              lastModified: Date.now(),
+            });
+          }
+        }
+
+        maxWidth = Math.floor(maxWidth * 0.82);
+        maxHeight = Math.floor(maxHeight * 0.82);
+      }
+
+      if (lastBlob && lastBlob.size <= MAX_BYTES) {
+        return new File([lastBlob], `${baseName}.${OUTPUT_EXT}`, {
+          type: OUTPUT_MIME,
+          lastModified: Date.now(),
+        });
+      }
+
+      throw new Error(`No se pudo comprimir la imagen por debajo de ${MAX_MB}MB.`);
+    } finally {
+      bitmap.close?.();
+    }
   }
 
   function pickImageFile() {
@@ -101,6 +149,10 @@
     }
 
     const webpFile = await imageFileToWebp(file);
+
+    if (webpFile.size > MAX_BYTES) {
+      throw new Error(`La imagen procesada excede ${MAX_MB}MB.`);
+    }
 
     const fd = new FormData();
     fd.append("modulo", String(modulo));
@@ -151,6 +203,7 @@
   window.AdminMedia = {
     API_MEDIA,
     MAX_MB,
+    INPUT_MAX_MB,
     validateImageFile,
     pickImageFile,
     uploadAdminMedia,
