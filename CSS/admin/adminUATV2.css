@@ -1254,3 +1254,66 @@ main.home-samapa.admin-dashboard {
   min-height: auto;
 }
 
+
+/* =========================================================
+   IPAD / TABLET: DRAWER CON FOOTER DENTRO DEL SCROLL REAL
+   ========================================================= */
+
+@media (max-width: 1180px), (pointer: coarse) {
+  .home-samapa.admin-dashboard .admin-drawer {
+    height: 100dvh;
+    max-height: 100dvh;
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .home-samapa.admin-dashboard .admin-drawer__head,
+  .home-samapa.admin-dashboard .admin-drawer__body,
+  .home-samapa.admin-dashboard .admin-drawer__foot {
+    flex: initial;
+  }
+
+  .home-samapa.admin-dashboard .admin-drawer__body {
+    overflow: visible;
+    padding-bottom: 20px;
+  }
+
+  .home-samapa.admin-dashboard .admin-drawer__foot {
+    position: static !important;
+    bottom: auto !important;
+    z-index: auto;
+    background: #fff;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* =========================================================
+   FIX HEADER DRAWER EN TABLET/IPAD
+   Recupera layout del título + botón cerrar
+   ========================================================= */
+
+@media (max-width: 1180px), (pointer: coarse) {
+  .home-samapa.admin-dashboard .admin-drawer__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #fff;
+  }
+
+  .home-samapa.admin-dashboard .admin-drawer__head > div {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .home-samapa.admin-dashboard .admin-drawer__close {
+    flex: 0 0 38px;
+    margin-left: auto;
+  }
+}
