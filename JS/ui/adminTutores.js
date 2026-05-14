@@ -578,9 +578,9 @@
           </div>
         </td>
         <td title="${esc(row.nombre || "")}">
-          <strong>${esc(excerpt(row.nombre || "Sin nombre", 40))}</strong>
+          <strong>${esc(excerpt(row.nombre || "Sin nombre", 30))}</strong>
         </td>
-        <td>${esc(excerpt(row.descripcion || "-", 50))}</td>
+        <td>${esc(excerpt(row.descripcion || "-", 35))}</td>
         <td>${esc(fmtDate(row.fecha_creacion))}</td>
         <td>${statusBadge(row.estatus)}</td>
         <td>
