@@ -370,10 +370,10 @@
           </div>
         </td>
         <td title="${esc(row.titulo || "")}">
-         <strong>${esc(excerpt(row.titulo || "Sin título", 50))}</strong>
+         <strong>${esc(excerpt(row.titulo || "Sin título", 30))}</strong>
         </td>
         <td class="admin-table__desc" title="${esc(row.desc_uno || "")}">
-          ${esc(excerpt(row.desc_uno, 50))}
+          ${esc(excerpt(row.desc_uno, 35))}
         </td>
         <td>${esc(row.fecha_creacion || "—")}</td>
         <td>${statusBadge(row.estatus)}</td>
