@@ -577,7 +577,9 @@
             <img data-tutor-img="${esc(row.id)}" alt="${esc(row.nombre || "Tutor")}" src="${noImageSvgDataURI()}">
           </div>
         </td>
-        <td><strong>${esc(row.nombre || "Sin nombre")}</strong></td>
+        <td title="${esc(row.nombre || "")}">
+          <strong>${esc(excerpt(row.nombre || "Sin nombre", 40))}</strong>
+        </td>
         <td>${esc(excerpt(row.descripcion || "-", 50))}</td>
         <td>${esc(fmtDate(row.fecha_creacion))}</td>
         <td>${statusBadge(row.estatus)}</td>

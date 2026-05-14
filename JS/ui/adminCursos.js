@@ -414,7 +414,9 @@
           </div>
         </td>
         <td>
-          <strong>${esc(row.nombre || "Sin nombre")}</strong>
+          <strong title="${esc(row.nombre || "")}">
+            ${esc(excerpt(row.nombre || "Sin nombre", 55))}
+          </strong>
           <div class="admin-table-muted">${esc(excerpt(row.descripcion_breve || "", 50))}</div>
         </td>
         <td>${esc(mapLabel(S.maps.tutores, row.tutor))}</td>
