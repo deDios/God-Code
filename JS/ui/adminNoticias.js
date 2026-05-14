@@ -369,9 +369,11 @@
             <img data-news-img="${esc(row.id)}" alt="${esc(row.titulo || "Noticia")}" src="${noImageSvgDataURI()}">
           </div>
         </td>
-        <td><strong>${esc(row.titulo || "Sin título")}</strong></td>
+        <td title="${esc(row.titulo || "")}">
+         <strong>${esc(excerpt(row.titulo || "Sin título", 50))}</strong>
+        </td>
         <td class="admin-table__desc" title="${esc(row.desc_uno || "")}">
-          ${esc(excerpt(row.desc_uno, 80))}
+          ${esc(excerpt(row.desc_uno, 50))}
         </td>
         <td>${esc(row.fecha_creacion || "—")}</td>
         <td>${statusBadge(row.estatus)}</td>
