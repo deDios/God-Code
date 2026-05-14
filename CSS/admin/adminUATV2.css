@@ -1317,3 +1317,40 @@ main.home-samapa.admin-dashboard {
     margin-left: auto;
   }
 }
+
+/* =========================================================
+   FIX MINI DRAWER CURSOS LIGADOS - TEXTOS MUY LARGOS
+   ========================================================= */
+
+.home-samapa.admin-dashboard .admin-drawer--mini {
+  max-width: min(460px, 90vw);
+  overflow-x: hidden;
+}
+
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-drawer__head {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-drawer__head > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-drawer__title,
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-drawer__subtitle,
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-readonly {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.home-samapa.admin-dashboard .admin-drawer--mini .admin-readonly {
+  overflow-x: hidden;
+}
+
+.home-samapa.admin-dashboard .admin-course-mini {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
