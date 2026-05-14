@@ -415,7 +415,7 @@
         </td>
         <td>
           <strong title="${esc(row.nombre || "")}">
-            ${esc(excerpt(row.nombre || "Sin nombre", 55))}
+            ${esc(excerpt(row.nombre || "Sin nombre", 40))}
           </strong>
           <div class="admin-table-muted">${esc(excerpt(row.descripcion_breve || "", 50))}</div>
         </td>
