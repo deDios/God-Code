@@ -290,6 +290,12 @@ main.home-samapa.admin-dashboard {
   transform: translateY(1px);
 }
 
+.home-samapa.admin-dashboard .admin-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
+
 .home-samapa.admin-dashboard .hs-btn-new,
 .home-samapa.admin-dashboard .admin-btn--primary {
   background: var(--admin-primary);
@@ -1353,4 +1359,34 @@ main.home-samapa.admin-dashboard {
   min-width: 0;
   max-width: 100%;
   overflow-x: hidden;
+}
+
+.home-samapa.admin-dashboard .admin-form-help {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.home-samapa.admin-dashboard .admin-required {
+  color: #dc2626;
+}
+
+.home-samapa.admin-dashboard .admin-optional {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.home-samapa.admin-dashboard .admin-field input.is-invalid,
+.home-samapa.admin-dashboard .admin-field textarea.is-invalid,
+.home-samapa.admin-dashboard .admin-field select.is-invalid {
+  border-color: #dc2626;
+  background: #fff7f7;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.home-samapa.admin-dashboard .admin-field-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 600;
 }

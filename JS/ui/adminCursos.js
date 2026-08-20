@@ -27,6 +27,41 @@
     cf_competencias: 250,
   };
 
+  const REQUIRED_COURSE_FIELDS = [
+    ["cf_nombre", "Nombre"],
+    ["cf_desc_breve", "Descripción breve"],
+    ["cf_desc_media", "Descripción media"],
+    ["cf_desc_curso", "Descripción del curso"],
+    ["cf_dirigido", "Dirigido a"],
+    ["cf_competencias", "Competencias"],
+    ["cf_tutor", "Tutor"],
+    ["cf_categoria", "Categoría"],
+    ["cf_prioridad", "Prioridad"],
+    ["cf_calendario", "Calendario"],
+    ["cf_tipo_eval", "Tipo de evaluación"],
+    ["cf_actividades", "Actividades"],
+    ["cf_horas", "Horas"],
+    ["cf_fecha", "Fecha de inicio"],
+  ];
+
+  const API_FIELD_TO_FORM_ID = {
+    nombre: "cf_nombre",
+    descripcion_breve: "cf_desc_breve",
+    descripcion_media: "cf_desc_media",
+    descripcion_curso: "cf_desc_curso",
+    dirigido: "cf_dirigido",
+    competencias: "cf_competencias",
+    tutor: "cf_tutor",
+    categoria: "cf_categoria",
+    prioridad: "cf_prioridad",
+    calendario: "cf_calendario",
+    tipo_evaluacion: "cf_tipo_eval",
+    actividades: "cf_actividades",
+    horas: "cf_horas",
+    precio: "cf_precio",
+    fecha_inicio: "cf_fecha",
+  };
+
   const S = {
     data: [],
     page: 1,
@@ -102,15 +137,22 @@
 
     const text = await res.text().catch(() => "");
 
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${text}`);
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(
+        res.ok
+          ? "El servidor devolvió una respuesta inválida."
+          : `Error HTTP ${res.status}.`
+      );
     }
 
-    try {
-      return JSON.parse(text);
-    } catch {
-      return { _raw: text };
+    if (!res.ok || data?.error) {
+      throw new Error(data?.error || `Error HTTP ${res.status}.`);
     }
+
+    return data;
   }
 
   function excerpt(value, max = 50) {
@@ -482,6 +524,7 @@
           <div>
             <h2 class="admin-drawer__title" id="admin-curso-drawer-title">Nuevo curso</h2>
             <p class="admin-drawer__subtitle">Completa la información del curso.</p>
+            <p class="admin-form-help"><span aria-hidden="true">*</span> Campos obligatorios</p>
           </div>
 
           <button class="admin-drawer__close" type="button" id="btn-admin-curso-close" aria-label="Cerrar">
@@ -492,84 +535,84 @@
         <div class="admin-drawer__body">
           <div class="admin-news-form">
             <div class="admin-field">
-              <label for="cf_nombre">Nombre</label>
-              <input id="cf_nombre" type="text" maxlength="${FIELD_LIMITS.cf_nombre}">
+              <label for="cf_nombre">Nombre <span class="admin-required" aria-hidden="true">*</span></label>
+              <input id="cf_nombre" type="text" maxlength="${FIELD_LIMITS.cf_nombre}" required>
               ${charCounter("cf_nombre")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_desc_breve">Descripción breve</label>
-              <textarea id="cf_desc_breve" maxlength="${FIELD_LIMITS.cf_desc_breve}"></textarea>
+              <label for="cf_desc_breve">Descripción breve <span class="admin-required" aria-hidden="true">*</span></label>
+              <textarea id="cf_desc_breve" maxlength="${FIELD_LIMITS.cf_desc_breve}" required></textarea>
               ${charCounter("cf_desc_breve")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_desc_media">Descripción media</label>
-              <textarea id="cf_desc_media" maxlength="${FIELD_LIMITS.cf_desc_media}"></textarea>
+              <label for="cf_desc_media">Descripción media <span class="admin-required" aria-hidden="true">*</span></label>
+              <textarea id="cf_desc_media" maxlength="${FIELD_LIMITS.cf_desc_media}" required></textarea>
               ${charCounter("cf_desc_media")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_desc_curso">Descripción del curso</label>
-              <textarea id="cf_desc_curso" maxlength="${FIELD_LIMITS.cf_desc_curso}"></textarea>
+              <label for="cf_desc_curso">Descripción del curso <span class="admin-required" aria-hidden="true">*</span></label>
+              <textarea id="cf_desc_curso" maxlength="${FIELD_LIMITS.cf_desc_curso}" required></textarea>
               ${charCounter("cf_desc_curso")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_dirigido">Dirigido a</label>
-              <textarea id="cf_dirigido" maxlength="${FIELD_LIMITS.cf_dirigido}"></textarea>
+              <label for="cf_dirigido">Dirigido a <span class="admin-required" aria-hidden="true">*</span></label>
+              <textarea id="cf_dirigido" maxlength="${FIELD_LIMITS.cf_dirigido}" required></textarea>
               ${charCounter("cf_dirigido")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_competencias">Competencias</label>
-              <textarea id="cf_competencias" maxlength="${FIELD_LIMITS.cf_competencias}"></textarea>
+              <label for="cf_competencias">Competencias <span class="admin-required" aria-hidden="true">*</span></label>
+              <textarea id="cf_competencias" maxlength="${FIELD_LIMITS.cf_competencias}" required></textarea>
               ${charCounter("cf_competencias")}
             </div>
 
             <div class="admin-field">
-              <label for="cf_tutor">Tutor</label>
-              <select id="cf_tutor"></select>
+              <label for="cf_tutor">Tutor <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_tutor" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_categoria">Categoría</label>
-              <select id="cf_categoria"></select>
+              <label for="cf_categoria">Categoría <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_categoria" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_prioridad">Prioridad</label>
-              <select id="cf_prioridad"></select>
+              <label for="cf_prioridad">Prioridad <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_prioridad" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_calendario">Calendario</label>
-              <select id="cf_calendario"></select>
+              <label for="cf_calendario">Calendario <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_calendario" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_tipo_eval">Tipo de evaluación</label>
-              <select id="cf_tipo_eval"></select>
+              <label for="cf_tipo_eval">Tipo de evaluación <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_tipo_eval" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_actividades">Actividades</label>
-              <select id="cf_actividades"></select>
+              <label for="cf_actividades">Actividades <span class="admin-required" aria-hidden="true">*</span></label>
+              <select id="cf_actividades" required></select>
             </div>
 
             <div class="admin-field">
-              <label for="cf_horas">Horas</label>
-              <input id="cf_horas" type="number" min="0">
+              <label for="cf_horas">Horas <span class="admin-required" aria-hidden="true">*</span></label>
+              <input id="cf_horas" type="number" min="0" required>
             </div>
 
             <div class="admin-field">
-              <label for="cf_precio">Precio</label>
+              <label for="cf_precio">Precio <span class="admin-optional">(opcional; vacío = gratuito)</span></label>
               <input id="cf_precio" type="number" min="0" step="0.01">
             </div>
 
             <div class="admin-field">
-              <label for="cf_fecha">Fecha de inicio</label>
-              <input id="cf_fecha" type="date">
+              <label for="cf_fecha">Fecha de inicio <span class="admin-required" aria-hidden="true">*</span></label>
+              <input id="cf_fecha" type="date" required>
             </div>
 
             <div class="admin-field">
@@ -590,7 +633,7 @@
             </label>
 
             <div class="admin-news-preview">
-              <p class="admin-module__subtitle">Portada</p>
+              <p class="admin-module__subtitle">Portada <span class="admin-optional">(opcional)</span></p>
               <img id="admin-course-preview-img" alt="Portada del curso" src="${noImageSvgDataURI()}">
               <button 
                 class="admin-btn admin-btn--ghost" 
@@ -681,6 +724,69 @@
     return value === "" ? null : Number(value);
   }
 
+  function clearFieldError(field) {
+    if (!field) return;
+    field.classList.remove("is-invalid");
+    field.removeAttribute("aria-invalid");
+    field.closest(".admin-field")?.querySelector(".admin-field-error")?.remove();
+  }
+
+  function markFieldError(field, message) {
+    if (!field) return;
+    clearFieldError(field);
+    field.classList.add("is-invalid");
+    field.setAttribute("aria-invalid", "true");
+
+    const error = document.createElement("small");
+    error.className = "admin-field-error";
+    error.textContent = message;
+    field.closest(".admin-field")?.appendChild(error);
+  }
+
+  function validateCourseForm() {
+    const missing = [];
+
+    REQUIRED_COURSE_FIELDS.forEach(([id, label]) => {
+      const field = qs(`#${id}`);
+      clearFieldError(field);
+
+      if (!field || String(field.value ?? "").trim() === "") {
+        missing.push({ field, label });
+        markFieldError(field, `Falta completar: ${label}.`);
+      }
+    });
+
+    const price = qs("#cf_precio");
+    clearFieldError(price);
+    if (price?.value !== "" && Number(price.value) < 0) {
+      missing.push({ field: price, label: "Precio" });
+      markFieldError(price, "El precio no puede ser negativo.");
+    }
+
+    const hours = qs("#cf_horas");
+    if (hours?.value !== "" && Number(hours.value) <= 0) {
+      missing.push({ field: hours, label: "Horas" });
+      markFieldError(hours, "Las horas deben ser mayores que cero.");
+    }
+
+    if (missing.length) {
+      missing[0].field?.focus();
+      missing[0].field?.scrollIntoView({ behavior: "smooth", block: "center" });
+      toast(`Revisa ${missing.length} ${missing.length === 1 ? "campo marcado" : "campos marcados"}.`, "error", 5000);
+      return false;
+    }
+
+    return true;
+  }
+
+  function setSaveBusy(isBusy) {
+    const button = qs("#btn-admin-curso-save");
+    if (!button) return;
+    button.disabled = isBusy;
+    button.setAttribute("aria-busy", String(isBusy));
+    button.textContent = isBusy ? "Guardando…" : "Guardar curso";
+  }
+
   function charCounter(id) {
     const max = FIELD_LIMITS[id];
 
@@ -738,6 +844,8 @@
     const title = qs("#admin-curso-drawer-title");
 
     if (!drawer || !overlay) return;
+
+    drawer.querySelectorAll(".is-invalid").forEach(clearFieldError);
 
     if (title) {
       title.textContent = row ? "Editar curso" : "Nuevo curso";
@@ -806,6 +914,8 @@
   async function saveCurso() {
     const id = S.current?.id ?? null;
 
+    if (!validateCourseForm()) return;
+
     const body = {
       id,
       nombre: getValue("cf_nombre"),
@@ -830,13 +940,24 @@
     if (
       !body.nombre ||
       !body.descripcion_breve ||
+      !body.descripcion_media ||
       !body.descripcion_curso ||
       !body.dirigido ||
-      !body.competencias
+      !body.competencias ||
+      !body.tutor ||
+      !body.categoria ||
+      !body.prioridad ||
+      !body.calendario ||
+      !body.tipo_evaluacion ||
+      !body.actividades ||
+      body.horas === null ||
+      !body.fecha_inicio
     ) {
       toast("Completa los campos obligatorios.", "error");
       return;
     }
+
+    setSaveBusy(true);
 
     try {
       if (id) {
@@ -857,8 +978,7 @@
         const newId = getCreatedId(created);
 
         if (!newId) {
-          console.warn(TAG, "No se pudo detectar el ID creado:", created);
-          toast("Curso creado, pero no se pudo subir la imagen porque no llegó el ID.", "warning");
+          throw new Error("El servidor no confirmó el ID del curso creado.");
         } else if (window.AdminMedia && S.tempImage instanceof File) {
           try {
             await window.AdminMedia.uploadAdminMedia({
@@ -883,7 +1003,16 @@
       closeEditor();
     } catch (error) {
       console.error(TAG, error);
-      toast("No se pudo guardar el curso.", "error");
+      const apiField = String(error.message || "").match(/Falta el campo requerido:\s*([a-z_]+)/i)?.[1];
+      const formField = apiField ? qs(`#${API_FIELD_TO_FORM_ID[apiField]}`) : null;
+      if (formField) {
+        markFieldError(formField, error.message);
+        formField.focus();
+        formField.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      toast(error.message || "No se pudo guardar el curso.", "error", 5000);
+    } finally {
+      setSaveBusy(false);
     }
   }
 
@@ -925,6 +1054,8 @@
     qs("#btn-admin-curso-cancel")?.addEventListener("click", closeEditor);
     qs("#admin-curso-overlay")?.addEventListener("click", closeEditor);
     qs("#btn-admin-curso-save")?.addEventListener("click", saveCurso);
+    qs("#admin-curso-drawer")?.addEventListener("input", (event) => clearFieldError(event.target));
+    qs("#admin-curso-drawer")?.addEventListener("change", (event) => clearFieldError(event.target));
     bindCharCounters();
 
     const search = qs("#admin-cursos-search");
