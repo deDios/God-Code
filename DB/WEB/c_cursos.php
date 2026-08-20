@@ -51,7 +51,7 @@ $query = "SELECT
             prioridad
           FROM god_code.GC_Cursos
           WHERE estatus = $estatus
-          ORDER BY nombre ASC";
+          ORDER BY fecha_creacion DESC, id DESC";
 
 $result = mysqli_query($con, $query);
 

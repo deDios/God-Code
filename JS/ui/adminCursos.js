@@ -94,7 +94,8 @@
     );
   }
 
-  const ORDER_CURSOS = [1, 4, 3, 2, 5, 0];
+  // Prioridad operativa: visibles/activos primero; archivados al final.
+  const ORDER_CURSOS = [1, 4, 2, 3, 5, 0];
 
   const STATUS_LABEL = {
     1: "Activo",
@@ -351,7 +352,14 @@
 
       if (ra !== rb) return ra - rb;
 
-      return String(a.nombre || "").localeCompare(String(b.nombre || ""));
+      const dateA = Date.parse(String(a.fecha_creacion || "").replace(" ", "T"));
+      const dateB = Date.parse(String(b.fecha_creacion || "").replace(" ", "T"));
+
+      if (Number.isFinite(dateA) && Number.isFinite(dateB) && dateA !== dateB) {
+        return dateB - dateA;
+      }
+
+      return Number(b.id || 0) - Number(a.id || 0);
     });
   }
 
